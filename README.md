@@ -1,9 +1,12 @@
-Aerial is a virtual browser  for visually creating web applications.
-
+Aerial is a virtual browser for visually creating web applications. 
 
 #### Use cases
 
+Aerial is currently powering [Tandem](http://tandemcode.com/), but it can be used in many other use cases:
 
+- Running your application in a headless environment such as NodeJS with access to real browser rendering engines via [Browsertap](http://browsertap.com/)
+- Visual QA testing
+- Your own visual editor
 
 #### Example
 
@@ -24,4 +27,5 @@ browser.open({ url: 'http://google.com' });
 
 #### Features
 
-
+- Ability to target any browser rendering engine
+- DOM diffing so that client-side editing doesn't get interrupted
