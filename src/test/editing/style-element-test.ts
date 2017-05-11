@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { FileEditorProvider } from "@tandem/sandbox";
-import { SyntheticCSSStyleRule } from "@tandem/synthetic-browser";
-import { loadTestBrowser, timeout } from "@tandem/synthetic-browser/test";
+import { SyntheticCSSStyleRule } from "../..";
+import { loadTestBrowser, timeout } from "../../test";
 import { PrivateBusProvider, LogLevel } from "@tandem/common";
 
 // TODO - media queries, keyframes 

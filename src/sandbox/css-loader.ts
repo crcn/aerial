@@ -13,7 +13,7 @@ import { CSS_MIME_TYPE, inject, Kernel, KernelProvider } from "@tandem/common";
 
 import {
   parseCSS,
-} from "@tandem/synthetic-browser";
+} from "..";
 
 const hasProtocol = (value) => /^\w+:\/\//.test(value);
 

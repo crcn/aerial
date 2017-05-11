@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadTestBrowser } from "@tandem/synthetic-browser/test";
+import { loadTestBrowser } from "../test";
 
 describe(__filename + "#", () => {
   it("resolves urls from the css source file", async () => {

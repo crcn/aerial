@@ -1,7 +1,7 @@
 import { DOMNodeType } from "./node-types";
 import { SyntheticDOMNode, SyntheticDOMNodeEdit, SyntheticDOMNodeEditor } from "./node";
 import { SyntheticDOMText } from "./text-node";
-import { DOMNodeEvent } from "@tandem/synthetic-browser/messages";
+import { DOMNodeEvent } from "../../messages";
 import nwmatcher =  require("nwmatcher");
 import {
   Mutation,

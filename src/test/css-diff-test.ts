@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { generateRandomStyleSheet } from "@tandem/synthetic-browser/test/helpers";
+import { generateRandomStyleSheet } from "../test/helpers";
 import { flattenTree } from "@tandem/common";
 import chalk =  require("chalk");
 import { 
@@ -8,10 +8,10 @@ import { 
   SyntheticCSSStyleSheet,
   SyntheticCSSObjectEdit,
   SyntheticCSSGroupAtRuleEdit,
-  SyntheticCSSElementStyleRuleEdit,
   CSSGroupingRuleMutationTypes,
+  SyntheticCSSElementStyleRuleEdit,
   SyntheticCSSElementStyleRuleMutationTypes,
-} from "@tandem/synthetic-browser";
+} from "..";
 import { SyntheticObjectChangeTypes } from "@tandem/sandbox";
 
 

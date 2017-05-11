@@ -1,6 +1,6 @@
 import { IEqualable } from "@tandem/common";
 import { SyntheticDOMElement } from "./element";
-import { ISyntheticDocumentRenderer } from "@tandem/synthetic-browser/renderers";
+import { ISyntheticDocumentRenderer } from "../../renderers";
 import { bindable, BoundingRect, IPoint, waitForPropertyChange } from "@tandem/common";
 
 // TODO - possibly move this over to @tandem/common/display or similar

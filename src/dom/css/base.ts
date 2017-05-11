@@ -8,7 +8,7 @@ import {
   sourcePositionEquals
 } from "@tandem/common";
 import { SyntheticCSSStyleSheet } from "./style-sheet";
-import { SyntheticDOMNode } from "@tandem/synthetic-browser/dom";
+import { SyntheticDOMNode } from "../markup";
 import {
   IEditable,
   IEditor,

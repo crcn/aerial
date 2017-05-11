@@ -1,4 +1,4 @@
-import { evaluateCSS, parseCSS } from "@tandem/synthetic-browser/dom/css";
+import { evaluateCSS, parseCSS } from "./index";
 import { SyntheticCSSElementStyleRule } from "./style-rule";
 import { SyntheticCSSGroupingRule, SyntheticCSSGroupingRuleEditor, SyntheticCSSGroupingRuleEdit } from "./grouping";
 import { SyntheticCSSStyle } from "./style";

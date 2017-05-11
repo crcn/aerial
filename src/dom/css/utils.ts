@@ -1,7 +1,7 @@
 import { camelCase, values, uniq } from "lodash";
-import { DOMNodeType } from "@tandem/synthetic-browser/dom/markup/node-types";
+import { DOMNodeType } from "../../dom/markup/node-types";
 import { SyntheticCSSObject } from "./base";
-import { SyntheticDOMElement, SyntheticHTMLElement } from "@tandem/synthetic-browser/dom";
+import { SyntheticDOMElement, SyntheticHTMLElement } from "..";
 import { diffArray, ArrayMutation } from "@tandem/common";
 import { SyntheticCSSFontFace } from "./font-face";
 import { SyntheticCSSMediaRule } from "./media-rule";

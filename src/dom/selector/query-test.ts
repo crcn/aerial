@@ -4,7 +4,7 @@ import {
   SyntheticWindow,
   SyntheticDocument,
   SyntheticHTMLElement,
-} from "@tandem/synthetic-browser";
+} from "..";
 import parse5 = require("parse5");
 
 /*

@@ -1,7 +1,7 @@
 import sift = require("sift");
 import { SyntheticCSSObject } from "./base";
 import { kebabCase, camelCase } from "lodash";
-import { SyntheticDOMNode } from "@tandem/synthetic-browser/dom";
+import { SyntheticDOMNode } from "..";
 import { CallbackDispatcher } from "@tandem/mesh";
 import { SyntheticCSSElementStyleRuleMutationTypes } from "./style-rule";
 import { ISerializable, serializable, diffArray, ITreeWalker, PropertyMutation, serialize, deserialize } from "@tandem/common";

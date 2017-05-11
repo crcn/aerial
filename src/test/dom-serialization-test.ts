@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { serialize, deserialize } from "@tandem/common";
-import { generateRandomSyntheticHTMLElement } from "@tandem/synthetic-browser/test/helpers";
-import { SyntheticWindow } from "@tandem/synthetic-browser";
+import { generateRandomSyntheticHTMLElement } from "../test/helpers";
+import { SyntheticWindow } from "..";
 
 describe(__filename + "#", () => {
   // fuzzy

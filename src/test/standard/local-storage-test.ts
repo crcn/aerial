@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { LogLevel } from "@tandem/common";
-import { SyntheticBrowser, SyntheticHTMLElement } from "@tandem/synthetic-browser";
+import { SyntheticBrowser, SyntheticHTMLElement } from "../..";
 import { createTestMasterApplication } from "@tandem/editor/test";
-import { loadTestBrowser } from "@tandem/synthetic-browser/test";
+import { loadTestBrowser } from "../../test";
 
 // poorly organized DOM spec tests. TODO - move these into sep fiels
 describe(__filename + "#", () => {

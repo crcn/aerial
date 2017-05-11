@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { SyntheticCSSStyleSheet, SyntheticCSSElementStyleRule } from "@tandem/synthetic-browser";
+import { SyntheticCSSStyleSheet, SyntheticCSSElementStyleRule } from "./";
 
 describe(__filename + "#", () => {
   it("can be created", () => {

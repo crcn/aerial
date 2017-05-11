@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { Mutation, serialize, deserialize } from "@tandem/common";
 import { SyntheticObjectChangeWatcher, SyntheticObjectTreeEditor, URIProtocolProvider } from "@tandem/sandbox";
-import { loadTestBrowser, timeout } from "@tandem/synthetic-browser/test";
-import { SyntheticCSSElementStyleRule, SyntheticDocument } from "@tandem/synthetic-browser";
+import { loadTestBrowser, timeout } from "../test";
+import { SyntheticCSSElementStyleRule, SyntheticDocument } from "..";
 
 
 describe(__filename + "#", () => {

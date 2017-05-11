@@ -1,11 +1,11 @@
 import fs =  require("fs");
 import path =  require("path");
 import { expect } from "chai";
-import { generateRandomStyleSheet } from "@tandem/synthetic-browser/test/helpers";
+import { generateRandomStyleSheet } from "../test/helpers";
 import { FileEditorProvider, URIProtocolProvider } from "@tandem/sandbox";
 import { waitForPropertyChange, Application, LogLevel } from "@tandem/common";
 import { createTestMasterApplication, createRandomFileName } from "@tandem/editor/test";
-import { SyntheticCSSStyleSheet, SyntheticBrowser, parseCSS, evaluateCSS } from "@tandem/synthetic-browser";
+import { SyntheticCSSStyleSheet, SyntheticBrowser, parseCSS, evaluateCSS } from "..";
 
 export const cssEditorTestCases = [
   [`a { color: red; }`, `a{ color: blue; }`],

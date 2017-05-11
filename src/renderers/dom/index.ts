@@ -10,7 +10,7 @@ import {
   HTML_VOID_ELEMENTS,
   SyntheticDOMElementMutationTypes,
   SyntheticDOMValueNodeMutationTypes
-} from "@tandem/synthetic-browser/dom";
+} from "../../dom";
 
 import {
   bindable,

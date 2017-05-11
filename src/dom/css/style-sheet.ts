@@ -1,7 +1,7 @@
 import { atob } from "abab";
 import { RawSourceMap } from "source-map";
 import { SyntheticCSSFontFace } from "./font-face";
-import { evaluateCSS, parseCSS, evaluateCSSSource } from "@tandem/synthetic-browser/dom/css";
+import { evaluateCSS, parseCSS, evaluateCSSSource } from "../..";
 import { SyntheticCSSMediaRule } from "./media-rule";
 import { SyntheticCSSKeyframesRule } from "./keyframes-rule";
 import { SyntheticObjectChangeTypes, BaseEditor } from "@tandem/sandbox";

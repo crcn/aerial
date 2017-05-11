@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { SyntheticBrowser, SyntheticHTMLElement } from "@tandem/synthetic-browser";
+import { SyntheticBrowser, SyntheticHTMLElement } from "..";
 import { URIProtocolProvider, FileEditorProvider } from "@tandem/sandbox";
-import { generateRandomSyntheticHTMLElementSource } from "@tandem/synthetic-browser/test";
+import { generateRandomSyntheticHTMLElementSource } from "../test";
 import { Application, waitForPropertyChange, LogLevel } from "@tandem/common";
 import { createTestMasterApplication, createRandomFileName } from "@tandem/editor/test";
 

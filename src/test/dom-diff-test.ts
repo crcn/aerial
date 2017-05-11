@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { flattenTree } from "@tandem/common";
-import { generateRandomSyntheticHTMLElement } from "@tandem/synthetic-browser/test/helpers";
+import { generateRandomSyntheticHTMLElement } from "../test/helpers";
 import chalk =  require("chalk");
 import {
   evaluateMarkup,
@@ -16,7 +16,7 @@ import {
   SyntheticDOMElementEdit,
   SyntheticDocumentEdit,
   SyntheticDocument,
-} from "@tandem/synthetic-browser";
+} from "..";
 import { SyntheticObjectChangeTypes } from "@tandem/sandbox";
 
 describe(__filename + "#", () => {

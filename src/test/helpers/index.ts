@@ -15,7 +15,7 @@ import {
   SyntheticDOMElement,
   SyntheticDOMContainer,
   SyntheticCSSStyleSheet,
-} from "@tandem/synthetic-browser";
+} from "../..";
 
 export function createMockBrowser() {
   const deps = createSandboxProviders();

@@ -27,7 +27,7 @@ import {
   HTML_VOID_ELEMENTS,
   LoadableElementProvider,
   ElementTextContentMimeTypeProvider,
-} from "@tandem/synthetic-browser";
+} from "..";
 
 const hasProtocol = (value) => !!/\w+:\/\//.test(value);
 

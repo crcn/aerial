@@ -1,17 +1,17 @@
 import { CoreEvent, MutationEvent, TreeNodeMutationTypes, serializable } from "@tandem/common";
-import { ISyntheticBrowserOpenOptions } from "@tandem/synthetic-browser";
-import { SyntheticCSSStyle } from "@tandem/synthetic-browser/dom/css";
+import { ISyntheticBrowserOpenOptions } from "./index";
+import { SyntheticCSSStyle } from "./dom/css";
 import {
-  isDOMNodeMutation,
   isCSSMutation,
+  isDOMNodeMutation,
   SyntheticDOMElement,
   CSSGroupingRuleMutationTypes,
   SyntheticDocumentMutationTypes,
   SyntheticDOMElementMutationTypes,
-  SyntheticCSSElementStyleRuleMutationTypes,
   SyntheticDOMContainerMutationTypes,
   SyntheticDOMValueNodeMutationTypes,
-} from "@tandem/synthetic-browser/dom";
+  SyntheticCSSElementStyleRuleMutationTypes,
+} from "./dom";
 
 export class DOMNodeEvent extends CoreEvent {
   static readonly DOM_NODE_LOADED = "domNodeLoaded";
