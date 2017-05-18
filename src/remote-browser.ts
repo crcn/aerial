@@ -92,7 +92,7 @@ export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
   private _bus: IStreamableDispatcher<any>;
   private _documentEditor: SyntheticObjectTreeEditor;
   private _remoteStreamReader: ReadableStreamDefaultReader<any>;
-  private _writer: WritableStreamDefaultWriter;
+  private _writer: any;
 
   @bindable(true)
   public status: Status = new Status(Status.IDLE);
@@ -289,6 +289,7 @@ export class RemoteBrowserService extends BaseApplicationService {
       const browserObserver = new CallbackDispatcher((event: CoreEvent) => {
         if (event.type === LogEvent.LOG) {
           const logEvent = event as LogEvent;
+          console.log("EMITTING LOG", logEvent.text);
           writer.write({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.VM_LOG, [[logEvent.level, logEvent.text]])) });
         }
       });

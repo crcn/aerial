@@ -278,6 +278,7 @@ var RemoteBrowserService = (function (_super) {
             var browserObserver = new mesh_1.CallbackDispatcher(function (event) {
                 if (event.type === common_1.LogEvent.LOG) {
                     var logEvent = event;
+                    console.log("EMITTING LOG", logEvent.text);
                     writer.write({ payload: common_1.serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.VM_LOG, [[logEvent.level, logEvent.text]])) });
                 }
             });

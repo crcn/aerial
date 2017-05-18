@@ -1,7 +1,7 @@
 import { Dependency } from "@tandem/sandbox";
 import { kebabCase } from "lodash";
 import { CallbackDispatcher } from "@tandem/mesh";
-import { SyntheticDOMElement, getSelectorTester } from "../..";
+import { SyntheticDOMElement, getSelectorTester } from "..";
 import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor } from "@tandem/sandbox";
 import { ISerializedSyntheticCSSStyle, SyntheticCSSStyle, isValidCSSDeclarationProperty } from "./style";
 import { SyntheticCSSObject, SyntheticCSSObjectSerializer, SyntheticCSSObjectEdit, SyntheticCSSObjectEditor } from "./base";

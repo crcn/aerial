@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var __1 = require("../..");
+var css_1 = require("../../dom/css");
 var grouping_1 = require("./grouping");
 var base_1 = require("./base");
 var common_1 = require("@tandem/common");
@@ -70,7 +70,7 @@ var SyntheticCSSStyleSheet = SyntheticCSSStyleSheet_1 = (function (_super) {
             // let map: RawSourceMap = parseSourceMaps(value);
             this
                 .createEdit()
-                .fromDiff(__1.evaluateCSSSource(value))
+                .fromDiff(css_1.evaluateCSSSource(value))
                 .applyMutationsTo(this);
         },
         enumerable: true,

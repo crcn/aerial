@@ -1,125 +1,85 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var _this = this;
-Object.defineProperty(exports, "__esModule", { value: true });
-var chai_1 = require("chai");
-var sandbox_1 = require("@tandem/sandbox");
-var test_1 = require("../../test");
-// TODO - media queries, keyframes 
-describe(__filename + "#", function () {
-    xit("Can returns the proper line & column information for style sheets in style elements", function () { return __awaiter(_this, void 0, void 0, function () {
-        var _a, kernel, window, styleSheet;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, test_1.loadTestBrowser({
-                        "index.html": "\n        <style>\n          .container {\n            color: red;\n          }\n        </style>\n      "
-                    }, "index.html")];
-                case 1:
-                    _a = _b.sent(), kernel = _a.kernel, window = _a.window;
-                    styleSheet = window.document.styleSheets[0];
-                    chai_1.expect(styleSheet.$source.start.line).to.equal(3);
-                    chai_1.expect(styleSheet.$source.start.column).to.equal(11);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it("Can edit a simple style rule", function () { return __awaiter(_this, void 0, void 0, function () {
-        var browser, styleSheet, rule, edit;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, test_1.loadTestBrowser({
-                        "index.html": "\n        <style>\n          .container {\n            color: red;\n          }\n        </style>\n      "
-                    }, "index.html")];
-                case 1:
-                    browser = _a.sent();
-                    styleSheet = browser.window.document.styleSheets[0];
-                    rule = styleSheet.rules[0];
-                    edit = rule.createEdit();
-                    edit.setDeclaration("color", "blue");
-                    return [4 /*yield*/, sandbox_1.FileEditorProvider.getInstance(browser.kernel).applyMutations(edit.mutations)];
-                case 2:
-                    _a.sent();
-                    return [4 /*yield*/, test_1.timeout()];
-                case 3:
-                    _a.sent();
-                    chai_1.expect(browser.window.document.styleSheets[0].cssText).to.equal(".container {\n\tcolor: blue;\n}\n");
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it("Maps urls to their full path", function () { return __awaiter(_this, void 0, void 0, function () {
-        var browser, styleSheet, rule;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, test_1.loadTestBrowser({
-                        "index.html": "\n        <style>\n          .container {\n            color: red;\n            background: url(test.png);\n          }\n        </style>\n      ",
-                        "test.png": "something"
-                    }, "index.html")];
-                case 1:
-                    browser = _a.sent();
-                    styleSheet = browser.window.document.styleSheets[0];
-                    rule = styleSheet.rules[0];
-                    chai_1.expect(rule.style.background).to.equal("url(\"file://test.png\")");
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    [
-        [
-            "@media screen {\n        .container {\n          color: red\n        }\n      }"
-        ],
-        [
-            "@keyframes test {\n        0%, 2% {\n          color: red\n        }\n      }"
-        ]
-    ].forEach(function (_a) {
-        var input = _a[0], output = _a[1];
-        it("Can parse " + input, function () { return __awaiter(_this, void 0, void 0, function () {
-            var browser;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, test_1.loadTestBrowser({
-                            "index.html": "\n          <style>\n            " + input + "\n          </style>\n        "
-                        }, "index.html")];
-                    case 1:
-                        browser = _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-});
+// import { expect } from "chai";
+// import { FileEditorProvider } from "@tandem/sandbox";
+// import { SyntheticCSSStyleRule } from "@tandem/synthetic-browser";
+// import { loadTestBrowser, timeout } from "@tandem/synthetic-browser/test";
+// import { PrivateBusProvider, LogLevel } from "@tandem/common";
+// // TODO - media queries, keyframes 
+// describe(__filename + "#", () => {
+//   xit("Can returns the proper line & column information for style sheets in style elements", async () => {
+//     const { kernel, window } = await loadTestBrowser({
+//       "index.html": `
+//         <style>
+//           .container {
+//             color: red;
+//           }
+//         </style>
+//       `
+//     }, "index.html");
+//     const styleSheet = window.document.styleSheets[0];
+//     expect(styleSheet.$source.start.line).to.equal(3);
+//     expect(styleSheet.$source.start.column).to.equal(11);
+//   });
+//   it("Can edit a simple style rule", async () => {
+//     const browser = await loadTestBrowser({
+//       "index.html": `
+//         <style>
+//           .container {
+//             color: red;
+//           }
+//         </style>
+//       `
+//     }, "index.html");
+//     const styleSheet = browser.window.document.styleSheets[0];
+//     const rule = styleSheet.rules[0] as SyntheticCSSStyleRule;
+//     const edit = rule.createEdit();
+//     edit.setDeclaration("color", "blue");
+//     await FileEditorProvider.getInstance(browser.kernel).applyMutations(edit.mutations);
+//     await timeout();
+//     expect(browser.window.document.styleSheets[0].cssText).to.equal(`.container {\n\tcolor: blue;\n}\n`);
+//   });
+//   it("Maps urls to their full path", async () => {
+//     const browser = await loadTestBrowser({
+//       "index.html": `
+//         <style>
+//           .container {
+//             color: red;
+//             background: url(test.png);
+//           }
+//         </style>
+//       `,
+//       "test.png": `something`
+//     }, "index.html");
+//     const styleSheet = browser.window.document.styleSheets[0];
+//     const rule = styleSheet.rules[0] as SyntheticCSSStyleRule;
+//     expect(rule.style.background).to.equal(`url("file://test.png")`);
+//   });
+//   [
+//     [
+//       `@media screen {
+//         .container {
+//           color: red
+//         }
+//       }`
+//     ],
+//     [
+//       `@keyframes test {
+//         0%, 2% {
+//           color: red
+//         }
+//       }`
+//     ]
+//   ].forEach(([input, output]) => {
+//     it(`Can parse ${input}`, async () => {
+//       // just this for now -- need to ensure that the style element parses css content properly
+//       // since it uses source maps
+//       const browser = await loadTestBrowser({
+//         "index.html": `
+//           <style>
+//             ${input}
+//           </style>
+//         `
+//       }, "index.html");
+//     });
+//   })
+// }); 
 //# sourceMappingURL=style-element-test.js.map

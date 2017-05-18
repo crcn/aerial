@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var node_types_1 = require("../../dom/markup/node-types");
+var dom_1 = require("../../dom");
 var common_1 = require("@tandem/common");
 var grouping_1 = require("./grouping");
 var atrule_1 = require("./atrule");
@@ -42,7 +42,7 @@ function eachInheritedMatchingStyleRule(element, each, filter) {
         filter = function () { return true; };
     var visited = {};
     var run = function (current) {
-        if (current.nodeType !== node_types_1.DOMNodeType.ELEMENT)
+        if (current.nodeType !== dom_1.DOMNodeType.ELEMENT)
             return;
         if (current.style) {
             each(current, current);

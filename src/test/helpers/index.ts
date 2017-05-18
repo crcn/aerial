@@ -1,6 +1,6 @@
 import { Kernel, LogLevel } from "@tandem/common";
 import { sample, sampleSize, random } from "lodash";
-import { createTestMasterApplication } from "@tandem/editor/test";
+// import { createTestMasterApplication } from "@tandem/editor/test";
 import { createSandboxProviders, IFileResolver } from "@tandem/sandbox";
 import parse5 = require("parse5");
 import {
@@ -121,21 +121,21 @@ export const timeout = (ms = 10) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const loadTestBrowser = async (mockFiles: any, entryFilePath: string) => {
-  const app = createTestMasterApplication({
-    log: {
-      level: LogLevel.VERBOSE
-    },
-    sandboxOptions: {
-      mockFiles: mockFiles
-    }
-  });
+// export const loadTestBrowser = async (mockFiles: any, entryFilePath: string) => {
+//   const app = createTestMasterApplication({
+//     log: {
+//       level: LogLevel.VERBOSE
+//     },
+//     sandboxOptions: {
+//       mockFiles: mockFiles
+//     }
+//   });
 
-  const browser = new SyntheticBrowser(app.kernel);
+//   const browser = new SyntheticBrowser(app.kernel);
 
-  await browser.open({
-    uri: entryFilePath
-  });
+//   await browser.open({
+//     uri: entryFilePath
+//   });
 
-  return browser;
-}
+//   return browser;
+// }

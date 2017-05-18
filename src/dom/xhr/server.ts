@@ -12,7 +12,9 @@ export class XHRServer implements IStreamableDispatcher<HTTPRequest> {
   @inject(KernelProvider.ID)
   private _kernel: Kernel;
 
-  constructor(window: SyntheticWindow) {}
+  constructor(window: SyntheticWindow) {
+    
+  }
   
   dispatch(request: HTTPRequest) {
     if (request.type !== HTTPRequest.HTTP_REQUEST) return;

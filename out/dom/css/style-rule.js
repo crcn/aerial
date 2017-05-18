@@ -18,7 +18,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var lodash_1 = require("lodash");
 var mesh_1 = require("@tandem/mesh");
-var __1 = require("../..");
+var __1 = require("..");
 var sandbox_1 = require("@tandem/sandbox");
 var style_1 = require("./style");
 var base_1 = require("./base");

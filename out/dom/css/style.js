@@ -41,12 +41,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var sift = require("sift");
+var sift_1 = require("sift");
 var lodash_1 = require("lodash");
 var style_rule_1 = require("./style-rule");
 var common_1 = require("@tandem/common");
 var sandbox_1 = require("@tandem/sandbox");
-exports.isValidCSSDeclarationProperty = sift({ $and: [{ $ne: /^[\$_]/ }, { $ne: "uid" }, { $ne: /^\d+$/ }] });
+exports.isValidCSSDeclarationProperty = sift_1.default({ $and: [{ $ne: /^[\$_]/ }, { $ne: "uid" }, { $ne: /^\d+$/ }] });
 // https://www.w3.org/TR/CSS21/propidx.html
 exports.INHERITED_CSS_STYLE_PROPERTIES = [
     "azimuth",

@@ -72,6 +72,7 @@ export class SyntheticHTMLLinkElement extends SyntheticHTMLElement {
 
     this.stylesheet.$ownerNode = this;
     this.attachStylesheet();
+
   }
 
   private attachStylesheet() {

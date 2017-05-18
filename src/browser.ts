@@ -4,8 +4,8 @@ import path = require("path");
 import { IDispatcher } from "@tandem/mesh";
 import { SyntheticLocation } from "./location";
 import { SyntheticRendererEvent } from "./messages";
-import { ISyntheticDocumentRenderer, SyntheticDOMRenderer, NoopRenderer } from "./renderers";
 import { SyntheticDocument, SyntheticWindow, SyntheticDOMNode, SyntheticDOMElement } from "./dom";
+import { ISyntheticDocumentRenderer, SyntheticDOMRenderer, NoopRenderer } from "./renderers";
 import {
   inject,
   Logger,
@@ -18,7 +18,6 @@ import {
   CoreEvent,
   Observable,
   IInjectable,
-  IDisposable,
   IObservable,
   bindProperty,
   findTreeNode,
@@ -220,7 +219,6 @@ export class SyntheticBrowser extends BaseSyntheticBrowser {
   private _entry: Dependency;
   private _graph: DependencyGraph;
   private _script: string;
-  private _entryRef: IDisposable;
 
   $didInject() {
     super.$didInject();
@@ -239,10 +237,6 @@ export class SyntheticBrowser extends BaseSyntheticBrowser {
     // TODO - setup file protocol specific to this CWD
 
     this._script = injectScript;
-    if (this._entryRef) {
-      console.log("EREF");
-      this._entryRef.dispose();
-    }
     this.logger.info(`Opening ${uri} ...`);
     const timerLogger = this.logger.startTimer();
     const strategyOptions = Object.assign({}, dependencyGraphStrategyOptions || {}) as IDependencyGraphStrategyOptions;
@@ -250,9 +244,7 @@ export class SyntheticBrowser extends BaseSyntheticBrowser {
     const dirname = uriParts.pathname && path.dirname(uriParts.pathname) || ".";
     strategyOptions.rootDirectoryUri = strategyOptions.rootDirectoryUri || (uriParts.protocol || "file:") + "//" + (uriParts.host || (dirname === "." ? "/" : dirname));
     const graph = this._graph = DependencyGraphProvider.getInstance(strategyOptions, this._kernel);
-    console.log("RESOLVING", uri);
     this._entry = await graph.getDependency(await graph.resolve(uri));
-    this._entryRef = this._entry.referee.addReference(this);
     await this._sandbox.open(this._entry);
     timerLogger.stop(`Loaded ${uri}`);
   }

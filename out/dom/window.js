@@ -51,12 +51,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var memoize = require("memoizee");
-var nwmatcher = require("nwmatcher");
 var decorators_1 = require("@tandem/common/decorators");
 var abab_1 = require("abab");
 var constants_1 = require("./constants");
+var memoize = require("memoizee");
 var url_1 = require("./url");
+var nwmatcher = require("nwmatcher");
 var blob_1 = require("./blob");
 var history_1 = require("./history");
 var location_1 = require("../location");
@@ -66,8 +66,8 @@ var local_storage_1 = require("./local-storage");
 var timers_1 = require("./timers");
 var utils_1 = require("./utils");
 var markup_1 = require("./markup");
-var css_1 = require("./css");
 var xhr_1 = require("./xhr");
+var css_1 = require("./css");
 var common_1 = require("@tandem/common");
 var mesh_1 = require("@tandem/mesh");
 var events_1 = require("./events");
@@ -189,10 +189,7 @@ var SyntheticWindow = (function (_super) {
         // but doesn't work -- element instanceof HTMLElement 
         _this.HTMLElement = html_1.SyntheticHTMLElement;
         _this.Element = markup_1.SyntheticDOMElement;
-        var xhrServer = new xhr_1.XHRServer(_this);
-        var xhrRecorder = new xhr_1.XHRRecorder(xhrServer);
-        // make the http requests a
-        _this.$xhrRequests = xhrRecorder.requests;
+        var xhrServer = _this._server = new xhr_1.XHRServer(_this);
         _this.WebSocket = (function () {
             function WebSocket() {
             }
@@ -203,7 +200,7 @@ var SyntheticWindow = (function (_super) {
         _this.XMLHttpRequest = (function (_super) {
             __extends(class_1, _super);
             function class_1() {
-                return _super.call(this, xhrRecorder) || this;
+                return _super.call(this, xhrServer) || this;
             }
             return class_1;
         }(xhr_1.SyntheticXMLHttpRequest));

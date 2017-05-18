@@ -1,20 +1,21 @@
-import { Sandbox } from "@tandem/sandbox";
+import { CallbackDispatcher } from "@tandem/mesh";
+import { SyntheticWindow, SyntheticDOMImplementation } from "./window";
 import { ISyntheticBrowser } from "../browser";
 import { SyntheticLocation } from "../location";
-import { CallbackDispatcher } from "@tandem/mesh";
 import { SyntheticHTMLElement } from "./html";
 import { SyntheticCSSStyleSheet } from "./css";
+import { Sandbox } from "@tandem/sandbox";
+
 import { SyntheticHTMLCollection } from "./collections";
-import { SyntheticWindow, SyntheticDOMImplementation } from "./window";
 
 import {
   DOMNodeType,
   SyntheticDOMText,
   SyntheticDOMNode,
   IMarkupNodeVisitor,
-  DOMContainerEditor,
   SyntheticDOMElement,
   SyntheticDOMComment,
+  DOMContainerEditor,
   SyntheticDOMContainer,
   SyntheticDOMValueNode,
   isDOMContainerMutation,
@@ -26,27 +27,28 @@ import {
 } from "./markup";
 
 import {
+  bindable,
   Kernel,
   Mutation,
-  bindable,
   diffArray,
   serialize,
+  findTreeNode,
   filterTree,
+  ArrayMutation,
   ISerializer,
   deserialize,
   ITreeWalker,
-  findTreeNode,
   serializable,
-  ArrayMutation,
   MutationEvent,
   RemoveMutation,
   BubbleDispatcher,
   MoveChildMutation,
+  SerializedContentType,
   InsertChildMutation,
   RemoveChildMutation,
   ObservableCollection,
-  SerializedContentType,
 } from "@tandem/common";
+
 
 export interface IRegisterComponentOptions {
   prototype: any;

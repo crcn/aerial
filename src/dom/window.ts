@@ -1,10 +1,10 @@
-import memoize = require("memoizee");
-import nwmatcher = require("nwmatcher");
 import { Sandbox } from "@tandem/sandbox";
 import { bindable } from "@tandem/common/decorators";
 import { btoa, atob } from "abab"
 import { HTML_XMLNS } from "./constants";
+import memoize = require("memoizee");
 import { URL, FakeURL } from "./url";
+import nwmatcher = require("nwmatcher");
 import { Blob, FakeBlob } from "./blob";
 import { SyntheticHistory } from "./history";
 import { ISyntheticBrowser } from "../browser";
@@ -15,9 +15,9 @@ import { SyntheticLocalStorage } from "./local-storage";
 import { SyntheticWindowTimers } from "./timers";
 import { bindDOMNodeEventMethods } from "./utils";
 import { SyntheticDOMElement, DOMNodeType } from "./markup";
+import { SyntheticXMLHttpRequest, XHRServer } from "./xhr";
 import { SyntheticCSSStyle, SyntheticCSSElementStyleRule } from "./css";
-import { SyntheticXMLHttpRequest, XHRServer, XHRRecorder, HTTPRequest } from "./xhr";
-import { Logger, LogEvent, Observable, ObservableCollection, PrivateBusProvider, PropertyWatcher, MutationEvent } from "@tandem/common";
+import { Logger, LogEvent, Observable, PrivateBusProvider, PropertyWatcher, MutationEvent } from "@tandem/common";
 import { noopDispatcherInstance, IStreamableDispatcher, CallbackDispatcher } from "@tandem/mesh";
 import { 
   DOMEventTypes,
@@ -76,6 +76,7 @@ export class SyntheticDOMImplementation {
 
     document.appendChild(documentElement);
     return document;
+
   }
 }
 
@@ -106,9 +107,6 @@ export class SyntheticWindow extends Observable {
   readonly clearTimeout: Function;
   readonly clearInterval: Function;
   readonly clearImmediate: Function;
-
-  // make accessible so the browser instance can observe all xhr requests
-  readonly $xhrRequests: ObservableCollection<HTTPRequest>;
   readonly localStorage: SyntheticLocalStorage;
   readonly self: SyntheticWindow;
 
@@ -128,6 +126,7 @@ export class SyntheticWindow extends Observable {
 
   private _windowTimers: SyntheticWindowTimers;
   private _eventListeners: DOMEventDispatcherMap;
+  private _server: XHRServer;
 
   readonly Blob = Blob;
   readonly URL  = URL;
@@ -143,6 +142,8 @@ export class SyntheticWindow extends Observable {
     super();
 
     const kernel = browser && browser.kernel;
+
+
     const bus = kernel && PrivateBusProvider.getInstance(kernel) || noopDispatcherInstance;
     
     // in case proto gets set - don't want the original to get fudged
@@ -150,11 +151,7 @@ export class SyntheticWindow extends Observable {
     this.HTMLElement = SyntheticHTMLElement;
     this.Element     = SyntheticDOMElement;
 
-    const xhrServer = new XHRServer(this);
-    const xhrRecorder = new XHRRecorder(xhrServer);
-
-    // make the http requests a
-    this.$xhrRequests = xhrRecorder.requests;
+    const xhrServer = this._server = new XHRServer(this);
 
     this.WebSocket = class WebSocket { }
 
@@ -162,11 +159,12 @@ export class SyntheticWindow extends Observable {
 
     this.XMLHttpRequest = class extends SyntheticXMLHttpRequest { 
       constructor() {
-        super(xhrRecorder);
+        super(xhrServer);
       }
     };
 
     this.self = this;
+
     this._implementation = new SyntheticDOMImplementation(this);
     this._eventListeners = new DOMEventDispatcherMap(this);
 
@@ -182,6 +180,7 @@ export class SyntheticWindow extends Observable {
       this.location.$copyPropertiesFromUrl(newLocation.toString());
     });
 
+    
     new PropertyWatcher<SyntheticLocation, string>(this.location, "href").connect((newValue) =>  {
       this.notify(new SyntheticDOMEvent(DOMEventTypes.POP_STATE));
     });

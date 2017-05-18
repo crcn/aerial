@@ -55,8 +55,8 @@ var vm = require("vm");
 var Url = require("url");
 var path = require("path");
 var location_1 = require("./location");
-var renderers_1 = require("./renderers");
 var dom_1 = require("./dom");
+var renderers_1 = require("./renderers");
 var common_1 = require("@tandem/common");
 var sandbox_1 = require("@tandem/sandbox");
 var providers_1 = require("./providers");
@@ -224,10 +224,6 @@ var SyntheticBrowser = (function (_super) {
                     case 0:
                         // TODO - setup file protocol specific to this CWD
                         this._script = injectScript;
-                        if (this._entryRef) {
-                            console.log("EREF");
-                            this._entryRef.dispose();
-                        }
                         this.logger.info("Opening " + uri + " ...");
                         timerLogger = this.logger.startTimer();
                         strategyOptions = Object.assign({}, dependencyGraphStrategyOptions || {});
@@ -235,14 +231,12 @@ var SyntheticBrowser = (function (_super) {
                         dirname = uriParts.pathname && path.dirname(uriParts.pathname) || ".";
                         strategyOptions.rootDirectoryUri = strategyOptions.rootDirectoryUri || (uriParts.protocol || "file:") + "//" + (uriParts.host || (dirname === "." ? "/" : dirname));
                         graph = this._graph = sandbox_1.DependencyGraphProvider.getInstance(strategyOptions, this._kernel);
-                        console.log("RESOLVING", uri);
                         _a = this;
                         _c = (_b = graph).getDependency;
                         return [4 /*yield*/, graph.resolve(uri)];
                     case 1: return [4 /*yield*/, _c.apply(_b, [_d.sent()])];
                     case 2:
                         _a._entry = _d.sent();
-                        this._entryRef = this._entry.referee.addReference(this);
                         return [4 /*yield*/, this._sandbox.open(this._entry)];
                     case 3:
                         _d.sent();

@@ -1,33 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
-var __1 = require("..");
+var _1 = require("../");
 describe(__filename + "#", function () {
     it("can be created", function () {
-        var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ background: "black" }));
+        var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ background: "black" }));
     });
     describe("background colors", function () {
         it("adds a background object from background-color", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ backgroundColor: "black" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ backgroundColor: "black" }));
             chai_1.expect(graphics.backgrounds.length).to.equal(1);
             chai_1.expect(graphics.primaryBackground.color.toHex()).to.equal("#000000");
         });
         it("adds a background object from background-repeat", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ backgroundRepeat: "no-repeat" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ backgroundRepeat: "no-repeat" }));
             chai_1.expect(graphics.backgrounds.length).to.equal(1);
             chai_1.expect(graphics.primaryBackground.repeat).to.equal("no-repeat");
         });
         it("adds a background object from background-image", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ backgroundImage: "url(path.png)" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ backgroundImage: "url(path.png)" }));
             chai_1.expect(graphics.primaryBackground.image).to.equal("path.png");
         });
         it("adds a background object from background-position", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ backgroundPosition: "center" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ backgroundPosition: "center" }));
             chai_1.expect(graphics.primaryBackground.position.top.value).to.equal(0.5);
             chai_1.expect(graphics.primaryBackground.position.left.value).to.equal(0.5);
         });
         it("adds a background object from background", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ background: "#F60 url(test.png) center repeat-y" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ background: "#F60 url(test.png) center repeat-y" }));
             var background = graphics.primaryBackground;
             chai_1.expect(background.color.toHex()).to.equal("#FF6600");
             chai_1.expect(background.image).to.equal("test.png");
@@ -36,14 +36,14 @@ describe(__filename + "#", function () {
             chai_1.expect(background.repeat).to.equal("repeat-y");
         });
         it("can add multiple backgrounds", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ background: "#F60, #F0F" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ background: "#F60, #F0F" }));
             var backgrounds = graphics.backgrounds;
             chai_1.expect(backgrounds.length).to.equal(2);
             chai_1.expect(backgrounds[0].color.toHex()).to.equal("#FF6600");
             chai_1.expect(backgrounds[1].color.toHex()).to.equal("#FF00FF");
         });
         it("can be converted back to the original style", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({
                 backgroundColor: "orange",
                 backgroundPosition: "center"
             }));
@@ -57,7 +57,7 @@ describe(__filename + "#", function () {
     });
     describe("box shadows", function () {
         it("can add a single box shadow", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ boxShadow: "0 1 2 3 #F60" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ boxShadow: "0 1 2 3 #F60" }));
             chai_1.expect(graphics.boxShadows.length).to.equal(1);
             var boxShadow = graphics.boxShadows[0];
             chai_1.expect(boxShadow.x.value).to.equal(0);
@@ -67,7 +67,7 @@ describe(__filename + "#", function () {
             chai_1.expect(boxShadow.color.toHex()).to.equal("#FF6600");
         });
         it("can be converted back to the original style", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({
                 boxShadow: "inset 5 4 3 2 orange"
             }));
             chai_1.expect(graphics.toStyle().toObject()).to.eql({
@@ -77,7 +77,7 @@ describe(__filename + "#", function () {
     });
     describe("filters", function () {
         it("can add multiple filters", function () {
-            var graphics = new __1.SyntheticCSSStyleGraphics(__1.SyntheticCSSStyle.fromObject({ filter: "contrast(175%) brightness(3%)" }));
+            var graphics = new _1.SyntheticCSSStyleGraphics(_1.SyntheticCSSStyle.fromObject({ filter: "contrast(175%) brightness(3%)" }));
             chai_1.expect(graphics.filters.length).to.equal(2);
         });
     });

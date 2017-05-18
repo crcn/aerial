@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { SyntheticCSSStyleGraphics, SyntheticCSSStyle } from "..";
+import { SyntheticCSSStyleGraphics, SyntheticCSSStyle } from "../";
 
 describe(__filename + "#", () => {
   it("can be created", () => {

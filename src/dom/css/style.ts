@@ -1,7 +1,7 @@
-import sift = require("sift");
+import sift from "sift";
 import { SyntheticCSSObject } from "./base";
 import { kebabCase, camelCase } from "lodash";
-import { SyntheticDOMNode } from "..";
+import { SyntheticDOMNode } from "../../dom";
 import { CallbackDispatcher } from "@tandem/mesh";
 import { SyntheticCSSElementStyleRuleMutationTypes } from "./style-rule";
 import { ISerializable, serializable, diffArray, ITreeWalker, PropertyMutation, serialize, deserialize } from "@tandem/common";
@@ -9,7 +9,7 @@ import { IContentEdit , ISyntheticObject, generateSyntheticUID, IEditable, BaseC
 
 export interface ISerializedSyntheticCSSStyle extends SyntheticCSSStyle { }
 
-export const isValidCSSDeclarationProperty = sift({ $and: [ { $ne: /^[\$_]/ }, {$ne: "uid" }, { $ne: /^\d+$/ }] });
+export const isValidCSSDeclarationProperty = sift({ $and: [ { $ne: /^[\$_]/ }, {$ne: "uid" }, { $ne: /^\d+$/ }] } as any);
 
 // https://www.w3.org/TR/CSS21/propidx.html
 export const INHERITED_CSS_STYLE_PROPERTIES = [

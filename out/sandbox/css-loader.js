@@ -56,7 +56,7 @@ var path = require("path");
 var sm = require("source-map");
 var sandbox_2 = require("@tandem/sandbox");
 var common_1 = require("@tandem/common");
-var __1 = require("..");
+var synthetic_browser_1 = require("@tandem/synthetic-browser");
 var hasProtocol = function (value) { return /^\w+:\/\//.test(value); };
 var CSSDependencyLoader = (function (_super) {
     __extends(CSSDependencyLoader, _super);
@@ -174,7 +174,7 @@ var CSSDependencyLoader = (function (_super) {
                                 }
                             });
                         }); };
-                        return [4 /*yield*/, compile(__1.parseCSS(content, map))];
+                        return [4 /*yield*/, compile(synthetic_browser_1.parseCSS(content, map))];
                     case 4:
                         result = (_a.sent()).toStringWithSourceMap({
                             file: uri

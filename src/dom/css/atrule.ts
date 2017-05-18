@@ -1,4 +1,4 @@
-import { evaluateCSS, parseCSS } from "./index";
+import { evaluateCSS, parseCSS } from "../../dom/css";
 import { SyntheticCSSElementStyleRule } from "./style-rule";
 import { SyntheticCSSGroupingRule, SyntheticCSSGroupingRuleEditor, SyntheticCSSGroupingRuleEdit } from "./grouping";
 import { SyntheticCSSStyle } from "./style";
