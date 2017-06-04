@@ -1,6 +1,16 @@
-Aerial is a virtual browser for visually creating web applications. 
+Aerial is a virtual browser for the realtime visual development & testing of web applications. 
 
-#### Use cases
+#### JavaScript example
+
+
+```typescript
+import { SyntheticBrowser, StringRenderer } from 'aerial';
+const browser = new SyntheticBrowser(new StringRenderer());
+await browser.window.open('http://google.com');
+console.log(browserer.renderer.htmlContent); 
+```
+
+#### What can you use this library for?
 
 Aerial is currently powering [Tandem](http://tandemcode.com/), but it can be used in many other use cases:
 
