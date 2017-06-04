@@ -24,5 +24,7 @@ Aerial is currently powering [Tandem](http://tandemcode.com/), but it can be use
 
 #### Features
 
+Aerial comes with a bunch of features that enables you to run web application code 
+
 - Ability to target any browser rendering engine
 - DOM diffing so that client-side editing doesn't get interrupted
