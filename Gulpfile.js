@@ -10,11 +10,17 @@ const gutil   = require('gulp-util');
 
 gulp.task('default', ['build']);
 
-const PACKAGE_DIRS         = glob.sync('./packages/*');
+const PACKAGE_DIRS         = [
+  ...glob.sync('./packages/*'),
+  ...glob.sync('./examples/*')
+];
+
 const NODE_MODULES_DIR     = join(__dirname, 'node_modules');
 const NODE_MODULES_BIN_DIR = join(NODE_MODULES_DIR, '.bin');
 const WATCH                = argv.watch != null;
 const GREP                 = argv.grep;
+
+console.log(PACKAGE_DIRS);
 
 const gulpSpawn = (command, args, options) => {
   const proc = spawn(command, args, options);
