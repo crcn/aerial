@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { RemoteBrowserService } from "./remote-browser";
 import { Kernel, ApplicationServiceProvider } from "@tandem/common";
 

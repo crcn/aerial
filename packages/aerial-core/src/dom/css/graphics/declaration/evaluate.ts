@@ -450,8 +450,6 @@ export class SyntheticCSSLinearGradient extends SyntheticCSSValue {
   }
 }
 
-
-
 // for now use built-in functions 
 const globalContext = {
   rgba([r], [g], [b], [a]) {

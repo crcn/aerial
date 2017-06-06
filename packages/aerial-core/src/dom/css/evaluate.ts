@@ -28,7 +28,6 @@ function parseSourceMaps(value) {
   return _smcache[value] = JSON.parse(new Buffer(sourceMappingURL.split(",").pop(), "base64").toString("utf8"));
 }
 
-
 let _cache: {
   [Identifier: string]: SyntheticCSSStyleSheet
 } = {};
