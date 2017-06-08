@@ -1,0 +1,15 @@
+{
+  "name": "aerial-serialization",
+  "version": "1.0.0",
+  "description": "Small serialization library",
+  "main": "out/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcn/aerial.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
