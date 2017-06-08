@@ -5,7 +5,6 @@ Aerial is a virtual browser for the realtime visual development & testing of web
 
 #### JavaScript example
 
-
 ```typescript
 import { SyntheticBrowser, DOMRenderer } from 'aerial';
 const renderer = new DOMRenderer(); 
@@ -31,3 +30,8 @@ Aerial comes with a bunch of features that enables you to run web application co
 
 - Ability to target any browser rendering engine
 - DOM diffing so that client-side editing doesn't get interrupted
+
+
+#### TODOs
+
+- [ ] Generalize sandbox to be usable in other JS environments

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Simple website crawler that displays every page of a given site. Users are able to make minor edits to HTML & CSS and see those changes across all pages that share the same resources.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcn/aerial.git"
+  },
   "scripts": {
     "test": ""
   },

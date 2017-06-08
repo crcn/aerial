@@ -2,6 +2,10 @@
   "name": "aerial",
   "version": "1.0.0",
   "description": "Aerial is a virtual browser for visually creating web applications.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcn/aerial.git"
+  },
   "main": "index.js",
   "author": "",
   "license": "ISC",

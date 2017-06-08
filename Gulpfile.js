@@ -21,6 +21,7 @@ const WATCH                = argv.watch != null;
 const GREP                 = argv.grep;
 
 const gulpSpawn = (command, args, options) => {
+  gutil.log([command, ...args, options.cwd].join(' '));
   const proc = spawn(command, args, options);
 
   proc.stdout.setEncoding('utf8');
@@ -50,14 +51,10 @@ const extraArgs = function() {
   return extra.length ? ['--', ...extra] : [];
 };
 
-gulp.task('build', ['copy-assets'], () => {
+gulp.task('build', () => {
   return merge(PACKAGE_DIRS.map((dir) => (
     gulpSpawn(join(NODE_MODULES_BIN_DIR, 'tsc'), ['--declaration', '--pretty', ...(WATCH ? ['--watch'] : [])], { cwd: dir })
   )));
-});
-
-gulp.task('copy-assets', () => {
-  
 });
 
 gulp.task('test', () => {

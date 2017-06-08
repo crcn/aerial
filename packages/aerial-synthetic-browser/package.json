@@ -1,7 +1,7 @@
 {
-  "name": "aerial-core",
+  "name": "aerial-synthetic-browser",
   "version": "1.0.0",
-  "description": "",
+  "description": "Synthetic browser implementation",
   "main": "index.js",
   "scripts": {
     "test": "mocha ./out/**.js"
