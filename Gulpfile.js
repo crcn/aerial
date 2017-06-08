@@ -1,12 +1,14 @@
 'use strict';
 
-const gulp    = require('gulp');
-const merge   = require('merge2');
-const glob    = require('glob');
-const {spawn} = require('child_process');
-const {join}  = require('path');
-const {argv}  = require('yargs');
-const gutil   = require('gulp-util');
+const gulp      = require('gulp');
+const glob      = require('glob');
+const gutil     = require('gulp-util');
+const merge     = require('merge2');
+const {join}    = require('path');
+const {argv}    = require('yargs');
+const {spawn}   = require('child_process');
+const gsequence = require('gulp-sequence');
+const {keys, intersection} = require('lodash');
 
 gulp.task('default', ['build']);
 
@@ -14,6 +16,8 @@ const PACKAGE_DIRS         = [
   ...glob.sync('./packages/*'),
   ...glob.sync('./examples/*')
 ];
+
+const PACKAGE_NAMES = PACKAGE_DIRS.map(dir => dir.split('/').pop());
 
 const NODE_MODULES_DIR     = join(__dirname, 'node_modules');
 const NODE_MODULES_BIN_DIR = join(NODE_MODULES_DIR, '.bin');
@@ -63,7 +67,31 @@ gulp.task('test', () => {
   )));
 });
 
-gulp.task('npm:link', () => {
+gulp.task('npm:link', gsequence('npm:link:criss', 'npm:link:cross'));
+
+/**
+ * Link packages globally
+ */
+
+gulp.task('npm:link:criss', () => {
+  return merge(PACKAGE_DIRS.map((dir) => (
+    gulpSpawn('npm', ['link'], { cwd: dir })
+  )));
+});
+
+/**
+ * Link package dependencies
+ */
+
+gulp.task('npm:link:cross', () => {
+  return merge(
+    PACKAGE_DIRS.map(dir => {
+      const pkg = require(join(__dirname, dir, 'package.json'));
+      return merge(intersection(keys(Object.assign({}, pkg.dependencies || {}, pkg.devDependencies || {})), PACKAGE_NAMES).map((dep) => {
+        return gulpSpawn('npm', ['link', dep], { cwd: dir });
+      }));
+    })
+  );
   return merge(PACKAGE_DIRS.map((dir) => (
     gulpSpawn('npm', ['link'], { cwd: dir })
   )));

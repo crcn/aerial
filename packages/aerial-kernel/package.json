@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/crcn/aerial.git"
   },
-  "main": "index.js",
+  "main": "out/index.js",
   "scripts": {
     "test": ""
   },
