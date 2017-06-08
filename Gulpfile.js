@@ -20,8 +20,6 @@ const NODE_MODULES_BIN_DIR = join(NODE_MODULES_DIR, '.bin');
 const WATCH                = argv.watch != null;
 const GREP                 = argv.grep;
 
-console.log(PACKAGE_DIRS);
-
 const gulpSpawn = (command, args, options) => {
   const proc = spawn(command, args, options);
 
@@ -52,10 +50,14 @@ const extraArgs = function() {
   return extra.length ? ['--', ...extra] : [];
 };
 
-gulp.task('build', () => {
+gulp.task('build', ['copy-assets'], () => {
   return merge(PACKAGE_DIRS.map((dir) => (
     gulpSpawn(join(NODE_MODULES_BIN_DIR, 'tsc'), ['--declaration', '--pretty', ...(WATCH ? ['--watch'] : [])], { cwd: dir })
   )));
+});
+
+gulp.task('copy-assets', () => {
+  
 });
 
 gulp.task('test', () => {

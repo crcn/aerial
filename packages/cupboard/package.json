@@ -1,7 +1,7 @@
 {
-  "name": "aerial-kernel",
+  "name": "cupboard",
   "version": "1.0.0",
-  "description": "kernel libraries for aerial",
+  "description": "JS package manage CLI utility.",
   "main": "index.js",
   "scripts": {
     "test": ""
