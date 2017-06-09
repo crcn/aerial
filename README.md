@@ -19,7 +19,7 @@ This library is primarly geared for developers that want to create tooling that 
 
 - Programatically test for visual CSS issues in unit tests. In the future, you will be able to target any browser you want for this via [Browsertap](http://browsertap.com).
 - Visually QA test every state of your application. Ability to manipulate file resources and see how those changes manifest across all visual states.
-- Hook Aerial up to a code editor & build applications visually in realtime.  
+- Hook Aerial up to a code editor & build applications visually in realtime (basically Tandem).
 
 #### App examples
 
