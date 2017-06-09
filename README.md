@@ -15,7 +15,7 @@ the APIs necessary for creating realtime visual programming environments (like S
 
 #### Who is Aerial for?
 
-This library is primarly geared for developers that want to create tooling that helps find visual anomolies in their web application. You can use Aerial to:
+This library is primarly geared for developers that want to create tooling that helps find them visual bugs in their web apps. You can use Aerial to:
 
 - Programatically test for visual CSS issues in unit tests. In the future, you will be able to target any browser you want for this via [Browsertap](http://browsertap.com).
 - Visually QA test every state of your application. Ability to manipulate file resources and see how those changes manifest across all visual states.
