@@ -37,18 +37,11 @@ This library was designed for developers that want to create tooling for catchin
 #### App examples
 
 - [Tandem](http://tandemcode.com) - visually create web applications. 
+- [Code Playground](./examples/tandem-playground) - small visual editor. 
+- [Crawler](./examples/tandem-crawler) - crawls a website (up to 20 pages), and displays editable pages. 
 
-## Code examples
+#### Code examples
 
-Here's a very basic example of using Tandem;
-
-```typescript
-import { SyntheticBrowser, DOMRenderer } from 'aerial';
-const renderer = new DOMRenderer(); 
-
-document.body.appendChild(renderer.element);
-const browser = new SyntheticBrowser(renderer);
-await browser.window.open('http://google.com');
-
-// TODO - edit DOM
-```
+- [Unit testing](./examples/unit-testing) - example of how you can use Tandem for unit testing.
+- Custom dependency graph - TODO
+- Custom rendering engine - TODO
