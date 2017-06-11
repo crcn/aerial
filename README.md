@@ -20,7 +20,9 @@ The browser VM supports _native_ rendering, meaning that the HTML & CSS that you
 
 Many of the emulated APIs are enhanced. The DOM & CSSOM for instance both support diffing & patching (just like React). This means that as your application produces new HTML & CSS, only the parts that have changed get updated in the synthetic DOM / CSSOM objects. This hot-swapping was originally introduced to allow users to visually edit applications regardless of their technical stack (Ruby, Java, PHP, Angular, anything that produces HTML & CSS).
 
-Aerial uses a dependency graph that can be adapted to any bundling library including SystemJS, CommonJS, Webpack, and rollup. The environment that uses the dependency graph can be set to re-execute whenever a source file changes. This paired with hot-swapping capabilities allows developers to visually create their application as they're writing code. 
+Aerial uses a dependency graph that can be adapted to any bundling library including SystemJS, CommonJS, Webpack, and rollup. The environment that uses the dependency graph can be set to re-execute whenever a source file changes. This paired with hot-swapping capabilities allows developers to write code, and see how their application visualy changes in realtime. Because the DOM & CSSOM is emulated, developers also have the ability to visually edit elements to write code back to the dependency graph. The dependency graph can also be shared across _multiple_ emulated browser instances which _automatically_ reload whenever a dependency graph file changes. Here's an example of that:
+
+
 
 Aerial can also defer application execution to remote processes using the `RemoteBrowser` object, paired with the diffing & patching algorithms. This enables you to offload some of the heavy work - possibly to a NodeJS thread, or even remotely (AWS, lamda), to allow for a smooth user experience if you're building a visual editor. 
 
