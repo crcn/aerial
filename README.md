@@ -30,7 +30,7 @@ Aerial can also defer application execution to remote processes using the `Remot
 
 This library was designed for developers that want to create tooling for catching visual bugs in web applications. Here are some examples of what you can do with Aeiral:
 
-- Programatically test for visual CSS issues in unit tests. In the future, you will be able to target any browser you want for this via [Browsertap](http://browsertap.com).
+- Unit testing CSS (this is probably the most general use case) across any browser (Safari, Firefox, Chrome, Mobile) via browsertap.com, and across any application state. 
 - Visually QA test every state of your application. Ability to manipulate file resources and see how those changes manifest across all visual states.
 - Hook Aerial up to a code editor & build applications visually in realtime (basically Tandem).
 
@@ -38,7 +38,9 @@ This library was designed for developers that want to create tooling for catchin
 
 - [Tandem](http://tandemcode.com) - visually create web applications. 
 
-#### Code example
+## Code examples
+
+Here's a very basic example of using Tandem;
 
 ```typescript
 import { SyntheticBrowser, DOMRenderer } from 'aerial';
