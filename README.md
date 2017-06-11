@@ -10,7 +10,7 @@ Aerial was originally created for [Tandem](http://tandemcode.com) to aid in the 
 
 
 The library takes inspiration from many ideas, more notabily Bret Victor's presentation on [the future of programming](https://vimeo.com/36579366). Aerial is an attempt to provide
-the APIs necessary for creating realtime visual programming environments (like Sketch + coding). 
+the APIs necessary for creating realtime programming environments (like Sketch + coding). 
 
 #### How does Aerial work?
 
