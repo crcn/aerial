@@ -14,7 +14,7 @@ the APIs necessary for creating realtime visual programming environments (like S
 
 #### How does Aerial work?
 
-Aerial runs your application code in a sandboxed environment that emulates native JavaScript APIs -- currently just for the browser (DOM, navigator, history). All emulated APIs can be inspected so you can test how your application is interacting with them. You can also define environment parameters such as browser type, network information (offline, throttled), and even the rendering engine, to see how your application looks & behaves in different environments. 
+Aerial runs your application code in a sandboxed environment that emulates native JavaScript APIs -- currently just for the browser (DOM, navigator, history). All emulated APIs can be inspected so you can test how your application is interacting with them. You can also define environment parameters such as browser type, network information (offline, throttled), and even the rendering engine to see how your application looks & behaves in different environments. 
 
 The browser VM supports _native_ rendering, meaning that the HTML & CSS that your application produces can be rendered out to the actual DOM. Native DOM APIs such as `element.getBoundingClientRect`, and `window.getComputedStyle(element)` work the same. The rendering engine is interchangable, and will eventually support _remote_ browsers so that you can run your application code in one local environment (Node for instance), and have its HTML & CSS rendered out to as many native browsers as you want via [Browsertap](browsertap.com). 
 
