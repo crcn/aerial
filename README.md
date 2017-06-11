@@ -22,7 +22,7 @@ Many of the emulated APIs are enhanced. The DOM & CSSOM for instance both suppor
 
 Aerial uses a dependency graph that can be adapted to any bundling library including SystemJS, CommonJS, Webpack, and rollup. The environment that uses the dependency graph can be set to re-execute whenever a source file changes. This paired with hot-swapping capabilities allows developers to write code, and see how their application visualy changes in realtime. Because the DOM & CSSOM is emulated, developers also have the ability to visually edit elements to write code back to the dependency graph. The dependency graph can also be shared across _multiple_ emulated browser instances which _automatically_ reload whenever a dependency graph file changes. Here's an example of that:
 
-
+![ezgif-2-7e5a33fa16](https://user-images.githubusercontent.com/757408/27011517-0c27d188-4e8b-11e7-8bf1-811b07bce87d.gif)
 
 Aerial can also defer application execution to remote processes using the `RemoteBrowser` object, paired with the diffing & patching algorithms. This enables you to offload some of the heavy work - possibly to a NodeJS thread, or even remotely (AWS, lamda), to allow for a smooth user experience if you're building a visual editor. 
 
