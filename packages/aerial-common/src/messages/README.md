@@ -1,0 +1,1 @@
+Actions which can be dispatched on the application mediator

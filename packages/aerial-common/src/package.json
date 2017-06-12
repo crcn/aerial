@@ -1,0 +1,16 @@
+{
+  "name": "@tandem/common",
+  "version": "1.0.33",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "mongoid-js": "^1.1.0",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  }
+}

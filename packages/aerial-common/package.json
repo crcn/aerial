@@ -1,0 +1,16 @@
+{
+  "name": "aerial-common",
+  "version": "1.0.0",
+  "description": "This is currently a junk drawer of dependencies. Most everything here should be moved into separate repositories eventually.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcn/aerial.git"
+  },
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/mocha": "^2.2.41"
+  }
+}
