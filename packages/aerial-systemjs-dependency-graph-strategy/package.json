@@ -9,7 +9,7 @@
   "main": "out/index.js",
   "scripts": {
     "test": "",
-    "build": "tsc --declaration"
+    "build": "rm -rf lib; tsc"
   },
   "author": "",
   "license": "ISC"

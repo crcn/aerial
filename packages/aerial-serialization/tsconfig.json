@@ -9,7 +9,7 @@
       "es6"
     ],
     "module": "commonjs",
-    "outDir": "out",
+    "outDir": "lib",
     "baseUrl": "src",
     "experimentalDecorators": true,
     "jsx": "react"
@@ -22,7 +22,7 @@
     "node_modules",
     "*-test",
     "old",
-    "out",
+    "lib",
     "dist",
     "integrations",
     "examples"
