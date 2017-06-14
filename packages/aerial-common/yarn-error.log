@@ -1,0 +1,59 @@
+Arguments: 
+  /Users/crcn/.nvm/versions/node/v6.9.4/bin/node /usr/local/bin/yarn install
+
+PATH: 
+  /Users/crcn/.nvm/versions/node/v6.9.4/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  0.17.8
+
+Node version: 
+  6.9.4
+
+Platform: 
+  darwin x64
+
+npm manifest: 
+  {
+    "name": "aerial-common",
+    "version": "0.0.1",
+    "description": "This is currently a junk drawer of dependencies. Most everything here should be moved into separate repositories eventually.",
+    "main": "index.js",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/crcn/aerial.git"
+    },
+    "scripts": {
+      "build": "rm -rf lib; npm run copy-js; tsc",
+      "copy-js": "for FILE in `find ./src -name *.js -o -name *.d.ts`; do OUT_FILE=`echo $FILE | sed 's/src/lib/'`; mkdir -p `dirname $OUT_FILE`; cp $FILE $OUT_FILE; done;"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "@types/inflection": "^1.5.28",
+      "@types/mocha": "^2.2.41",
+      "@types/node": "^7.0.31",
+      "@types/reflect-metadata": "0.0.5",
+      "chai": "^4.0.2"
+    },
+    "dependencies": {
+      "i": "^0.3.5",
+      "inflection": "^1.12.0",
+      "mesh": "^7.0.3",
+      "mesh-crud": "0.0.1",
+      "mongoid-js": "^1.1.2",
+      "npm": "^5.0.3",
+      "reflect-metadata": "^0.1.10",
+      "sift": "3.3.x"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: https://registry.yarnpkg.com/sift/-/sift-3.3.11.tgz: ENOENT: no such file or directory, lstat '/Users/crcn/Library/Caches/Yarn/npm-sift-3.3.11-2ca4984e854e56f89e204cbdc48b51df408edb68/.npmignore'
+      at Error (native)

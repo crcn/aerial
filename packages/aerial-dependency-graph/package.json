@@ -8,7 +8,6 @@
     "url": "git+https://github.com/crcn/aerial.git"
   },
   "dependencies": {
-    "aerial-kernel": "0.0.x"
   },
   "scripts": {
     "test": "",

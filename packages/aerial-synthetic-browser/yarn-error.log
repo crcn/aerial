@@ -1,0 +1,68 @@
+Arguments: 
+  /Users/crcn/.nvm/versions/node/v6.9.4/bin/node /usr/local/bin/yarn install
+
+PATH: 
+  /Users/crcn/.nvm/versions/node/v6.9.4/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  0.17.8
+
+Node version: 
+  6.9.4
+
+Platform: 
+  darwin x64
+
+npm manifest: 
+  {
+    "name": "aerial-synthetic-browser",
+    "version": "0.0.1",
+    "description": "Synthetic browser implementation",
+    "main": "index.js",
+    "scripts": {
+      "test": "mocha ./out/**.js",
+      "build": "rm -rf lib; tsc"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/tandemcode/aerial.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/tandemcode/aerial/issues"
+    },
+    "homepage": "https://github.com/tandemcode/aerial#readme",
+    "devDependencies": {
+      "@types/chai": "^3.5.2",
+      "@types/mocha": "^2.2.41",
+      "@types/react": "^15.0.24",
+      "@types/socket.io": "^1.4.29",
+      "@types/source-map": "^0.5.0",
+      "typescript": "^2.2.2"
+    },
+    "dependencies": {
+      "abab": "^1.0.3",
+      "aerial-common": "0.0.x",
+      "aerial-sandbox": "0.0.x",
+      "chalk": "^1.1.3",
+      "ent": "^2.2.0",
+      "memoizee": "^0.4.5",
+      "mesh": "7.0.x",
+      "nwmatcher": "^1.3.9",
+      "parse5": "^3.0.2",
+      "postcss": "^6.0.1",
+      "sift": "3.3.x",
+      "tinycolor2": "^1.4.1"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: ENOTEMPTY: directory not empty, rmdir '/Users/crcn/Library/Caches/Yarn/npm-sift-3.3.11-2ca4984e854e56f89e204cbdc48b51df408edb68'
+      at Error (native)

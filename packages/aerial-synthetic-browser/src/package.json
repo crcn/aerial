@@ -23,7 +23,7 @@
     "tinycolor2": "^1.4.1"
   },
   "peerDependencies": {
-    "aerial-common": "1.0.x",
-    "aerial-sandbox": "1.0.x"
+    "aerial-common": "0.0.x",
+    "aerial-sandbox": "0.0.x"
   }
 }

@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "abab": "^1.0.3",
-    "aerial-common": "0.0.1",
+    "aerial-common": "0.0.x",
     "md5": "^2.2.1",
     "memoizee": "^0.4.5",
     "mesh-ds": "0.0.x",

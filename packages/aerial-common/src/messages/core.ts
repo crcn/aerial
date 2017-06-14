@@ -1,4 +1,4 @@
-import sift from "sift";
+import sift = require("sift");
 import { CoreEvent } from "./base";
 import { ITreeNode } from "../tree";
 import { IDisposable } from "../object";

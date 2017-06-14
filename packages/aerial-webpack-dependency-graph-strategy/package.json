@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aerial-common": "^0.0.2",
-    "aerial-sandbox": "^0.0.1",
+    "aerial-common": "0.0.x",
+    "aerial-sandbox": "0.0.x",
     "detective": "^4.5.0",
     "md5": "^2.2.1",
     "node-libs-browser": "^2.0.0",
