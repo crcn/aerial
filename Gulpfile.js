@@ -73,7 +73,7 @@ gulp.task('test', () => {
   )));
 });
 
-gulp.task('yarn:link', gsequence('yarn:link:criss', 'yarn:link:cross'));
+gulp.task('link', gsequence('yarn:link:criss', 'yarn:link:cross'));
 
 /**
  * Link packages globally
@@ -110,5 +110,18 @@ gulp.task('npm:patch', () => {
 gulp.task('npm:publish', () => {
   return merge(PACKAGE_DIRS.map((dir) => (
     gulpSpawn('npm', ['publish'], { cwd: dir })
+  )));
+});
+
+gulp.task('clean', ['clean:node_modules', 'clean:yarnlock']);
+
+gulp.task('clean:node_modules', () => {
+  return merge(PACKAGE_DIRS.map((dir) => (
+    gulpSpawn('rm', ['-rf', 'node_modules'], { cwd: dir })
+  )));
+});
+gulp.task('clean:yarnlock', () => {
+  return merge(PACKAGE_DIRS.map((dir) => (
+    gulpSpawn('rm', ['yarn.lock'], { cwd: dir })
   )));
 });

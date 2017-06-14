@@ -1,5 +1,5 @@
 import { IMessage, IBus, IStreamableBus, DuplexStream, WritableStream, TransformStream } from "mesh";
-import { DSInsertRequest, DSRemoveRequest, DSUpdateRequest } from "mesh-crud";
+import { DSInsertRequest, DSRemoveRequest, DSUpdateRequest } from "mesh-ds";
 import { PostDSMessage } from "../messages";
 
 export class PostDsNotifierBus implements IStreamableBus<any> {

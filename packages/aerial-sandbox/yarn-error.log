@@ -24,7 +24,7 @@ npm manifest:
     },
     "main": "./index.js",
     "scripts": {
-      "test": "",
+      "test": "mocha ./lib/**/*.js",
       "build": "rm -rf lib; tsc"
     },
     "author": "",
@@ -41,7 +41,7 @@ npm manifest:
     },
     "dependencies": {
       "abab": "^1.0.3",
-      "aerial-common": "0.0.1",
+      "aerial-common": "0.0.x",
       "md5": "^2.2.1",
       "memoizee": "^0.4.5",
       "mesh-ds": "0.0.x",
@@ -57,5 +57,5 @@ Lockfile:
   No lockfile
 
 Trace: 
-  Error: https://registry.yarnpkg.com/sift/-/sift-3.3.11.tgz: ENOENT: no such file or directory, open '/Users/crcn/Library/Caches/Yarn/npm-sift-3.3.11-2ca4984e854e56f89e204cbdc48b51df408edb68/.yarn-tarball.tgz'
+  Error: https://registry.yarnpkg.com/aerial-common/-/aerial-common-0.0.4.tgz: ENOENT: no such file or directory, open '/Users/crcn/Library/Caches/Yarn/npm-aerial-common-0.0.4-ac9762a6bd3dda705108bcd2c657ff1273f3b7cb/.yarn-tarball.tgz'
       at Error (native)

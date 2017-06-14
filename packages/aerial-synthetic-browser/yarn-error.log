@@ -38,8 +38,7 @@ npm manifest:
       "@types/mocha": "^2.2.41",
       "@types/react": "^15.0.24",
       "@types/socket.io": "^1.4.29",
-      "@types/source-map": "^0.5.0",
-      "typescript": "^2.2.2"
+      "@types/source-map": "^0.5.0"
     },
     "dependencies": {
       "abab": "^1.0.3",
@@ -64,5 +63,5 @@ Lockfile:
   No lockfile
 
 Trace: 
-  Error: ENOTEMPTY: directory not empty, rmdir '/Users/crcn/Library/Caches/Yarn/npm-sift-3.3.11-2ca4984e854e56f89e204cbdc48b51df408edb68'
+  Error: https://registry.yarnpkg.com/aerial-common/-/aerial-common-0.0.4.tgz: ENOENT: no such file or directory, lstat '/Users/crcn/Library/Caches/Yarn/npm-aerial-common-0.0.4-ac9762a6bd3dda705108bcd2c657ff1273f3b7cb/README.md'
       at Error (native)
