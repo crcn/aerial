@@ -6,7 +6,7 @@ import {
   PropertyMutation,
   ITreeWalker,
   sourcePositionEquals
-} from "@tandem/common";
+} from "aerial-common";
 import { SyntheticCSSStyleSheet } from "./style-sheet";
 import { SyntheticDOMNode } from "../../dom";
 import {

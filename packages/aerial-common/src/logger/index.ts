@@ -1,4 +1,4 @@
-import { IDispatcher } from "@tandem/mesh";
+import { IBus } from "mesh";
 import { LogLevel } from "./levels";
 import { CoreEvent } from "../messages";
 
@@ -38,7 +38,7 @@ export class Logger {
   public generatePrefix: () => string;
   public filterable: boolean;
 
-  constructor(public bus: IDispatcher<any, any>, public prefix: string = "", private _parent?: Logger) { }
+  constructor(public bus: IBus<any, any>, public prefix: string = "", private _parent?: Logger) { }
 
   createChild(prefix: string = "") {
     return new Logger(this.bus, prefix, this);

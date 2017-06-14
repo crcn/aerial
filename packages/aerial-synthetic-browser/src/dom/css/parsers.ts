@@ -1,6 +1,6 @@
 import postcss =  require("postcss");
 
-import { IRange } from "@tandem/common";
+import { IRange } from "aerial-common";
 import { RawSourceMap } from "source-map";
 
 

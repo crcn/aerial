@@ -1,6 +1,6 @@
-import { Observable, bindable } from "@tandem/common";
+import { Observable, bindable } from "aerial-common";
 import { bindDOMEventMethods } from "../utils";
-import { IStreamableDispatcher, IMessage, WritableStream, ReadableStream } from "@tandem/mesh";
+import { IStreamableBus, IMessage, WritableStream, ReadableStream } from "mesh";
 import { HTTPRequest, HTTPResponse, IHTTPHeaders, HTTPStatusType } from "./messages";
 
 import {
@@ -38,7 +38,7 @@ export class SyntheticXMLHttpRequest extends Observable implements IDOMEventEmit
   public onreadystatechange: Function;
   public onload: Function;
 
-  constructor(readonly bus: IStreamableDispatcher<any>) {
+  constructor(readonly bus: IStreamableBus<any>) {
     super();
     this.setReadyState(XMLHttpRequestReadyState.UNSET);
     this._domListenerMap = new DOMEventDispatcherMap(this);

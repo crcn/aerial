@@ -1,4 +1,4 @@
-import { Kernel, LogLevel } from "@tandem/common";
+import { Kernel, LogLevel } from "aerial-common";
 import { sample, sampleSize, random } from "lodash";
 // import { createTestMasterApplication } from "@tandem/editor/test";
 import { createSandboxProviders, IFileResolver } from "@tandem/sandbox";

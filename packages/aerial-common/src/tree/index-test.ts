@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { MutationEvent, CoreEvent, TreeNode, TreeNodeMutationTypes } from "@tandem/common";
+import { MutationEvent, CoreEvent, TreeNode, TreeNodeMutationTypes } from "..";
 
 describe(__filename + "#", () => {
   it("can create a new node", () => {

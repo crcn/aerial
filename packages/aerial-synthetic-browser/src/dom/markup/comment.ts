@@ -1,7 +1,7 @@
 import { DOMNodeType } from "./node-types";
 import { SyntheticDocument } from "../document";
 import { IMarkupNodeVisitor } from "./visitor";
-import { serializable, ITreeWalker } from "@tandem/common";
+import { serializable, ITreeWalker } from "aerial-common";
 import { SyntheticDOMNodeSerializer } from "./node";
 import { SyntheticDOMValueNode, SyntheticDOMValueNodeSerializer, SyntheticDOMValueNodeEdit } from "./value-node";
 

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { SequenceBus, CallbackDispatcher, DuplexStream } from "@tandem/mesh";
+import { SequenceBus, CallbackBus, DuplexStream } from "mesh";
 import { 
   IHTTPHeaders,
   HTTPResponse,
@@ -11,7 +11,7 @@ import {
 describe(__filename + "#", () => {
 
   const createStubbedSyntheticXMLHttpRequest = (requests: HTTPRequest[], response?: HTTPResponse, ...chunks: string[]) => {
-    return new SyntheticXMLHttpRequest(new CallbackDispatcher((request: HTTPRequest) => {
+    return new SyntheticXMLHttpRequest(new CallbackBus((request: HTTPRequest) => {
       requests.push(request);
       return new DuplexStream((input, output) => {
         const writer = output.getWriter();

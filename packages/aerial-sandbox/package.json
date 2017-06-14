@@ -2,7 +2,6 @@
   "name": "aerial-sandbox",
   "version": "0.0.1",
   "description": "sandbox environment for running javascript",
-  "main": "out/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crcn/aerial.git"
@@ -11,5 +10,24 @@
     "test": ""
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.0.0",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.31",
+    "@types/sinon": "^2.3.1",
+    "aerial-commonjs-extension": "^0.0.1",
+    "chai": "^4.0.2",
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.4"
+  },
+  "dependencies": {
+    "abab": "^1.0.3",
+    "aerial-common": "0.0.1",
+    "md5": "^2.2.1",
+    "memoizee": "^0.4.5",
+    "mesh-ds": "0.0.x",
+    "mesh-memory-ds": "^0.0.1",
+    "package-path": "^1.0.0"
+  }
 }

@@ -1,4 +1,4 @@
-import { Mutation } from "@tandem/common";
+import { Mutation } from "aerial-common";
 
 import { isDOMElementMutation } from "./element";
 import { isDOMContainerMutation } from "./container";

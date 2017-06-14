@@ -1,4 +1,4 @@
-import { Kernel } from "@tandem/common/ioc";
+import { Kernel } from "../ioc";
 
 export class System {
   constructor() {

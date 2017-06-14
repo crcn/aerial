@@ -1,4 +1,4 @@
-import { ISourceLocation } from "@tandem/common";
+import { ISourceLocation } from "aerial-common";
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries
 export enum CSSMediaExpressionKind {

@@ -1,4 +1,4 @@
-import { PropertyWatcher, Observable } from "@tandem/common";
+import { PropertyWatcher, Observable } from "aerial-common";
 import { IDOMEventEmitter, DOMEventListenerFunction } from "../events";
 import { SyntheticDOMElement, SyntheticDOMContainer } from "../markup";
 

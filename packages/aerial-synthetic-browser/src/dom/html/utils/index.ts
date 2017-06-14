@@ -1,4 +1,4 @@
-import { IPoint } from "@tandem/common";
+import { IPoint } from "aerial-common";
 import { SyntheticHTMLElement } from "../element";
 
 /**

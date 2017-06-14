@@ -1,5 +1,5 @@
 import sm = require("source-map");
-import { ISourcePosition } from "@tandem/common";
+import { ISourcePosition } from "aerial-common";
 import { DOMNodeType } from "./node-types";
 import { SandboxModule } from "@tandem/sandbox";
 import { SyntheticDOMNode } from "./node";

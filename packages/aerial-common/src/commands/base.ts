@@ -1,14 +1,14 @@
-import { inject, loggable } from "@tandem/common/decorators";
-import { IBus, IMessage } from "@tandem/mesh";
-import { IBrokerBus } from "../dispatchers";
+import { inject, loggable } from "../decorators";
+import { IBus, IMessage } from "mesh";
+import { IBrokerBus } from "../busses";
 import {
   Kernel,
   IInjectable,
   KernelProvider,
   PrivateBusProvider,
-} from "@tandem/common/ioc";
+} from "../ioc";
 
-import { Logger } from "@tandem/common/logger";
+import { Logger } from "../logger";
 
 export interface ICommand {
   execute(message?: IMessage): any;

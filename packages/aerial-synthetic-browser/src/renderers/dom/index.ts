@@ -2,7 +2,7 @@ import assert = require("assert");
 import { decode } from "ent";
 import { camelCase } from "lodash";
 import { BaseRenderer } from "../base";
-import { CallbackDispatcher } from "@tandem/mesh";
+import { CallbackBus } from "mesh";
 import {
   HTML_XMLNS,
   SVG_XMLNS,
@@ -29,7 +29,7 @@ import {
   RemoveChildMutation,
   TreeNodeMutationTypes,
   calculateAbsoluteBounds
-} from "@tandem/common";
+} from "aerial-common";
 
 import {
   DOMNodeType,

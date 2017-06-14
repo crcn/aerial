@@ -1,14 +1,14 @@
-import { IDispatcher } from "@tandem/mesh";
+import { IBus } from "mesh";
 import {
   Kernel,
   PrivateBusProvider,
   MimeTypeProvider,
   KernelProvider,
-} from "@tandem/common/ioc";
-import { IDisposable } from "@tandem/common/object";
+} from "../ioc";
+import { IDisposable } from "../object";
 
-import { bindable, inject } from "@tandem/common/decorators";
-import { Observable, watchProperty } from "@tandem/common/observable";
+import { bindable, inject } from "../decorators";
+import { Observable, watchProperty } from "../observable";
 
 
 export class File extends Observable {
@@ -30,7 +30,7 @@ export class File extends Observable {
   protected _kernel: Kernel;
 
   @inject(PrivateBusProvider.ID)
-  protected _bus: IDispatcher<any, any>;
+  protected _bus: IBus<any, any>;
 
   constructor() {
     super();

@@ -1,6 +1,6 @@
-import { CallbackDispatcher, IDispatcher } from "@tandem/mesh";
-import { IObservable, Observable } from "@tandem/common/observable";
-import { CoreEvent, PropertyMutation } from "@tandem/common/messages";
+import { CallbackBus, IBus } from "mesh";
+import { IObservable, Observable } from "../observable";
+import { CoreEvent, PropertyMutation } from "../messages";
 
 function shouldBubbleEvents(proto: any, property: string) {
   return proto[`$bubbleEvents$${property}`];
@@ -11,11 +11,11 @@ export function bindable(bubbles: boolean = false) {
   class BindableValue {
     private _value: any;
     private _shouldBubbleEvents: boolean;
-    private _valueObserver: IDispatcher<any, any>;
+    private _valueObserver: IBus<any, any>;
 
     constructor(readonly target: IObservable, readonly property: string) {
       if (shouldBubbleEvents(target, property)) {
-        this._valueObserver = new CallbackDispatcher(this.onValueEvent.bind(this));
+        this._valueObserver = new CallbackBus(this.onValueEvent.bind(this));
       }
     }
 

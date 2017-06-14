@@ -1,21 +1,24 @@
 import sift from 'sift';
-import { IDispatcher } from "@tandem/mesh";
-import { inject } from "@tandem/common/decorators";
-import { isMaster } from "@tandem/common/workers";
-import { IBrokerBus } from "@tandem/common/dispatchers";
-import { IDisposable } from "@tandem/common/object";
+import { IBus } from "mesh";
+import { inject } from "../decorators";
+import { isMaster } from "../workers";
+import { IBrokerBus } from "../busses";
+import { IDisposable } from "../object";
 import { IActiveRecord } from "./base";
-import { PostDSMessage } from "@tandem/common/messages";
-import { ObservableCollection } from "@tandem/common/observable";
-import { Kernel, PrivateBusProvider, IInjectable } from "@tandem/common/ioc";
+import { PostDSMessage } from "../messages";
+import { ObservableCollection } from "../observable";
+import { Kernel, PrivateBusProvider, IInjectable } from "../ioc";
 import {
   FilterBus,
   readOneChunk,
-  DSFindRequest,
   readAllChunks,
+  CallbackBus,
+} from "mesh";
+import {
+  DSFindRequest,
   DSUpdateRequest,
-  CallbackDispatcher,
-  DSInsertRequest } from "@tandem/mesh";
+  DSInsertRequest 
+} from "mesh-ds";
 
 // TODO - remove global listener
 // TODO - listen to DS mediator for updates on record collection
@@ -25,7 +28,7 @@ export class ActiveRecordCollection<T extends IActiveRecord<any>, U> extends Obs
   public query: Object;
   public createActiveRecord: (source: U) => T;
   private _bus: IBrokerBus;
-  private _globalMessageObserver: IDispatcher<any, any>;
+  private _globalMessageObserver: IBus<any, any>;
 
   static create<T extends IActiveRecord<any>, U>(collectionName: string, kernel: Kernel, createActiveRecord: (source: U) => T, query: any = {}): ActiveRecordCollection<T, U> {
     return (ObservableCollection.create.call(this) as ActiveRecordCollection<any, any>).setup(collectionName, kernel, createActiveRecord, query);
@@ -37,7 +40,7 @@ export class ActiveRecordCollection<T extends IActiveRecord<any>, U> extends Obs
     this.createActiveRecord = createActiveRecord;
     this._globalMessageObserver = new FilterBus((message: PostDSMessage) => {
       return (message.type === DSUpdateRequest.DS_UPDATE || message.type === DSInsertRequest.DS_INSERT || message.type === PostDSMessage.DS_DID_UPDATE || message.type === PostDSMessage.DS_DID_INSERT) && message.collectionName === this.collectionName && sift(this.query)(message.data);
-    }, new CallbackDispatcher(this.onPostDSMessage.bind(this)));
+    }, new CallbackBus(this.onPostDSMessage.bind(this)));
     this.query = query || {};
     return this;
   }

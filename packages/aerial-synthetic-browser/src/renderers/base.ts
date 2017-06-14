@@ -1,6 +1,6 @@
 import { values } from "lodash";
-import { CoreEvent, MutationEvent } from "@tandem/common";
-import { CallbackDispatcher, IDispatcher } from "@tandem/mesh";
+import { CoreEvent, MutationEvent } from "aerial-common";
+import { CallbackBus, IBus } from "mesh";
 import { SyntheticRendererEvent, DOMNodeEvent } from "../messages";
 
 import {
@@ -15,7 +15,7 @@ import {
   PropertyMutation,
   MetadataChangeEvent,
   waitForPropertyChange,
-} from "@tandem/common";
+} from "aerial-common";
 
 import {
   DOMNodeType,
@@ -98,7 +98,7 @@ export abstract class BaseRenderer extends Observable implements ISyntheticDocum
   readonly rectsWatcher: PropertyWatcher<BaseRenderer, any>;
 
   private _shouldRenderAgain: boolean;
-  private _targetObserver: IDispatcher<any, any>;
+  private _targetObserver: IBus<any, any>;
   private _computedStyles: any;
   private _currentRenderPromise: Promise<any>;
 
@@ -120,7 +120,7 @@ export abstract class BaseRenderer extends Observable implements ISyntheticDocum
       this.element = this.createElement();
     }
 
-    this._targetObserver = new CallbackDispatcher(this.onDocumentEvent.bind(this));
+    this._targetObserver = new CallbackBus(this.onDocumentEvent.bind(this));
   }
 
   get rects(): any {
@@ -253,7 +253,7 @@ export abstract class BaseRenderer extends Observable implements ISyntheticDocum
 export class BaseDecoratorRenderer extends Observable implements ISyntheticDocumentRenderer {
   constructor(protected _renderer: ISyntheticDocumentRenderer) {
     super();
-    _renderer.observe(new CallbackDispatcher(this.onTargetRendererEvent.bind(this)));
+    _renderer.observe(new CallbackBus(this.onTargetRendererEvent.bind(this)));
   }
   get rects() {
     return this._renderer.rects;

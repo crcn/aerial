@@ -1,6 +1,6 @@
-import { CoreEvent } from "@tandem/common/messages";
+import { CoreEvent } from "../messages";
 import { IObservable } from "./base";
-import { IDispatcher } from "@tandem/mesh";
+import { IBus } from "mesh";
 
 // TODO - change "notify" to "dispatch"
 export class Observable implements IObservable {
@@ -11,9 +11,9 @@ export class Observable implements IObservable {
     }
   }
 
-  observe(...dispatchers: IDispatcher<any, any>[]) {
-    for (let i = 0, n = dispatchers.length; i < n; i++) {
-      const actor = dispatchers[i];
+  observe(...busses: IBus<any, any>[]) {
+    for (let i = 0, n = busses.length; i < n; i++) {
+      const actor = busses[i];
       if (!actor && !actor.dispatch) {
         throw new Error(`Attempting to add a non-observable object.`);
       }
@@ -28,9 +28,9 @@ export class Observable implements IObservable {
     }
   }
 
-  unobserve(...dispatchers: IDispatcher<any, any>[]) {
-    for (let i = 0, n = dispatchers.length; i < n; i++) {
-      const actor = dispatchers[i];
+  unobserve(...busses: IBus<any, any>[]) {
+    for (let i = 0, n = busses.length; i < n; i++) {
+      const actor = busses[i];
       if (this._observers === actor) {
         this._observers = null;
       } else if (Array.isArray(this._observers)) {

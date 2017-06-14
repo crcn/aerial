@@ -1,5 +1,5 @@
 import { flattenDeep } from "lodash";
-import { ICloneable } from "@tandem/common/object";
+import { ICloneable } from "../object";
 import assert = require("assert");
 
 export interface IInjectable {

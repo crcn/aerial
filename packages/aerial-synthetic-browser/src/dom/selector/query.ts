@@ -1,4 +1,4 @@
-import { IDispatcher } from "@tandem/mesh";
+import { IBus } from "mesh";
 import { throttle, Cancelable } from "lodash";
 import { getSelectorTester, ISelectorTester } from "./tester";
 import { SyntheticDOMNode, SyntheticDOMElement, SyntheticDOMContainer, DOMNodeType } from "../markup";
@@ -19,10 +19,10 @@ import {
   DisposableCollection,
   PropertyMutation,
   propertyChangeCallbackType,
-} from "@tandem/common";
+} from "aerial-common";
 
 
-import { CallbackDispatcher } from "@tandem/mesh";
+import { CallbackBus } from "mesh";
 
 export interface IDOMTreeWalker extends ITreeWalker {
   stop();
@@ -204,11 +204,11 @@ export abstract class BaseElementQuerier<T extends SyntheticDOMElement> extends 
 
 export class SyntheticElementQuerier<T extends SyntheticDOMElement> extends BaseElementQuerier<T> {
 
-  private _rootObserver: IDispatcher<any, any>;
+  private _rootObserver: IBus<any, any>;
 
   constructor(target?: SyntheticDOMContainer, selector: string = "*", filter?: elementQueryFilterType) {
     super(target, selector, filter);
-    this._rootObserver = new CallbackDispatcher(this.onRootEvent.bind(this));
+    this._rootObserver = new CallbackBus(this.onRootEvent.bind(this));
   }
 
   protected reset() {

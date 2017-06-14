@@ -3,7 +3,7 @@ Worker API for tandem.
 entry.js:
 
 ```javascript
-import { isMaster, fork } from '@tandem/common/workers';
+import { isMaster, fork } from 'aerial-common/workers';
 
 
 if (isMaster) {
@@ -18,7 +18,7 @@ if (isMaster) {
 any-file.js:
 
 ```javascript
-import { thread } from '@tandem/common/workers';
+import { thread } from 'aerial-common/workers';
 
 export default const slowFunction = thread(function() {
   return 'do something!';

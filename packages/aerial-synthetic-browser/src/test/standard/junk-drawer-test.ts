@@ -1,5 +1,5 @@
 // import { expect } from "chai";
-// import { LogLevel } from "@tandem/common";
+// import { LogLevel } from "aerial-common";
 // import { loadTestBrowser } from "../../test";
 // import { SyntheticBrowser, SyntheticHTMLElement } from "../..";
 

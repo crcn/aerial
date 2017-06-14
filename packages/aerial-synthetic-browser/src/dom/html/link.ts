@@ -3,7 +3,7 @@ import {
   deserialize,
   CSS_MIME_TYPE,
   HTML_MIME_TYPE,
-} from "@tandem/common";
+} from "aerial-common";
 
 import { SyntheticHTMLElement } from "./element";
 import { SyntheticCSSStyleSheet } from "../css";

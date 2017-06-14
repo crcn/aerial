@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { flattenTree } from "@tandem/common";
+import { flattenTree } from "aerial-common";
 import { generateRandomSyntheticHTMLElement } from "../test/helpers";
 import chalk =  require("chalk");
 import {

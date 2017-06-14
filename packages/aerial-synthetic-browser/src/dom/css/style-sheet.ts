@@ -22,7 +22,7 @@ import {
   SerializedContentType,
   RemoveChildMutation,
   InsertChildMutation,
-} from "@tandem/common";
+} from "aerial-common";
 
 import { syntheticCSSRuleType, diffStyleSheetRules } from "./utils";
 

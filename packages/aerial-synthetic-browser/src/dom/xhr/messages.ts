@@ -1,4 +1,4 @@
-import { IMessage } from "@tandem/mesh";
+import { IMessage } from "mesh";
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
 export interface IHTTPHeaders {

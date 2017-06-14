@@ -3,7 +3,7 @@ import { BaseContentEdit } from "@tandem/sandbox";
 import { SyntheticDocument } from "../document";
 import { IMarkupNodeVisitor } from "./visitor";
 import { SyntheticDOMNodeSerializer } from "./node";
-import { serializable, serialize, deserialize, ISerializable, ISerializer, ITreeWalker } from "@tandem/common";
+import { serializable, serialize, deserialize, ISerializable, ISerializer, ITreeWalker } from "aerial-common";
 import { SyntheticDOMValueNode, SyntheticDOMValueNodeSerializer, SyntheticDOMValueNodeEdit } from "./value-node";
 
 

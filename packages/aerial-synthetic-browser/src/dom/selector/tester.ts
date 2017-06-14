@@ -2,7 +2,7 @@ import nwmatcher =  require("nwmatcher");
 import { SyntheticWindow } from "../window";
 import { SyntheticDocument } from "../document";
 import { SyntheticHTMLElement } from "../html";
-import { getTreeAncestors, getPreviousTreeSiblings } from "@tandem/common";
+import { getTreeAncestors, getPreviousTreeSiblings } from "aerial-common";
 import { SyntheticDOMNode, SyntheticDOMElement, DOMNodeType } from "../markup";
 
 const _testers = {};

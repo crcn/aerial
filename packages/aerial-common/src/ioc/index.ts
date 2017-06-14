@@ -1,9 +1,9 @@
 import {Observable } from "../observable";
-import { ICommand } from "@tandem/common/commands";
+import { ICommand } from "../commands";
 import { CoreEvent } from "../messages";
-import { IBrokerBus } from "../dispatchers";
-import { ITyped, INamed } from "@tandem/common/object";
-import { IDispatcher, IMessage } from "@tandem/mesh";
+import { IBrokerBus } from "../busses";
+import { ITyped, INamed } from "../object";
+import { IBus, IMessage } from "mesh";
 
 import {
   IFactory,
@@ -191,9 +191,9 @@ export function createSingletonProviderClass<T>(id: string): { getInstance(provi
 }
 
 
-export class DSProvider extends Provider<IDispatcher<any, any>> {
+export class DSProvider extends Provider<IBus<any, any>> {
   static readonly ID: string = "ds";
-  constructor(value: IDispatcher<any, any>) {
+  constructor(value: IBus<any, any>) {
     super(DSProvider.ID, value);
   }
 }

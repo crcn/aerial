@@ -1,5 +1,5 @@
-import { IMessage, IDispatcher } from "@tandem/mesh";
-import { CoreEvent, Observable, serializable } from "@tandem/common";
+import { IMessage, IBus } from "mesh";
+import { CoreEvent, Observable, serializable } from "aerial-common";
 import { SyntheticDOMNode } from "../markup";
 
 export class SyntheticDOMEvent<T> extends CoreEvent {
@@ -76,7 +76,7 @@ export namespace DOMEventTypes {
 
 export type DOMEventListenerFunction = <T extends SyntheticDOMNode>(event: SyntheticDOMEvent<T>) => boolean|void;
 
-export class DOMEventDispatcher implements IDispatcher<SyntheticDOMEvent<any>, void> {
+export class DOMEventDispatcher implements IBus<SyntheticDOMEvent<any>, void> {
   constructor(readonly type: string, readonly listener: DOMEventListenerFunction) { }
 
   dispatch(event: SyntheticDOMEvent<any>) {

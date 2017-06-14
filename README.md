@@ -32,6 +32,12 @@ Aerial can also defer application execution to remote processes using the `Remot
 
 #### Who is Aerial for?
 
+<!-- There were a few guiding principles when developing Aerial out:
+
+- 
+- Cross-browser, and platform testing (mobile, tablet, desktop), should 
+-->
+
 This library was designed for developers that want to create tooling for catching visual bugs in web applications. Here are some examples of what you can do with Aeiral:
 
 - Unit testing CSS (this is probably the most general use case) across any browser (Safari, Firefox, Chrome, Mobile) via browsertap.com, and across any application state. 

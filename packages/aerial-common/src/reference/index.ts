@@ -1,5 +1,5 @@
 import { IReference } from "./base";
-import { Metadata } from "@tandem/common/metadata";
+import { Metadata } from "../metadata";
 
 export { IReference };
 

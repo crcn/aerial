@@ -1,4 +1,4 @@
-import { BoundingRect } from "@tandem/common";
+import { BoundingRect } from "aerial-common";
 import { SyntheticHTMLElement } from "./element";
 
 export class SyntheticTextRange {

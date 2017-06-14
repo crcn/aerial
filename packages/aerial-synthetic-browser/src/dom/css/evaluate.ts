@@ -13,7 +13,7 @@ import { SyntheticCSSMediaRule } from "./media-rule";
 import { SyntheticCSSStyleSheet } from "./style-sheet";
 import { SyntheticCSSKeyframesRule } from "./keyframes-rule";
 import { SyntheticCSSStyle } from "./style";
-import { ISourceLocation } from "@tandem/common";
+import { ISourceLocation } from "aerial-common";
 
 
 let _smcache = {};

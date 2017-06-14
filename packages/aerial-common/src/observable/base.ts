@@ -1,8 +1,8 @@
-import { IDispatcher } from "@tandem/mesh";
-import { CoreEvent } from "@tandem/common/messages";
+import { IBus } from "mesh";
+import { CoreEvent } from "../messages";
 
 export interface IObservable {
-  observe(actor: IDispatcher<any, any>);
-  unobserve(actor: IDispatcher<any, any>);
+  observe(actor: IBus<any, any>);
+  unobserve(actor: IBus<any, any>);
   notify(event: CoreEvent);
 }

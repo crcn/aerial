@@ -3,7 +3,7 @@ import { SyntheticDocument } from "../document";
 import { IMarkupNodeVisitor } from "./visitor";
 import { SyntheticDOMContainer } from "./container";
 
-import { serializable, ISerializer, serialize, deserialize, SerializedContentType } from "@tandem/common";
+import { serializable, ISerializer, serialize, deserialize, SerializedContentType } from "aerial-common";
 
 
 class SyntheticDocumentFragmentSerializer implements ISerializer<SyntheticDocumentFragment, any[]> {

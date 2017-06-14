@@ -1,4 +1,4 @@
-import { bindable } from "@tandem/common/decorators";
+import { bindable } from "aerial-common/decorators";
 import { difference } from "lodash";
 import { DOMNodeType } from "./node-types";
 import { SyntheticDocument } from "../document";
@@ -6,7 +6,7 @@ import { IMarkupNodeVisitor } from "./visitor";
 import { selectorMatchesElement } from "../selector";
 import { syntheticElementClassType } from "./types";
 import { SyntheticDocumentFragment } from "./document-fragment";
-import { CallbackDispatcher, IDispatcher } from "@tandem/mesh";
+import { CallbackBus, IBus } from "mesh";
 import { SyntheticDOMNode, SyntheticDOMNodeSerializer } from "./node";
 import { DOMEventListenerFunction } from "../events";
 import { 
@@ -36,7 +36,7 @@ import {
   InsertChildMutation,
   ObservableCollection,
   SerializedContentType,
-} from "@tandem/common";
+} from "aerial-common";
 
 
 import { Dependency } from "@tandem/sandbox";
@@ -300,7 +300,7 @@ export class SyntheticDOMElement extends SyntheticDOMContainer {
   readonly dataset: any;
   private _shadowRoot: SyntheticDocumentFragment;
 
-  private _shadowRootObserver: IDispatcher<any, any>;
+  private _shadowRootObserver: IBus<any, any>;
 
   /**
    * Attributes that are not modifiable by the editor. These are typically
@@ -317,7 +317,7 @@ export class SyntheticDOMElement extends SyntheticDOMContainer {
     this._readonlyAttributeNames = [];
     this._shadowRootObserver = new BubbleDispatcher(this);
     this.attributes = SyntheticDOMAttributes.create() as SyntheticDOMAttributes;
-    this.attributes.observe(new CallbackDispatcher(this.onAttributesEvent.bind(this)));
+    this.attributes.observe(new CallbackBus(this.onAttributesEvent.bind(this)));
 
     // todo - proxy this
     this.dataset = {};

@@ -91,7 +91,7 @@ setTimeout(() => {
 The mutations API is used to diff & patch DOM objects whenever an application reloads. The APIs can *also* be used to apply edits to DOM object source files.
 
 ```typescript
-import { Kernel, PrivateBusProvider } from "@tandem/common"
+import { Kernel, PrivateBusProvider } from "aerial-common"
 import { Sandbox, ApplyFileEditRequest } from "@tandem/sandbox";
 import { SyntheticBrowser, ISyntheticDOMRenderer } from "@tandem/synthetic-browser";
 
@@ -325,7 +325,7 @@ Creates a new synthetic browser that executes web application code in the *curre
 
 
 ```typescript
-import { Kernel } from "@tandem/common";
+import { Kernel } from "aerial-common";
 import { Sandbox } from "@tandem/sandbox";
 import { SyntheticBrowser } from "@tandem/synthetic-browser";
 

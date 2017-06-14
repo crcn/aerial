@@ -1,6 +1,6 @@
 import tinyColor =  require("tinycolor2");
 const { parse }  =  require("./parser.peg");
-import { ITreeWalker, bindable, bubble, Observable, ObservableCollection } from "@tandem/common";
+import { ITreeWalker, bindable, bubble, Observable, ObservableCollection } from "aerial-common";
 import { ISyntheticObject, generateSyntheticUID, ISyntheticSourceInfo } from "@tandem/sandbox";
 
 import { 

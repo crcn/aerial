@@ -1,4 +1,4 @@
-import { CoreEvent, MutationEvent, TreeNodeMutationTypes, serializable } from "@tandem/common";
+import { CoreEvent, MutationEvent, TreeNodeMutationTypes, serializable } from "aerial-common";
 import { ISyntheticBrowserOpenOptions } from "./index";
 import { SyntheticCSSStyle } from "./dom/css";
 import {

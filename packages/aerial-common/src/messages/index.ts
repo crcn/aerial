@@ -1,5 +1,5 @@
 import { CoreEvent } from "./base";
-import { IDispatcher, IStreamableDispatcher, DuplexStream, readOneChunk } from "@tandem/mesh";
+import { IBus, IStreamableBus, DuplexStream, readOneChunk } from "mesh";
 
 export * from "./base";
 export * from "./core";

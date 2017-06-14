@@ -1,16 +1,33 @@
 {
   "name": "aerial-common",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "This is currently a junk drawer of dependencies. Most everything here should be moved into separate repositories eventually.",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crcn/aerial.git"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "tsc --declaration; npm run copy-js",
+    "copy-js": "for FILE in `find ./src -name *.js -o -name *.d.ts`; do OUT_FILE=`echo $FILE | sed 's/src/lib/'`; mkdir -p `dirname $OUT_FILE`; cp $FILE $OUT_FILE; done;"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/mocha": "^2.2.41"
+    "@types/inflection": "^1.5.28",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.31",
+    "@types/reflect-metadata": "0.0.5",
+    "chai": "^4.0.2"
+  },
+  "dependencies": {
+    "i": "^0.3.5",
+    "inflection": "^1.12.0",
+    "mesh": "^7.0.3",
+    "mesh-ds": "0.0.x",
+    "mongoid-js": "^1.1.2",
+    "npm": "^5.0.3",
+    "reflect-metadata": "^0.1.10",
+    "sift": "^3.3.10"
   }
 }

@@ -1,11 +1,11 @@
 import { SyntheticWindow } from "../window";
 import { URIProtocolProvider } from "@tandem/sandbox";
-import { IStreamableDispatcher, DuplexStream } from "@tandem/mesh";
-import { inject, Kernel, KernelProvider, loggable, Logger } from "@tandem/common";
+import { IStreamableBus, DuplexStream } from "mesh";
+import { inject, Kernel, KernelProvider, loggable, Logger } from "aerial-common";
 import { IHTTPHeaders, HTTPRequest, HTTPResponse, HTTPStatusType } from "./messages";
 
 @loggable()
-export class XHRServer implements IStreamableDispatcher<HTTPRequest> {
+export class XHRServer implements IStreamableBus<HTTPRequest> {
   
   protected readonly logger: Logger;
 

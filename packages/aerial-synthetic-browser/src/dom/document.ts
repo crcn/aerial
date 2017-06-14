@@ -1,4 +1,4 @@
-import { CallbackDispatcher } from "@tandem/mesh";
+import { CallbackBus } from "mesh";
 import { SyntheticWindow, SyntheticDOMImplementation } from "./window";
 import { ISyntheticBrowser } from "../browser";
 import { SyntheticLocation } from "../location";
@@ -47,7 +47,7 @@ import {
   InsertChildMutation,
   RemoveChildMutation,
   ObservableCollection,
-} from "@tandem/common";
+} from "aerial-common";
 
 
 export interface IRegisterComponentOptions {
@@ -178,7 +178,7 @@ export class SyntheticDocument extends SyntheticDOMContainer {
     super("#document");
     this.$implementation = implementation;
     this.styleSheets = ObservableCollection.create() as any;
-    this.styleSheets.observe(new CallbackDispatcher(this.onStyleSheetsEvent.bind(this)));
+    this.styleSheets.observe(new CallbackBus(this.onStyleSheetsEvent.bind(this)));
     this.$registeredElements = {};
   }
 

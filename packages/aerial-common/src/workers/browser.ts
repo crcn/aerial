@@ -1,4 +1,4 @@
-import { IDispatcher, RemoteBus, filterFamilyMessage } from "@tandem/mesh";
+import { IBus, RemoteBus, filterFamilyMessage } from "mesh";
 import { serialize, deserialize } from "../serialize";
 import { CoreEvent } from "../messages";
 
@@ -33,7 +33,7 @@ function getNextWorker(): Worker {
   return workers.length ? workers[currentWorkerIndex = (currentWorkerIndex + 1) % workers.length] : undefined;
 }
 
-function createWorkerBus(family: string, worker: any, localBus: IDispatcher<any, any>): IDispatcher<any, any> {
+function createWorkerBus(family: string, worker: any, localBus: IBus<any, any>): IBus<any, any> {
   return new RemoteBus({
     family: family,
     testMessage: filterFamilyMessage,
@@ -53,14 +53,14 @@ function createWorkerBus(family: string, worker: any, localBus: IDispatcher<any,
 /**
  */
 
-export function fork(family: string, localBus: IDispatcher<any, any>, pathName?: string, argv?: any[], env?: any) {
+export function fork(family: string, localBus: IBus<any, any>, pathName?: string, argv?: any[], env?: any) {
   return createWorkerBus(family, new Worker(pathName || lastScriptSrc), localBus);
 }
 
 /**
  */
 
-export function hook(family, localBus: IDispatcher<any, any>) {
+export function hook(family, localBus: IBus<any, any>) {
   return createWorkerBus(family, self, localBus);
 }
 

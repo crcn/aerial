@@ -5,7 +5,7 @@
 import { flattenDeep } from "lodash";
 import { SyntheticCSSStyle, isValidCSSDeclarationProperty } from "../style";
 import { uniq } from "lodash";
-import { Observable, ObservableCollection, bindable, bubble } from "@tandem/common";
+import { Observable, ObservableCollection, bindable, bubble } from "aerial-common";
 import { 
   parseCSSDeclValue, 
   SyntheticCSSColor,   

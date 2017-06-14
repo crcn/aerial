@@ -1,4 +1,4 @@
-import { IObservable } from "@tandem/common/observable";
+import { IObservable } from "../observable";
 
 export interface ITreeNode<T extends ITreeNode<any>> extends IObservable {
   children: Array<T>;

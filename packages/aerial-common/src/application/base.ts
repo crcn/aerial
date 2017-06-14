@@ -1,6 +1,7 @@
-import { IBus } from "@tandem/mesh";
-import { SequenceBus } from "@tandem/mesh";
-import { IBrokerBus, BrokerBus } from "@tandem/common/dispatchers";
+import { IBus } from "mesh";
+
+import { SequenceBus } from "mesh";
+import { IBrokerBus, BrokerBus } from "../busses";
 import { ApplicationServiceProvider } from "./providers";
 import { LoadApplicationRequest, InitializeApplicationRequest, ApplicationReadyMessage } from "../messages";
 import {

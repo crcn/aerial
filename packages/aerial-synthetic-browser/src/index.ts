@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { RemoteBrowserService } from "./remote-browser";
-import { Kernel, ApplicationServiceProvider } from "@tandem/common";
+import { Kernel, ApplicationServiceProvider } from "aerial-common";
 
 export function createSyntheticBrowserWorkerProviders() {
   return [

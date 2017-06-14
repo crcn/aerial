@@ -1,9 +1,9 @@
-import { IRange } from "@tandem/common/geom";
-import { patchable } from "@tandem/common/decorators";
-import { diffArray } from "@tandem/common/utils/array";
-import { ITreeNode, TreeNode } from "@tandem/common/tree";
-import { IObservable, Observable } from "@tandem/common/observable";
-import { IDisposable, IComparable, IPatchable } from "@tandem/common/object";
+import { IRange } from "../geom";
+import { patchable } from "../decorators";
+import { diffArray } from "../utils/array";
+import { ITreeNode, TreeNode } from "../tree";
+import { IObservable, Observable } from "../observable";
+import { IDisposable, IComparable, IPatchable } from "../object";
 
 export interface ISourcePosition {
   line: number;

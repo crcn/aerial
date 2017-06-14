@@ -2,7 +2,7 @@
 // import { SyntheticBrowser, SyntheticHTMLElement } from "..";
 // import { URIProtocolProvider, FileEditorProvider } from "@tandem/sandbox";
 // import { generateRandomSyntheticHTMLElementSource } from "../test";
-// import { Application, waitForPropertyChange, LogLevel } from "@tandem/common";
+// import { Application, waitForPropertyChange, LogLevel } from "aerial-common";
 // // import { createTestMasterApplication, createRandomFileName } from "@tandem/editor/test";
 
 // describe(__filename + "#", () => {

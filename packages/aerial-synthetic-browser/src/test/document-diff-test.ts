@@ -1,5 +1,5 @@
 // import { expect } from "chai";
-// import { Mutation, serialize, deserialize } from "@tandem/common";
+// import { Mutation, serialize, deserialize } from "aerial-common";
 // import { SyntheticObjectChangeWatcher, SyntheticObjectTreeEditor, URIProtocolProvider } from "@tandem/sandbox";
 // import { loadTestBrowser, timeout } from "../test";
 // import { SyntheticCSSElementStyleRule, SyntheticDocument } from "..";

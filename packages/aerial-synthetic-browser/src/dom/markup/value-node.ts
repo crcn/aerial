@@ -1,9 +1,9 @@
-import { bindable } from "@tandem/common";
+import { bindable } from "aerial-common";
 import { decode } from "ent";
 import { DOMNodeType } from "./node-types";
 import { SyntheticDocument } from "../document";
 import { SyntheticDOMNode, SyntheticDOMNodeEdit } from "./node";
-import { ISerializer, Mutation, SetValueMutation, PropertyMutation  } from "@tandem/common";
+import { ISerializer, Mutation, SetValueMutation, PropertyMutation  } from "aerial-common";
 import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor, GroupEditor } from "@tandem/sandbox";
 
 export namespace SyntheticDOMValueNodeMutationTypes {

@@ -5,14 +5,14 @@ import { ISyntheticBrowser, SyntheticBrowser, BaseSyntheticBrowser, ISyntheticBr
 import { 
   pump, 
   IMessage,
-  IDispatcher, 
+  IBus, 
   DuplexStream, 
   WritableStream, 
   ReadableStream, 
-  CallbackDispatcher, 
-  IStreamableDispatcher, 
+  CallbackBus, 
+  IStreamableBus, 
   ReadableStreamDefaultReader, 
-} from "@tandem/mesh";
+} from "mesh";
 import {
   fork,
   Logger,
@@ -35,7 +35,7 @@ import {
   watchProperty,
   PrivateBusProvider,
   BaseApplicationService,
-} from "@tandem/common";
+} from "aerial-common";
 
 import { 
   getNodePath,
@@ -89,7 +89,7 @@ export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
 
   readonly logger: Logger;
 
-  private _bus: IStreamableDispatcher<any>;
+  private _bus: IStreamableBus<any>;
   private _documentEditor: SyntheticObjectTreeEditor;
   private _remoteStreamReader: ReadableStreamDefaultReader<any>;
   private _writer: any;
@@ -286,7 +286,7 @@ export class RemoteBrowserService extends BaseApplicationService {
         writer.write({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.STATUS_CHANGE, status)) });
       };
 
-      const browserObserver = new CallbackDispatcher((event: CoreEvent) => {
+      const browserObserver = new CallbackBus((event: CoreEvent) => {
         if (event.type === LogEvent.LOG) {
           const logEvent = event as LogEvent;
           console.log("EMITTING LOG", logEvent.text);

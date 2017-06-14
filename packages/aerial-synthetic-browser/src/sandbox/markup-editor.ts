@@ -6,7 +6,7 @@ import {
   MoveChildMutation,
   InsertChildMutation,
   sourcePositionEquals,
-} from "@tandem/common";
+} from "aerial-common";
 
 import {
   ISyntheticObject,

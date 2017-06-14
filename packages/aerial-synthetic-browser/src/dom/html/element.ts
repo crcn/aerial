@@ -3,7 +3,7 @@ import { SyntheticCSSStyle } from "../css";
 import { bindDOMEventMethods } from "../utils";
 import { localizeFixedPosition } from "./utils";
 import { DOMEventListenerFunction } from "../events";
-import { BoundingRect, serializable, IPoint, bindable, ArrayCollection } from "@tandem/common";
+import { BoundingRect, serializable, IPoint, bindable, ArrayCollection } from "aerial-common";
 
 import {
   evaluateMarkup,

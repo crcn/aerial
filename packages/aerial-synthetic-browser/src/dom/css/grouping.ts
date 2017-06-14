@@ -1,4 +1,4 @@
-import { Mutation, InsertChildMutation, RemoveChildMutation, MoveChildMutation } from "@tandem/common";
+import { Mutation, InsertChildMutation, RemoveChildMutation, MoveChildMutation } from "aerial-common";
 import { parseCSS } from "./parsers";
 import { diffStyleSheetRules, syntheticCSSRuleType } from "./utils";
 import { BaseEditor } from "@tandem/sandbox";

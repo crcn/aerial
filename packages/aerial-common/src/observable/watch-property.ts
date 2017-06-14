@@ -1,15 +1,15 @@
 import { IObservable } from "./base";
 import { Observable } from "./core";
 import { IDisposable } from "../object";
-import { IDispatcher } from "@tandem/mesh";
-import { PropertyMutation, MutationEvent, CoreEvent } from "@tandem/common/messages";
+import { IBus } from "mesh";
+import { PropertyMutation, MutationEvent, CoreEvent } from "../messages";
 
 export type propertyChangeCallbackType = (newValue: any, oldValue: any) => void;
 
 
 export class PropertyWatcher<T extends IObservable, U> extends Observable {
   private _currentValue: U;
-  private _observer: IDispatcher<any, any>;
+  private _observer: IBus<any, any>;
   private _listening: boolean;
 
   constructor(readonly target: T, readonly propertyName: string) {

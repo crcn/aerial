@@ -1,10 +1,10 @@
 import sift = require("sift");
 import { CoreEvent } from "./base";
-import { ITreeNode } from "@tandem/common/tree";
-import { IDisposable } from "@tandem/common/object";
-import { serializable, ISerializer } from "@tandem/common/serialize";
-import {  DSFindRequest, DSInsertRequest, DSRemoveRequest, DSUpdateRequest, DSMessage } from "@tandem/mesh/ds";
-import { Message } from "@tandem/mesh";
+import { ITreeNode } from "../tree";
+import { IDisposable } from "../object";
+import { serializable, ISerializer } from "../serialize";
+import {  DSFindRequest, DSInsertRequest, DSRemoveRequest, DSUpdateRequest, DSMessage } from "mesh-ds";
+import { Message } from "mesh";
 
 export { CoreEvent };
 

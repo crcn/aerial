@@ -1,7 +1,7 @@
 import { CoreEvent } from "../messages";
 import { Observable } from "./index";
 import { expect } from "chai";
-import { CallbackDispatcher } from "@tandem/mesh";
+import { CallbackBus } from "mesh";
 
 describe(__filename + "#", () => {
   it("can be created", () => {
@@ -70,7 +70,7 @@ describe(__filename + "#", () => {
   it("can unobserve an observable", () => {
     const obs = new Observable();
     let i = 0;
-    const observer = new CallbackDispatcher(() => i++);
+    const observer = new CallbackBus(() => i++);
     obs.observe(observer);
     obs.notify(new CoreEvent("a"));
     expect(i).to.equal(1);

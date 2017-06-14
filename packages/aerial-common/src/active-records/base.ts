@@ -1,18 +1,20 @@
 import sift = require("sift");
-import { inject } from "@tandem/common/decorators";
-import { IStreamableDispatcher, IBus, DuplexStream, DSMessage } from "@tandem/mesh";
+import { inject } from "../decorators";
+import { IStreamableBus, IBus, DuplexStream, ParallelBus, readOneChunk, CallbackBus, IMessage } from "mesh";
+import {  } from "mesh-ds";
 import mongoid = require("mongoid-js");
-import { IDisposable } from "@tandem/common/object";
-import { ISerializable } from "@tandem/common/serialize";
-import { IBrokerBus } from "@tandem/common/dispatchers";
-import { Observable, IObservable } from "@tandem/common/observable";
-import { CallbackDispatcher, ParallelBus, readOneChunk, DSFindRequest, DSInsertRequest, DSUpdateRequest, DSRemoveRequest, IMessage } from "@tandem/mesh";
-import { Kernel, PrivateBusProvider, IInjectable } from "@tandem/common/ioc";
+import { IDisposable } from "../object";
+import { ISerializable } from "../serialize";
+import 
+{ IBrokerBus } from "../busses";
+import { Observable, IObservable } from "../observable";
+import { DSMessage, DSFindRequest, DSInsertRequest, DSUpdateRequest, DSRemoveRequest } from "mesh-ds";
+import { Kernel, PrivateBusProvider, IInjectable } from "../ioc";
 import {
   PostDSMessage,
   DisposeEvent,
   ActiveRecordEvent,
-} from "@tandem/common/messages";
+} from "../messages";
 
 
 export interface IActiveRecord<T> extends IObservable, IInjectable, IDisposable, ISerializable<T> {
@@ -38,7 +40,7 @@ export interface IActiveRecord<T> extends IObservable, IInjectable, IDisposable,
 export abstract class BaseActiveRecord<T> extends Observable implements IActiveRecord<T> {
 
   @inject(PrivateBusProvider.ID)
-  protected dispatcher: IStreamableDispatcher<any>;
+  protected dispatcher: IStreamableBus<any>;
 
   // TODO - move this to reflect metadata
   readonly idProperty: string = "_id";

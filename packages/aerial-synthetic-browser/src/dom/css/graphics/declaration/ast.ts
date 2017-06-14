@@ -1,4 +1,4 @@
-import { ISourceLocation } from "@tandem/common";
+import { ISourceLocation } from "aerial-common";
 
 export enum CSSDeclValueExpressionKind {
   IDENTIFIER  = 1,

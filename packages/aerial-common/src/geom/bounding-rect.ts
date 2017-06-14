@@ -1,4 +1,4 @@
-import { IPoint } from "@tandem/common/geom";
+import { IPoint } from "../geom";
 import { serializable } from "../serialize";
 
 @serializable("BoundingRect", {

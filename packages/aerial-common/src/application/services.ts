@@ -1,8 +1,8 @@
 import { Logger } from "../logger";
-import { IBrokerBus } from "../dispatchers";
+import { IBrokerBus } from "../busses";
 import { loggable, inject } from "../decorators";
 import { ApplicationConfigurationProvider } from "./providers";
-import {  IDispatcher, IMessageTester, IMessage } from "@tandem/mesh";
+import {  IBus, IMessageTester, IMessage } from "mesh";
 import { Kernel, IInjectable, KernelProvider,  PrivateBusProvider } from "../ioc";
 
 /**
@@ -10,7 +10,7 @@ import { Kernel, IInjectable, KernelProvider,  PrivateBusProvider } from "../io
  * entiry application.
  */
 
-export abstract class BaseApplicationService implements  IDispatcher<any, any>, IInjectable, IMessageTester<any> {
+export abstract class BaseApplicationService implements  IBus<any, any>, IInjectable, IMessageTester<any> {
 
   protected readonly logger: Logger;
 

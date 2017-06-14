@@ -2,9 +2,9 @@ import sift from "sift";
 import { SyntheticCSSObject } from "./base";
 import { kebabCase, camelCase } from "lodash";
 import { SyntheticDOMNode } from "../../dom";
-import { CallbackDispatcher } from "@tandem/mesh";
+import { CallbackBus } from "mesh";
 import { SyntheticCSSElementStyleRuleMutationTypes } from "./style-rule";
-import { ISerializable, serializable, diffArray, ITreeWalker, PropertyMutation, serialize, deserialize } from "@tandem/common";
+import { ISerializable, serializable, diffArray, ITreeWalker, PropertyMutation, serialize, deserialize } from "aerial-common";
 import { IContentEdit , ISyntheticObject, generateSyntheticUID, IEditable, BaseContentEdit } from "@tandem/sandbox";
 
 export interface ISerializedSyntheticCSSStyle extends SyntheticCSSStyle { }

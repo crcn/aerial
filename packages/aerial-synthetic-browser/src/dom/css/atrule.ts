@@ -16,7 +16,7 @@ import {
   SerializedContentType,
   InsertChildMutation,
   RemoveChildMutation,
-} from "@tandem/common";
+} from "aerial-common";
 
 import {
   BaseEditor,

@@ -1,5 +1,5 @@
 import Url = require("url");
-import { Observable, PropertyWatcher, bindable } from "@tandem/common";
+import { Observable, PropertyWatcher, bindable } from "aerial-common";
 import { SyntheticLocation } from "../../location";
 
 export class SyntheticHistory extends Observable {

@@ -1,4 +1,5 @@
-import { Kernel } from "@tandem/common/ioc";
+import "reflect-metadata";
+import { Kernel } from "../ioc";
 
 export type SerializedContentType<T> = any[];
 

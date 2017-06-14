@@ -1,6 +1,6 @@
 import { Dependency } from "@tandem/sandbox";
 import { kebabCase } from "lodash";
-import { CallbackDispatcher } from "@tandem/mesh";
+import { CallbackBus } from "mesh";
 import { SyntheticDOMElement, getSelectorTester } from "..";
 import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor } from "@tandem/sandbox";
 import { ISerializedSyntheticCSSStyle, SyntheticCSSStyle, isValidCSSDeclarationProperty } from "./style";
@@ -19,7 +19,7 @@ import {
   PropertyMutation,
   SetValueMutation,
   SerializedContentType,
-} from "@tandem/common";
+} from "aerial-common";
 
 export namespace SyntheticCSSStyleRuleMutationTypes {
   export const SET_DECLARATION = "setDeclaration";
@@ -95,7 +95,7 @@ export class SyntheticCSSStyleRuleEditor extends BaseEditor<SyntheticCSSStyleRul
 export abstract class SyntheticCSSStyleRule extends SyntheticCSSObject {
   
   private _metadata: Metadata;
-  private _metadataObserver: CallbackDispatcher<any, any>;
+  private _metadataObserver: CallbackBus<any, any>;
 
   constructor(public style: SyntheticCSSStyle) {
     super();
@@ -106,7 +106,7 @@ export abstract class SyntheticCSSStyleRule extends SyntheticCSSObject {
   get metadata() {
     if (this._metadata) return this._metadata;
     this._metadata = new Metadata();
-    this._metadata.observe(this._metadataObserver = new CallbackDispatcher(this._onMetadataEvent.bind(this)));
+    this._metadata.observe(this._metadataObserver = new CallbackBus(this._onMetadataEvent.bind(this)));
     return this._metadata;
   }
 

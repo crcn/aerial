@@ -3,9 +3,9 @@ import {
   Kernel,
   ClassFactoryProvider,
 } from "../ioc";
-import { IDispatcher } from "@tandem/mesh";
+import { IBus } from "mesh";
 
-export class ApplicationServiceProvider<T extends  IDispatcher<any, any>> extends ClassFactoryProvider {
+export class ApplicationServiceProvider<T extends  IBus<any, any>> extends ClassFactoryProvider {
 
   static readonly NS = "services";
 

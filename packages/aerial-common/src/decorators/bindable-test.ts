@@ -1,6 +1,6 @@
 import { bindable } from "./bindable";
 import { expect } from "chai";
-import { IMessage } from "@tandem/mesh";
+import { IMessage } from "mesh";
 import { Observable } from "../observable";
 
 describe(__filename + "#", () => {

@@ -1,4 +1,4 @@
-import { IValued } from "@tandem/common/object";
+import { IValued } from "../object";
 
 export interface IReference extends IValued {
   value: any;

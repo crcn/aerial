@@ -1,9 +1,9 @@
-import { IEqualable } from "@tandem/common";
+import { IEqualable } from "aerial-common";
 import { SyntheticDOMElement } from "./element";
 import { ISyntheticDocumentRenderer } from "../../renderers";
-import { bindable, BoundingRect, IPoint, waitForPropertyChange } from "@tandem/common";
+import { bindable, BoundingRect, IPoint, waitForPropertyChange } from "aerial-common";
 
-// TODO - possibly move this over to @tandem/common/display or similar
+// TODO - possibly move this over to aerial-common/display or similar
 export class VisibleDOMNodeCapabilities {
   constructor(
     readonly movable: boolean,

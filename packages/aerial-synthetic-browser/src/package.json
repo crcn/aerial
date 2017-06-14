@@ -23,7 +23,7 @@
     "tinycolor2": "^1.4.1"
   },
   "peerDependencies": {
-    "@tandem/common": "1.0.x",
+    "aerial-common": "1.0.x",
     "@tandem/sandbox": "1.0.x"
   }
 }

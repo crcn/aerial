@@ -1,8 +1,8 @@
 import { ITreeNode } from "./base";
 import { ITreeWalker, IWalkable } from "./walker";
-import { Observable, IObservable } from "@tandem/common/observable";
-import { CallbackDispatcher, IDispatcher } from "@tandem/mesh";
-import { CoreEvent, Mutation, InsertChildMutation, RemoveChildMutation } from "@tandem/common/messages";
+import { Observable, IObservable } from "../observable";
+import { CallbackBus, IBus } from "mesh";
+import { CoreEvent, Mutation, InsertChildMutation, RemoveChildMutation } from "../messages";
 
 export { ITreeNode };
 
@@ -15,12 +15,12 @@ export class TreeNode<T extends TreeNode<any>> extends Observable implements ITr
 
   private _parent: T;
   private _children: Array<T>;
-  private _childObserver: IDispatcher<any, any>;
+  private _childObserver: IBus<any, any>;
 
   constructor() {
     super();
     this._children = this.createChildren();
-    this._childObserver = new CallbackDispatcher(this.onChildAction.bind(this));
+    this._childObserver = new CallbackBus(this.onChildAction.bind(this));
   }
 
   get children(): Array<T> {

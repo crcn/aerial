@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { generateRandomStyleSheet } from "../test/helpers";
-import { flattenTree } from "@tandem/common";
+import { flattenTree } from "aerial-common";
 import chalk =  require("chalk");
 import { 
   parseCSS,

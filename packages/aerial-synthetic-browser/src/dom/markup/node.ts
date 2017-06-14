@@ -37,7 +37,7 @@ import {
   findTreeNode,
   serializable,
   BubbleDispatcher,
-} from "@tandem/common";
+} from "aerial-common";
 
 export interface ISerializedSyntheticDOMNode {
   source: ISyntheticSourceInfo;

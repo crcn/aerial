@@ -1,6 +1,6 @@
-import { CoreEvent } from "@tandem/common/messages";
+import { CoreEvent } from "../messages";
 import { IObservable } from "./base";
-import { IDispatcher } from "@tandem/mesh";
+import { IBus } from "mesh";
 
 export { IObservable };
 

@@ -1,5 +1,5 @@
 
-import { BoundingRect } from "@tandem/common/geom";
+import { BoundingRect } from "../../geom";
 
 export function translateAbsoluteToRelativePoint(event, relativeElement) {
 

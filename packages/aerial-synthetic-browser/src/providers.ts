@@ -16,7 +16,7 @@ import {
   HTML_MIME_TYPE,
   MimeTypeProvider, 
   ApplicationServiceProvider,
-} from "@tandem/common";
+} from "aerial-common";
 
 import { 
   HTML_XMLNS, 

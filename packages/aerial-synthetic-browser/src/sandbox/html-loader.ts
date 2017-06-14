@@ -20,7 +20,7 @@ import {
   ISourceLocation,
   ISourcePosition,
   KernelProvider,
-} from "@tandem/common";
+} from "aerial-common";
 
 import {
   getHTMLASTNodeLocation,

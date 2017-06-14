@@ -9,27 +9,18 @@
       "es6"
     ],
     "module": "commonjs",
-    "outDir": "out",
+    "outDir": "lib",
     "baseUrl": "src",
-    "experimentalDecorators": true,
-    "jsx": "react"
+    "experimentalDecorators": true
   },
-  "types": [
-    "sift",
-    "get-port"
-  ],
   "exclude": [
     "node_modules",
     "*-test",
-    "old",
-    "out",
-    "dist",
-    "integrations",
-    "examples"
+    "lib",
+    "index.d.ts"
   ],
   "filesGlob": [
-    "./src/**/*.ts",
-    "./src/**/*.tsx"
+    "./src/**/*.ts"
   ],
   "rootDirs": [
     "src",

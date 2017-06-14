@@ -12,7 +12,7 @@ import {
   diffArray,
   SerializedContentType,
   ITreeWalker
-} from "@tandem/common";
+} from "aerial-common";
 import { SyntheticCSSGroupAtRule, SyntheticCSSGroupAtRuleEdit, SyntheticCSSGroupAtRuleMutationTypes } from "./atrule";
 
 export interface ISerializedSyntheticCSSKeyframesRule {

@@ -1,7 +1,7 @@
 import vm =  require("vm");
 import Url = require("url");
 import path = require("path");
-import { IDispatcher } from "@tandem/mesh";
+import { IBus } from "mesh";
 import { SyntheticLocation } from "./location";
 import { SyntheticRendererEvent } from "./messages";
 import { SyntheticDocument, SyntheticWindow, SyntheticDOMNode, SyntheticDOMElement } from "./dom";
@@ -33,7 +33,7 @@ import {
   MetadataChangeEvent,
   ObservableCollection,
   waitForPropertyChange,
-} from "@tandem/common";
+} from "aerial-common";
 
 import {
   Sandbox,
@@ -50,7 +50,7 @@ import {
   SyntheticDOMElementClassProvider,
 } from "./providers";
 
-import { CallbackDispatcher } from "@tandem/mesh";
+import { CallbackBus } from "mesh";
 
 export interface ISyntheticBrowserOpenOptions {
 
@@ -96,8 +96,8 @@ export abstract class BaseSyntheticBrowser extends Observable implements ISynthe
 
   private _url: string;
   private _window: SyntheticWindow;
-  private _documentObserver: IDispatcher<any, any>;
-  private _windowObserver: IDispatcher<any, any>;
+  private _documentObserver: IBus<any, any>;
+  private _windowObserver: IBus<any, any>;
   private _location: SyntheticLocation;
   private _openOptions: ISyntheticBrowserOpenOptions;
   private _renderer: ISyntheticDocumentRenderer;
@@ -114,9 +114,9 @@ export abstract class BaseSyntheticBrowser extends Observable implements ISynthe
     this.statusWatcher = new PropertyWatcher<BaseSyntheticBrowser, Status>(this, "status");
     this.logs = ObservableCollection.create<LogEvent>() as ObservableCollection<LogEvent>;
     this._renderer = _kernel.inject(isMaster ? renderer || new SyntheticDOMRenderer() : new NoopRenderer());
-    this._renderer.observe(new CallbackDispatcher(this.onRendererEvent.bind(this)));
-    this._documentObserver = new CallbackDispatcher(this.onDocumentEvent.bind(this));
-    this._windowObserver = new CallbackDispatcher(this.onWindowEvent.bind(this));
+    this._renderer.observe(new CallbackBus(this.onRendererEvent.bind(this)));
+    this._documentObserver = new CallbackBus(this.onDocumentEvent.bind(this));
+    this._windowObserver = new CallbackBus(this.onWindowEvent.bind(this));
   }
 
   $didInject() { }

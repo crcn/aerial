@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { serialize, deserialize } from "@tandem/common";
+import { serialize, deserialize } from "aerial-common";
 import { generateRandomSyntheticHTMLElement } from "../test/helpers";
 import { SyntheticWindow } from "..";
 

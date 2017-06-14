@@ -1,5 +1,5 @@
-import { Observable } from "@tandem/common/observable";
-import { MetadataChangeEvent } from "@tandem/common/messages";
+import { Observable } from "../observable";
+import { MetadataChangeEvent } from "../messages";
 
 export class Metadata extends Observable {
   constructor(private _data: any = {}) {

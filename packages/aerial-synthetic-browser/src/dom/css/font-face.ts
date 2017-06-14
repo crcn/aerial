@@ -11,7 +11,7 @@ import {
   deserialize,
   serializable,
   SerializedContentType,
-} from "@tandem/common";
+} from "aerial-common";
 
 export interface ISerializedSyntheticCSSFontFace {
   style: SerializedContentType<any>;

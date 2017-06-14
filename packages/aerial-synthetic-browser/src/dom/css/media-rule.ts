@@ -14,7 +14,7 @@ import {
   PropertyMutation,
   InsertChildMutation,
   RemoveChildMutation,
-} from "@tandem/common";
+} from "aerial-common";
 
 import { BaseContentEdit } from "@tandem/sandbox";
 

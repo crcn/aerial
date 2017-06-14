@@ -1,5 +1,5 @@
 import { Sandbox } from "@tandem/sandbox";
-import { bindable } from "@tandem/common/decorators";
+import { bindable } from "aerial-common";
 import { btoa, atob } from "abab"
 import { HTML_XMLNS } from "./constants";
 import memoize = require("memoizee");
@@ -17,8 +17,8 @@ import { bindDOMNodeEventMethods } from "./utils";
 import { SyntheticDOMElement, DOMNodeType } from "./markup";
 import { SyntheticXMLHttpRequest, XHRServer } from "./xhr";
 import { SyntheticCSSStyle, SyntheticCSSElementStyleRule } from "./css";
-import { Logger, LogEvent, Observable, PrivateBusProvider, PropertyWatcher, MutationEvent } from "@tandem/common";
-import { noopDispatcherInstance, IStreamableDispatcher, CallbackDispatcher } from "@tandem/mesh";
+import { Logger, LogEvent, Observable, PrivateBusProvider, PropertyWatcher, MutationEvent } from "aerial-common";
+import { noopDispatcherInstance, IStreamableBus, CallbackBus } from "mesh";
 import { 
   DOMEventTypes,
   IDOMEventEmitter,
@@ -187,7 +187,7 @@ export class SyntheticWindow extends Observable {
     
     this.window   = this;
     this.console  = new SyntheticConsole(
-      new Logger(new CallbackDispatcher(this.onVMLog.bind(this)))
+      new Logger(new CallbackBus(this.onVMLog.bind(this)))
     );
 
     const windowTimers  = this._windowTimers = new SyntheticWindowTimers();

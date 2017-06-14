@@ -1,6 +1,6 @@
 import { omit } from "lodash";
 import React =  require("react");
-import { CSS_MIME_TYPE } from "@tandem/common";
+import { CSS_MIME_TYPE } from "aerial-common";
 import sm = require("source-map");
 import postcss = require("postcss");
 

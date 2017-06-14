@@ -1,5 +1,5 @@
 import Url =  require("url");
-import { bindable, PropertyWatcher } from "@tandem/common";
+import { bindable, PropertyWatcher } from "aerial-common";
 import { SyntheticHTMLElement } from "./element";
 import { SyntheticLocation } from "../../location";
 

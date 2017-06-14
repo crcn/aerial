@@ -1,5 +1,5 @@
 import path =  require("path");
-import { JS_MIME_TYPE } from "@tandem/common";
+import { JS_MIME_TYPE } from "aerial-common";
 import { SyntheticHTMLElement } from "./element";
 import { compileGlobalSandboxScript, runGlobalSandboxScript } from "@tandem/sandbox";
 
