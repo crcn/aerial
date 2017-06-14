@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var mesh_1 = require("mesh");
-var mesh_ds_1 = require("mesh-ds");
+var mesh_crud_1 = require("mesh-crud");
 var messages_1 = require("../messages");
 var PostDsNotifierBus = (function () {
     function PostDsNotifierBus(_dsBus, _dispatcher) {
@@ -10,7 +10,7 @@ var PostDsNotifierBus = (function () {
     }
     PostDsNotifierBus.prototype.dispatch = function (message) {
         var _this = this;
-        if ([mesh_ds_1.DSInsertRequest.DS_INSERT, mesh_ds_1.DSRemoveRequest.DS_REMOVE, mesh_ds_1.DSUpdateRequest.DS_UPDATE].indexOf(message.type) > -1) {
+        if ([mesh_crud_1.DSInsertRequest.DS_INSERT, mesh_crud_1.DSRemoveRequest.DS_REMOVE, mesh_crud_1.DSUpdateRequest.DS_UPDATE].indexOf(message.type) > -1) {
             return new mesh_1.DuplexStream(function (input, output) {
                 var writer = output.getWriter();
                 _this._dsBus.dispatch(message).readable.pipeTo(new mesh_1.WritableStream({

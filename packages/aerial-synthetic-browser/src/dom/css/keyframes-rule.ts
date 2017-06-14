@@ -1,7 +1,7 @@
 import { SyntheticCSSElementStyleRule } from "./style-rule";
 import { SyntheticCSSStyle } from "./style";
 import { SyntheticCSSObject, SyntheticCSSObjectSerializer } from "./base";
-import { BaseContentEdit } from "@tandem/sandbox";
+import { BaseContentEdit } from "aerial-sandbox";
 import {
   ISerializer,
   deserialize,

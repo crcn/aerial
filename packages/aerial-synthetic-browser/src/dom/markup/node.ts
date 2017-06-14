@@ -1,6 +1,6 @@
 import assert = require("assert");
 import { DOMNodeType } from "./node-types";
-import {BaseContentEdit } from "@tandem/sandbox";
+import {BaseContentEdit } from "aerial-sandbox";
 import { SyntheticDocument } from "../document";
 import { IMarkupNodeVisitor } from "./visitor";
 
@@ -19,7 +19,7 @@ import {
   SyntheticObjectEditor,
   generateSyntheticUID,
   SyntheticObjectSerializer,
- } from "@tandem/sandbox";
+ } from "aerial-sandbox";
 
 import { ISyntheticBrowser } from "../../browser";
 import { DOMEventDispatcherMap } from "../events";

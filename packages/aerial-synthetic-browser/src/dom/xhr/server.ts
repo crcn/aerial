@@ -1,5 +1,5 @@
 import { SyntheticWindow } from "../window";
-import { URIProtocolProvider } from "@tandem/sandbox";
+import { URIProtocolProvider } from "aerial-sandbox";
 import { IStreamableBus, DuplexStream } from "mesh";
 import { inject, Kernel, KernelProvider, loggable, Logger } from "aerial-common";
 import { IHTTPHeaders, HTTPRequest, HTTPResponse, HTTPStatusType } from "./messages";

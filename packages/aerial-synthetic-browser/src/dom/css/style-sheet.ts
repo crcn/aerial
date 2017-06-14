@@ -4,7 +4,7 @@ import { SyntheticCSSFontFace } from "./font-face";
 import { evaluateCSS, parseCSS, evaluateCSSSource } from "../../dom/css";
 import { SyntheticCSSMediaRule } from "./media-rule";
 import { SyntheticCSSKeyframesRule } from "./keyframes-rule";
-import { SyntheticObjectChangeTypes, BaseEditor } from "@tandem/sandbox";
+import { SyntheticObjectChangeTypes, BaseEditor } from "aerial-sandbox";
 import { SyntheticCSSElementStyleRule } from "./style-rule";
 import { SyntheticCSSGroupingRuleEdit, SyntheticCSSGroupingRuleEditor, SyntheticCSSGroupingRule } from "./grouping";
 import { SyntheticCSSObject, SyntheticCSSObjectSerializer, SyntheticCSSObjectEdit, SyntheticCSSObjectEditor } from "./base";

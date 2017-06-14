@@ -50,7 +50,7 @@ var messages_1 = require("../messages");
 var observable_1 = require("../observable");
 var ioc_1 = require("../ioc");
 var mesh_1 = require("mesh");
-var mesh_ds_1 = require("mesh-ds");
+var mesh_crud_1 = require("mesh-crud");
 // TODO - remove global listener
 // TODO - listen to DS mediator for updates on record collection
 var ActiveRecordCollection = (function (_super) {
@@ -68,7 +68,7 @@ var ActiveRecordCollection = (function (_super) {
         this._bus = ioc_1.PrivateBusProvider.getInstance(kernel);
         this.createActiveRecord = createActiveRecord;
         this._globalMessageObserver = new mesh_1.FilterBus(function (message) {
-            return (message.type === mesh_ds_1.DSUpdateRequest.DS_UPDATE || message.type === mesh_ds_1.DSInsertRequest.DS_INSERT || message.type === messages_1.PostDSMessage.DS_DID_UPDATE || message.type === messages_1.PostDSMessage.DS_DID_INSERT) && message.collectionName === _this.collectionName && sift_1.default(_this.query)(message.data);
+            return (message.type === mesh_crud_1.DSUpdateRequest.DS_UPDATE || message.type === mesh_crud_1.DSInsertRequest.DS_INSERT || message.type === messages_1.PostDSMessage.DS_DID_UPDATE || message.type === messages_1.PostDSMessage.DS_DID_INSERT) && message.collectionName === _this.collectionName && sift_1.default(_this.query)(message.data);
         }, new mesh_1.CallbackBus(this.onPostDSMessage.bind(this)));
         this.query = query || {};
         return this;
@@ -95,7 +95,7 @@ var ActiveRecordCollection = (function (_super) {
                         _c = [
                             // TODO - need to check for duplicates
                             this];
-                        return [4 /*yield*/, mesh_1.readAllChunks(this._bus.dispatch(new mesh_ds_1.DSFindRequest(this.collectionName, this.query, true)))];
+                        return [4 /*yield*/, mesh_1.readAllChunks(this._bus.dispatch(new mesh_crud_1.DSFindRequest(this.collectionName, this.query, true)))];
                     case 1:
                         // TODO - need to check for duplicates
                         _b.apply(_a, _c.concat([(_d.sent()).map(function (value) {
@@ -134,7 +134,7 @@ var ActiveRecordCollection = (function (_super) {
                         loaded = this.find(function (model) { return test(model.source); });
                         if (loaded)
                             return [2 /*return*/, loaded];
-                        return [4 /*yield*/, mesh_1.readOneChunk(this._bus.dispatch(new mesh_ds_1.DSFindRequest(this.collectionName, query, false)))];
+                        return [4 /*yield*/, mesh_1.readOneChunk(this._bus.dispatch(new mesh_crud_1.DSFindRequest(this.collectionName, query, false)))];
                     case 1:
                         _a = _b.sent(), value = _a.value, done = _a.done;
                         // item exists, so add and return it. Otherwise return undefined indicating

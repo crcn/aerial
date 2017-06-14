@@ -55,7 +55,7 @@ var decorators_1 = require("../decorators");
 var mesh_1 = require("mesh");
 var mongoid = require("mongoid-js");
 var observable_1 = require("../observable");
-var mesh_ds_1 = require("mesh-ds");
+var mesh_crud_1 = require("mesh-crud");
 var ioc_1 = require("../ioc");
 var messages_1 = require("../messages");
 // TODO - need to queue requests
@@ -92,7 +92,7 @@ var BaseActiveRecord = (function (_super) {
      * is stale.
      */
     BaseActiveRecord.prototype.refresh = function () {
-        return this.fetch(new mesh_ds_1.DSFindRequest(this.collectionName, this.sourceQuery));
+        return this.fetch(new mesh_crud_1.DSFindRequest(this.collectionName, this.sourceQuery));
     };
     BaseActiveRecord.prototype.save = function () {
         return this.isNew ? this.insert() : this.update();
@@ -107,10 +107,10 @@ var BaseActiveRecord = (function (_super) {
             newData[this.idProperty] = String(mongoid());
             // console.error(newData, this);
         }
-        return this.fetch(new mesh_ds_1.DSInsertRequest(this.collectionName, newData));
+        return this.fetch(new mesh_crud_1.DSInsertRequest(this.collectionName, newData));
     };
     BaseActiveRecord.prototype.remove = function () {
-        return this.fetch(new mesh_ds_1.DSRemoveRequest(this.collectionName, this.sourceQuery));
+        return this.fetch(new mesh_crud_1.DSRemoveRequest(this.collectionName, this.sourceQuery));
     };
     Object.defineProperty(BaseActiveRecord.prototype, "sourceQuery", {
         get: function () {
@@ -148,7 +148,7 @@ var BaseActiveRecord = (function (_super) {
         this.willUpdate();
         this.willSave();
         var newData = this.serialize();
-        return this.fetch(new mesh_ds_1.DSUpdateRequest(this.collectionName, newData, this.sourceQuery));
+        return this.fetch(new mesh_crud_1.DSUpdateRequest(this.collectionName, newData, this.sourceQuery));
     };
     BaseActiveRecord.prototype.toJSON = function () {
         return this.serialize();

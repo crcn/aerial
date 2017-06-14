@@ -21,7 +21,7 @@ import {
   syntheticSourceInfoEquals,
   SyntheticObjectSerializer,
   SyntheticObjectChangeTypes,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 export class SyntheticCSSObjectEdit<T extends SyntheticCSSObject> extends SyntheticObjectEdit<T> {
 }

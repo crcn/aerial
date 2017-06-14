@@ -17,7 +17,7 @@ import {
   SyntheticDocumentEdit,
   SyntheticDocument,
 } from "..";
-import { SyntheticObjectChangeTypes } from "@tandem/sandbox";
+import { SyntheticObjectChangeTypes } from "aerial-sandbox";
 
 describe(__filename + "#", () => {
   [

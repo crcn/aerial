@@ -1,7 +1,7 @@
 import tinyColor =  require("tinycolor2");
 const { parse }  =  require("./parser.peg");
 import { ITreeWalker, bindable, bubble, Observable, ObservableCollection } from "aerial-common";
-import { ISyntheticObject, generateSyntheticUID, ISyntheticSourceInfo } from "@tandem/sandbox";
+import { ISyntheticObject, generateSyntheticUID, ISyntheticSourceInfo } from "aerial-sandbox";
 
 import { 
   CSSUnitType,

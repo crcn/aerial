@@ -1,7 +1,7 @@
 import { Kernel, LogLevel } from "aerial-common";
 import { sample, sampleSize, random } from "lodash";
 // import { createTestMasterApplication } from "@tandem/editor/test";
-import { createSandboxProviders, IFileResolver } from "@tandem/sandbox";
+import { createSandboxProviders, IFileResolver } from "aerial-sandbox";
 import parse5 = require("parse5");
 import {
   parseCSS,

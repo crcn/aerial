@@ -35,7 +35,7 @@ import {
   ISyntheticObjectChild,
   ISyntheticSourceInfo,
   BaseContentEditor,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 // TODO - move this to synthetic-browser
 // TODO - may need to split this out into separate CSS editors. Some of this is specific
@@ -141,14 +141,14 @@ export class CSSEditor extends BaseContentEditor<postcss.Node> {
     }
   }
 
-  protected findTargetASTNode(root: postcss.Container, target: ISyntheticObject) {
-    let found: postcss.Node;
+  protected findTargetASTNode(root: postcss.Container, target: ISyntheticObject): postcss.ChildNode {
+    let found: postcss.ChildNode;
 
     const walk = (node: postcss.Node, index: number) => {
       if (found) return false;
       
       if (this.nodeMatchesSyntheticSource(node, target.source)) {
-        found = node;
+        found = node as postcss.ChildNode;
         return false;
       }
     };

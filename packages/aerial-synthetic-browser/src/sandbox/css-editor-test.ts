@@ -2,7 +2,7 @@
 // import path =  require("path");
 // import { expect } from "chai";
 // import { generateRandomStyleSheet } from "@tandem/synthetic-browser/test/helpers";
-// import { FileEditorProvider, URIProtocolProvider } from "@tandem/sandbox";
+// import { FileEditorProvider, URIProtocolProvider } from "aerial-sandbox";
 // import { waitForPropertyChange, Application, LogLevel } from "aerial-common";
 // // import { createTestMasterApplication, createRandomFileName } from "@tandem/test";
 // import { SyntheticCSSStyleSheet, SyntheticBrowser, parseCSS, evaluateCSS } from "..";

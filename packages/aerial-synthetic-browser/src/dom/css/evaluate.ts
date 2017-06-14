@@ -4,7 +4,7 @@ import { parseCSS } from "./parsers";
 
 import { without } from "lodash";
 import { camelCase } from "lodash";
-import { SandboxModule } from "@tandem/sandbox";
+import { SandboxModule } from "aerial-sandbox";
 import { SyntheticCSSObject } from "./base";
 import { SyntheticCSSUnknownGroupAtRule } from "./atrule";
 import { SyntheticCSSFontFace } from "./font-face";

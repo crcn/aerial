@@ -1,5 +1,5 @@
 import { CoreEvent } from "./base";
-import { DSInsertRequest, DSRemoveRequest, DSUpdateRequest, DSMessage } from "mesh-ds";
+import { DSInsertRequest, DSRemoveRequest, DSUpdateRequest, DSMessage } from "mesh-crud";
 import { Message } from "mesh";
 export { CoreEvent };
 export declare class DisposeEvent extends CoreEvent {

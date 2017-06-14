@@ -57,7 +57,7 @@ import {
   DependencyGraphProvider,
   SyntheticObjectChangeWatcher,
   IDependencyGraphStrategyOptions
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 
 // TODO - add user event stuff here

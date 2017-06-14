@@ -24,6 +24,6 @@
   },
   "peerDependencies": {
     "aerial-common": "1.0.x",
-    "@tandem/sandbox": "1.0.x"
+    "aerial-sandbox": "1.0.x"
   }
 }

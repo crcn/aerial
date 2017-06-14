@@ -48,8 +48,8 @@ var md5 = require("md5");
 var fs = require("fs");
 var nodeLibs = require("node-libs-browser");
 var detective = require("detective");
-var resolver_1 = require("@tandem/sandbox/resolver");
-var providers_1 = require("@tandem/sandbox/providers");
+var resolver_1 = require("aerial-sandbox/resolver");
+var providers_1 = require("aerial-sandbox/providers");
 var path = require("path");
 var resolveNodeModule = require("resolve");
 function testLoader(uri, loader) {

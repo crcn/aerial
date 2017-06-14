@@ -26,10 +26,10 @@ import {
   IDependencyGraphStrategy,
 } from "../base";
 
-import { IModule } from "@tandem/sandbox/sandbox";
-import { Dependency } from "@tandem/sandbox/dependency-graph/dependency";
-import { NodeModuleResolver } from "@tandem/sandbox/resolver";
-import { FileCacheProvider } from "@tandem/sandbox/providers";
+import { IModule } from "aerial-sandbox/sandbox";
+import { Dependency } from "aerial-sandbox/dependency-graph/dependency";
+import { NodeModuleResolver } from "aerial-sandbox/resolver";
+import { FileCacheProvider } from "aerial-sandbox/providers";
 
 import path =  require("path");
 import sift = require("sift");

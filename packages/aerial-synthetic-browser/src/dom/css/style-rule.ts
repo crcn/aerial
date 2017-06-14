@@ -1,8 +1,8 @@
-import { Dependency } from "@tandem/sandbox";
+import { Dependency } from "aerial-sandbox";
 import { kebabCase } from "lodash";
 import { CallbackBus } from "mesh";
 import { SyntheticDOMElement, getSelectorTester } from "..";
-import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor } from "@tandem/sandbox";
+import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor } from "aerial-sandbox";
 import { ISerializedSyntheticCSSStyle, SyntheticCSSStyle, isValidCSSDeclarationProperty } from "./style";
 import { SyntheticCSSObject, SyntheticCSSObjectSerializer, SyntheticCSSObjectEdit, SyntheticCSSObjectEditor } from "./base";
 import {

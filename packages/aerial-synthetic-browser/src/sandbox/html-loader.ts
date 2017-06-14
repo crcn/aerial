@@ -10,7 +10,7 @@ import {
   DefaultDependencyLoader,
   IDependencyLoaderResult,
   DependencyLoaderFactoryProvider,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 import {
   inject,

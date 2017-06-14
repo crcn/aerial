@@ -3,12 +3,12 @@ import {
   IDependencyLoader,
   BaseDependencyLoader,
   IDependencyLoaderResult,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 import * as path from "path";
 import sm = require("source-map");
 import postcss = require("postcss");
-import { URIProtocolProvider } from "@tandem/sandbox"; 
+import { URIProtocolProvider } from "aerial-sandbox"; 
 import { CSS_MIME_TYPE, inject, Kernel, KernelProvider } from "aerial-common";
 
 import {

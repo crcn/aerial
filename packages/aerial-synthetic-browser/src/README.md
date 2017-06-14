@@ -92,7 +92,7 @@ The mutations API is used to diff & patch DOM objects whenever an application re
 
 ```typescript
 import { Kernel, PrivateBusProvider } from "aerial-common"
-import { Sandbox, ApplyFileEditRequest } from "@tandem/sandbox";
+import { Sandbox, ApplyFileEditRequest } from "aerial-sandbox";
 import { SyntheticBrowser, ISyntheticDOMRenderer } from "@tandem/synthetic-browser";
 
 const kernel = new Kernel(
@@ -143,7 +143,7 @@ You'll notice above that file mutations can be applied to *any resource* that's 
 File mutations don't *actually* mutate the *original* source file. Instead, they're applied to an intermediate caching layer which you can access like so:
 
 ```typescript
-import { FileCacheProvider } from "@tandem/sandbox";
+import { FileCacheProvider } from "aerial-sandbox";
 
 const fileCache = FileCacheProvider.getInstance(kernel);
 await fileCache.save("cache://my/fake/file.txt", { content: "hello world", type: "text/plain" });
@@ -209,7 +209,7 @@ It's also possible to defer web application execution to the cloud through AWS L
 This library currently supports `file://`, and `http(s)://` protocols out of the box. If you need to add your *own*, you can easily do that:
 
 ```typescript
-import { URIProtocol } from "@tandem/sandbox";
+import { URIProtocol } from "aerial-sandbox";
 import mime = require("mimetype");
 
 export class CacheProtocol extends URIProtocol {
@@ -326,7 +326,7 @@ Creates a new synthetic browser that executes web application code in the *curre
 
 ```typescript
 import { Kernel } from "aerial-common";
-import { Sandbox } from "@tandem/sandbox";
+import { Sandbox } from "aerial-sandbox";
 import { SyntheticBrowser } from "@tandem/synthetic-browser";
 
 const kernel = new 

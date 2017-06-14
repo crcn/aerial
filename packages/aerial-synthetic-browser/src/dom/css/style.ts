@@ -5,7 +5,7 @@ import { SyntheticDOMNode } from "../../dom";
 import { CallbackBus } from "mesh";
 import { SyntheticCSSElementStyleRuleMutationTypes } from "./style-rule";
 import { ISerializable, serializable, diffArray, ITreeWalker, PropertyMutation, serialize, deserialize } from "aerial-common";
-import { IContentEdit , ISyntheticObject, generateSyntheticUID, IEditable, BaseContentEdit } from "@tandem/sandbox";
+import { IContentEdit , ISyntheticObject, generateSyntheticUID, IEditable, BaseContentEdit } from "aerial-sandbox";
 
 export interface ISerializedSyntheticCSSStyle extends SyntheticCSSStyle { }
 

@@ -1,4 +1,3 @@
-import { bindable } from "aerial-common/decorators";
 import { difference } from "lodash";
 import { DOMNodeType } from "./node-types";
 import { SyntheticDocument } from "../document";
@@ -18,6 +17,7 @@ import {
   SyntheticDOMContainerMutationTypes, 
 } from "./container";
 import {
+  bindable,
   Mutation,
   serialize,
   diffArray,
@@ -39,11 +39,11 @@ import {
 } from "aerial-common";
 
 
-import { Dependency } from "@tandem/sandbox";
+import { Dependency } from "aerial-sandbox";
 import {
   BaseContentEdit,
   ISyntheticObjectChild,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 export interface ISerializedSyntheticDOMAttribute {
   name: string;

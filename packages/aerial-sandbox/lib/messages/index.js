@@ -51,7 +51,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { IReadFileResultItem } from "@tandem/sandbox/file-system";
+// import { IReadFileResultItem } from "aerial-sandbox/file-system";
 var aerial_common_1 = require("aerial-common");
 var mesh_1 = require("mesh");
 var UpdateFileCacheRequest = UpdateFileCacheRequest_1 = (function () {

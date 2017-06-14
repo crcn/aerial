@@ -16,7 +16,7 @@ import {
   RemoveChildMutation,
 } from "aerial-common";
 
-import { BaseContentEdit } from "@tandem/sandbox";
+import { BaseContentEdit } from "aerial-sandbox";
 
 import { SyntheticCSSGroupAtRule, SyntheticCSSGroupAtRuleEdit } from "./atrule";
 

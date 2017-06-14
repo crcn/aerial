@@ -1,7 +1,7 @@
 import { Mutation, InsertChildMutation, RemoveChildMutation, MoveChildMutation } from "aerial-common";
 import { parseCSS } from "./parsers";
 import { diffStyleSheetRules, syntheticCSSRuleType } from "./utils";
-import { BaseEditor } from "@tandem/sandbox";
+import { BaseEditor } from "aerial-sandbox";
 import { evaluateCSS } from "./evaluate";
 import { SyntheticCSSObject, SyntheticCSSObjectEditor, SyntheticCSSObjectEdit } from "./base";
 

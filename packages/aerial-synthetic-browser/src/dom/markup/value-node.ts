@@ -4,7 +4,7 @@ import { DOMNodeType } from "./node-types";
 import { SyntheticDocument } from "../document";
 import { SyntheticDOMNode, SyntheticDOMNodeEdit } from "./node";
 import { ISerializer, Mutation, SetValueMutation, PropertyMutation  } from "aerial-common";
-import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor, GroupEditor } from "@tandem/sandbox";
+import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor, GroupEditor } from "aerial-sandbox";
 
 export namespace SyntheticDOMValueNodeMutationTypes {
   export const SET_VALUE_NODE_EDIT = "setValueNodeEdit";

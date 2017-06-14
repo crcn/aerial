@@ -1,7 +1,7 @@
 import {
  SandboxModule,
  ISandboxDependencyEvaluator,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 import {
   evaluateMarkup,

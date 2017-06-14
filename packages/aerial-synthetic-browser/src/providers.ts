@@ -7,7 +7,7 @@ import {
   ContentEditorFactoryProvider, 
   DependencyLoaderFactoryProvider,
   SandboxModuleEvaluatorFactoryProvider,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 import { 
   Kernel, 

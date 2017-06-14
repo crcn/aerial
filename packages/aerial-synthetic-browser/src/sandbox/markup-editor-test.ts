@@ -1,6 +1,6 @@
 // import { expect } from "chai";
 // import { SyntheticBrowser, SyntheticHTMLElement } from "..";
-// import { URIProtocolProvider, FileEditorProvider } from "@tandem/sandbox";
+// import { URIProtocolProvider, FileEditorProvider } from "aerial-sandbox";
 // import { generateRandomSyntheticHTMLElementSource } from "../test";
 // import { Application, waitForPropertyChange, LogLevel } from "aerial-common";
 // // import { createTestMasterApplication, createRandomFileName } from "@tandem/editor/test";

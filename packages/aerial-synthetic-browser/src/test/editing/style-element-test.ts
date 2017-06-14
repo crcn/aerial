@@ -1,5 +1,5 @@
 // import { expect } from "chai";
-// import { FileEditorProvider } from "@tandem/sandbox";
+// import { FileEditorProvider } from "aerial-sandbox";
 // import { SyntheticCSSStyleRule } from "@tandem/synthetic-browser";
 // import { loadTestBrowser, timeout } from "@tandem/synthetic-browser/test";
 // import { PrivateBusProvider, LogLevel } from "aerial-common";

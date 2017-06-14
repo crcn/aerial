@@ -1,6 +1,8 @@
 /**
  * ES5 compatible subclassing of arrays.
  */
+
+
 function ArrayCollection() {
   Array.prototype.push.apply(this, arguments);
 }
@@ -14,11 +16,6 @@ ArrayCollection.create = function() {
   // try the es5 route
   return this.apply(proto, arguments);
 };
-
-// export declare class ArrayCollection<T> extends Array<T> {
-//   protected constructor(...items:T[]);
-//   public static create<T>(...items: T[]): ArrayCollection<T>;
-// }
 
 exports.ArrayCollection = ArrayCollection;
 

@@ -27,7 +27,7 @@ import {
   IContentEdit,
   BaseContentEdit,
   ISyntheticObject,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 export namespace SyntheticDOMContainerMutationTypes {
   export const INSERT_CHILD_NODE_EDIT = TreeNodeMutationTypes.NODE_ADDED;

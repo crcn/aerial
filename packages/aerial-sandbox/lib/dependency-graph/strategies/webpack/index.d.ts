@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { Logger, Kernel } from "aerial-common";
 import { IDependencyLoader, IResolvedDependencyInfo, IDependencyGraphStrategy } from "../base";
-import { IModule } from "@tandem/sandbox/sandbox";
+import { IModule } from "aerial-sandbox/sandbox";
 export interface IWebpackLoaderConfig {
     test: RegExp | ((uri: string) => boolean);
     include: string[];

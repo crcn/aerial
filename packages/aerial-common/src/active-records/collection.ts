@@ -18,7 +18,7 @@ import {
   DSFindRequest,
   DSUpdateRequest,
   DSInsertRequest 
-} from "mesh-ds";
+} from "mesh-crud";
 
 // TODO - remove global listener
 // TODO - listen to DS mediator for updates on record collection

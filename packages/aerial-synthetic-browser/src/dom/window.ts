@@ -1,4 +1,4 @@
-import { Sandbox } from "@tandem/sandbox";
+import { Sandbox } from "aerial-sandbox";
 import { bindable } from "aerial-common";
 import { btoa, atob } from "abab"
 import { HTML_XMLNS } from "./constants";
@@ -18,7 +18,7 @@ import { SyntheticDOMElement, DOMNodeType } from "./markup";
 import { SyntheticXMLHttpRequest, XHRServer } from "./xhr";
 import { SyntheticCSSStyle, SyntheticCSSElementStyleRule } from "./css";
 import { Logger, LogEvent, Observable, PrivateBusProvider, PropertyWatcher, MutationEvent } from "aerial-common";
-import { noopDispatcherInstance, IStreamableBus, CallbackBus } from "mesh";
+import { noopBusInstance, IStreamableBus, CallbackBus } from "mesh";
 import { 
   DOMEventTypes,
   IDOMEventEmitter,
@@ -144,7 +144,7 @@ export class SyntheticWindow extends Observable {
     const kernel = browser && browser.kernel;
 
 
-    const bus = kernel && PrivateBusProvider.getInstance(kernel) || noopDispatcherInstance;
+    const bus = kernel && PrivateBusProvider.getInstance(kernel) || noopBusInstance;
     
     // in case proto gets set - don't want the original to get fudged
     // but doesn't work -- element instanceof HTMLElement 

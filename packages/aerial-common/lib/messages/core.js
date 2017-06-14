@@ -19,7 +19,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var base_1 = require("./base");
 exports.CoreEvent = base_1.CoreEvent;
 var serialize_1 = require("../serialize");
-var mesh_ds_1 = require("mesh-ds");
+var mesh_crud_1 = require("mesh-crud");
 var mesh_1 = require("mesh");
 var DisposeEvent = (function (_super) {
     __extends(DisposeEvent, _super);
@@ -69,7 +69,7 @@ var DSUpsertRequest = DSUpsertRequest_1 = (function (_super) {
         return _this;
     }
     return DSUpsertRequest;
-}(mesh_ds_1.DSMessage));
+}(mesh_crud_1.DSMessage));
 DSUpsertRequest.DS_UPSERT = "dsUpsert";
 DSUpsertRequest = DSUpsertRequest_1 = __decorate([
     serialize_1.serializable("DSUpsertRequest")
@@ -85,14 +85,14 @@ var PostDSMessage = PostDSMessage_1 = (function (_super) {
     }
     PostDSMessage.createFromDSRequest = function (request, data) {
         return new PostDSMessage_1((_a = {},
-            _a[mesh_ds_1.DSInsertRequest.DS_INSERT] = PostDSMessage_1.DS_DID_INSERT,
-            _a[mesh_ds_1.DSUpdateRequest.DS_UPDATE] = PostDSMessage_1.DS_DID_UPDATE,
-            _a[mesh_ds_1.DSRemoveRequest.DS_REMOVE] = PostDSMessage_1.DS_DID_REMOVE,
+            _a[mesh_crud_1.DSInsertRequest.DS_INSERT] = PostDSMessage_1.DS_DID_INSERT,
+            _a[mesh_crud_1.DSUpdateRequest.DS_UPDATE] = PostDSMessage_1.DS_DID_UPDATE,
+            _a[mesh_crud_1.DSRemoveRequest.DS_REMOVE] = PostDSMessage_1.DS_DID_REMOVE,
             _a)[request.type], request.collectionName, data, request.timestamp);
         var _a;
     };
     return PostDSMessage;
-}(mesh_ds_1.DSMessage));
+}(mesh_crud_1.DSMessage));
 PostDSMessage.DS_DID_INSERT = "dsDidInsert";
 PostDSMessage.DS_DID_REMOVE = "dsDidRemove";
 PostDSMessage.DS_DID_UPDATE = "dsDidUpdate";

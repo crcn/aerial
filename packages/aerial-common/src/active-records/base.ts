@@ -1,14 +1,14 @@
 import sift = require("sift");
 import { inject } from "../decorators";
 import { IStreamableBus, IBus, DuplexStream, ParallelBus, readOneChunk, CallbackBus, IMessage } from "mesh";
-import {  } from "mesh-ds";
+import {  } from "mesh-crud";
 import mongoid = require("mongoid-js");
 import { IDisposable } from "../object";
 import { ISerializable } from "../serialize";
 import 
 { IBrokerBus } from "../busses";
 import { Observable, IObservable } from "../observable";
-import { DSMessage, DSFindRequest, DSInsertRequest, DSUpdateRequest, DSRemoveRequest } from "mesh-ds";
+import { DSMessage, DSFindRequest, DSInsertRequest, DSUpdateRequest, DSRemoveRequest } from "mesh-crud";
 import { Kernel, PrivateBusProvider, IInjectable } from "../ioc";
 import {
   PostDSMessage,

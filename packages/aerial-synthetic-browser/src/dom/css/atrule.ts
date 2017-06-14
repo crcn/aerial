@@ -21,7 +21,7 @@ import {
 import {
   BaseEditor,
   BaseContentEdit,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 import {diffStyleSheetRules } from "./utils";
 

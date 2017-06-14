@@ -12,7 +12,7 @@ import {
   ISyntheticObject,
   BaseContentEditor,
   ContentEditorFactoryProvider,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 import parse5 = require("parse5");
 import { ElementTextContentMimeTypeProvider } from "../providers";

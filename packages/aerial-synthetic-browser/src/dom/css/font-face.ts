@@ -1,5 +1,5 @@
 import { SyntheticCSSStyleRule } from "./style-rule";
-import { BaseContentEdit } from "@tandem/sandbox";
+import { BaseContentEdit } from "aerial-sandbox";
 import { SyntheticCSSStyle } from "./style";
 import { SyntheticCSSGroupAtRule, ISyntheticCSSAtRule } from "./atrule";
 import { SyntheticCSSObject, SyntheticCSSObjectSerializer } from "./base";

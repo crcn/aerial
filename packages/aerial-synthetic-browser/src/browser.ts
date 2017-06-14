@@ -44,7 +44,7 @@ import {
   DependencyGraphProvider,
   IDependencyGraphStrategyOptions,
   DependencyGraphStrategyOptionsProvider,
-} from "@tandem/sandbox";
+} from "aerial-sandbox";
 
 import {
   SyntheticDOMElementClassProvider,

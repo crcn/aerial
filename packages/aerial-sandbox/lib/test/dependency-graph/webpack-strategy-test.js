@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
-var test_1 = require("@tandem/sandbox/test");
+var test_1 = require("aerial-sandbox/test");
 describe(__filename + "#", function () {
     var createWebpackDependencyGraph = function (mockFiles) {
         return test_1.createTestDependencyGraph({ name: "webpack" }, { mockFiles: mockFiles });
