@@ -13,7 +13,7 @@ import { 
 } from "aerial-common";
 import { ReadableStream } from "mesh";
 import { MemoryDataStore } from "mesh-memory-ds";
-import { createJavaScriptSandboxProviders } from "aerial-commonjs-extension/lib/sandbox";
+import { createJavaScriptSandboxProviders } from "aerial-commonjs-extension";
 
 import {
   Sandbox,

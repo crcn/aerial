@@ -1,4 +1,4 @@
-import sift = require("sift");
+import sift from "sift";
 import { DuplexStream, IBus, IStreamableBus, readOneChunk } from "mesh";
 
 export class UpsertBus implements IStreamableBus<any> {

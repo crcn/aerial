@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "postinstall": "gulp install yarn:link"
   },
   "devDependencies": {
     "glob": "^7.1.2",

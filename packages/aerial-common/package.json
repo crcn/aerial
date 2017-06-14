@@ -28,6 +28,6 @@
     "mongoid-js": "^1.1.2",
     "npm": "^5.0.3",
     "reflect-metadata": "^0.1.10",
-    "sift": "^3.3.10"
+    "sift": "3.3.x"
   }
 }

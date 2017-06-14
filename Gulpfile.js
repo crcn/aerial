@@ -13,7 +13,7 @@ const {keys, intersection} = require('lodash');
 gulp.task('default', ['build']);
 
 const PACKAGE_DIRS         = [
-  ...glob.sync('./packages/aerial-common'),
+  ...glob.sync('./packages/*'),
   ...glob.sync('./examples/*')
 ];
 
@@ -54,6 +54,12 @@ const extraArgs = function() {
 
   return extra.length ? ['--', ...extra] : [];
 };
+
+gulp.task('install', () => {
+  return merge(PACKAGE_DIRS.map((dir) => (
+    gulpSpawn('yarn', ['install'], { cwd: dir })
+  )));
+});
 
 gulp.task('build', () => {
   return merge(PACKAGE_DIRS.map((dir) => (

@@ -1,4 +1,4 @@
-import sift = require("sift");
+import sift from "sift";
 import { inject } from "../decorators";
 import { IStreamableBus, IBus, DuplexStream, ParallelBus, readOneChunk, CallbackBus, IMessage } from "mesh";
 import {  } from "mesh-crud";

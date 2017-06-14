@@ -31,7 +31,7 @@ import {
 } from "aerial-sandbox";
 
 import path =  require("path");
-import sift = require("sift");
+
 import resolveNodeModule =  require("resolve");
 
 // https://webpack.github.io/docs/configuration.html
