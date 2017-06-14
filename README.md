@@ -20,7 +20,7 @@ The browser VM supports _native_ rendering, meaning that the HTML & CSS that you
 
 <!-- example here -->
 
-The renderer can also be customized to target other platforms such as Canvas, WebGL, or just plain strings if you plan on running synthetic browser instances in a headless environment (Server-side rendering via node, or unit testing for instance). This enables you to use Aerial in other ways -- perhaps integrating it with Sketch so that you can code & design your application in realtime (similar to [Airbnb's React-sketchapp](https://github.com/airbnb/react-sketchapp), but with Aerial it may be possible for Sketch to write code). 
+The renderer can also be customized to target other platforms such as Canvas, WebGL, or just plain strings if you plan on running synthetic browser instances in a headless environment (Server-side rendering via node, or unit testing for instance). This enables you to use Aerial in other ways -- perhaps integrating it with Sketch so that you can code & design your application in realtime (similar to [Airbnb's React-sketchapp](https://github.com/airbnb/react-sketchapp), but with Aerial it may be possible for Sketch to write code, and not limited to React). 
 
 Many of the emulated APIs are enhanced. The DOM & CSSOM for instance both support diffing & patching (just like React). This means that as your application produces new HTML & CSS, only the DOM / CSSOM objects that change get updated. This hot-swapping was originally introduced to allow users to visually edit applications regardless of their technical stack (Ruby, Java, PHP, Angular, anything that produces HTML & CSS).
 
