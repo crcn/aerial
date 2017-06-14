@@ -1,0 +1,12 @@
+import 'reflect-metadata';
+import { RemoteBrowserService } from "./remote-browser";
+import { ApplicationServiceProvider } from "aerial-common";
+export declare function createSyntheticBrowserWorkerProviders(): ApplicationServiceProvider<RemoteBrowserService>[];
+export * from "./dom";
+export * from "./browser";
+export * from "./renderers";
+export * from "./providers";
+export * from "./sandbox";
+export * from "./location";
+export * from "./messages";
+export * from "./remote-browser";

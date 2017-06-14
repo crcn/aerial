@@ -8,7 +8,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "test": "",
+    "build": "tsc --declaration"
   },
   "author": "",
   "license": "ISC"

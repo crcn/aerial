@@ -6,8 +6,10 @@
     "type": "git",
     "url": "git+https://github.com/crcn/aerial.git"
   },
+  "main": "./index.js",
   "scripts": {
-    "test": ""
+    "test": "",
+    "build": "rm -rf lib; tsc"
   },
   "author": "",
   "license": "ISC",

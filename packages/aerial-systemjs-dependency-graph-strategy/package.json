@@ -1,0 +1,16 @@
+{
+  "name": "aerial-systemjs-dependency-graph-strategy",
+  "version": "0.0.1",
+  "description": "SystemJS dependency graph strategy",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcn/aerial.git"
+  },
+  "main": "out/index.js",
+  "scripts": {
+    "test": "",
+    "build": "tsc --declaration"
+  },
+  "author": "",
+  "license": "ISC"
+}

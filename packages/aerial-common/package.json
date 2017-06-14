@@ -8,7 +8,7 @@
     "url": "git+https://github.com/crcn/aerial.git"
   },
   "scripts": {
-    "build": "tsc --declaration; npm run copy-js",
+    "build": "rm -rf lib; npm run copy-js; tsc",
     "copy-js": "for FILE in `find ./src -name *.js -o -name *.d.ts`; do OUT_FILE=`echo $FILE | sed 's/src/lib/'`; mkdir -p `dirname $OUT_FILE`; cp $FILE $OUT_FILE; done;"
   },
   "author": "",

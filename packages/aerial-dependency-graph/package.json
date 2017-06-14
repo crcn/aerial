@@ -11,7 +11,8 @@
     "aerial-kernel": "0.0.x"
   },
   "scripts": {
-    "test": ""
+    "test": "",
+    "build": "rm -rf lib; tsc"
   },
   "author": "",
   "license": "ISC"

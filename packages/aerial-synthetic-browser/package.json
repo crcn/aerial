@@ -4,7 +4,8 @@
   "description": "Synthetic browser implementation",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./out/**.js"
+    "test": "mocha ./out/**.js",
+    "build": "tsc --declaration"
   },
   "repository": {
     "type": "git",

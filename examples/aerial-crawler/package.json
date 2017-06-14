@@ -8,7 +8,8 @@
     "url": "git+https://github.com/crcn/aerial.git"
   },
   "scripts": {
-    "test": ""
+    "test": "",
+    "build": "tsc --declaration"
   },
   "author": "",
   "license": "ISC"

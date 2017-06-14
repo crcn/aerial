@@ -13,7 +13,7 @@ const {keys, intersection} = require('lodash');
 gulp.task('default', ['build']);
 
 const PACKAGE_DIRS         = [
-  ...glob.sync('./packages/*'),
+  ...glob.sync('./packages/aerial-common'),
   ...glob.sync('./examples/*')
 ];
 
@@ -57,7 +57,7 @@ const extraArgs = function() {
 
 gulp.task('build', () => {
   return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn(join(NODE_MODULES_BIN_DIR, 'tsc'), ['--declaration', '--pretty', ...(WATCH ? ['--watch'] : [])], { cwd: dir })
+    gulpSpawn('npm', ['run', 'build', ...(WATCH ? ['--', '--watch'] : [])], { cwd: dir })
   )));
 });
 
