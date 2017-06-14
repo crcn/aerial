@@ -1,6 +1,6 @@
 {
   "name": "aerial-common",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "This is currently a junk drawer of dependencies. Most everything here should be moved into separate repositories eventually.",
   "main": "index.js",
   "repository": {
@@ -8,6 +8,7 @@
     "url": "git+https://github.com/crcn/aerial.git"
   },
   "scripts": {
+    "test": "mocha ./lib/**/*-test.js",
     "build": "rm -rf lib; npm run copy-js; tsc",
     "copy-js": "for FILE in `find ./src -name *.js -o -name *.d.ts`; do OUT_FILE=`echo $FILE | sed 's/src/lib/'`; mkdir -p `dirname $OUT_FILE`; cp $FILE $OUT_FILE; done;"
   },
