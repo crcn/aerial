@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo ''",
-    "build": "tsc"
+    "build": "rm -rf lib; tsc"
   },
   "author": "",
   "license": "ISC",
