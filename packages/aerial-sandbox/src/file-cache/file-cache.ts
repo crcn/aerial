@@ -53,7 +53,7 @@ export class FileCache extends Observable {
   }
 
   public $didInject() {
-    this._collection = ActiveRecordCollection.create(this.collectionName, this._kernel, (source: IFileCacheItemData) => {
+    this._collection = new ActiveRecordCollection(this.collectionName, this._kernel, (source: IFileCacheItemData) => {
       return this._kernel.inject(new FileCacheItem(source, this.collectionName));
     });
     this._collection.load();

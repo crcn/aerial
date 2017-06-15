@@ -421,7 +421,7 @@ export class Dependency extends BaseActiveRecord<IDependencyData> implements IIn
       this._changeWatchers.dispose();
     }
 
-    const changeWatchers = this._changeWatchers = DisposableCollection.create() as DisposableCollection;
+    const changeWatchers = this._changeWatchers = new DisposableCollection();
 
     // included dependencies aren't self contained, so they don't get a Dependency object. For
     // that we'll need to watch their file cache active record and watch it for any changes. Since

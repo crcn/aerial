@@ -64,7 +64,7 @@ export class DependencyGraph extends Observable implements IDependencyGraph {
 
     // temporary - this should be passed into the constructor
     this.$strategy = this._strategy;
-    this._collection = ActiveRecordCollection.create(this.collectionName, this.$kernel, (source: IDependencyData) => {
+    this._collection = new ActiveRecordCollection(this.collectionName, this.$kernel, (source: IDependencyData) => {
       return this.$kernel.inject(new Dependency(source, this.collectionName, this));
     });
 
