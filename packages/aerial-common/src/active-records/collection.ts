@@ -30,8 +30,9 @@ export class ActiveRecordCollection<T extends IActiveRecord<any>, U> extends Obs
   private _bus: IBrokerBus;
   private _globalMessageObserver: IBus<any, any>;
 
-  static create<T extends IActiveRecord<any>, U>(collectionName: string, kernel: Kernel, createActiveRecord: (source: U) => T, query: any = {}): ActiveRecordCollection<T, U> {
-    return (ObservableCollection.create.call(this) as ActiveRecordCollection<any, any>).setup(collectionName, kernel, createActiveRecord, query);
+  constructor(collectionName: string, kernel: Kernel, createActiveRecord: (source: U) => T, query: any = {}) {
+    super();
+    this.setup(collectionName, kernel, createActiveRecord, query);
   }
 
   setup(collectionName: string, kernel: Kernel, createActiveRecord: (source: U) => T, query?: Object) {

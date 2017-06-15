@@ -12,9 +12,16 @@ ArrayCollection.prototype = [];
 ArrayCollection.create = function() {
   var proto = [];
   proto["__proto__"] =  Object.create(this.prototype);
+  
+  try {
+    console.log(this);
+    // try the es5 route
+    return this.apply(proto, arguments);
+  } catch(e) {
 
-  // try the es5 route
-  return this.apply(proto, arguments);
+    // es6 enabled
+    return new this(...arguments);
+  }
 };
 
 exports.ArrayCollection = ArrayCollection;

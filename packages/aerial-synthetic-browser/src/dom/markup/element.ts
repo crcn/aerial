@@ -97,7 +97,6 @@ export class SyntheticDOMAttribute extends Observable implements ISyntheticObjec
   }
 }
 
-
 export class SyntheticDOMAttributes extends ObservableCollection<SyntheticDOMAttribute> {
   splice(start: number, deleteCount: number = 0, ...items: SyntheticDOMAttribute[]) {
     for (let i = start, n = Math.min(start + deleteCount, this.length); i < n; i++) {
