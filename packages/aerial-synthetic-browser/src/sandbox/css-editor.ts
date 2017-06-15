@@ -25,7 +25,7 @@ import {
   SyntheticCSSKeyframesRuleEdit,
   SyntheticCSSElementStyleRuleMutationTypes,
   SyntheticCSSElementStyleRuleEdit,
-} from "../dom";
+} from "../dom/css";
 
 import {
   Dependency,

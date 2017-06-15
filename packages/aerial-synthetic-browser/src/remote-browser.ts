@@ -83,7 +83,6 @@ export class RemoteBrowserDocumentMessage extends CoreEvent {
   }
 }
 
-
 @loggable()
 export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
 

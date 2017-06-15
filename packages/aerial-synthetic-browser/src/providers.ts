@@ -1,5 +1,3 @@
-import { SyntheticBrowser } from "./browser";
-import { RemoteBrowserService } from "./remote-browser";
 import { syntheticElementClassType, SyntheticDOMNode } from "./dom";
 import parse5 = require("parse5");
 

@@ -8,7 +8,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "",
+    "test": "echo ''",
     "build": "rm -rf lib; tsc"
   },
   "author": "",

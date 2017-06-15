@@ -8,7 +8,7 @@ import {
   sourcePositionEquals
 } from "aerial-common";
 import { SyntheticCSSStyleSheet } from "./style-sheet";
-import { SyntheticDOMNode } from "../../dom";
+import { SyntheticDOMNode } from "../../dom/markup";
 import {
   IEditable,
   IEditor,

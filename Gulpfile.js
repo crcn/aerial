@@ -55,35 +55,20 @@ const extraArgs = function() {
   return extra.length ? ['--', ...extra] : [];
 };
 
-gulp.task('install', () => {
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('yarn', ['install'], { cwd: dir })
-  )));
-});
+const createPackageSpawnTask = (command, ...args) => () => merge(PACKAGE_DIRS.map((dir) => (
+  gulpSpawn(command, args, { cwd: dir })
+)))
 
-gulp.task('build', () => {
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('npm', ['run', 'build', ...(WATCH ? ['--', '--watch'] : [])], { cwd: dir })
-  )));
-});
-
-gulp.task('test', () => {
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('npm', ['test', ...extraArgs(WATCH, '--watch', GREP, ['--grep', GREP])], { cwd: dir })
-  )));
-});
-
+gulp.task('install', createPackageSpawnTask('yarn', 'install'));
+gulp.task('build', createPackageSpawnTask('npm', 'run', 'build', ...(WATCH ? ['--', '--watch'] : [])));
+gulp.task('test', createPackageSpawnTask('npm', 'test', ...extraArgs(WATCH, '--watch', GREP, ['--grep', GREP])));
 gulp.task('link', gsequence('yarn:link:criss', 'yarn:link:cross'));
 
 /**
  * Link packages globally
  */
 
-gulp.task('yarn:link:criss', () => {
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('yarn', ['link'], { cwd: dir })
-  )));
-});
+gulp.task('yarn:link:criss', createPackageSpawnTask('yarn', 'link'));
 
 /**
  * Link package dependencies
@@ -98,30 +83,15 @@ gulp.task('yarn:link:cross', () => {
       }));
     })
   );
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('yarn', ['link'], { cwd: dir })
-  )));
+  return createPackageSpawnTask('yarn', 'link')();
 });
 
 gulp.task('npm:patch', () => {
   // TODO 
 });
 
-gulp.task('npm:publish', () => {
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('npm', ['publish'], { cwd: dir })
-  )));
-});
-
+gulp.task('npm:publish', createPackageSpawnTask('npm', 'publish'));
 gulp.task('clean', ['clean:node_modules', 'clean:yarnlock']);
 
-gulp.task('clean:node_modules', () => {
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('rm', ['-rf', 'node_modules'], { cwd: dir })
-  )));
-});
-gulp.task('clean:yarnlock', () => {
-  return merge(PACKAGE_DIRS.map((dir) => (
-    gulpSpawn('rm', ['yarn.lock'], { cwd: dir })
-  )));
-});
+gulp.task('clean:node_modules', createPackageSpawnTask('rm', '-rf', 'node_modules'));
+gulp.task('clean:yarnlock', createPackageSpawnTask('rm', 'yarnlock'));

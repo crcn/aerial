@@ -8,7 +8,7 @@
   },
   "main": "./index.js",
   "scripts": {
-    "test": "mocha ./lib/**/*.js",
+    "test": "mocha ./lib/**/*-test.js",
     "build": "rm -rf lib; tsc"
   },
   "author": "",

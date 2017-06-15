@@ -3,7 +3,7 @@ import {
  ISandboxDependencyEvaluator,
 } from "aerial-sandbox";
 
-import { evaluateCSS, parseCSS, evaluateCSSSource } from "..";
+import { evaluateCSS, parseCSS, evaluateCSSSource } from "../dom/css";
 
 export class CSSDependencyEvaluator implements ISandboxDependencyEvaluator {
   evaluate(module: SandboxModule) {

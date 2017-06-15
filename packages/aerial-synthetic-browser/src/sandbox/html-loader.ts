@@ -23,11 +23,14 @@ import {
 } from "aerial-common";
 
 import {
-  getHTMLASTNodeLocation,
-  HTML_VOID_ELEMENTS,
   LoadableElementProvider,
   ElementTextContentMimeTypeProvider,
-} from "..";
+} from "../providers";
+
+import {
+  getHTMLASTNodeLocation,
+  HTML_VOID_ELEMENTS,
+} from "../dom";
 
 const hasProtocol = (value) => !!/\w+:\/\//.test(value);
 

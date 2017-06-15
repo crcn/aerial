@@ -8,7 +8,7 @@ export * from "./style-sheet";
 export * from "./atrule";
 export * from "./base";
 export * from "./utils";
-export * from "./grouping";
 export * from "./graphics";
 export * from "./font-face";
 export * from "./media";
+export * from "./grouping";

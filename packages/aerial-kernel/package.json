@@ -8,7 +8,7 @@
   },
   "main": "out/index.js",
   "scripts": {
-    "test": "",
+    "test": "echo ''",
     "build": "tsc"
   },
   "author": "",

@@ -13,7 +13,7 @@ import { CSS_MIME_TYPE, inject, Kernel, KernelProvider } from "aerial-common";
 
 import {
   parseCSS,
-} from "..";
+} from "../dom/css";
 
 const hasProtocol = (value) => /^\w+:\/\//.test(value);
 
