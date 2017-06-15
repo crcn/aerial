@@ -11,7 +11,7 @@
   "license": "ISC",
   "scripts": {
     "test": "gulp test",
-    "postinstall": "gulp install yarn:link"
+    "postinstall": "gulp link; gulp install; gulp build"
   },
   "devDependencies": {
     "glob": "^7.1.2",
