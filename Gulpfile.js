@@ -3,7 +3,6 @@
 const gulp      = require('gulp');
 const glob      = require('glob');
 const gutil     = require('gulp-util');
-const merge     = require('merge2');
 const {join}    = require('path');
 const {argv}    = require('yargs');
 const {spawn}   = require('child_process');
