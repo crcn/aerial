@@ -21,6 +21,7 @@ const PACKAGE_NAMES = PACKAGE_DIRS.map(dir => dir.split('/').pop());
 
 const NODE_MODULES_DIR     = join(__dirname, 'node_modules');
 const NODE_MODULES_BIN_DIR = join(NODE_MODULES_DIR, '.bin');
+const YARN_BIN             = join(NODE_MODULES_BIN_DIR, 'yarn');
 const WATCH                = argv.watch != null;
 const GREP                 = argv.grep;
 
@@ -65,7 +66,7 @@ const createPackageSpawnTask = (command, ...args) => (done) => _(PACKAGE_DIRS).m
   gulpSpawn(command, args, { cwd: dir })
 )).sequence().done(done);
 
-gulp.task('install', createPackageSpawnTask('yarn', 'install'));
+gulp.task('install', createPackageSpawnTask(YARN_BIN, 'install'));
 gulp.task('build', createPackageSpawnTask('npm', 'run', 'build', ...(WATCH ? ['--', '--watch'] : [])));
 gulp.task('test', createPackageSpawnTask('npm', 'test', ...extraArgs(WATCH, '--watch', GREP, ['--grep', GREP])));
 gulp.task('link', gsequence('yarn:link:criss', 'yarn:link:cross'));
@@ -74,7 +75,7 @@ gulp.task('link', gsequence('yarn:link:criss', 'yarn:link:cross'));
  * Link packages globally
  */
 
-gulp.task('yarn:link:criss', createPackageSpawnTask('yarn', 'link'));
+gulp.task('yarn:link:criss', createPackageSpawnTask(YARN_BIN, 'link'));
 
 /**
  * Link package dependencies
@@ -85,7 +86,7 @@ gulp.task('yarn:link:cross', (done) => {
     PACKAGE_DIRS.map(dir => {
       const pkg = require(join(__dirname, dir, 'package.json'));
       return _(intersection(keys(Object.assign({}, pkg.dependencies || {}, pkg.devDependencies || {})), PACKAGE_NAMES).map((dep) => {
-        return gulpSpawn('yarn', ['link', dep], { cwd: dir });
+        return gulpSpawn(YARN_BIN, ['link', dep], { cwd: dir });
       })).sequence()
     })
   ).sequence().done(done);
