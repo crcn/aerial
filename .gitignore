@@ -3,4 +3,5 @@ node_modules
 out
 yarn.lock
 *.log
+package-lock.json
 packages/*/lib
