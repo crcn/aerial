@@ -315,7 +315,7 @@ export class SyntheticDOMElement extends SyntheticDOMContainer {
     super(tagName);
     this._readonlyAttributeNames = [];
     this._shadowRootObserver = new BubbleDispatcher(this);
-    this.attributes = SyntheticDOMAttributes.create() as SyntheticDOMAttributes;
+    this.attributes = new SyntheticDOMAttributes();
     this.attributes.observe(new CallbackBus(this.onAttributesEvent.bind(this)));
 
     // todo - proxy this

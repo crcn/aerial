@@ -10,7 +10,7 @@ export class ObservableCollection<T> extends ArrayCollection<T> implements IObse
   private _observable: Observable;
   private _itemObserver: IBus<any, any>;
 
-  protected constructor(...items: T[]) {
+  constructor(...items: T[]) {
     super(...items);
     this._observable = new Observable(this);
     this._itemObserver = new BubbleDispatcher(this);

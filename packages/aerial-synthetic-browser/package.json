@@ -1,10 +1,10 @@
 {
   "name": "aerial-synthetic-browser",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Synthetic browser implementation",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./lib/**/*-test.js",
+    "test": "mocha ./lib/**/*-test.js --timeout=6000",
     "build": "rm -rf lib; for FILE in `find ./src -name *.peg`; do OUT_FILE=`echo $FILE | sed 's/src/lib/' | sed 's/.peg/.peg.js/';`; mkdir -p `dirname $OUT_FILE`; ./node_modules/.bin/pegjs -o $OUT_FILE $FILE; done; for FILE in `find ./src -name *.d.ts`; do OUT_FILE=`echo $FILE | sed 's/src/lib/'`; mkdir -p `dirname $OUT_FILE`; cp $FILE $OUT_FILE; done; tsc"
   },
   "repository": {

@@ -1,6 +1,6 @@
 {
   "name": "aerial-sandbox",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "sandbox environment for running javascript",
   "repository": {
     "type": "git",

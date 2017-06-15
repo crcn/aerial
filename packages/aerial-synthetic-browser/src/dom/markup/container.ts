@@ -189,13 +189,13 @@ export abstract class SyntheticDOMContainer extends SyntheticDOMNode {
   }
 
   public getElementsByTagName(tagName: string) {
-    return SyntheticHTMLCollection.create(...filterTree(this, (node) => {
+    return new SyntheticHTMLCollection(...filterTree(this, (node) => {
       return node.nodeType === DOMNodeType.ELEMENT && (tagName === "*" || node.nodeName === tagName);
     })) as any as SyntheticHTMLCollection<SyntheticDOMElement>;
   }
 
   public getElementsByClassName(className: string) {
-    return SyntheticHTMLCollection.create(...this.querySelectorAll("." + className)) as SyntheticHTMLCollection<SyntheticDOMElement>;
+    return new SyntheticHTMLCollection(...this.querySelectorAll("." + className)) as SyntheticHTMLCollection<SyntheticDOMElement>;
   }
 
   createEditor() {

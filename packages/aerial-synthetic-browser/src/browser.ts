@@ -112,7 +112,7 @@ export abstract class BaseSyntheticBrowser extends Observable implements ISynthe
     _kernel.inject(this);
 
     this.statusWatcher = new PropertyWatcher<BaseSyntheticBrowser, Status>(this, "status");
-    this.logs = ObservableCollection.create<LogEvent>() as ObservableCollection<LogEvent>;
+    this.logs = new ObservableCollection<LogEvent>();
     this._renderer = _kernel.inject(isMaster ? renderer || new SyntheticDOMRenderer() : new NoopRenderer());
     this._renderer.observe(new CallbackBus(this.onRendererEvent.bind(this)));
     this._documentObserver = new CallbackBus(this.onDocumentEvent.bind(this));

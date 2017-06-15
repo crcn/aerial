@@ -177,7 +177,7 @@ export class SyntheticDocument extends SyntheticDOMContainer {
   constructor(readonly defaultNamespaceURI: string, implementation?: SyntheticDOMImplementation) {
     super("#document");
     this.$implementation = implementation;
-    this.styleSheets = ObservableCollection.create() as any;
+    this.styleSheets = new ObservableCollection<SyntheticCSSStyleSheet>();
     this.styleSheets.observe(new CallbackBus(this.onStyleSheetsEvent.bind(this)));
     this.$registeredElements = {};
   }

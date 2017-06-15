@@ -270,7 +270,7 @@ export class ChildElementQuerier<T extends SyntheticDOMElement> extends BaseElem
       if (this._parentWatchers) this._parentWatchers.dispose();
       const { targetWatcher, queriedElementsWatcher } = parent;
       parent.targetWatcher
-      this._parentWatchers = DisposableCollection.create(
+      this._parentWatchers = new DisposableCollection(
         targetWatcher.connect(target => this.target = target).trigger(),
         queriedElementsWatcher.connect(this.reset.bind(this))
       ) as DisposableCollection;
