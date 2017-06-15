@@ -8,6 +8,7 @@ const {join}    = require('path');
 const {argv}    = require('yargs');
 const {spawn}   = require('child_process');
 const gsequence = require('gulp-sequence');
+const _         = require('highland');
 const {keys, intersection} = require('lodash');
 
 gulp.task('default', ['build']);
@@ -24,10 +25,10 @@ const NODE_MODULES_BIN_DIR = join(NODE_MODULES_DIR, '.bin');
 const WATCH                = argv.watch != null;
 const GREP                 = argv.grep;
 
-const gulpSpawn = (command, args, options) => {
+const gulpSpawn = (command, args, options) => _.wrapCallback((callback) => {
+
   gutil.log([command, ...args, options.cwd].join(' '));
   const proc = spawn(command, args, options);
-
   proc.stdout.setEncoding('utf8');
   proc.stderr.setEncoding('utf8');
 
@@ -40,8 +41,14 @@ const gulpSpawn = (command, args, options) => {
     gutil.beep();
   });
 
-  return proc.stdout;
-};
+  proc.on('exit', (code) => {
+    if (code) {
+      callback(new Error(`command "${command} ${args.join(' ')}" exited with an error code: ${code}`));
+    } else {
+      callback();
+    }
+  });
+})();
 
 // extraArgs(WATCH, watchArgs, GREP, grepArgs)
 const extraArgs = function() {
@@ -55,9 +62,9 @@ const extraArgs = function() {
   return extra.length ? ['--', ...extra] : [];
 };
 
-const createPackageSpawnTask = (command, ...args) => () => merge(PACKAGE_DIRS.map((dir) => (
+const createPackageSpawnTask = (command, ...args) => (done) => _(PACKAGE_DIRS).map((dir) => (
   gulpSpawn(command, args, { cwd: dir })
-)))
+)).sequence().done(done);
 
 gulp.task('install', createPackageSpawnTask('yarn', 'install'));
 gulp.task('build', createPackageSpawnTask('npm', 'run', 'build', ...(WATCH ? ['--', '--watch'] : [])));
@@ -74,24 +81,21 @@ gulp.task('yarn:link:criss', createPackageSpawnTask('yarn', 'link'));
  * Link package dependencies
  */
 
-gulp.task('yarn:link:cross', () => {
-  return merge(
+gulp.task('yarn:link:cross', (done) => {
+  return _(
     PACKAGE_DIRS.map(dir => {
       const pkg = require(join(__dirname, dir, 'package.json'));
-      return merge(intersection(keys(Object.assign({}, pkg.dependencies || {}, pkg.devDependencies || {})), PACKAGE_NAMES).map((dep) => {
+      return _(intersection(keys(Object.assign({}, pkg.dependencies || {}, pkg.devDependencies || {})), PACKAGE_NAMES).map((dep) => {
         return gulpSpawn('yarn', ['link', dep], { cwd: dir });
-      }));
+      })).sequence()
     })
-  );
-  return createPackageSpawnTask('yarn', 'link')();
+  ).sequence().done(done);
 });
 
-gulp.task('npm:patch', () => {
-  // TODO 
-});
 
 gulp.task('npm:publish', createPackageSpawnTask('npm', 'publish'));
-gulp.task('clean', ['clean:node_modules', 'clean:yarnlock']);
+gulp.task('clean', ['clean:node_modules', 'clean:yarnlock', 'clean:package-lock']);
 
 gulp.task('clean:node_modules', createPackageSpawnTask('rm', '-rf', 'node_modules'));
-gulp.task('clean:yarnlock', createPackageSpawnTask('rm', 'yarnlock'));
+gulp.task('clean:yarnlock', createPackageSpawnTask('rm', '-f', 'yarn.lock'));
+gulp.task('clean:package-lock', createPackageSpawnTask('rm', '-f', 'package-lock.json'));

@@ -11,7 +11,7 @@
   "license": "ISC",
   "scripts": {
     "test": "gulp test",
-    "postinstall": "gulp install; gulp link; gulp build"
+    "prepublish": "gulp clean; gulp link; gulp install; gulp build"
   },
   "devDependencies": {
     "glob": "^7.1.2",
@@ -20,8 +20,8 @@
     "gulp-typescript": "^3.1.7",
     "gulp-util": "^3.0.8",
     "gulp-watch": "^4.3.11",
+    "highland": "^2.10.5",
     "lodash": "^4.17.4",
-    "merge2": "^1.0.3",
     "typescript": "^2.3.4",
     "yargs": "^8.0.1"
   }
