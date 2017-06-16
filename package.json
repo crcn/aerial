@@ -11,7 +11,7 @@
   "license": "ISC",
   "scripts": {
     "test": "gulp test",
-    "prepublish": "gulp clean; gulp link; gulp install; gulp build"
+    "postinstall": "gulp clean; gulp link; gulp install; gulp build"
   },
   "devDependencies": {
     "glob": "^7.1.2",
