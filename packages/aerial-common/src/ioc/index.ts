@@ -166,7 +166,7 @@ export class StoreProvider implements IProvider {
   }
 }
 
-export function createSingletonProviderClass<T>(id: string): { getInstance(providers: Kernel): T, ID: string, new(clazz: { new(...rest): T }): IProvider } {
+export function createSingletonProviderClass<T>(id: string): { getInstance(kernel: Kernel): T, ID: string, new(clazz: { new(...rest): T }): IProvider } {
   return class SingletonProvider implements IProvider {
     static readonly ID: string = id;
     private _value: T;
@@ -183,8 +183,8 @@ export function createSingletonProviderClass<T>(id: string): { getInstance(provi
     clone() {
       return new SingletonProvider(this._clazz);
     }
-    static getInstance(providers: Kernel): T {
-      const dep = providers.query<SingletonProvider>(id);
+    static getInstance(kernel: Kernel): T {
+      const dep = kernel.query<SingletonProvider>(id);
       return dep ? dep.value : undefined;
     }
   }

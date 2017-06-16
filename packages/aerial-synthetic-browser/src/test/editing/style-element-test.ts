@@ -1,7 +1,7 @@
 // import { expect } from "chai";
 // import { FileEditorProvider } from "aerial-sandbox";
-// import { SyntheticCSSStyleRule } from "@tandem/synthetic-browser";
-// import { loadTestBrowser, timeout } from "@tandem/synthetic-browser/test";
+// import { SyntheticCSSStyleRule } from "aerial-synthetic-browser";
+// import { loadTestBrowser, timeout } from "aerial-synthetic-browser/test";
 // import { PrivateBusProvider, LogLevel } from "aerial-common";
 
 // // TODO - media queries, keyframes 

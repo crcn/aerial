@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { flattenTree } from "aerial-common";
-import { generateRandomSyntheticHTMLElement } from "../test/helpers";
+import { generateRandomSyntheticHTMLElement } from "../test";
 import chalk =  require("chalk");
 import {
   evaluateMarkup,

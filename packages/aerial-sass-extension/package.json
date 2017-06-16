@@ -1,0 +1,19 @@
+{
+  "name": "aerial-sass-extension",
+  "version": "1.0.33",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo '';",
+    "build": "rm -rf lib; tsc;"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aerial-common": "0.0.x",
+    "aerial-sandbox": "0.0.x",
+    "aerial-synthetic-browser": "0.0.x",
+    "postcss": "^6.0.2",
+    "postcss-scss": "^1.0.1"
+  }
+}

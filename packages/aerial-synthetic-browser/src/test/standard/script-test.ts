@@ -1,8 +1,8 @@
 // import { expect } from "chai";
 // import { LogLevel } from "aerial-common";
-// import { SyntheticBrowser, SyntheticHTMLElement } from "@tandem/synthetic-browser";
+// import { SyntheticBrowser, SyntheticHTMLElement } from "aerial-synthetic-browser";
 // import { createTestMasterApplication } from "@tandem/editor/test";
-// import { loadTestBrowser } from "@tandem/synthetic-browser/test";
+// import { loadTestBrowser } from "aerial-synthetic-browser/test";
 
 // // poorly organized DOM spec tests. TODO - move these into sep fiels
 // describe(__filename + "#", () => {

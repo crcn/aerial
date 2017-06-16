@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { serialize, deserialize } from "aerial-common";
-import { generateRandomSyntheticHTMLElement } from "../test/helpers";
+import { generateRandomSyntheticHTMLElement } from "../test";
 import { SyntheticWindow } from "..";
 
 describe(__filename + "#", () => {

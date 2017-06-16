@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { generateRandomStyleSheet } from "../test/helpers";
+import { generateRandomStyleSheet } from "../test";
 import { flattenTree } from "aerial-common";
 import chalk =  require("chalk");
 import { 

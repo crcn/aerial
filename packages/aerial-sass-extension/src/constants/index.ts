@@ -1,0 +1,1 @@
+export const SASS_MIME_TYPE = "text/scss";

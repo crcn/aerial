@@ -1,7 +1,7 @@
 import sinon =  require("sinon");
 import { expect } from "chai";
 import { Kernel, Status } from "aerial-common";
-import { MockFileResolver, createSandboxTestKernel } from "../test/helpers";
+import { MockFileResolver, createSandboxTestKernel } from "../test";
 import {
   Dependency,
   IDependencyGraph,

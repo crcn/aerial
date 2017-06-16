@@ -1,8 +1,25 @@
-import { Kernel, LogLevel } from "aerial-common";
-import { sample, sampleSize, random } from "lodash";
-// import { createTestMasterApplication } from "@tandem/editor/test";
-import { createSandboxProviders, IFileResolver } from "aerial-sandbox";
 import parse5 = require("parse5");
+import { sample, sampleSize, random } from "lodash";
+import { createJavaScriptSandboxProviders } from "aerial-commonjs-extension";
+import { ISandboxTestProviderOptions, createTestSandboxProviders } from "aerial-sandbox/test";
+import { 
+  Kernel, 
+  LogLevel, 
+  BrokerBus, 
+  KernelProvider, 
+  HTML_MIME_TYPE,
+  PrivateBusProvider, 
+} from "aerial-common";
+
+import { 
+  IFileResolver, 
+  FileCacheProvider,
+  createSandboxProviders, 
+  DependencyGraphProvider,
+  ProtocolURLResolverProvider,
+  ContentEditorFactoryProvider, 
+} from "aerial-sandbox";
+
 import {
   parseCSS,
   evaluateCSS,
@@ -15,6 +32,7 @@ import {
   SyntheticDOMElement,
   SyntheticDOMContainer,
   SyntheticCSSStyleSheet,
+  createSyntheticHTMLProviders,
 } from "../..";
 
 export function createMockBrowser() {
@@ -121,21 +139,45 @@ export const timeout = (ms = 10) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// export const loadTestBrowser = async (mockFiles: any, entryFilePath: string) => {
-//   const app = createTestMasterApplication({
-//     log: {
-//       level: LogLevel.VERBOSE
-//     },
-//     sandboxOptions: {
-//       mockFiles: mockFiles
-//     }
-//   });
+interface ITestKernelOptions {
+  log?: {
+    level: LogLevel
+  },
+  sandboxOptions?: ISandboxTestProviderOptions,
+  createTestProviders?: () => any
+}
 
-//   const browser = new SyntheticBrowser(app.kernel);
+const createTestKernel = (options: ITestKernelOptions = {}) => {
+  const bus = new BrokerBus();
+  const kernel = new Kernel(
+    createTestSandboxProviders(options),
+    new KernelProvider(),
+    new PrivateBusProvider(bus),
+    createSyntheticHTMLProviders(),
+    createJavaScriptSandboxProviders(),
+  );
+  if (options.createTestProviders) {
+    kernel.register(options.createTestProviders());
+  }
+  FileCacheProvider.getInstance(kernel).syncWithLocalFiles();
+  return kernel;
+};
 
-//   await browser.open({
-//     uri: entryFilePath
-//   });
+export const loadTestBrowser = async (mockFiles: any, entryFilePath: string) => {
+  const kernel = createTestKernel({
+    log: {
+      level: LogLevel.VERBOSE
+    },
+    sandboxOptions: {
+      mockFiles: mockFiles
+    }
+  });
 
-//   return browser;
-// }
+  const browser = new SyntheticBrowser(kernel);
+
+  await browser.open({
+    uri: entryFilePath
+  });
+
+  return browser;
+}

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha ./lib/**/*-test.js --timeout=6000",
+    "test-coverage": "istanbul cover _mocha ./lib/**/*-test.js -- --timeout=6000",
     "build": "rm -rf lib; for FILE in `find ./src -name *.peg`; do OUT_FILE=`echo $FILE | sed 's/src/lib/' | sed 's/.peg/.peg.js/';`; mkdir -p `dirname $OUT_FILE`; ./node_modules/.bin/pegjs -o $OUT_FILE $FILE; done; for FILE in `find ./src -name *.d.ts`; do OUT_FILE=`echo $FILE | sed 's/src/lib/'`; mkdir -p `dirname $OUT_FILE`; cp $FILE $OUT_FILE; done; tsc"
   },
   "repository": {
@@ -23,10 +24,11 @@
     "@types/react": "^15.0.24",
     "@types/socket.io": "^1.4.29",
     "@types/source-map": "^0.5.0",
+    "aerial-commonjs-extension": "^0.0.2",
     "chai": "^4.0.2",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2",
-    "ts-node": "^3.0.6"
+    "mocha-istanbul": "^0.3.0"
   },
   "dependencies": {
     "abab": "^1.0.3",

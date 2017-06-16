@@ -1,7 +1,7 @@
 // import fs =  require("fs");
 // import path =  require("path");
 // import { expect } from "chai";
-// import { generateRandomStyleSheet } from "@tandem/synthetic-browser/test/helpers";
+// import { generateRandomStyleSheet } from "aerial-synthetic-browser/test/helpers";
 // import { FileEditorProvider, URIProtocolProvider } from "aerial-sandbox";
 // import { waitForPropertyChange, Application, LogLevel } from "aerial-common";
 // // import { createTestMasterApplication, createRandomFileName } from "@tandem/test";

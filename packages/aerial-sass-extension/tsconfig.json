@@ -1,0 +1,31 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es6",
+    "sourceMap": true,
+    "lib": [
+      "es2015.promise",
+      "dom",
+      "es6"
+    ],
+    "module": "commonjs",
+    "outDir": "lib",
+    "baseUrl": "src",
+    "experimentalDecorators": true,
+    "paths": {
+      "postcss": ["../node_modules/postcss/lib/postcss.d.ts"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "*-test",
+    "lib",
+    "index.ts"
+  ],
+  "filesGlob": [
+    "./src/**/*.ts"
+  ],
+  "rootDirs": [
+    "src"
+  ]
+}

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { SyntheticDOMRenderer } from "./index";
 import { SyntheticWindow, SyntheticDocument, SyntheticHTMLStyleElement } from "../..";
-import { generateRandomSyntheticHTMLElementSource, generateRandomStyleSheet } from "../../test/helpers";
+import { generateRandomSyntheticHTMLElementSource, generateRandomStyleSheet } from "../../test";
 
 describe(__filename + "#", () => {
 
