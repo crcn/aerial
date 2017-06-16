@@ -92,7 +92,6 @@ gulp.task('yarn:link:cross', (done) => {
   ).sequence().done(done);
 });
 
-
 gulp.task('npm:publish', createPackageSpawnTask('npm', 'publish'));
 gulp.task('clean', ['clean:node_modules', 'clean:yarnlock', 'clean:package-lock']);
 
