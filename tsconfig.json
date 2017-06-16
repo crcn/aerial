@@ -10,7 +10,7 @@
     ],
     "module": "commonjs",
     "outDir": "lib",
-    "baseUrl": "src",
+    "baseUrl": "src/packages",
     "experimentalDecorators": true
   },
   "exclude": [
