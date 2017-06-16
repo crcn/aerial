@@ -17,7 +17,8 @@
     "node_modules",
     "*-test",
     "lib",
-    "index.ts"
+    "index.ts",
+    "test.ts"
   ],
   "filesGlob": [
     "./src/**/*.ts"
