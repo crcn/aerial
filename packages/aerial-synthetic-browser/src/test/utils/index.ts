@@ -35,6 +35,7 @@ import {
   createSyntheticHTMLProviders,
 } from "../..";
 
+
 export function createMockBrowser() {
   const deps = createSandboxProviders();
   return new SyntheticBrowser(new Kernel(deps));

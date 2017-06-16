@@ -1,7 +1,8 @@
 import { Dependency } from "aerial-sandbox";
 import { kebabCase } from "lodash";
 import { CallbackBus } from "mesh";
-import { SyntheticDOMElement, getSelectorTester } from "..";
+import { SyntheticDOMElement } from "../markup";
+import { getSelectorTester } from "../selector";
 import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor } from "aerial-sandbox";
 import { ISerializedSyntheticCSSStyle, SyntheticCSSStyle, isValidCSSDeclarationProperty } from "./style";
 import { SyntheticCSSObject, SyntheticCSSObjectSerializer, SyntheticCSSObjectEdit, SyntheticCSSObjectEditor } from "./base";

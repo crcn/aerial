@@ -1,8 +1,8 @@
 import { atob } from "abab";
 import { RawSourceMap } from "source-map";
 import { SyntheticCSSFontFace } from "./font-face";
-import { parseCSS } from "../../dom/css/parsers";
-import { evaluateCSS, evaluateCSSSource } from "../../dom/css/evaluate";
+import { parseCSS } from "./parsers";
+import { evaluateCSS, evaluateCSSSource } from "./evaluate";
 import { SyntheticCSSMediaRule } from "./media-rule";
 import { SyntheticCSSKeyframesRule } from "./keyframes-rule";
 import { SyntheticObjectChangeTypes, BaseEditor } from "aerial-sandbox";

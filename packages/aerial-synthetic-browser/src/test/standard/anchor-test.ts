@@ -7,7 +7,7 @@ import { loadTestBrowser } from "../utils";
 describe(__filename + "#", () => {
 
   // note that this does not work yet.
-  xit("anchor tags have a pathname property", async () => {
+  it("anchor tags have a pathname property", async () => {
     const { window } = await loadTestBrowser({
       "index.html": `
         <a href="http://localhost:8080/a/b/c/d?e=f#/hash/path"></a>
@@ -39,7 +39,7 @@ describe(__filename + "#", () => {
   });
 
   // note that this does not work yet.
-  xit("can change any property of the anchor tag and see it reflected in the href", async () => {
+  it("can change any property of the anchor tag and see it reflected in the href", async () => {
     const { window } = await loadTestBrowser({
       "index.html": `
         <a href="http://localhost:8080/a/b/c/d?e=f#/hash/path"></a>
@@ -71,5 +71,4 @@ describe(__filename + "#", () => {
       "file://test.com/e/f?e=f#/ish\n"
     );
   });
-
 });
