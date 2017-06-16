@@ -33,10 +33,11 @@ let _cache: {
 } = {};
 
 export function evaluateCSSSource(source: string, map?: sm.RawSourceMap, module?: SandboxModule) {
-  if (_cache[source]) return _cache[source].clone(true).regenerateUID();
+  const hash = source + (module && module.uri);
+  if (_cache[hash]) return _cache[hash].clone(true).regenerateUID();
   if (!map) map = parseSourceMaps(source);
   const ast = parseCSS(source, map);
-  const styleSheet = _cache[source] = evaluateCSS(ast, map, module);
+  const styleSheet = _cache[hash] = evaluateCSS(ast, map, module);
 
   // re-exec to ensure that the cached version doesn't get mutated
   return evaluateCSSSource(source, map, module);

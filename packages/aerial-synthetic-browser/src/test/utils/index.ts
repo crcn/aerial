@@ -147,7 +147,9 @@ interface ITestKernelOptions {
   createTestProviders?: () => any
 }
 
-const createTestKernel = (options: ITestKernelOptions = {}) => {
+export const createRandomFileName = (extension) => Math.round(Math.random() * 9999999999) + "." + extension;
+
+export const createTestKernel = (options: ITestKernelOptions = {}) => {
   const bus = new BrokerBus();
   const kernel = new Kernel(
     createTestSandboxProviders(options.sandboxOptions),

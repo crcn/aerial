@@ -10,8 +10,6 @@ import { SyntheticCSSStyleSheet } from "../css";
 
 import path =  require("path");
 
-const _cache = {};
-
 // TODO - implement imports
 export class SyntheticHTMLLinkElement extends SyntheticHTMLElement {
 
@@ -72,7 +70,6 @@ export class SyntheticHTMLLinkElement extends SyntheticHTMLElement {
 
     this.stylesheet.$ownerNode = this;
     this.attachStylesheet();
-
   }
 
   private attachStylesheet() {
@@ -91,8 +88,7 @@ export class SyntheticHTMLLinkElement extends SyntheticHTMLElement {
   }
 }
 
-
-
+// TODO - move this to utility function
 function parseDataURI(uri: string): { type: string, content: string } {
   const parts = uri.match(/data:(.*?),(.*)/);
   return parts && { type: parts[1], content: parts[2] };

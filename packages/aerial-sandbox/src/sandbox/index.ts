@@ -142,7 +142,6 @@ export class Sandbox extends Observable {
     const evaluatorFactoryDepedency = SandboxModuleEvaluatorFactoryProvider.find(dependency.type, this._kernel);
 
     if (!evaluatorFactoryDepedency) {
-      // console.log(dependency.so)
       throw new Error(`Cannot evaluate ${dependency.uri}:${dependency.type} in sandbox.`);
     }
 
