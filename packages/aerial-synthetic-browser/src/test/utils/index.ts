@@ -35,7 +35,6 @@ import {
   createSyntheticHTMLProviders,
 } from "../..";
 
-
 export function createMockBrowser() {
   const deps = createSandboxProviders();
   return new SyntheticBrowser(new Kernel(deps));
@@ -151,7 +150,7 @@ interface ITestKernelOptions {
 const createTestKernel = (options: ITestKernelOptions = {}) => {
   const bus = new BrokerBus();
   const kernel = new Kernel(
-    createTestSandboxProviders(options),
+    createTestSandboxProviders(options.sandboxOptions),
     new KernelProvider(),
     new PrivateBusProvider(bus),
     createSyntheticHTMLProviders(),

@@ -4,9 +4,7 @@ class _ArrayCollection<T> extends Array<T> {
   }
 }
 
-function __ArrayCollection() {
-  const _this = [];
-  Array.apply(_this, arguments);
+function __ArrayCollection(..._this: any[]) {
   _this["__proto__"] = this.constructor.prototype;
   return _this;
 }

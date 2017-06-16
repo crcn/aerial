@@ -46,7 +46,6 @@ setInterval(() => _cache = {}, 1000 * 60);
 
 export function evaluateCSS(expression: postcss.Root, map?: sm.RawSourceMap, module?: SandboxModule): SyntheticCSSStyleSheet {
 
-
   const dependency = module && module.source;
 
   const sourceMapConsumer = map && new sm.SourceMapConsumer(map);

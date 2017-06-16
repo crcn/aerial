@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import {BaseSyntheticBrowser} from "./browser";
 import { RemoteBrowserService } from "./remote-browser";
 import { Kernel, ApplicationServiceProvider } from "aerial-common";
