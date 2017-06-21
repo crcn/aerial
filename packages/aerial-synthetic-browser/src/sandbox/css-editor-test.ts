@@ -110,7 +110,4 @@ describe(__filename + "#", () => {
       expect((await a.reloadStylesheet()).cssText).to.equal(b.styleSheet.cssText);
     });
   });
-
-
-  xit("doesn't save the file if there's a syntax error in an edit");
 });

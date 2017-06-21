@@ -396,7 +396,6 @@ export class SyntheticDOMElement extends SyntheticDOMContainer {
 
   setAttribute(name: string, value: string) {
 
-
     // attributes that are not editable by the editor
     if (name === "data-td-readonly") {
       this._readonlyAttributeNames = JSON.parse(value) as string[];

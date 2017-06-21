@@ -223,8 +223,6 @@ export class SyntheticHTMLElement extends VisibleSyntheticDOMElement<SyntheticCS
   }
 
   public setAbsoluteBounds(newBounds: BoundingRect) {
-    // const oldBounds = this.getAbsoluteBounds();
-
     Object.assign(this.style, {
       left: newBounds.left,
       top: newBounds.top,

@@ -214,7 +214,9 @@ export class FileEditor {
     const changes = this._mutations;
     this._mutations = undefined;
 
-    const mutationsByUri = {};
+    const mutationsByUri: {
+      [Identifer: string]: Mutation<ISyntheticObject>[]
+    } = {};
 
     // find all events that are part of the same file and
     // batch them together. Important to ensure that we do not trigger multiple
