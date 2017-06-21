@@ -71,6 +71,11 @@ describe(__filename + "#", () => {
       [3, 6, `def`, `<a><b></b>def</a>`]
     ],
     [
+      `abcdefghij`,
+      [2, 6, `klmno`, `abklmnoghij`],
+      [1, 7, `pq`, `abklmnoghij`]
+    ],
+    [
       `<a b c d></a>`,
       [2, 4, ``, `<a c d></a>`],
       [4, 6, ``, `<a d></a>`],

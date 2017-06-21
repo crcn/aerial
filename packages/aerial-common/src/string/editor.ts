@@ -1,3 +1,4 @@
+
 export class SourceStringEditor {
   private _replacements: Array<[number, number, string]>;
 
@@ -33,15 +34,31 @@ export class SourceStringEditor {
       for (let j = 0; j < i; j++) {
         const [previousStartIndex, previousEndIndex, previousNewValue] = this._replacements[j];
 
+        const prevInsertion     = previousStartIndex === previousEndIndex;
+        const startIndicesMatch = startIndex === previousStartIndex;
+        const endIndicesMatch   = endIndex === previousEndIndex;
+
         // input :  a b c d e f g h i
         // prev  :     ^-------^
         // curr  :     ^
-        const insertBeginning        = startIndex === previousStartIndex && insertion;
+        const insertBeginning        = startIndicesMatch && insertion;
 
         // input :  a b c d e f g h i
         // prev  :     ^-------^
         // curr  :             ^
-        const insertEnd              = endIndex === previousEndIndex && insertion;
+        const insertEnd              = endIndicesMatch && insertion;
+
+        // input :  a b c d e f g h i
+        // prev  :     ^
+        // curr  :     ^-------^
+        const prevInsertBeginning    = startIndicesMatch && prevInsertion;
+        
+        // input :  a b c d e f g h i
+        // prev  :     ^
+        // curr  :     ^-------^
+        const prevInsertEnd         = endIndicesMatch && prevInsertion;
+
+        const currOrPrevInserting   = insertBeginning || insertEnd || prevInsertBeginning || prevInsertEnd;
 
         // input :  a b c d e f g h i
         // prev  :         ^-------^ 
@@ -62,9 +79,15 @@ export class SourceStringEditor {
         // input :  a b c d e f g h i 
         // prev  :   ^---------^
         // curr  :     ^---^
+        // curr  : ^-------------^
         // not   :   ^
         // not   :             ^
-        if (startIndex >= previousStartIndex && endIndex <= previousEndIndex && !insertBeginning && !insertEnd) {
+        // not   :   ^-----------^
+        if (
+            (
+              (startIndex >= previousStartIndex && endIndex <= previousEndIndex) || 
+              (startIndex < previousStartIndex && endIndex >= previousEndIndex)
+            ) && !currOrPrevInserting) {
           invalid = true;
           break;
         }

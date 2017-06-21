@@ -53,7 +53,7 @@ describe(__filename + "#", () => {
     [`<div>a<!--b--><c /></div>`, `<div><!--b--><c />a</div>`],
 
     [
-      `<g a="gca" a="geab"></g>`,
+      `<g a="gca"></g>`,
       `<g g="b" f="d"></g>`
     ],
 
