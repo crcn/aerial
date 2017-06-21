@@ -279,7 +279,6 @@ export class MarkupEditor extends BaseContentEditor<parse5.AST.Default.Node> {
   }
 
   getFormattedContent(root: parse5.AST.Default.Node) {
-    // console.log(JSON.stringify(this._sourceMutations.map(({startIndex, endIndex, value}) => ({startIndex, endIndex, value})), null, 2));
     return new StringEditor(this.content).applyMutations(this._sourceMutations);
   }
 }

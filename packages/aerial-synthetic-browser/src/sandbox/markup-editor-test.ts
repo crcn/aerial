@@ -65,10 +65,10 @@ describe(__filename + "#", () => {
     [
       `<l>gb</l>`,
       `<l><g></g>afc</l>`
-    ]
+    ],
 
     // fuzzy
-    ...fuzzyCases
+    // ...fuzzyCases
   ].forEach(([oldSource, newSource]) => {
     it(`Can apply file edits from ${oldSource} to ${newSource}`, async () => {
       const oldResult = await loadHTML(oldSource);
