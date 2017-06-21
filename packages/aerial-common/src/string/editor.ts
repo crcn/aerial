@@ -5,6 +5,9 @@ export class StringMutation extends Mutation<any> {
   constructor(readonly startIndex: number, readonly endIndex: number, readonly value: string = "") {
     super(StringMutation.REPLACE);
   }
+  paramsToString() {
+    return [this.startIndex, this.endIndex, this.value].join(", ");
+  }
 }
 
 export class StringEditor {
