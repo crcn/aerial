@@ -1,9 +1,9 @@
 import {expect} from "chai";
-import {SourceStringEditor} from "./editor";
+import {StringEditor, StringMutation} from "./editor";
 
 describe(__filename + "#", () => {
   it("can be created", () => {
-    new SourceStringEditor("abba");
+    new StringEditor("abba");
   });
 
   [
@@ -84,11 +84,12 @@ describe(__filename + "#", () => {
     ]
   ].forEach(([input, ...steps]: any) => {
     it(`can convert ${input} to ${steps[steps.length - 1][3]} with ${JSON.stringify(steps)}`, () => {
-      const editor = new SourceStringEditor(input);
+      const editor = new StringEditor(input);
+      const mutations = [];
       for (const [startIndex, endIndex, newValue, currentOutput] of steps) {
-        editor.replace(startIndex, endIndex, newValue);
+        mutations.push(new StringMutation(startIndex, endIndex, newValue));
         if (currentOutput) {
-          expect(editor.getOutput()).to.eql(currentOutput);
+          expect(editor.applyMutations(mutations)).to.eql(currentOutput);
         }
       }
     });

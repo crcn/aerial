@@ -1,29 +1,23 @@
+export class StringMutation {
+  constructor(readonly startIndex: number, readonly endIndex: number, readonly value: string = "") {
 
-export class SourceStringEditor {
-  private _replacements: Array<[number, number, string]>;
+  }
+}
 
+export class StringEditor {
   private _position: number = 0;
   private _output: string;
 
   constructor(readonly input: string) {
     this._output = input;
-    this._replacements = [];
   }
 
-  replace(sourceStartIndex: number, sourceEndIndex: number, value = "") {
-    
-    let offsetSourceStartIndex = sourceStartIndex;
-    let offsetSourceEndIndex   = sourceEndIndex;
-
-    this._replacements.push([sourceStartIndex, sourceEndIndex, value]);
-  }
-
-  getOutput() {
+  applyMutations(mutations: StringMutation[]) {
     let output = this.input;
     const computedReplacements: Array<[number, number, string]> = [];
 
-    for (let i = 0, n = this._replacements.length; i < n; i++) {
-      const [startIndex, endIndex, value] = this._replacements[i];
+    for (let i = 0, n = mutations.length; i < n; i++) {
+      const {startIndex, endIndex, value} = mutations[i];
 
       let offsetStartIndex = startIndex;
       let offsetEndIndex   = endIndex;
@@ -32,7 +26,7 @@ export class SourceStringEditor {
 
       // based on all of the previous edits, calculate where this edit is
       for (let j = 0; j < i; j++) {
-        const [previousStartIndex, previousEndIndex, previousNewValue] = this._replacements[j];
+        const {startIndex: previousStartIndex, endIndex: previousEndIndex, value: previousNewValue} = mutations[j];
 
         const prevInsertion     = previousStartIndex === previousEndIndex;
         const startIndicesMatch = startIndex === previousStartIndex;

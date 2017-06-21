@@ -1,10 +1,11 @@
 import {
   Mutation,
+  StringEditor,
   RemoveMutation,
+  StringMutation,
   SetValueMutation,
   PropertyMutation,
   MoveChildMutation,
-  SourceStringEditor,
   InsertChildMutation,
   sourcePositionEquals,
 } from "aerial-common";
@@ -43,30 +44,38 @@ interface IReplacement {
   value: string;
 }
 
+class MarkupStringMutation<T extends Mutation<ISyntheticObject>> extends StringMutation {
+  constructor(start: number, end: number, value: string, readonly node: parse5.AST.Default.Element | parse5.AST.Default.TextNode, readonly source: T) {
+    super(start, end, value);
+  }
+}
+
 // TODO - mutate ast, diff that, then apply sorted
 // text transformations
 export class MarkupEditor extends BaseContentEditor<parse5.AST.Default.Node> {
 
   // TODO - possibly move to base editor
-  private _sourceEditor: SourceStringEditor;
+  private _sourceMutations: MarkupStringMutation<Mutation<ISyntheticObject>>[];
 
   constructor(uri, content) {
     super(uri, content);
-    this._sourceEditor = new SourceStringEditor(content);
+    this._sourceMutations = [];
   }
 
-  [RemoveMutation.REMOVE_CHANGE](node: parse5.AST.Default.Element, { target }: RemoveMutation<any>) {
+  [RemoveMutation.REMOVE_CHANGE](node: parse5.AST.Default.Element, mutation: RemoveMutation<any>) {
+    const { target } = mutation;
     const index = node.parentNode.childNodes.indexOf(node);
-    this._sourceEditor.replace(node.__location.startOffset, node.__location.endOffset, "");
+    this._sourceMutations.push(new MarkupStringMutation(node.__location.startOffset, node.__location.endOffset, "", node, mutation));
   }
 
   // compatible with command & value node
-  [SyntheticDOMValueNodeMutationTypes.SET_VALUE_NODE_EDIT](node: any, { target, newValue }: SetValueMutation<any>) {
-    // node.value = node.data = newValue;
-    this._sourceEditor.replace(node.__location.startOffset, node.__location.endOffset, newValue);
+  [SyntheticDOMValueNodeMutationTypes.SET_VALUE_NODE_EDIT](node: any, mutation: SetValueMutation<any>) {
+    const { target, newValue } = mutation;
+    this._sourceMutations.push(new MarkupStringMutation(node.__location.startOffset, node.__location.endOffset, newValue, node, mutation));
   }
 
-  [SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT](node: parse5.AST.Default.Element, { target, name, newValue, oldName, index }: PropertyMutation<any>) {
+  [SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT](node: parse5.AST.Default.Element, mutation: PropertyMutation<any>) {
+    const { target, name, newValue, oldName, index } = mutation;
     
     const syntheticElement = <SyntheticHTMLElement>target;
 
@@ -85,32 +94,56 @@ export class MarkupEditor extends BaseContentEditor<parse5.AST.Default.Node> {
         end   = attrLocation.endOffset;
         if (i !== index && beforeAttr) {
           const beforeAttrLocation = node.__location.attrs[beforeAttr.name];
-          this._sourceEditor.replace(
+          this._sourceMutations.push(new MarkupStringMutation(
             start,
             end,
-            ""
-          );
+            "",
+            node,
+            mutation
+          ));
+
           start = end = beforeAttrLocation.startOffset;
+          node.attrs.splice(i, 1);
+          node.attrs.splice(index, 0, attr);
         }
 
-        this._sourceEditor.replace(
+        this._sourceMutations.push(new MarkupStringMutation(
           start,
           end, 
-          newValue ? ` ${name}="${newValue}"` : ``
-        );
+          newValue ? ` ${name}="${newValue}"` : ``,
+          node,
+          mutation
+        ));
       }
     }
 
     if (!found) {
-      this._sourceEditor.replace(
+
+      const newMutation = new MarkupStringMutation(
         start,
         end, 
-        newValue ? ` ${name}="${newValue}"` : ``
+        newValue ? ` ${name}="${newValue}"` : ``,
+        node,
+        mutation
       );
+      let i = 0;
+
+      for (i = 0; i < this._sourceMutations.length; i++) {
+        const stringMutation = this._sourceMutations[i];
+        if (stringMutation.node === node && stringMutation.source.type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
+          const prevAttrMutation = stringMutation.source as PropertyMutation<any>;
+          if (prevAttrMutation.index < index && stringMutation.startIndex === start) {
+            break;
+          }
+        }
+      }
+      this._sourceMutations.splice(i, 0, newMutation);
+      node.attrs.splice(index, 0, { name: name, value: newValue });
     }
   }
 
-  [SyntheticDOMContainerMutationTypes.INSERT_CHILD_NODE_EDIT](node: parse5.AST.Default.Element, { target, child, index }: InsertChildMutation<SyntheticDOMElement, SyntheticDOMNode>) {
+  [SyntheticDOMContainerMutationTypes.INSERT_CHILD_NODE_EDIT](node: parse5.AST.Default.Element, mutation: InsertChildMutation<SyntheticDOMElement, SyntheticDOMNode>) {
+    const { target, child, index } = mutation;
 
     const childExpression = parse5.parseFragment((<SyntheticDOMNode>child).toString(), { locationInfo: true }) as any;
 
@@ -124,52 +157,65 @@ export class MarkupEditor extends BaseContentEditor<parse5.AST.Default.Node> {
 
       node.childNodes.splice(index, 0, childExpression);
 
-      this._sourceEditor.replace(
+      this._sourceMutations.push(new MarkupStringMutation(
         node.__location.startTag.startOffset,
         node.__location.startTag.endOffset,
-        formatMarkupExpression(node)
-      );
+        formatMarkupExpression(node),
+        node,
+        mutation
+      ));
     } else {
-      this._sourceEditor.replace(
+      this._sourceMutations.push(new MarkupStringMutation(
         beforeChild.__location.startOffset,
         beforeChild.__location.startOffset,
-        (<SyntheticDOMNode>child).toString()
-      );
+        (<SyntheticDOMNode>child).toString(),
+        node,
+        mutation
+      ));
     }
   }
 
-  [SyntheticDOMContainerMutationTypes.REMOVE_CHILD_NODE_EDIT](node: parse5.AST.Default.Element, { target, child, index }: InsertChildMutation<SyntheticDOMElement, SyntheticDOMNode>) {
+  [SyntheticDOMContainerMutationTypes.REMOVE_CHILD_NODE_EDIT](node: parse5.AST.Default.Element, mutation: InsertChildMutation<SyntheticDOMElement, SyntheticDOMNode>) {
+    const { target, child, index } = mutation;
     const childNode = this.findTargetASTNode(node, child as SyntheticDOMNode) as parse5.AST.Default.Element;
-    this._sourceEditor.replace(
+    this._sourceMutations.push(new MarkupStringMutation(
        childNode.__location.startOffset,
        childNode.__location.endOffset,
-       ""
-    );
-    // node.childNodes.splice(node.childNodes.indexOf(childNode), 1);
+       "",
+       node,
+       mutation
+    ));
   }
 
-  [SyntheticDOMContainerMutationTypes.MOVE_CHILD_NODE_EDIT](node: parse5.AST.Default.Element, { target, child, index }: MoveChildMutation<SyntheticDOMElement, SyntheticDOMNode>) {
+  [SyntheticDOMContainerMutationTypes.MOVE_CHILD_NODE_EDIT](node: parse5.AST.Default.Element, mutation: MoveChildMutation<SyntheticDOMElement, SyntheticDOMNode>) {
+    const { target, child, index } = mutation;
     const childNode = this.findTargetASTNode(node, child as SyntheticDOMNode) as parse5.AST.Default.Element;
 
-    this._sourceEditor.replace(
+    this._sourceMutations.push(new MarkupStringMutation(
       childNode.__location.startOffset,
       childNode.__location.endOffset,
-      ""
-    );
+      "",
+      node,
+      mutation
+    ));
 
     const afterChild = (node.childNodes[index] || node.childNodes[node.childNodes.length - 1]) as parse5.AST.Default.Element;
 
-    this._sourceEditor.replace(
+    this._sourceMutations.push(new MarkupStringMutation(
       childNode.__location.startOffset,
       childNode.__location.endOffset,
-      ""
-    );
+      "",
+      node,
+      mutation
+    ));
     
-    this._sourceEditor.replace(
+    this._sourceMutations.push(new MarkupStringMutation(
       afterChild.__location.endOffset,
       childNode.__location.endOffset,
-      this.content.substr(childNode.__location.startOffset, childNode.__location.endOffset - childNode.__location.startOffset)
-    );
+      this.content.substr(childNode.__location.startOffset, childNode.__location.endOffset - childNode.__location.startOffset),
+      node,
+      mutation
+    ));
   }
 
   findTargetASTNode(root: parse5.AST.Default.Node, synthetic: SyntheticDOMNode) {
@@ -219,11 +265,13 @@ export class MarkupEditor extends BaseContentEditor<parse5.AST.Default.Node> {
 
     const newTextContent = editorProvider.create(this.uri, lines + matchingTextNode.value).applyMutations([mutation]);
 
-    this._sourceEditor.replace(
+    this._sourceMutations.push(new MarkupStringMutation(
       matchingTextNode.__location.startOffset,
       matchingTextNode.__location.endOffset,
-      newTextContent
-    );
+      newTextContent,
+      matchingTextNode,
+      mutation
+    ));
   }
 
   parseContent(content: string) {
@@ -231,7 +279,8 @@ export class MarkupEditor extends BaseContentEditor<parse5.AST.Default.Node> {
   }
 
   getFormattedContent(root: parse5.AST.Default.Node) {
-    return this._sourceEditor.getOutput();
+    // console.log(JSON.stringify(this._sourceMutations.map(({startIndex, endIndex, value}) => ({startIndex, endIndex, value})), null, 2));
+    return new StringEditor(this.content).applyMutations(this._sourceMutations);
   }
 }
 

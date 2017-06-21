@@ -68,7 +68,7 @@ describe(__filename + "#", () => {
     ]
 
     // fuzzy
-    // ...fuzzyCases
+    ...fuzzyCases
   ].forEach(([oldSource, newSource]) => {
     it(`Can apply file edits from ${oldSource} to ${newSource}`, async () => {
       const oldResult = await loadHTML(oldSource);
