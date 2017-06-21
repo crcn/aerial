@@ -1,6 +1,9 @@
-export class StringMutation {
-  constructor(readonly startIndex: number, readonly endIndex: number, readonly value: string = "") {
+import {Mutation} from '../messages';
 
+export class StringMutation extends Mutation<any> {
+  static readonly REPLACE = 'replace';
+  constructor(readonly startIndex: number, readonly endIndex: number, readonly value: string = "") {
+    super(StringMutation.REPLACE);
   }
 }
 
@@ -34,36 +37,36 @@ export class StringEditor {
 
         // input :  a b c d e f g h i
         // prev  :     ^-------^
-        // curr  :     ^
+        // ✔     :     ^
         const insertBeginning        = startIndicesMatch && insertion;
 
         // input :  a b c d e f g h i
         // prev  :     ^-------^
-        // curr  :             ^
+        // ✔     :             ^
         const insertEnd              = endIndicesMatch && insertion;
 
         // input :  a b c d e f g h i
         // prev  :     ^
-        // curr  :     ^-------^
+        // ✔     :     ^-------^
         const prevInsertBeginning    = startIndicesMatch && prevInsertion;
         
         // input :  a b c d e f g h i
         // prev  :     ^
-        // curr  :     ^-------^
+        // ✔     :     ^-------^
         const prevInsertEnd         = endIndicesMatch && prevInsertion;
 
         const currOrPrevInserting   = insertBeginning || insertEnd || prevInsertBeginning || prevInsertEnd;
 
         // input :  a b c d e f g h i
         // prev  :         ^-------^ 
-        // curr  :     ^-------^
+        // ✔     :     ^-------^
         if (previousStartIndex < endIndex && previousStartIndex > startIndex) {
           offsetEndIndex = offsetEndIndex - (endIndex - previousStartIndex);
         }
 
         // input :  a b c d e f g h i
         // prev  :   ^-----^
-        // curr  :       ^-------^
+        // ✔     :       ^-------^
         if (previousEndIndex > startIndex && previousEndIndex < endIndex) {
           offsetStartIndex = offsetStartIndex + (previousEndIndex - startIndex);
         }
@@ -72,11 +75,11 @@ export class StringEditor {
         // completely clobbers this one. There's nothing else to edit.
         // input :  a b c d e f g h i 
         // prev  :   ^---------^
-        // curr  :     ^---^
-        // curr  : ^-------------^
-        // not   :   ^
-        // not   :             ^
-        // not   :   ^-----------^
+        // ✔     :     ^---^
+        // ✔     : ^-------------^
+        // ✘     :   ^
+        // ✘     :             ^
+        // ✘     :   ^-----------^
         if (
             (
               (startIndex >= previousStartIndex && endIndex <= previousEndIndex) || 
@@ -88,17 +91,17 @@ export class StringEditor {
 
         // input :  a b c d e f g h
         // prev  :     ^-----^
-        // curr  :       ^-----^
-        // curr  :           ^---^
-        // curr  :               ^-^
-        // curr  : ^-----^
-        // not   : ^---^
-        // not   :   ^-^
-        // not   :     ^
+        // ✔     :       ^-----^
+        // ✔     :           ^---^
+        // ✔     :               ^-^
+        // ✔     : ^-----^
+        // ✘     : ^---^
+        // ✘     :   ^-^
+        // ✘     :     ^
 
         // input :  a b c d e f g h
         // prev  : ^---^
-        // curr  :   ^---^
+        // ✔     :   ^---^
         if (previousStartIndex <= startIndex && endIndex > previousStartIndex) {
           const prevValueLengthDelta = previousNewValue.length - (previousEndIndex - previousStartIndex);
 
