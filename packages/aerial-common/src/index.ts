@@ -10,7 +10,7 @@ export * from "./ioc";
 export * from "./geom";
 export * from "./tokenizers";
 export * from "./metadata";
-// export * from "./models";
+export * from "./services";
 export * from "./object";
 export * from "./logger";
 export * from "./observable";

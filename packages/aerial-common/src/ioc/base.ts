@@ -3,7 +3,7 @@ import { ICloneable } from "../object";
 import assert = require("assert");
 
 export interface IInjectable {
-  $didInject?(): void;
+  $didInject(): void;
 }
 
 export interface IProvider extends ICloneable {

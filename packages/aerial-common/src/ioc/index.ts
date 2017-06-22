@@ -33,7 +33,11 @@ export function createSingletonBusProviderClass(name: string): { getInstance(pro
     }
 
     static getInstance(providers: Kernel): IBrokerBus {
-      return providers.query<any>(id).value;
+      const provider = providers.query<any>(id);
+      if (!provider) {
+        throw new Error(`Cannot get a singleton provider instance of "${id}"`);
+      }
+      return provider.value;
     }
   };
 }

@@ -20,6 +20,7 @@ export class Application {
 
   constructor(readonly kernel: Kernel) {
     this.bus = PrivateBusProvider.getInstance(kernel);
+    this.registerProviders();
   }
 
   /**
@@ -50,6 +51,11 @@ export class Application {
 
     this.didInitialize();
   }
+
+  /**
+   */
+
+  protected registerProviders() { }
 
   /**
    */

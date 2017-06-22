@@ -52,6 +52,8 @@ export abstract class BaseActiveRecord<T> extends Observable implements IActiveR
     }
   }
 
+  $didInject() { }
+
   get isNew() {
     return this[this.idProperty] == null;
   }

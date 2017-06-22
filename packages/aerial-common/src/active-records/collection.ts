@@ -51,6 +51,8 @@ export class ActiveRecordCollection<T extends IActiveRecord<any>, U> extends Obs
     this.load();
   }
 
+  $didInject() { }
+
   async load() {
 
     // TODO - need to check for duplicates

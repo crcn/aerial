@@ -26,4 +26,6 @@ export abstract class BaseCommand implements ICommand, IInjectable {
   protected kernel: Kernel;
 
   abstract execute(message: IMessage);
+
+  $didInject() {}
 }

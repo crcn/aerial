@@ -7,6 +7,7 @@ describe(__filename + "#", () => {
     class Person implements IInjectable {
       @inject("name")
       public name: string;
+      $didInject() { }
     }
 
     const kernel = new Kernel(
@@ -23,6 +24,7 @@ describe(__filename + "#", () => {
     class Person implements IInjectable {
       @inject("name", dependency => dependency.value.toUpperCase())
       public name: string;
+      $didInject() { }
     }
 
     const kernel = new Kernel(

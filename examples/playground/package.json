@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo '';",
-    "build": "rm -rf lib; tsc",
-    "start": "node lib/server"
+    "build": "rm -rf lib; tsc; webpack",
+    "start": "node lib/back-end/entry"
   },
   "repository": {
     "type": "git",
@@ -21,18 +21,23 @@
   "homepage": "https://github.com/tandemcode/aerial#readme",
   "devDependencies": {
     "@types/chai": "^4.0.0",
+    "@types/express": "^4.0.36",
     "@types/lodash": "^4.14.66",
     "@types/mocha": "^2.2.41",
-    "@types/react": "^15.0.28",
+    "@types/react": "^15.0.30",
     "@types/react-dom": "^15.5.0",
     "@types/recompose": "^0.23.0",
     "@types/socket.io": "^1.4.29",
     "@types/source-map": "^0.5.0",
     "chai": "^4.0.2",
+    "gulp": "^3.9.1",
+    "gulp-util": "^3.0.8",
+    "highland": "^2.11.0",
     "mocha": "^3.4.2",
+    "null-loader": "^0.1.1",
     "ts-loader": "^2.1.0",
     "typescript": "^2.2.2",
-    "webpack": "^2.6.1"
+    "webpack": "^3.0.0"
   },
   "dependencies": {
     "abab": "^1.0.3",
@@ -41,6 +46,7 @@
     "aerial-synthetic-browser": "0.0.x",
     "chalk": "^1.1.3",
     "ent": "^2.2.0",
+    "express": "^4.15.3",
     "lodash": "^4.17.4",
     "memoizee": "^0.4.5",
     "mesh": "^7.0.3",
@@ -51,6 +57,7 @@
     "react-dom": "^15.6.1",
     "recompose": "^0.23.5",
     "sift": "3.3.x",
+    "systemjs": "^0.20.14",
     "tinycolor2": "^1.4.1"
   }
 }
