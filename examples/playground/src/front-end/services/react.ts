@@ -19,6 +19,8 @@ export class ReactService extends BaseFrontEndService {
   }
 
   render = throttle(() => {
-    ReactDOM.render(RootComponentProvider.create({}, this.kernel), this.config.element);
+    ReactDOM.render(RootComponentProvider.create({
+      kernel: this.kernel
+    }, this.kernel), this.config.element);
   }, RENDER_MS)
 }
