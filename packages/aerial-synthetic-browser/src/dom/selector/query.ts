@@ -93,7 +93,7 @@ export function selectorMatchesElement(selector: string, element: SyntheticDOMEl
  * @interface IElementQuerier
  */
 
-export interface IElementQuerier<T extends SyntheticDOMElement> extends IObservable, IDisposable {
+export interface IElementQuerier<T> extends IObservable, IDisposable {
 
   /**
    * additional filter not available with selectors

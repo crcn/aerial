@@ -1,9 +1,9 @@
-import {mapValues} from "lodash";
-import {ImmutableArray, IImmutableArray} from "./array";
-import {ImmutableObject, ImmutableObjectType} from "./object";
+import {mapValues, each} from "lodash";
+import {ImmutableArray} from "./array";
+import {ImmutableObject} from "./object";
 
-export function immutable<T extends T[]>(value: T[]): IImmutableArray<T>;
-export function immutable<T extends Object>(value: T): ImmutableObjectType<T>;
+export function immutable<T extends T[]>(value: T[]): ImmutableArray<T>;
+export function immutable<T extends Object>(value: T): ImmutableObject<T>;
 
 export function immutable(value) {
   if (value.$$immutable) return value;
@@ -23,37 +23,48 @@ export function mutable(value) {
       value;
 }
 
-type Map<T> = (value: T) => T;
+type MapFn<T> = (value: T) => T;
 
 type Partial<T> = {
-  [P in keyof T]?: Map<T[P]> | Partial<T[P]>;
+  [P in keyof T]?: MapFn<T[P]> | Partial<T[P]>;
 }
 
-type MergeOptions<T> = Map<T> | Partial<T> | T;
+type ObjectMap<T> = MapFn<T> | Partial<T> | T;
 
-export function updateImmutable<T extends Array<T>>(target: T, properties: MergeOptions<T> ): IImmutableArray<T>;
-export function updateImmutable<T extends IImmutableArray<any>>(target: T, properties: MergeOptions<T>): T;
+export function mapImmutable<T>(target: T, map: ObjectMap<T>): T;
 
-export function updateImmutable<T>(target: T, properties: MergeOptions<T>): ImmutableObjectType<T>;
-export function updateImmutable<T extends ImmutableObjectType<any>>(target: T, properties: MergeOptions<T>): T;
-
-// TODO - use mongodb syntax for this
-export function updateImmutable(oldValue, newValue) {
-  let mergedValue;
-
-  if (Array.isArray(newValue)) {
-    mergedValue = new Array(newValue.length);
-    for (let i = 0, n = newValue.length; i < n; i++) {
-      mergedValue[i] = i < oldValue.length ? updateImmutable(oldValue[i], newValue[i]) : immutable(newValue[i]);
+export function mapImmutable<T>(target: T, map: ObjectMap<T>): T {
+  if (typeof map === 'function') {
+    return immutable(map(target));
+  } else if (typeof map === 'object') {
+    let result = immutable(target);
+    for (const key in map) {
+      result = result.set(key, mapImmutable(result[key], map[key]));
     }
-  } else if (typeof newValue === 'object') {
-    mergedValue = {};
-    for (const key in newValue) {
-      mergedValue[key] = oldValue[key] != null ? updateImmutable(oldValue[key], newValue[key]) : newValue[key];
-    }
+    return result;
   } else {
-    mergedValue = newValue;
+    return map;
   }
+}
 
-  return immutable(mergedValue);
+export const weakMemo = <TFunc extends Function>(TFunc) => {
+  const memos = new Map();
+  const key   = Symbol();
+  let count = 1;
+  return function(arg) {
+    let hash = "";
+
+    for (let i = 0, n = arguments.length; i < n; i++) {
+      const arg = arguments[i];
+      hash += ":" + (arg[key] || (arg[key] = count++)) && arg[key] || arg;
+    }
+
+    if (memos.has(hash)) {
+      return memos.get(hash);
+    } else {
+      const result = TFunc.apply(this, arguments);
+      memos.set(hash, result);
+      return result;
+    }
+  } as any as TFunc;
 }

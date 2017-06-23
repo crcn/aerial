@@ -3,7 +3,7 @@ import { ICloneable } from "../object";
 import assert = require("assert");
 
 export interface IInjectable {
-  $didInject(): void;
+  $didInject?(): void;
 }
 
 export interface IProvider extends ICloneable {
@@ -154,14 +154,14 @@ export class Kernel implements ICloneable {
   /**
    */
 
-  inject<T>(instance: T & IInjectable) {
+  inject<T>(instance: T) {
     const values = this.getPropertyValues(instance);
     for (const property in values) {
       instance[property] = values[property];
     }
 
-    if (instance.$didInject) {
-      instance.$didInject();
+    if ((instance as any as IInjectable).$didInject) {
+      (instance as any as IInjectable).$didInject();
     }
 
     return instance;

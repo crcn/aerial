@@ -1,5 +1,5 @@
 import fs =  require("fs");
-import { URIProtocol } from "../uri";
+import { URIProtocol, IURIProtocolReadResult } from "../uri";
 import { ReadableStream } from "mesh";
 import { 
   inject, 
@@ -17,7 +17,7 @@ export class FileURIProtocol extends URIProtocol {
   async read(uri: string) {
     const filePath = this.removeProtocol(uri);
     this.logger.debug("read", filePath);
-    return new Promise((resolve, reject) => {
+    return new Promise<IURIProtocolReadResult>((resolve, reject) => {
       fs.readFile(filePath, (err, data) => {
         if (err) return reject(err);
         resolve({
@@ -32,7 +32,7 @@ export class FileURIProtocol extends URIProtocol {
     const filePath = this.removeProtocol(uri);
     return new Promise((resolve) => {
       fs.stat(filePath, (err, stat) => {
-        if (err) return resolve(err);
+        if (err) return resolve(false);
         resolve(!stat.isDirectory());
       });
     });

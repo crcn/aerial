@@ -22,7 +22,7 @@ import {
  } from "aerial-sandbox";
 
 import { ISyntheticBrowser } from "../../browser";
-import { DOMEventDispatcherMap } from "../events";
+import { DOMEventDispatcherMap, IDOMEventEmitter, DOMEventListenerFunction } from "../events";
 
 import {
   Mutation,
@@ -50,7 +50,7 @@ export abstract class SyntheticDOMNodeEdit<T extends SyntheticDOMNode> extends S
 export class SyntheticDOMNodeEditor<T extends SyntheticDOMNode> extends SyntheticObjectEditor<T> { }
 
 // TODO - possibly have metadata here since it's generic and can be used with any synthetic
-export abstract class SyntheticDOMNode extends TreeNode<SyntheticDOMNode> implements IComparable, ISyntheticObject, IEditable {
+export abstract class SyntheticDOMNode extends TreeNode<SyntheticDOMNode> implements IComparable, ISyntheticObject, IEditable, IDOMEventEmitter {
 
   readonly metadata: Metadata;
 
@@ -157,11 +157,11 @@ export abstract class SyntheticDOMNode extends TreeNode<SyntheticDOMNode> implem
     return this.parent as SyntheticDOMContainer;
   }
 
-  addEventListener(type: string, listener: (event: CoreEvent) => any) {
+  addEventListener(type: string, listener: DOMEventListenerFunction, capture?: boolean) {
     this.eventDispatcher.add(type, listener);
   }
 
-  removeEventListener(type: string, listener: (event: CoreEvent) => any) {
+  removeEventListener(type: string, listener: DOMEventListenerFunction, capture?: boolean) {
     this.eventDispatcher.remove(type, listener);
   }
 

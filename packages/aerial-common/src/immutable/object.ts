@@ -1,40 +1,29 @@
-export type ImmutableObjectType<TProps> = {
-  [P in keyof TProps]: TProps[P];
-} & { 
-  set<K extends keyof TProps>(key: K, value: TProps[K]): _ImmutableObject<TProps>;
+export type ImmutableObject<TProps> = {
+  set<K extends keyof TProps>(key: K, value: TProps[K]): ImmutableObject<TProps>;
+} & TProps;
+
+export interface ImmutableObjectClass {
+  new<TProps>(properties: TProps): ImmutableObject<TProps>;
 }
 
-export interface IImmutableObject<TProps> {
-  set<K extends keyof TProps>(key: K, value: TProps[K]): _ImmutableObject<TProps>;
-};
+export declare const ImmutableObject: ImmutableObjectClass;
 
-class _ImmutableObject<TProps> extends Object implements IImmutableObject<TProps> {
-  constructor(properties: TProps) {
-    super(properties);
-  }
-  set<K extends keyof TProps>(key: K, value: TProps[K]): _ImmutableObject<TProps> {
-    return this;
-  }
-}
+// const People: ImmutableArrayIdentity<{ name: string }> = ImmutableArray;
+export type ImmutableObjectIdentity<T> = { new<T>(...items: T[]): ImmutableObject<T> };
 
-function __ImmutableObject({..._this}) {
+function _ImmutableObject({..._this}) {
   _this["__proto__"] = this.constructor.prototype;
   return Object.freeze(_this);
 }
 
-Object.assign(__ImmutableObject.prototype, {
+Object.assign(_ImmutableObject.prototype, {
   $$immutable: true,
-  constructor: __ImmutableObject,
+  constructor: _ImmutableObject,
   set(key: string, value: any) {
     return new this.constructor({...this, [key]: value });
   }
 });
 
-export const ImmutableObject: typeof _ImmutableObject = __ImmutableObject as any;
+exports.ImmutableObject = _ImmutableObject;
 
-// const Person: ImmutableObjectIdentity<{ name: string }> = ImmutableObject;
-export interface ImmutableObjectIdentity<T> {
-  new(properties: T): _ImmutableObject<T>;
-}
-
-export const createImmutableObject = <T>(properties: T) => new ImmutableObject(properties);
+export const createImmutableObject = <T>(properties: T): ImmutableObject<T> => new exports.ImmutableObject(properties);

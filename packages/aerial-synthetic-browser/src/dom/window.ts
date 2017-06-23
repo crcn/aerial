@@ -244,7 +244,6 @@ export class SyntheticWindow extends Observable {
     return style;
   }
   
-
   addEventListener(type: string, listener: DOMEventListenerFunction) {
     this._eventListeners.add(type, listener);
   }

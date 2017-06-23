@@ -1,5 +1,13 @@
 import {expect} from "chai";
-import {immutable, mutable, updateImmutable, ImmutableArray, ImmutableObject} from "./index";
+import {
+  immutable, 
+  mutable, 
+  weakMemo,
+  mapImmutable,
+  ImmutableArray, 
+  ImmutableObject,
+} from "./index";
+import {negate} from "lodash";
 
 describe(__filename + "#", () => {
   describe("immutable#", () => {
@@ -56,47 +64,58 @@ describe(__filename + "#", () => {
     });
   });
 
-  describe("mergeImmutable#", () => {
-    it("can merge two objects together", () => {
-      const obj = updateImmutable({ a: 'b' }, { a: 'c' });
-      expect(obj.a).to.eql('c');
-    });
-    
-    it("can merge two immutable objects together", () => {
-      const oldValue = immutable({ a: 'b' });
-      const obj = updateImmutable(oldValue, immutable({ a: 'c' }));
-      expect(obj.a).to.eql('c');
-      expect(obj === oldValue).to.eql(false);
+  describe("mapImmutable#", () => {
+    it("can map a simple object to another", () => {
+      const obj = mapImmutable(immutable({ a: "b" }), { a: "c" });
+      expect(obj.a).to.eql("c");
     });
 
-    it("can merge two arrays together", () => {
-      const obj = updateImmutable([7, 6, 8], [1, 2, 3, 4, 5, 6]);
-      expect(obj.length).to.eql(6);
+    mapImmutable({ name: 'string' }, a => ({ name: 'jeff' }));
+
+    it("can map an immutable array", () => {
+      const obj = mapImmutable(immutable([1, 2, 3, 4]), negate(() => 2));
+      console.log(obj);
+    });
+  });
+
+  describe("weakMemo#", () => {
+    it("can memoize a function with an object that's already been processed", () => {
+      let calls = 0;
+      const mfn = weakMemo(({count}) => {
+        calls++;
+        return count + 1;
+      });
+      const obj = { count: 1 };
+      expect(mfn(obj)).to.eql(2);
+      expect(mfn(obj)).to.eql(2);
+      expect(calls).to.eql(1);
     });
 
-    it("can merge two arrays together with objects", () => {
-      const obj = updateImmutable([{ a: 1 }, { b: 2 }], [{ a: 3 }, { b:  4 }]);
-      expect(mutable(obj)).to.eql([{ a: 3 }, { b:  4 }]); 
-      expect(obj[0].$$immutable).to.eql(true);
+    it("does not memoize two different objects that share the same shape", () => {
+      let calls = 0;
+      const mfn = weakMemo(({count}) => {
+        calls++;
+        return count + 1;
+      });
+      const obj = { count: 1 };
+      expect(mfn({ count: 1 })).to.eql(2);
+      expect(mfn({ count: 1 })).to.eql(2);
+      expect(calls).to.eql(2);
     });
 
-    xit("can merge a nested object", () => {
-      interface IPerson {
-        name: string;
-        friends?: IPerson[];
-      }
-
-      const obj = updateImmutable<IPerson>({
-        name: 'jeff',
-        friends: [
-          { name: 'jake' }
-        ]
-      }, { 
-        friends: (friends) => [{ name:77 }]
+    it("can take multiple arguments", () => {
+      let calls = 0;
+      const add = weakMemo((a, b) => {
+        calls++;
+        return a.count + b.count;
       });
 
-      expect(obj.friends.length).to.eql(2);
-      expect(obj.name).to.eql('jeff');
+      const a = { count: 1 };
+      const b = { count: 2 };
+      expect(add(a, b)).to.eql(3);
+      expect(add(a, b)).to.eql(3);
+      expect(calls).to.eql(1);
     });
+
   });
 });

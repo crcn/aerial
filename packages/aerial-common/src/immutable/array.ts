@@ -1,23 +1,34 @@
+import {ImmutableObject} from "./object";
 
-import {ImmutableObject, ImmutableObjectIdentity} from "./object";
-
-export interface IImmutableArray<T> {
+export type ImmutableArray<T> = {
+  constructor(...items: T[]);
   [index: number]: T;
-  set(index: number, value: T): IImmutableArray<T>;
-  push(...items: any[]): IImmutableArray<T>;
-  unshift(...items: any[]): IImmutableArray<T>;
-  splice(index: number, removeCount: number, ...items: any[]): IImmutableArray<T>;
+  set(index: number, value: T): ImmutableArray<T>;
+  push(...items: any[]): ImmutableArray<T>;
+  unshift(...items: any[]): ImmutableArray<T>;
+  splice(index: number, removeCount: number, ...items: any[]): ImmutableArray<T>;
+  [Symbol.iterator]();
+} & Array<T>;
+
+export interface ImmutableArrayClass {
+  new<T>(...items: T[]): ImmutableArray<T>;
 }
 
-function __ImmutableArray(..._this: any[]) {
+export declare const ImmutableArray: ImmutableArrayClass;
+
+export type ImmutableArrayIdentity<T> = { new<T>(...items: T[]): ImmutableArray<T> };
+
+function _ImmutableArray(..._this: any[]) {
   _this["__proto__"] = this.constructor.prototype;
   return Object.freeze(_this);
 }
 
-__ImmutableArray.prototype = [];
+exports.ImmutableArray = _ImmutableArray;
 
-Object.assign(__ImmutableArray.prototype, {
-  constructor: __ImmutableArray,
+_ImmutableArray.prototype = [];
+
+Object.assign(_ImmutableArray.prototype, {
+  constructor: _ImmutableArray,
   $$immutable: true,
   set(key: number, value: any) {
     const tmp = Array.prototype.slice.call(this);
@@ -29,6 +40,9 @@ Object.assign(__ImmutableArray.prototype, {
   },
   slice(startIndex: number, endIndex: number) {
     return new this.constructor(...Array.prototype.slice.call(this).slice(startIndex, endIndex));
+  },  
+  filter(fn: Function) {
+    return new this.constructor(...Array.prototype.filter.call(this, fn));
   },  
   unshift(...items: any[]) {
     return new this.constructor(...items, ...this);
@@ -45,7 +59,4 @@ Object.assign(__ImmutableArray.prototype, {
   }
 });
 
-
-export const ImmutableArray: { new<T>(...items: T[]): IImmutableArray<T> & Array<T> } = __ImmutableArray as any;
-
-export const createImmutableArray = <T>(...items: T[]) => new ImmutableArray(...items);
+export const createImmutableArray = <T>(...items: T[]): ImmutableArray<T> => new exports.ImmutableArray(...items);
