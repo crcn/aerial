@@ -7,7 +7,6 @@ import {
   ImmutableArray, 
   ImmutableObject,
 } from "./index";
-import {negate} from "lodash";
 
 describe(__filename + "#", () => {
   describe("immutable#", () => {
@@ -73,8 +72,16 @@ describe(__filename + "#", () => {
     mapImmutable({ name: 'string' }, a => ({ name: 'jeff' }));
 
     it("can map an immutable array", () => {
-      const obj = mapImmutable(immutable([1, 2, 3, 4]), negate(() => 2));
-      console.log(obj);
+      const obj = mapImmutable(immutable([1, 2, 3, 4]), v => v.filter(v => v !== 3));
+      expect(obj.length).to.eql(3);
+    });
+
+    it("can map an immutable array's value based on an object", () => {
+      const target = immutable([1, 2, 3]);
+
+      const result = mapImmutable(target, { [target.indexOf(2)]: v => v * 10 });
+      expect(result.length).to.eql(3);
+      expect(result[1]).to.eql(20);
     });
   });
 
