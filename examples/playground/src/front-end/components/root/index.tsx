@@ -1,3 +1,5 @@
+import "./index.scss";
+
 import * as React from "react";
 import { Kernel } from "aerial-common";
 import { TextEditor } from "../text-editor";

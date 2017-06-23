@@ -1,3 +1,5 @@
+import "./scss/index.scss";
+
 import { ReactService } from "./services";
 import { RootComponent, VisualEditor } from "./components";
 import { RootComponentProvider, EditorComponentProvider } from "./providers";

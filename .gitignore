@@ -3,6 +3,7 @@ html-report/
 coverage/
 node_modules
 out
+examples/*/lib
 yarn.lock
 *.log
 package-lock.json
