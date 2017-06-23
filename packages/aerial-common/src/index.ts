@@ -26,3 +26,4 @@ export * from "./constants";
 export * from "./flow";
 export * from "./status";
 export * from "./array-collection";
+export * from "./immutable";

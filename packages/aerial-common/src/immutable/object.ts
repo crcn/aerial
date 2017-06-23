@@ -1,12 +1,22 @@
 const shallowClone = (value) => {
-  if (Array.isArray) {
+  if (Array.isArray(value)) {
     return [...value];
   } else {
     return {...value};
   }
 }
 
-class _ImmutableObject<TProps> extends Object {
+export type ImmutableObjectType<TProps> = {
+  [P in keyof TProps]: TProps[P];
+} & { 
+  set<K extends keyof TProps>(key: K, value: TProps[K]): _ImmutableObject<TProps>;
+}
+
+export interface IImmutableObject<TProps> {
+  set<K extends keyof TProps>(key: K, value: TProps[K]): _ImmutableObject<TProps>;
+};
+
+class _ImmutableObject<TProps> extends Object implements IImmutableObject<TProps> {
   constructor(properties: TProps) {
     super(properties);
   }
@@ -20,19 +30,21 @@ const proxyHandler = {
     return target[key];
   },
   set(target: _ImmutableObject<any>, key: any, value: any) {
-    target.set(key, value);
-    return true;
+    // noop
+    return false;
   }
 };
 
 function __ImmutableObject(properties: any) {
   const _this = shallowClone(properties);
-  const proto = this.constructor.prototype;
+  const proto = Object.create(this.constructor.prototype);
   _this["__proto__"] = proto;
   return new Proxy(_this as _ImmutableObject<any>, proxyHandler);
 }
 
 Object.assign(__ImmutableObject.prototype, {
+  $$immutable: true,
+  constructor: __ImmutableObject,
   set(key: string, value: any) {
     return new this.constructor({...this, [key]: value });
   }
@@ -44,3 +56,5 @@ export const ImmutableObject: typeof _ImmutableObject = __ImmutableObject as any
 export interface ImmutableObjectIdentity<T> {
   new(properties: T): _ImmutableObject<T>;
 }
+
+export const createImmutableObject = <T>(properties: T) => new ImmutableObject(properties);

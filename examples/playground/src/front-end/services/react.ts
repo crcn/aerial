@@ -1,11 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Provider, inject } from "aerial-common";
-import { BaseFrontEndService } from "./base";
+
 import { Message } from "mesh";
 import { throttle } from "lodash";
+import { Provider, inject } from "aerial-common";
+import { BaseFrontEndService } from "./base";
 import { RootComponentProvider } from "../providers";
-
 
 const RENDER_MS = 1000 / 35;
 
