@@ -23,21 +23,19 @@ export function mutable(value) {
       value;
 }
 
+type Map<T> = (value: T) => T;
+
 type Partial<T> = {
-  [P in keyof T]?: Partial<T[P]>;
+  [P in keyof T]?: Map<T[P]> | Partial<T[P]>;
 }
 
-type Query<T> = {
-  $set: Partial<T>
-}
+type MergeOptions<T> = Map<T> | Partial<T> | T;
 
-type MergeOptions<T> = Query<T> | T;
+export function updateImmutable<T extends Array<T>>(target: T, properties: MergeOptions<T> ): IImmutableArray<T>;
+export function updateImmutable<T extends IImmutableArray<any>>(target: T, properties: MergeOptions<T>): T;
 
 export function updateImmutable<T>(target: T, properties: MergeOptions<T>): ImmutableObjectType<T>;
-export function updateImmutable<T extends ImmutableObjectType<any>>(target: T, properties: Partial<T>): T;
-
-export function updateImmutable<T>(target: T, properties: MergeOptions<T> ): IImmutableArray<T>;
-export function updateImmutable<T extends IImmutableArray<any>>(target: T, properties: Partial<T>): T;
+export function updateImmutable<T extends ImmutableObjectType<any>>(target: T, properties: MergeOptions<T>): T;
 
 // TODO - use mongodb syntax for this
 export function updateImmutable(oldValue, newValue) {

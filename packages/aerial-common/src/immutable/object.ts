@@ -1,11 +1,3 @@
-const shallowClone = (value) => {
-  if (Array.isArray(value)) {
-    return [...value];
-  } else {
-    return {...value};
-  }
-}
-
 export type ImmutableObjectType<TProps> = {
   [P in keyof TProps]: TProps[P];
 } & { 
@@ -25,21 +17,9 @@ class _ImmutableObject<TProps> extends Object implements IImmutableObject<TProps
   }
 }
 
-const proxyHandler = {
-  get(target: _ImmutableObject<any>, key) {
-    return target[key];
-  },
-  set(target: _ImmutableObject<any>, key: any, value: any) {
-    // noop
-    return false;
-  }
-};
-
-function __ImmutableObject(properties: any) {
-  const _this = shallowClone(properties);
-  const proto = Object.create(this.constructor.prototype);
-  _this["__proto__"] = proto;
-  return new Proxy(_this as _ImmutableObject<any>, proxyHandler);
+function __ImmutableObject({..._this}) {
+  _this["__proto__"] = this.constructor.prototype;
+  return Object.freeze(_this);
 }
 
 Object.assign(__ImmutableObject.prototype, {

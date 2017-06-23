@@ -10,7 +10,8 @@ export interface IImmutableArray<T> {
 }
 
 function __ImmutableArray(..._this: any[]) {
-  return ImmutableObject.call(this, _this);
+  _this["__proto__"] = this.constructor.prototype;
+  return Object.freeze(_this);
 }
 
 __ImmutableArray.prototype = [];

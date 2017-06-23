@@ -13,7 +13,7 @@ describe(__filename + "#", () => {
     try {
       array[0] = 2;
     } catch(e) {
-      expect(e.message).to.contain(`trap returned falsish for property '0'`);
+      expect(e.message).to.contain(`Cannot assign to read only property`);
     }
     expect(array[0]).to.equal(1);
   });
@@ -35,7 +35,6 @@ describe(__filename + "#", () => {
 
     it("can be spread to a new array", () => {
       const items = [...createImmutableArray(1, 2, 3)];
-      console.log(items);
       expect(items.length).to.eql(3);
     });
   });
