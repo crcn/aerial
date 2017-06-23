@@ -1,7 +1,20 @@
-class _ImmutableArray<T> extends Array<T> {
+
+import {ImmutableObject, ImmutableObjectIdentity} from "./object";
+
+class _ImmutableArray<T> extends ImmutableObject<T[]> {
   constructor(...items: T[]) {
-    super(...items);
+    super(items);
   }
+  set(key: number, value: T) {
+    return this;
+  }
+}
+
+interface IImmutableArray<T> {
+  [index: number]: T;
+  push(...items: any[]): IImmutableArray<T>;
+  unshift(...items: any[]): IImmutableArray<T>;
+  splice(index: number, removeCount: number, ...items: any[]): IImmutableArray<T>;
 }
 
 function __ImmutableArray(..._this: any[]) {
@@ -30,3 +43,5 @@ Object.assign(__ImmutableArray.prototype, {
 });
 
 export const ImmutableArray: typeof _ImmutableArray = __ImmutableArray as any;
+
+const im = new ImmutableArray(1, 2, 3);

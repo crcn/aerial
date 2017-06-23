@@ -1,6 +1,6 @@
 import { ReactService } from "./services";
-import { RootComponent } from "./components";
-import { RootComponentProvider } from "./providers";
+import { RootComponent, VisualEditor } from "./components";
+import { RootComponentProvider, EditorComponentProvider } from "./providers";
 import { 
   KernelProvider,
   ServiceApplication, 
@@ -12,6 +12,9 @@ export class FrontEndApplication extends ServiceApplication {
     this.kernel.register(
       new KernelProvider(),
       new RootComponentProvider(RootComponent),
+
+      // components
+      new EditorComponentProvider(VisualEditor.name, VisualEditor),
 
       // services
       new ApplicationServiceProvider(ReactService.name, ReactService),
