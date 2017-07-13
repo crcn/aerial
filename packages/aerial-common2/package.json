@@ -1,5 +1,5 @@
 {
-  "name": "aerial-common",
+  "name": "aerial-common2",
   "version": "0.0.7",
   "description": "This is currently a junk drawer of dependencies. Most everything here should be moved into separate repositories eventually.",
   "main": "index.js",
@@ -26,12 +26,12 @@
     "ansi_up": "^2.0.0",
     "i": "^0.3.5",
     "inflection": "^1.12.0",
-    "mesh": "8.0.x",
+    "mesh": "^8.0.3",
     "mesh-ds": "1.0.x",
     "moment": "^2.18.1",
     "mongoid-js": "^1.1.2",
     "npm": "^5.0.3",
     "reflect-metadata": "^0.1.10",
-    "sift": "^3.3.10"
+    "sift": "^3.3.12"
   }
 }

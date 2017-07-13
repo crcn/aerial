@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { Message } from "mesh";
+import { Message } from "../bus";
 import { throttle } from "lodash";
 import { Provider, inject } from "aerial-common";
 import { BaseFrontEndService } from "./base";

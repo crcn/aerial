@@ -64,7 +64,7 @@ const extraArgs = function() {
 
 const createPackageSpawnTask = (command, ...args) => (done) => _(PACKAGE_DIRS).map((dir) => (
   gulpSpawn(command, args, { cwd: dir })
-)).sequence().done(done);
+)).parallel(WATCH ? Infinity : 1).done(done);
 
 gulp.task('install', createPackageSpawnTask(YARN_BIN, 'install'));
 gulp.task('build', createPackageSpawnTask('npm', 'run', 'build', ...(WATCH ? ['--', '--watch'] : [])));

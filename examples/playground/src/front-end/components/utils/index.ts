@@ -1,5 +1,4 @@
 import { map } from "lodash";
-import { IBus } from "mesh";
 import * as React from "react";
 import { PrivateBusProvider, Provider, Kernel } from "aerial-common";
 import { compose, getContext, withProps, InferableComponentEnhancer, ComponentEnhancer } from "recompose";
@@ -8,10 +7,6 @@ export type Component<P> = React.ComponentClass<P> | React.StatelessComponent<P>
 
 export interface IKernelProps {
   kernel: Kernel;
-}
-
-export interface IBussedProps {
-  bus: IBus<any, any>
 }
 
 export const withKernel = <TProps>(BaseComponent: Component<TProps & IKernelProps>) => getContext<any, TProps>({

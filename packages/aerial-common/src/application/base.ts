@@ -1,25 +1,25 @@
-import { IBus } from "mesh";
-
+import { Dispatcher } from "../bus";
 import { SequenceBus } from "mesh";
-import { IBrokerBus, BrokerBus } from "../busses";
 import { ApplicationServiceProvider } from "./providers";
 import { LoadApplicationRequest, InitializeApplicationRequest, ApplicationReadyMessage } from "../messages";
 import {
-  Provider,
   Kernel,
+  Provider,
   PrivateBusProvider,
 } from '../ioc';
 
+
 /**
+ * @deprecated
  */
 
 export class Application {
 
-  readonly bus: IBrokerBus;
+  readonly dispatch: Dispatcher;
   private _initialized: boolean;
 
   constructor(readonly kernel: Kernel) {
-    this.bus = PrivateBusProvider.getInstance(kernel);
+    this.dispatch = PrivateBusProvider.getInstance(kernel);
     this.registerProviders();
   }
 
@@ -40,14 +40,14 @@ export class Application {
     // need to be loaded before being used by other kernel should listen on this message
     // here.
 
-    await this.bus.dispatch(new LoadApplicationRequest());
+    await this.dispatch(new LoadApplicationRequest());
 
     this.didLoad();
     this.willInitialize();
 
     // Notify the application that everything is ready
-    await this.bus.dispatch(new InitializeApplicationRequest());
-    await this.bus.dispatch(new ApplicationReadyMessage());
+    await this.dispatch(new InitializeApplicationRequest());
+    await this.dispatch(new ApplicationReadyMessage());
 
     this.didInitialize();
   }

@@ -71,7 +71,17 @@ export const createWorkspace        = createImmutableStructFactory<Workspace>(Ty
 export const createApplicationState = createImmutableStructFactory<ApplicationState>(Types.APPLICATION_STATE, {
   workspaces: []
 });
+
 export const createFile             = createImmutableStructFactory<File>(Types.FILE);
 export const createDirectory        = createImmutableStructFactory<Directory>(Types.DIRECTORY, { 
   files: [] 
 });
+
+/*
+  const state = createApplicationState();
+
+
+  const reduceApplicationState = combineReducers({
+    workspaces: reduceWorkspace
+  });
+*/
