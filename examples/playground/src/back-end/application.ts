@@ -29,11 +29,12 @@ const reduce = (state: RootState, message: Message) => {
   return state;
 }
 
-export const bootstrapBackend = bootstrapper((options: BackendOptions) => store(options.state, reduce, (state, dispatch) => parallel(
+export const bootstrapBackend = bootstrapper((options: BackendOptions) => store(options.state, reduce, (state, dispatch) => sequence(
+  async (message) => {
+    console.log('app state: ', message.type, state, state.progress);
+    return new Promise((resolve) => setTimeout(resolve, 1000));
+  },
   !state.progress ? (() => dispatch(appInitialized())) : state.progress === APP_INITIALIZED ? (() => dispatch(appReady())) : (() => {}),
-  (message) => {
-    console.log('app loaded: ', message.type, state, state.progress);
-  }
 )));
 // export class BackEndApplication extends ServiceApplication {
 //   protected registerProviders() {

@@ -1,4 +1,4 @@
-import { createDeferredPromise, readAll } from "mesh";
+import { createDeferredPromise, readAll, proxy, sequence, limit } from "mesh";
 import { Message, Dispatcher } from "../bus";
 
 /*
@@ -12,22 +12,16 @@ const dispatch = store({}, reduce, (state, dispatch) => {
 
 export const store = <T>(state: T, reduce: (state: T, message: Message) => T, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => {
 
-  let currentDispatch: Dispatcher<Message>;
-  let currentState = state;
-
-  const reset = () => {
-    return currentDispatch = dispatcher(currentState, (message: Message) => {
+  const reset = (currentState: T) => {
+    return dispatcher(currentState, (message: Message) => {
       const newState = reduce(currentState, message);
-      if (newState !== currentState) {
-        currentState = newState;
-        return reset()(message);
-      } else {
-        return currentDispatch(message);
+      if (currentState !== newState) {
+        return reset(newState)(message);
       }
     });
   };
-  
-  reset();
 
-  return (message: Message) => currentDispatch(message);
+  // functionality should be frozen along with the state
+  // passed into the store func.
+  return reset(state);
 }
