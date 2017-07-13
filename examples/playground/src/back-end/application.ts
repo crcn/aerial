@@ -30,13 +30,9 @@ const reduce = (state: RootState, message: Message) => {
 }
 
 export const bootstrapBackend = bootstrapper((options: BackendOptions) => store(options.state, reduce, (state, dispatch) => parallel(
-  (message: Message) => {
-    options.state = reduce(options.state, message);
-  },
-  when(() => !options.state.progress, () => dispatch(appInitialized())),
-  when(() => options.state.progress === APP_INITIALIZED, () => dispatch(appReady())),
-  () => {
-    console.log('app loaded: ', options.state.progress);
+  !state.progress ? (() => dispatch(appInitialized())) : state.progress === APP_INITIALIZED ? (() => dispatch(appReady())) : (() => {}),
+  (message) => {
+    console.log('app loaded: ', message.type, state, state.progress);
   }
 )));
 // export class BackEndApplication extends ServiceApplication {

@@ -19,6 +19,7 @@ export const store = <T>(state: T, reduce: (state: T, message: Message) => T, di
     return currentDispatch = dispatcher(currentState, (message: Message) => {
       const newState = reduce(currentState, message);
       if (newState !== currentState) {
+        currentState = newState;
         return reset()(message);
       } else {
         return currentDispatch(message);
