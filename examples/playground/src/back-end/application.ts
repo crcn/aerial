@@ -5,8 +5,10 @@ import {
 
 // TODO - pair dispatcher with state mutator
 
-import { noop, curryRight, flowRight } from "lodash";
 import { RootState } from "./state";
+import { httpDispatcher } from "./http";
+import { frontEndDispatcher } from "./front-end";
+import { noop, curryRight, flowRight } from "lodash";
 import { sequence, parallel, when, limit, awaitable } from "mesh";
 import { 
   store,
@@ -32,6 +34,8 @@ export type BackendConfig = {
 
 export const bootstrapBackend = bootstrapper((config: BackendConfig, state: RootState, upstreamDispatch: Dispatcher<any>, downstreamDispatch: Dispatcher<any> = noop) => 
   flowRight(
+    httpDispatcher(config),
+    frontEndDispatcher(config),
     consoleLogger(config),
     ((downstreamDispatch: Dispatcher<any>) => sequence(
       async (m) => new Promise(resolve => setTimeout(resolve, 100)),
