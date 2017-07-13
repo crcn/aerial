@@ -14,7 +14,9 @@ const dispatch = bootstrapBackend({
 
 readAll(dispatch({
   type: "DO SOMETHING"
-}));
+})).then(() => {
+  console.log('RUNNING');
+})
 
 // import {resolve} from "path";
 // import {BackEndApplication, IBackEndApplicationConfig} from "./index";

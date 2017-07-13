@@ -12,6 +12,7 @@ import {
   Message, 
   appReady, 
   APP_READY,
+  createMessage,
   bootstrapper, 
   appInitialized, 
   APP_INITIALIZED, 
@@ -21,8 +22,11 @@ export type BackendOptions = {
   state: RootState;
 };
 
+const DECREMENT = "DECREMENT";
+
 const reduce = (state: RootState, message: Message) => {
   switch(message.type) {
+    case DECREMENT: return state.set("count", state.count - 1);
     case APP_READY: return state.set('progress', APP_READY);
     case APP_INITIALIZED: return state.set('progress', APP_INITIALIZED);
   }
@@ -31,9 +35,19 @@ const reduce = (state: RootState, message: Message) => {
 
 export const bootstrapBackend = bootstrapper((options: BackendOptions) => store(options.state, reduce, (state, dispatch) => sequence(
   async (message) => {
-    console.log('app state: ', message.type, state, state.progress);
-    return new Promise((resolve) => setTimeout(resolve, 1000));
+    return new Promise((resolve) => setTimeout(resolve, 100));
   },
+  (message) => {
+    console.log(state);
+    if (state.progress === APP_READY) {
+      if (state.count) {
+        return dispatch(createMessage(DECREMENT));
+      }
+    }
+  },
+  // httpDispatcher(),
+  // frontEndDispatcher(),
+  // consoleDispatcher(),
   !state.progress ? (() => dispatch(appInitialized())) : state.progress === APP_INITIALIZED ? (() => dispatch(appReady())) : (() => {}),
 )));
 // export class BackEndApplication extends ServiceApplication {
