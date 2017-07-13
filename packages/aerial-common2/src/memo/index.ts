@@ -1,9 +1,10 @@
 
-export const weakMemo = <TFunc extends Function>(func: TFunc) => {
+
+export function weakMemo<TFunc extends (...args: any[]) => any>(func: TFunc): TFunc {
   const memos = new Map();
   const key   = Symbol();
   let count = 1;
-  return function(arg) {
+  return function() {
     let hash = "";
 
     for (let i = 0, n = arguments.length; i < n; i++) {

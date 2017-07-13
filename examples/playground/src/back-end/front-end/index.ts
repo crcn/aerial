@@ -1,16 +1,44 @@
 import * as http from "http";
+import * as express from "express";
+import * as path from "path";
 import { readAll } from "mesh";
 import { BackendConfig } from "../application";
 import { Dispatcher, Message, weakMemo, logDebugAction, log, underchange } from "aerial-common2";
 
 import { HTTPConfig, getHTTPServer } from "../http";
 
-const addListeners = weakMemo((config: HTTPConfig) => underchange(async (upstream) => {
-  const server = getHTTPServer(config);
-  log(logDebugAction(`adding front-end handlers`), upstream);
-})) as (config: HTTPConfig) => (dispatcher: Dispatcher<any>) => any;
+export type FrontEndConfig = {
+  frontEnd: {
+    entryPath: string
+  }
+};
 
-export const frontEndDispatcher = (config: BackendConfig, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
-  addListeners(config)(upstream);
+const addListeners = weakMemo((config: BackendConfig, _getHTTPServer: typeof getHTTPServer) => underchange(async (upstream) => {
+  log(logDebugAction(`adding front-end handlers`), upstream);
+  const frontEndEntryBasename = path.basename(config.frontEnd.entryPath);
+
+  const { expressServer } = _getHTTPServer(config);
+
+  expressServer.all("/index.html", (req, res) => {
+    res.send(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <div id="application"></div>
+          <script type="text/javascript" src="./${frontEndEntryBasename}"></script>
+        </body>
+      </html>
+    `);
+  });
+
+  expressServer.use(
+    express.static(path.dirname(config.frontEnd.entryPath))
+  );
+  
+}));
+
+export const frontEndDispatcher = (config: BackendConfig, _getHTTPServer: typeof getHTTPServer, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
+  addListeners(config, _getHTTPServer)(upstream);
   return downstream;
 };

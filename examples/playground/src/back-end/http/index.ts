@@ -16,8 +16,12 @@ export type HTTPServerConnectedEvent = {
 
 export const getHTTPServer = weakMemo((config: HTTPConfig) => {
   const server   = express();
-  return server.listen(config.http.port);
+  return {
+    expressServer: server,
+    httpServer: server.listen(config.http.port)
+  };
 });
+
 
 // export const httpDispatcher = (upstream: Dispatcher<any>) => {
 //   return (downstream: Dispatcher<any>) => {

@@ -6,7 +6,8 @@ import {
 // TODO - pair dispatcher with state mutator
 
 import { RootState } from "./state";
-import { frontEndDispatcher } from "./front-end";
+import { getHTTPServer } from "./http";
+import { frontEndDispatcher, FrontEndConfig } from "./front-end";
 import { noop, curryRight, flowRight } from "lodash";
 import { sequence, parallel, when, limit, awaitable } from "mesh";
 import { 
@@ -26,18 +27,15 @@ import {
 export type BackendConfig = {
   http: {
     port: number
-  },
-  frontEnd: {
-    entryPath: string
   }
-} & ConsoleLogConfig;
+} & ConsoleLogConfig & FrontEndConfig;
 
-export const bootstrapBackend = bootstrapper((config: BackendConfig, state: RootState, upstream: Dispatcher<any>) => 
+export const bootstrapBackend = (_getHTTPServer: typeof getHTTPServer = getHTTPServer) => bootstrapper((config: BackendConfig, state: RootState, upstream: Dispatcher<any>) => 
   flowRight(
 
     // sets up hooks for the front-end server ti interact with the backend. Note that hooks are
     // dispatched as events to the reducer which may modify the application state
-    frontEndDispatcher(config, upstream),
+    frontEndDispatcher(config, _getHTTPServer, upstream),
 
     ((downstream: Dispatcher<any>) => sequence(
       async (m) => new Promise(resolve => setTimeout(resolve, 100)),
@@ -48,36 +46,3 @@ export const bootstrapBackend = bootstrapper((config: BackendConfig, state: Root
     ))
   )
 );
-
-// export const bootstrapBackend = bootstrapper((options: BackendOptions) => store(options.state, reduce, (state, dispatch) => sequence(
-//   async (message) => {
-//     return new Promise((resolve) => setTimeout(resolve, 100));
-//   },
-//   (message) => {
-//     console.log(state);
-//     if (state.progress === APP_READY) {
-//       if (state.count) {
-//         return dispatch(createMessage(DECREMENT));
-//       }
-//     }
-//   },
-//   // httpDispatcher(),
-//   // frontEndDispatcher(),
-//   // consoleDispatcher(),
-//   !state.progress ? (() => dispatch(appInitialized())) : state.progress === APP_INITIALIZED ? (() => dispatch(appReady())) : (() => {}),
-// )));
-// export class BackEndApplication extends ServiceApplication {
-//   protected registerProviders() {
-//     super.registerProviders();
-//     this.kernel.register(
-
-//       // core
-//       new KernelProvider(),
-
-//       // services
-//       new ApplicationServiceProvider(HTTPService.name, HTTPService),
-//       new ApplicationServiceProvider(FrontEndService.name, FrontEndService),
-//       new ApplicationServiceProvider(ConsoleLogService.name, ConsoleLogService),
-//     );
-//   }
-// }
