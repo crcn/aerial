@@ -1,5 +1,7 @@
 import { createDeferredPromise, readAll, proxy, sequence, limit } from "mesh";
-import { Message, Dispatcher } from "../bus";
+import { Message, Event, Dispatcher } from "../bus";
+
+export type Reducer<T> = (state: T, event: Event) => T;
 
 /*
 
@@ -10,13 +12,13 @@ const dispatch = store({}, reduce, (state, dispatch) => {
 });
 */
 
-export const store = <T>(state: T, reduce: (state: T, message: Message) => T, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => {
+export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => {
 
   const reset = (currentState: T) => {
     let locked = false;
     let internalDispatch = dispatcher(currentState, (message: Message) => {
       if (locked) {
-        throw new Error(`Attempting to call dispatch with out of sync state`);
+        throw new Error(`Attempting to dispatch ${JSON.stringify(message)} after state change.`);
       }
       const newState = reduce(currentState, message);
       if (currentState !== newState) {

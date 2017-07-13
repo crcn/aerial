@@ -1,24 +1,11 @@
 import chalk =  require("chalk");
-import path =  require("path");
+import path = require("path");
+import moment = require("moment");
 import { titleize } from "inflection";
-import moment =  require("moment");
 import { ansi_to_html } from "ansi_up";
+import { whenType, Dispatcher, Message } from "../bus";
+import { LogLevel, LogAction, LogActionTypes } from "./base";
 
-// beat TS type checking
-chalk["" + "enabled"] = true;
-
-
-import {Logger, LogLevel, LogEvent} from "../logger";
-import {CoreEvent} from "../messages";
-import {serializable, serialize} from "../serialize";
-import {CoreApplicationService} from "../application/services";
-
-export class ConsoleLogServiceAction extends CoreEvent {
-  static readonly HIGHLIGHT_LOG = "hlog"; // abbreviated to make
-  constructor(type: string, readonly match: string) {
-    super(type);
-  }
-}
 
 function createLogColorizer(tester: RegExp, replaceValue: any) {
   return function(input: string) {
@@ -27,7 +14,7 @@ function createLogColorizer(tester: RegExp, replaceValue: any) {
   }
 }
 
-export interface ILogServiceConfig {
+export type ConsoleLogConfig = {
   argv?: {
     color?: boolean,
     hlog?: boolean
@@ -92,57 +79,6 @@ function colorize(input: string) {
   return output;
 }
 
-// I'm against abbreviations, but it's happening here
-// since all of these are the same length -- saves space in stdout, and makes
-// logs easier to read.
-const PREFIXES = {
-  [LogLevel.DEBUG]: "DBG ",
-  [LogLevel.INFO]: "INF ",
-  [LogLevel.WARNING]: "WRN ",
-  [LogLevel.ERROR]: "ERR ",
-}
-
-export class ConsoleLogService extends CoreApplicationService<ILogServiceConfig> {
-
-  [LogEvent.LOG]({ level, text, filterable }: LogEvent) {
-
-    const logOptions = this.config.log || { level: null, prefix: null };
-    const logLevel   = logOptions.level == null ? LogLevel.ALL : logOptions.level;
-    const logPrefix  = logOptions.prefix || "";
-
-    if (!(level & logLevel) && filterable !== false) return;
-
-    // highlight log function from argv -- --hlog="something to highlight"
-    const hlog = String(this.config && this.config.argv && this.config.argv.hlog || "");
-
-    const log = {
-      [LogLevel.DEBUG]: console.log.bind(console),
-      [LogLevel.LOG]: console.log.bind(console),
-      [LogLevel.INFO]: console.info.bind(console),
-      [LogLevel.WARNING]: console.warn.bind(console),
-      [LogLevel.ERROR]: console.error.bind(console)
-    }[level];
-
-    text = PREFIXES[level] + logPrefix + text;
-
-    if (!this.config.argv || this.config.argv.color !== false) {
-      text = colorize(text);
-    }
-
-    if (typeof window !== "undefined" && !window["$synthetic"]) {
-      return styledConsoleLog(ansi_to_html(text));
-    }
-
-    if (hlog) {
-      if (text.toLowerCase().indexOf(hlog.toLowerCase()) !== -1) {
-        text = text.replace(new RegExp(hlog, "ig"), match => chalk.bold.bgMagenta(match));
-      }
-    }
-
-    log(text);
-  }
-}
-
 function styledConsoleLog(...args: any[]) {
     var argArray = [];
 
@@ -165,3 +101,41 @@ function styledConsoleLog(...args: any[]) {
 
     console.log.apply(console, argArray);
 }
+
+// I'm against abbreviations, but it's happening here
+// since all of these are the same length -- saves space in stdout, and makes
+// logs easier to read.
+const PREFIXES = {
+  [LogLevel.DEBUG]: "DBG ",
+  [LogLevel.INFO]: "INF ",
+  [LogLevel.WARNING]: "WRN ",
+  [LogLevel.ERROR]: "ERR ",
+};
+
+
+export const consoleLogger = (config: ConsoleLogConfig) => (downstreamDispatch?: Dispatcher<any>) => {
+  const logConfig = config.log || { level: null, prefix: null };
+  const logLevel  = logConfig.level == null ? LogLevel.ALL : logConfig.level;
+  const logPrefix = logConfig.prefix || "";
+
+  return whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
+    if (!(level & logLevel)) return;
+
+    const log = {
+      [LogLevel.DEBUG]: console.log.bind(console),
+      [LogLevel.LOG]: console.log.bind(console),
+      [LogLevel.INFO]: console.info.bind(console),
+      [LogLevel.WARNING]: console.warn.bind(console),
+      [LogLevel.ERROR]: console.error.bind(console)
+    }[level];
+
+    text = PREFIXES[level] + logPrefix + text;
+    text = colorize(text);
+
+    if (typeof window !== "undefined" && !window["$synthetic"]) {
+      return styledConsoleLog(ansi_to_html(text));
+    }
+
+    log(text);
+  }, downstreamDispatch);
+};

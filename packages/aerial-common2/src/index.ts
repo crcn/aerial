@@ -4,3 +4,4 @@ export * from "./immutable";
 export * from "./gen";
 export * from "./store";
 export * from "./bus";
+export * from "./log";

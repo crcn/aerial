@@ -68,6 +68,7 @@ export type ApplicationState = {
 export const createWorkspace        = createImmutableStructFactory<Workspace>(Types.WORKSPACE, {
   editors: []
 });
+
 export const createApplicationState = createImmutableStructFactory<ApplicationState>(Types.APPLICATION_STATE, {
   workspaces: []
 });

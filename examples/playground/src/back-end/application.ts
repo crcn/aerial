@@ -5,51 +5,61 @@ import {
 
 // TODO - pair dispatcher with state mutator
 
+import { noop, curryRight, flowRight } from "lodash";
 import { RootState } from "./state";
 import { sequence, parallel, when, limit, awaitable } from "mesh";
 import { 
   store,
   Message, 
-  appReady, 
-  APP_READY,
-  createMessage,
+  logDebug,
+  whenType,
+  whenNotType,
+  Dispatcher,
   bootstrapper, 
-  appInitialized, 
-  APP_INITIALIZED, 
+  consoleLogger,
+  createMessage,
+  ConsoleLogConfig,
 } from "aerial-common2";
 
-export type BackendOptions = {
-  state: RootState;
-};
-
-const DECREMENT = "DECREMENT";
-
-const reduce = (state: RootState, message: Message) => {
-  switch(message.type) {
-    case DECREMENT: return state.set("count", state.count - 1);
-    case APP_READY: return state.set('progress', APP_READY);
-    case APP_INITIALIZED: return state.set('progress', APP_INITIALIZED);
+export type BackendConfig = {
+  http: {
+    port: number
+  },
+  frontEnd: {
+    entryPath: string
   }
-  return state;
-}
+} & ConsoleLogConfig;
 
-export const bootstrapBackend = bootstrapper((options: BackendOptions) => store(options.state, reduce, (state, dispatch) => sequence(
-  async (message) => {
-    return new Promise((resolve) => setTimeout(resolve, 100));
-  },
-  (message) => {
-    console.log(state);
-    if (state.progress === APP_READY) {
-      if (state.count) {
-        return dispatch(createMessage(DECREMENT));
-      }
-    }
-  },
-  // httpDispatcher(),
-  // frontEndDispatcher(),
-  // consoleDispatcher(),
-  !state.progress ? (() => dispatch(appInitialized())) : state.progress === APP_INITIALIZED ? (() => dispatch(appReady())) : (() => {}),
-)));
+export const bootstrapBackend = bootstrapper((config: BackendConfig, state: RootState, upstreamDispatch: Dispatcher<any>, downstreamDispatch: Dispatcher<any> = noop) => 
+  flowRight(
+    consoleLogger(config),
+    ((downstreamDispatch: Dispatcher<any>) => sequence(
+      async (m) => new Promise(resolve => setTimeout(resolve, 100)),
+      (m) => {
+        return upstreamDispatch(logDebug(`state: ${JSON.stringify(state)}`));
+      },
+      downstreamDispatch
+    ))
+  )(downstreamDispatch)
+);
+
+// export const bootstrapBackend = bootstrapper((options: BackendOptions) => store(options.state, reduce, (state, dispatch) => sequence(
+//   async (message) => {
+//     return new Promise((resolve) => setTimeout(resolve, 100));
+//   },
+//   (message) => {
+//     console.log(state);
+//     if (state.progress === APP_READY) {
+//       if (state.count) {
+//         return dispatch(createMessage(DECREMENT));
+//       }
+//     }
+//   },
+//   // httpDispatcher(),
+//   // frontEndDispatcher(),
+//   // consoleDispatcher(),
+//   !state.progress ? (() => dispatch(appInitialized())) : state.progress === APP_INITIALIZED ? (() => dispatch(appReady())) : (() => {}),
+// )));
 // export class BackEndApplication extends ServiceApplication {
 //   protected registerProviders() {
 //     super.registerProviders();

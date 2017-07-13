@@ -1,12 +1,12 @@
-import { createImmutableObject, ImmutableObject } from "aerial-common2";
-
+import { createImmutableObject, ImmutableObject, ApplicationState, ApplicationStatusTypes } from "aerial-common2";
 
 export type RootState = ImmutableObject<{
-  progress: string;
-  count: number;
-}>;
+  id: string,
+  count: number
+}> & ApplicationState;
 
 export const createRootState = (): RootState => createImmutableObject({
-  progress: undefined,
+  id: "root",
+  status: ApplicationStatusTypes.LOADING,
   count: 100
 });
