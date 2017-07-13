@@ -1,3 +1,4 @@
+import { noop } from "lodash";
 import { resolve } from "path";
 import { readAll } from "mesh";
 import { LogLevel } from "aerial-common2";
@@ -16,7 +17,7 @@ const dispatch = bootstrapBackend({
   log: {
     level: LogLevel.VERBOSE
   }
-}, createRootState());
+}, createRootState())(noop);
 
 readAll(dispatch({
   type: "DO SOMETHING"

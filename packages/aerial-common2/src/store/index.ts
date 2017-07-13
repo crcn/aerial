@@ -1,5 +1,6 @@
-import { createDeferredPromise, readAll, proxy, sequence, limit } from "mesh";
+import { noop } from "lodash";
 import { Message, Event, Dispatcher } from "../bus";
+import { createDeferredPromise, readAll, proxy, sequence, limit } from "mesh";
 
 export type Reducer<T> = (state: T, event: Event) => T;
 
@@ -12,13 +13,13 @@ const dispatch = store({}, reduce, (state, dispatch) => {
 });
 */
 
-export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => {
+export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => (downstreamDispatch: Dispatcher<any>) => {
 
   const reset = (currentState: T) => {
     let locked = false;
     const { promise, resolve } = createDeferredPromise<Dispatcher<any>>();
     const upstreamDispatch   = proxy(() => promise);
-    const downstreamDispatch = dispatcher(currentState, upstreamDispatch);
+    const _upstreamDispatch  = dispatcher(currentState, upstreamDispatch)(downstreamDispatch);
     resolve((message: Message) => {
       if (locked) {
         throw new Error(`Attempting to dispatch ${JSON.stringify(message)} after state change.`);
@@ -28,10 +29,10 @@ export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, di
         locked = true;
         return reset(newState)(message);
       } else {
-        return downstreamDispatch(message);
+        return _upstreamDispatch(message);
       }
     });
-    return downstreamDispatch;
+    return _upstreamDispatch;
   };
 
   // functionality should be frozen along with the state
