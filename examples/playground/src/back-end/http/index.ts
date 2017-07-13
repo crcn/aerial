@@ -19,8 +19,8 @@ export const getHTTPServer = weakMemo((config: HTTPConfig) => {
   return server.listen(config.http.port);
 });
 
-// export const httpDispatcher = (upstreamDispatch: Dispatcher<any>) => {
-//   return (downstreamDispatch: Dispatcher<any>) => {
-//     return downstreamDispatch;
+// export const httpDispatcher = (upstream: Dispatcher<any>) => {
+//   return (downstream: Dispatcher<any>) => {
+//     return downstream;
 //   };
 // };

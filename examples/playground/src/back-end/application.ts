@@ -32,19 +32,19 @@ export type BackendConfig = {
   }
 } & ConsoleLogConfig;
 
-export const bootstrapBackend = bootstrapper((config: BackendConfig, state: RootState, upstreamDispatch: Dispatcher<any>) => 
+export const bootstrapBackend = bootstrapper((config: BackendConfig, state: RootState, upstream: Dispatcher<any>) => 
   flowRight(
 
     // sets up hooks for the front-end server ti interact with the backend. Note that hooks are
     // dispatched as events to the reducer which may modify the application state
-    frontEndDispatcher(config, upstreamDispatch),
+    frontEndDispatcher(config, upstream),
 
-    ((downstreamDispatch: Dispatcher<any>) => sequence(
+    ((downstream: Dispatcher<any>) => sequence(
       async (m) => new Promise(resolve => setTimeout(resolve, 100)),
       (m) => {
-        return log(logDebugAction(`state: ${JSON.stringify(state)}`), upstreamDispatch);
+        return log(logDebugAction(`state: ${JSON.stringify(state)}`), upstream);
       },
-      downstreamDispatch
+      downstream
     ))
   )
 );

@@ -2,6 +2,7 @@ import chalk =  require("chalk");
 import path = require("path");
 import moment = require("moment");
 import { titleize } from "inflection";
+import { weakMemo } from "../memo";
 import { ansi_to_html } from "ansi_up";
 import { whenType, Dispatcher, Message } from "../bus";
 import { LogLevel, LogAction, LogActionTypes } from "./base";
@@ -113,29 +114,31 @@ const PREFIXES = {
 };
 
 
-export const consoleLogger = (config: ConsoleLogConfig) => (downstreamDispatch?: Dispatcher<any>) => {
+export const consoleLogger = weakMemo((config: ConsoleLogConfig) => {
   const logConfig = config.log || { level: null, prefix: null };
   const logLevel  = logConfig.level == null ? LogLevel.ALL : logConfig.level;
   const logPrefix = logConfig.prefix || "";
 
-  return whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
-    if (!(level & logLevel)) return;
+  return (downstream?: Dispatcher<any>) => {
+    return whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
+      if (!(level & logLevel)) return;
 
-    const log = {
-      [LogLevel.DEBUG]: console.log.bind(console),
-      [LogLevel.LOG]: console.log.bind(console),
-      [LogLevel.INFO]: console.info.bind(console),
-      [LogLevel.WARNING]: console.warn.bind(console),
-      [LogLevel.ERROR]: console.error.bind(console)
-    }[level];
+      const log = {
+        [LogLevel.DEBUG]: console.log.bind(console),
+        [LogLevel.LOG]: console.log.bind(console),
+        [LogLevel.INFO]: console.info.bind(console),
+        [LogLevel.WARNING]: console.warn.bind(console),
+        [LogLevel.ERROR]: console.error.bind(console)
+      }[level];
 
-    text = PREFIXES[level] + logPrefix + text;
-    text = colorize(text);
+      text = PREFIXES[level] + logPrefix + text;
+      text = colorize(text);
 
-    if (typeof window !== "undefined" && !window["$synthetic"]) {
-      return styledConsoleLog(ansi_to_html(text));
-    }
+      if (typeof window !== "undefined" && !window["$synthetic"]) {
+        return styledConsoleLog(ansi_to_html(text));
+      }
 
-    log(text);
-  }, downstreamDispatch);
-};
+      log(text);
+    }, downstream);
+  };
+});

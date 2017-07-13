@@ -24,7 +24,7 @@ export type ApplicationState = ImmutableObject<{
 
 export type ApplicationConfig = { };
 
-export type Bootstrapper<TConfig extends ApplicationConfig, UState extends ApplicationState> = (config: TConfig, state: UState, upstreamDispatch?: Dispatcher<any>) => (downstreamDispatch?: Dispatcher<any>) => Dispatcher<any>;
+export type Bootstrapper<TConfig extends ApplicationConfig, UState extends ApplicationState> = (config: TConfig, state: UState, upstream?: Dispatcher<any>) => (downstream?: Dispatcher<any>) => Dispatcher<any>;
 
 const appStateReducer = <TState extends ApplicationState>(child: Reducer<TState> = identity) => (state: TState, event: Event) => {
   switch(event.type) {
@@ -34,23 +34,23 @@ const appStateReducer = <TState extends ApplicationState>(child: Reducer<TState>
   return child(state, event);
 };
 
-const logConfig = (config: ApplicationConfig, state: ApplicationState, upstreamDispatch: Dispatcher<any>) => (downstream: Dispatch<any>) => state.status === ApplicationStatusTypes.LOADING ? (message) => {
-  log(logInfoAction(`config: ${JSON.stringify(config, null, 2)}`), upstreamDispatch);
+const logConfig = (config: ApplicationConfig, state: ApplicationState, upstream: Dispatcher<any>) => (downstream: Dispatch<any>) => state.status === ApplicationStatusTypes.LOADING ? (message) => {
+  log(logInfoAction(`config: ${JSON.stringify(config, null, 2)}`), upstream);
   return downstream(message);
 } : downstream;
 
 export const bootstrapper = <TConfig extends ApplicationConfig, UState extends ApplicationState>(child: Bootstrapper<TConfig, any>, reduce?: Reducer<UState>): Bootstrapper<TConfig, UState> => (
-  (config: TConfig, state: UState, upstreamDispatch: Dispatcher<any> = noop) => (
-    store(state, appStateReducer<UState>(reduce), (state, upstreamDispatch) => flowRight(
+  (config: TConfig, state: UState, upstream: Dispatcher<any> = noop) => (
+    store(state, appStateReducer<UState>(reduce), (state, upstream) => flowRight(
       consoleLogger(config),
-      logConfig(config, state, upstreamDispatch),
-      child(config, state, upstreamDispatch),
-      (downstreamDispatch) => sequence((message: Message) => {
+      logConfig(config, state, upstream),
+      child(config, state, upstream),
+      (downstream) => sequence((message: Message) => {
         switch(state.status) {
-          case ApplicationStatusTypes.LOADING: return upstreamDispatch(appEvent(ApplicationEventTypes.LOADED));
-          case ApplicationStatusTypes.INITIALIZING: return upstreamDispatch(appEvent(ApplicationEventTypes.INITALIZED));
+          case ApplicationStatusTypes.LOADING: return upstream(appEvent(ApplicationEventTypes.LOADED));
+          case ApplicationStatusTypes.INITIALIZING: return upstream(appEvent(ApplicationEventTypes.INITALIZED));
         }
-      }, downstreamDispatch)
+      }, downstream)
     )
   )
 ));
