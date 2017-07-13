@@ -1,4 +1,4 @@
-import { when } from "mesh";
+import { when, readAll } from "mesh";
 import { negate } from "lodash";
 
 export type Message = {
@@ -17,6 +17,7 @@ export const createMessage = (type: string, rest: any = {}): Message => ({
 });
 
 export const createAction = createMessage;
+export const createEvent = createMessage;
 
 export type Dispatcher<T extends Message> = (message: T) => any;
 

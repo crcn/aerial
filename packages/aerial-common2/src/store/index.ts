@@ -16,7 +16,10 @@ export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, di
 
   const reset = (currentState: T) => {
     let locked = false;
-    let internalDispatch = dispatcher(currentState, (message: Message) => {
+    const { promise, resolve } = createDeferredPromise<Dispatcher<any>>();
+    const upstreamDispatch   = proxy(() => promise);
+    const downstreamDispatch = dispatcher(currentState, upstreamDispatch);
+    resolve((message: Message) => {
       if (locked) {
         throw new Error(`Attempting to dispatch ${JSON.stringify(message)} after state change.`);
       }
@@ -25,10 +28,10 @@ export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, di
         locked = true;
         return reset(newState)(message);
       } else {
-        return internalDispatch(message);
+        return downstreamDispatch(message);
       }
     });
-    return internalDispatch;
+    return downstreamDispatch;
   };
 
   // functionality should be frozen along with the state

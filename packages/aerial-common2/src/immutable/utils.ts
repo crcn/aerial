@@ -46,25 +46,3 @@ export function mapImmutable<T>(target: T, map: ObjectMap<T>): T {
     return map;
   }
 }
-
-export const weakMemo = <TFunc extends Function>(TFunc) => {
-  const memos = new Map();
-  const key   = Symbol();
-  let count = 1;
-  return function(arg) {
-    let hash = "";
-
-    for (let i = 0, n = arguments.length; i < n; i++) {
-      const arg = arguments[i];
-      hash += ":" + (arg[key] || (arg[key] = count++)) && arg[key] || arg;
-    }
-
-    if (memos.has(hash)) {
-      return memos.get(hash);
-    } else {
-      const result = TFunc.apply(this, arguments);
-      memos.set(hash, result);
-      return result;
-    }
-  } as any as TFunc;
-}

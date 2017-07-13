@@ -6,20 +6,20 @@ import {
 // TODO - pair dispatcher with state mutator
 
 import { RootState } from "./state";
-import { httpDispatcher } from "./http";
 import { frontEndDispatcher } from "./front-end";
 import { noop, curryRight, flowRight } from "lodash";
 import { sequence, parallel, when, limit, awaitable } from "mesh";
 import { 
   store,
   Message, 
-  logDebug,
+  log,
   whenType,
   whenNotType,
   Dispatcher,
   bootstrapper, 
   consoleLogger,
   createMessage,
+  logDebugAction,
   ConsoleLogConfig,
 } from "aerial-common2";
 
@@ -34,13 +34,12 @@ export type BackendConfig = {
 
 export const bootstrapBackend = bootstrapper((config: BackendConfig, state: RootState, upstreamDispatch: Dispatcher<any>, downstreamDispatch: Dispatcher<any> = noop) => 
   flowRight(
-    httpDispatcher(config),
-    frontEndDispatcher(config),
+    frontEndDispatcher(config, upstreamDispatch),
     consoleLogger(config),
     ((downstreamDispatch: Dispatcher<any>) => sequence(
       async (m) => new Promise(resolve => setTimeout(resolve, 100)),
       (m) => {
-        return upstreamDispatch(logDebug(`state: ${JSON.stringify(state)}`));
+        return log(logDebugAction(`state: ${JSON.stringify(state)}`), upstreamDispatch);
       },
       downstreamDispatch
     ))

@@ -2,13 +2,25 @@ import * as http from "http";
 import { sequence } from "mesh";
 import * as express from "express";
 import { BackendConfig } from "../application";
-import { Dispatcher, weakMemo } from "aerial-common2";
+import { Dispatcher, weakMemo, ImmutableObject, Event, createEvent } from "aerial-common2";
 
-export const httpDispatcher = weakMemo((config: BackendConfig, ...handlers: Array<(config: BackendConfig) => (server: http.Server) => any>) => {
+export type HTTPConfig = {
+  http: {
+    port: number
+  }
+};
+
+export type HTTPServerConnectedEvent = {
+  server: http.Server
+} & Event;
+
+export const getHTTPServer = weakMemo((config: HTTPConfig) => {
   const server   = express();
-  const instance = server.listen(config.http.port);
-  handlers.forEach(handler => handler(config)(instance));
-  return (downstreamDispatch: Dispatcher<any>) => {
-    return downstreamDispatch;
-  };
+  return server.listen(config.http.port);
 });
+
+// export const httpDispatcher = (upstreamDispatch: Dispatcher<any>) => {
+//   return (downstreamDispatch: Dispatcher<any>) => {
+//     return downstreamDispatch;
+//   };
+// };

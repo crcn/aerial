@@ -1,4 +1,5 @@
-import { Action, createAction } from "../bus";
+import { readAll } from "mesh";
+import { Action, createAction, Dispatcher } from "../bus";
 
 export enum LogLevel {
    DEBUG   = 1       << 1,
@@ -23,12 +24,14 @@ export enum LogActionTypes {
   LOG = "log"
 }
 
-export const log = (level: LogLevel, text: string): LogAction => createAction(LogActionTypes.LOG, {
+export const logAction = (level: LogLevel, text: string): LogAction => createAction(LogActionTypes.LOG, {
   level,
   text
 }) as LogAction;
 
-export const logDebug    = (text: string) => log(LogLevel.DEBUG, text);
-export const logInfo     = (text: string) => log(LogLevel.INFO, text);
-export const logWarning  = (text: string) => log(LogLevel.WARNING, text);
-export const logError    = (text: string) => log(LogLevel.ERROR, text);
+export const log = (action: LogAction, dispatch: Dispatcher<any>) => readAll(dispatch(action));
+
+export const logDebugAction    = (text: string) => logAction(LogLevel.DEBUG, text);
+export const logInfoAction     = (text: string) => logAction(LogLevel.INFO, text);
+export const logWarningAction  = (text: string) => logAction(LogLevel.WARNING, text);
+export const logErrorAction    = (text: string) => logAction(LogLevel.ERROR, text);
