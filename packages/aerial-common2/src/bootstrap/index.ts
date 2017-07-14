@@ -44,13 +44,7 @@ export const bootstrapper = <TConfig extends ApplicationConfig, UState extends A
     store(state, appStateReducer<UState>(reduce), (state, upstream) => flowRight(
       consoleLogger(config),
       logConfig(config, state, upstream),
-      child(config, state, upstream),
-      (downstream) => sequence((message: Message) => {
-        // switch(state.status) {
-        //   case ApplicationStatusTypes.LOADING: return upstream(appEvent(ApplicationEventTypes.LOADED));
-        //   case ApplicationStatusTypes.INITIALIZING: return upstream(appEvent(ApplicationEventTypes.INITALIZED));
-        // }
-      }, downstream)
+      child(config, state, upstream)
     )
   )
 ));
