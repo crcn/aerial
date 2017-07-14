@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { readAll } from "mesh";
 import { reader, Reader } from "./reader";
 
 describe(__filename + "#", () => {
@@ -7,13 +8,6 @@ describe(__filename + "#", () => {
   });
 
   it("can be chained together with andThen", () => {
-
-    // const findUser = (id: string) => reader(({db}) => db.findSync('users', { id: id }));
-
-    // const removeUser = (id: string) => findUser(id).andThen((user) => {
-    //   if (!user) throw new Error(`user not found`);
-    //   return reader(db => db.removeSync('users', { id: user.id }));
-    // });
 
     const fn = reader((v: number) => v + 1).andThen((v: number) => (
       -v
@@ -24,8 +18,22 @@ describe(__filename + "#", () => {
 
   it("can return a reader in andThen", () => {
     const fn = reader((v: number) => v + 1).andThen((v: number) => reader((v2) => -v * v2));
-
     expect(fn(10)).to.eql(-110);
+  });
+
+  it("can handle promises", async () => {
+    const fn = reader((v) => Promise.resolve(-v)).andThen((v) => v - 2);
+    expect(await fn(3)).to.eql(-5);
+  });
+
+
+  it("can pipe an async iterable iterator into a mapped value", async () => {
+    const negate = reader(async function*(n: number) {
+      for (let i = n; i--;) {
+        yield i;
+      }
+    }).andThen(readAll).andThen((v) => v.map((i) => -i));
+    expect(await negate(5)).to.eql([-4, -3, -2, -1, -0]);
   });
   
 });
