@@ -1,25 +1,17 @@
-import "./scss/index.scss";
+import { sequence } from "mesh";
+import { flowRight } from "lodash";
+import { RootState } from "./state";
+import { reactDispatcher } from "./react";
+import { RootComponent } from "./components";
+import { bootstrapper, ApplicationState, ImmutableObject, Dispatcher, log, logDebugAction } from "aerial-common2";
 
-import { ReactService } from "./services";
-import { RootComponent, VisualEditor } from "./components";
-import { RootComponentProvider, EditorComponentProvider } from "./providers";
-import { 
-  KernelProvider,
-  ServiceApplication, 
-  ApplicationServiceProvider,
-} from "aerial-common";
+export type FrontendConfig = {
+  
+};
 
-export class FrontEndApplication extends ServiceApplication {
-  protected registerProviders() {
-    this.kernel.register(
-      new KernelProvider(),
-      new RootComponentProvider(RootComponent),
-
-      // components
-      new EditorComponentProvider(VisualEditor.name, VisualEditor),
-
-      // services
-      new ApplicationServiceProvider(ReactService.name, ReactService),
-    );
-  }
-}
+export const bootstrapFrontend = () => bootstrapper((config: FrontendConfig, state: RootState, upstream: Dispatcher<any>) => flowRight(
+  reactDispatcher(state, RootComponent),
+  (downstream) => sequence((m) => {
+    log(logDebugAction("test"), upstream);
+  }, downstream)
+));

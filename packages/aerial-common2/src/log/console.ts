@@ -3,10 +3,12 @@ import path = require("path");
 import moment = require("moment");
 import { titleize } from "inflection";
 import { weakMemo } from "../memo";
-import { ansi_to_html } from "ansi_up";
+import AnsiUp from "ansi_up";
 import { whenType, Dispatcher, Message } from "../bus";
 import { LogLevel, LogAction, LogActionTypes } from "./base";
 
+// beat TS type checking
+chalk.enabled = true;
 
 function createLogColorizer(tester: RegExp, replaceValue: any) {
   return function(input: string) {
@@ -118,6 +120,7 @@ export const consoleLogger = weakMemo((config: ConsoleLogConfig) => {
   const logConfig = config.log || { level: null, prefix: null };
   const logLevel  = logConfig.level == null ? LogLevel.ALL : logConfig.level;
   const logPrefix = logConfig.prefix || "";
+  
 
   return (downstream?: Dispatcher<any>) => {
     return whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
@@ -135,7 +138,7 @@ export const consoleLogger = weakMemo((config: ConsoleLogConfig) => {
       text = colorize(text);
 
       if (typeof window !== "undefined" && !window["$synthetic"]) {
-        return styledConsoleLog(ansi_to_html(text));
+        return styledConsoleLog(new AnsiUp().ansi_to_html(text));
       }
 
       log(text);

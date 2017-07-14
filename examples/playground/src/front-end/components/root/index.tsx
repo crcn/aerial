@@ -1,30 +1,43 @@
-import "./index.scss";
-
 import * as React from "react";
-import { Kernel } from "aerial-common";
-import { TextEditor } from "../text-editor";
-import { withBus, inject } from "../utils";
-import { withContext, compose } from "recompose";
-import { ComponentProvider, EditorComponentProvider } from "../../providers";
+import { Event, ImmutableObject, createImmutableObject } from "aerial-common2";
+import { RootState } from "../../state";
 
-export interface IRootComponentBaseProps {
-  kernel: Kernel;
-  editorComponents: React.ComponentClass<any>[];
+export type RootComponentProps = ImmutableObject<{
+  appState: RootState
+}>;
+
+const createRootComponentState = (appState: RootState): RootComponentProps => createImmutableObject({ appState });
+
+export const rootComponentReducer = (props: RootComponentProps, event: Event) => {
+  return props;
 };
 
-const RootComponentBase = ({ kernel, editorComponents }: IRootComponentBaseProps) => {
-  return <div>
-    {editorComponents.map((EditorComponent, i) => <EditorComponent key={i} />)}
-  </div>;
-};
+export const RootComponentBase = ({ appState }: RootComponentProps) => <div>
+  
+</div>;
 
-const enhanceRootComponent = compose<IRootComponentBaseProps, IRootComponentBaseProps>(
-  withContext({
-    kernel: React.PropTypes.object
-  }, ({ kernel }) => ({ kernel })),
-  inject({
-    editorComponents: [EditorComponentProvider.getId("**")]
-  })
-);
+export const RootComponent = RootComponentBase;
 
-export const RootComponent = enhanceRootComponent(RootComponentBase);
+import { zipObject } from "lodash";
+
+/*
+
+const application = (getProvider) => {
+  const httpServerProvider = getProvider("httpServer");
+}
+
+application((name) => {
+  switch(name) {
+    case "httpServer": return httpProvider;
+  }
+});
+
+application((name) => {
+  switch(name) {
+    case "httpServer": return mockHTTPProvider;
+  }
+});
+
+
+
+*/

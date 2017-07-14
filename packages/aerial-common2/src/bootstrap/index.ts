@@ -19,7 +19,7 @@ export enum ApplicationEventTypes {
 export const appEvent = (type: ApplicationEventTypes) => createMessage(type);
 
 export type ApplicationState = ImmutableObject<{
-  status: ApplicationStatusTypes
+  status?: ApplicationStatusTypes
 }>;
 
 export type ApplicationConfig = { };
@@ -46,10 +46,10 @@ export const bootstrapper = <TConfig extends ApplicationConfig, UState extends A
       logConfig(config, state, upstream),
       child(config, state, upstream),
       (downstream) => sequence((message: Message) => {
-        switch(state.status) {
-          case ApplicationStatusTypes.LOADING: return upstream(appEvent(ApplicationEventTypes.LOADED));
-          case ApplicationStatusTypes.INITIALIZING: return upstream(appEvent(ApplicationEventTypes.INITALIZED));
-        }
+        // switch(state.status) {
+        //   case ApplicationStatusTypes.LOADING: return upstream(appEvent(ApplicationEventTypes.LOADED));
+        //   case ApplicationStatusTypes.INITIALIZING: return upstream(appEvent(ApplicationEventTypes.INITALIZED));
+        // }
       }, downstream)
     )
   )

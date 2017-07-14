@@ -13,7 +13,7 @@ const dispatch = store({}, reduce, (state, dispatch) => {
 });
 */
 
-export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => (downstreamDispatch: Dispatcher<any>) => {
+export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => (downstreamDispatch: Dispatcher<any> = noop) => {
 
   const reset = (currentState: T) => {
     let locked = false;

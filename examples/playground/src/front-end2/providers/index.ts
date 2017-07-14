@@ -14,7 +14,6 @@ export class ComponentProvider extends Provider<Component<any>> {
     return React.createElement(this.value as any, props);
   }
   static findAll(name: string, kernel: Kernel) {
-    console.log(this.getId);
     return kernel.queryAll(this.getId(name));
   }
   static find(name: string, kernel: Kernel) {

@@ -1,6 +1,6 @@
 {
   "name": "aerial-common2",
-  "version": "0.0.7",
+  "version": "0.0.1",
   "description": "This is currently a junk drawer of dependencies. Most everything here should be moved into separate repositories eventually.",
   "main": "index.js",
   "repository": {

@@ -10,8 +10,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js', '.tsx'],
     alias: {
-      cluster: 'null-loader?cluster',
-      ansi_up: 'null-loader?ansi_up'
+      cluster: 'null-loader?cluster'
     },
     modules: [
       resolve(__dirname, 'src'),
