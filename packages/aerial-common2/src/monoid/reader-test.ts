@@ -21,6 +21,11 @@ describe(__filename + "#", () => {
     expect(fn(10)).to.eql(-110);
   });
 
+  it("can return a reader in a few andThens", () => {
+    const fn = reader((a: string) => a + "b").andThen((b) => (a) => b + a + "c").andThen((c) => (a) => c + a + "d");
+    expect(fn("a")).to.eql("abacad");
+  });
+
   it("can handle promises", async () => {
     const fn = reader((v) => Promise.resolve(-v)).andThen((v) => v - 2);
     expect(await fn(3)).to.eql(-5);
