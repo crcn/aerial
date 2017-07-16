@@ -1,49 +1,55 @@
-import { 
-  HTTPService,
-  FrontEndService, 
-} from "./services";
+// import { 
+//   HTTPService,
+//   FrontEndService, 
+// } from "./services";
 
-// TODO - pair dispatcher with state mutator
+// // TODO - pair dispatcher with state mutator
 
-import { RootState } from "./state";
-import { getHTTPServer } from "./http";
-import { frontEndDispatcher, FrontEndConfig } from "./front-end";
-import { noop, curryRight, flowRight } from "lodash";
-import { sequence, parallel, when, limit, awaitable } from "mesh";
-import { 
-  store,
-  Message, 
-  log,
-  whenType,
-  whenNotType,
-  Dispatcher,
-  bootstrapper, 
-  consoleLogger,
-  createMessage,
-  logDebugAction,
-  ConsoleLogConfig,
-} from "aerial-common2";
+// import { RootState } from "./state";
+// import { startExpressServer } from "./http";
+// import { frontEndDispatcher, FrontEndConfig, startFrontEndService } from "./front-end";
+// import { noop, curryRight, flowRight } from "lodash";
+// import { sequence, parallel, when, limit, awaitable } from "mesh";
+// import { 
+//   store,
+//   Message, 
+//   log,
+//   whenType,
+//   reader,
+//   whenNotType,
+//   Dispatcher,
+//   bootstrapper, 
+//   consoleLogger,
+//   createMessage,
+//   logDebugAction,
+//   ConsoleLogConfig,
+// } from "aerial-common2";
 
-export type BackendConfig = {
-  http: {
-    port: number
-  }
-} & ConsoleLogConfig & FrontEndConfig;
+// export type BackendConfig = {
+//   http: {
+//     port: number
+//   }
+// } & ConsoleLogConfig & FrontEndConfig;
 
-export const bootstrapBackend = (_getHTTPServer: typeof getHTTPServer = getHTTPServer) => bootstrapper((config: BackendConfig, state: RootState, upstream: Dispatcher<any>) => 
-  flowRight(
+// export const bootstrap = () => reader((config: BackendConfig) => {
+//   const { expressServer, httpServer } = startExpressServer(config);
+//   startFrontEndService
+// });
 
-    // sets up hooks for the front-end server ti interact with the backend. Note that hooks are
-    // dispatched as events to the reducer which may modify the application state
-    frontEndDispatcher(config, _getHTTPServer, upstream),
+// export const bootstrapBackend = (_getHTTPServer: typeof getHTTPServer = getHTTPServer) => bootstrapper((config: BackendConfig, state: RootState, upstream: Dispatcher<any>) => 
+//   flowRight(
 
-    ((downstream: Dispatcher<any>) => sequence(
-      async (m) => new Promise(resolve => setTimeout(resolve, 100)),
-      (m) => {
-        return log(logDebugAction(`state: ${JSON.stringify(state)}`), upstream);
-      },
-      downstream
-    ))
-  )
-);
+//     // sets up hooks for the front-end server ti interact with the backend. Note that hooks are
+//     // dispatched as events to the reducer which may modify the application state
+//     frontEndDispatcher(config, _getHTTPServer, upstream),
+
+//     ((downstream: Dispatcher<any>) => sequence(
+//       async (m) => new Promise(resolve => setTimeout(resolve, 100)),
+//       (m) => {
+//         return log(logDebugAction(`state: ${JSON.stringify(state)}`), upstream);
+//       },
+//       downstream
+//     ))
+//   )
+// );
 
