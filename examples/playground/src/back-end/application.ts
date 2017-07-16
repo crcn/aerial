@@ -7,6 +7,6 @@ export type BackEndConfig = HTTPConfig & FrontEndConfig & ConsoleLogConfig;
 
 export const initApplication = (config: BackEndConfig) => (
   initBaseApplication(config)
-    .bind(initHTTPServer(config).run)
-    .bind(initFrontEndService(config).run)
+    .then(initHTTPServer(config).run)
+    .then(initFrontEndService(config).run)
 );

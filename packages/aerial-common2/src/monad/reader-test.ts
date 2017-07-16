@@ -9,25 +9,25 @@ describe(__filename + "#", () => {
 
   it("can be chained together with andThen", () => {
 
-    const rd = reader((v: number) => v + 1).bind((v: number) => (
+    const rd = reader((v: number) => v + 1).then((v: number) => (
       -v
     ));
 
     expect(rd.run(10)).to.eql(-11);
   });
 
-  it("can return a reader in binds", () => {
-    const rd = reader((v: number) => v + 1).bind((v: number) => reader((v2) => -v * v2));
+  it("can return a reader in thens", () => {
+    const rd = reader((v: number) => v + 1).then((v: number) => reader((v2) => -v * v2));
     expect(rd.run(10)).to.eql(-110);
   });
 
-  it("can return a reader in a few binds", () => {
-    const fn = reader((a: string) => a + "b").bind((b) => reader((a) => b + a + "c")).bind((c) => reader((a) => c + a + "d"));
+  it("can return a reader in a few thens", () => {
+    const fn = reader((a: string) => a + "b").then((b) => reader((a) => b + a + "c")).then((c) => reader((a) => c + a + "d"));
     expect(fn.run("a")).to.eql("abacad");
   });
 
   it("can handle promises", async () => {
-    const fn = reader((v) => Promise.resolve(-v)).bind((v) => v - 2);
+    const fn = reader((v) => Promise.resolve(-v)).then((v) => v - 2);
     expect(await fn.run(3)).to.eql(-5);
   });
 
@@ -37,7 +37,7 @@ describe(__filename + "#", () => {
       for (let i = n; i--;) {
         yield i;
       }
-    }).bind(readAll).bind((v) => v.map((i) => -i));
+    }).then(readAll).then((v) => v.map((i) => -i));
     expect(await negate.run(5)).to.eql([-4, -3, -2, -1, -0]);
   });
 
@@ -48,7 +48,7 @@ describe(__filename + "#", () => {
     const getHTTPRequest = (url) => reader({ httpServer }) => httpServer.once('get', url)));
 
     race(
-      getHTTPRequest('get', '/index.html').bind((req) => )
+      getHTTPRequest('get', '/index.html').then((req) => )
     )
     */
     describe("#race", () => { 

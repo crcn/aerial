@@ -1,3 +1,5 @@
+import "./scss/index.scss";
+
 import { MainComponent } from "./components";
 import { initReactService } from "./react";
 import { initBackEndService } from "./back-end";
@@ -9,8 +11,8 @@ export type FrontEndConfig = {
 
 export const initApplication = (config: FrontEndConfig) => (
   initBaseApplication(config)
-    .bind(initBackEndService(config).run)
-    .bind(initReactService({
+    .then(initBackEndService(config).run)
+    .then(initReactService({
       element: config.element,
       mainComponentClass: MainComponent,
     }).run)

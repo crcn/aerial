@@ -8,10 +8,10 @@ export class Reader<T, U> {
     return this.__fn(input);
   }
 
-  bind = <V>(_then: (input: U) => (V | Promise<V> | Reader<T, V>)) => {
+  then = <V>(_then: (input: U) => (V | Promise<V> | Reader<T, V>)) => {
     return new Reader((input: T) => {
       const map = (value: U) => {
-        const ret = _then(value);
+        const ret =  _then(value);
         return ret instanceof Reader ? ret.run(input) : ret;
       }
       

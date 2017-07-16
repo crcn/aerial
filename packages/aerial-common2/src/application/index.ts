@@ -12,7 +12,7 @@ export const LOAD_APP = "LOAD_APP";
 export const loadAppAction = () => createAction(LOAD_APP);
 
 export const initBaseApplication = (config: BaseApplicationConfig) => (
-  initConsoleLogService(config).bind((context: BaseApplicationContext) => {
+  initConsoleLogService(config).then((context: BaseApplicationContext) => {
     context.log((logInfoAction(`config: ${JSON.stringify(config, null, 2)}`)));
     return context;
   })
