@@ -4,12 +4,12 @@ import { initApplication } from "./index";
 
 window.onload = () => 
   Promise.resolve(
-    initApplication({
+    initApplication(immutable({
       element: document.querySelector("#application") as HTMLElement,
       log: {
         level: LogLevel.VERBOSE
       }
-    }).run(immutable({
+    })).run(immutable({
       dispatch: noop
     }))
   ).then((context) => {

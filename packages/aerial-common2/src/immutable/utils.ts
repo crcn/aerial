@@ -9,7 +9,7 @@ export function immutable(value) {
   if (value.$$immutable) return value;
   return Array.isArray(value) ? 
     new ImmutableArray(...value.map(immutable)) : 
-      typeof value === "object" ?
+      typeof value != null && value.constructor === Object ?
       new ImmutableObject(mapValues(value, immutable)) :
       value;
 }

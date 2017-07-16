@@ -6,7 +6,7 @@ import { createImmutableObject, immutable, LogLevel } from "aerial-common2";
 // // TODO - point to browser prop on package.json
 const FRONT_END_ENTRY_PATH = resolve(__dirname, "..", "front-end", "entry.bundle.js");
 
-initApplication({
+initApplication(immutable({
   http: {
     port: 8080
   },
@@ -16,6 +16,6 @@ initApplication({
   log: {
     level: LogLevel.VERBOSE
   }
-}).run(immutable({
+})).run(immutable({
   dispatch: noop
 }));
