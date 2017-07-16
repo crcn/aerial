@@ -1,26 +1,8 @@
-import { noop } from "lodash";
-import { resolve } from "path";
-import { readAll } from "mesh";
-import { LogLevel } from "aerial-common2";
-import { bootstrapBackend, createRootState } from "./index";
+import { initApplication } from "./index";
+import { createImmutableObject, immutable } from "aerial-common2";
 
-// // TODO - point to browser prop on package.json
-const FRONT_END_ENTRY_PATH = resolve(__dirname, "..", "front-end", "entry.bundle.js");
-
-const dispatch = bootstrapBackend()({
+initApplication({
   http: {
-    port: Number(process.env.PORT || 8080)
-  },
-  frontEnd: {
-    entryPath: FRONT_END_ENTRY_PATH
-  },
-  log: {
-    level: LogLevel.VERBOSE
+    port: 8080
   }
-}, createRootState())(noop);
-
-readAll(dispatch({
-  type: "DO SOMETHING"
-})).then(() => {
-  console.log('RUNNING');
-})
+}).run(immutable({}));

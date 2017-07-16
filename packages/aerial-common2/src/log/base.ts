@@ -29,7 +29,9 @@ export const logAction = (level: LogLevel, text: string): LogAction => createAct
   text
 }) as LogAction;
 
-export const log = (action: LogAction, dispatch: Dispatcher<any>) => readAll(dispatch(action));
+export type Logger = (action: LogAction) => any;
+
+export const createLogger = (dispatch: Dispatcher<any>): Logger => (action: LogAction) => readAll(dispatch(action));
 
 export const logDebugAction    = (text: string) => logAction(LogLevel.DEBUG, text);
 export const logInfoAction     = (text: string) => logAction(LogLevel.INFO, text);

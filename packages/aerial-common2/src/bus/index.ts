@@ -1,5 +1,6 @@
-import { when, readAll } from "mesh";
 import { negate } from "lodash";
+import { when, readAll } from "mesh";
+import { ImmutableObject } from "../immutable";
 
 export type Message = {
   type: string;
@@ -33,3 +34,7 @@ export const whenType = (type: string | string[], _then?: Dispatcher<any>, _else
 export const whenNotType = (type: string | string[], _then?: Dispatcher<any>, _else?: Dispatcher<any>) => {
   return when(negate(messageTypeIs(type)), _then, _else);
 }
+
+export type DispatcherContext = ImmutableObject<{
+  dispatch: Dispatcher<any>
+}>;

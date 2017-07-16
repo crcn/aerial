@@ -4,7 +4,8 @@ import moment = require("moment");
 import { titleize } from "inflection";
 import { weakMemo } from "../memo";
 import AnsiUp from "ansi_up";
-import { whenType, Dispatcher, Message } from "../bus";
+import { reader } from "../monad";
+import { whenType, Dispatcher, Message, DispatcherContext } from "../bus";
 import { LogLevel, LogAction, LogActionTypes } from "./base";
 
 // beat TS type checking
@@ -115,15 +116,15 @@ const PREFIXES = {
   [LogLevel.ERROR]: "ERR ",
 };
 
+export type ConsoleLogContext = DispatcherContext;
 
-export const consoleLogger = weakMemo((config: ConsoleLogConfig) => {
+export const initConsoleLogService = (config: ConsoleLogConfig) => {
   const logConfig = config.log || { level: null, prefix: null };
   const logLevel  = logConfig.level == null ? LogLevel.ALL : logConfig.level;
   const logPrefix = logConfig.prefix || "";
-  
 
-  return (downstream?: Dispatcher<any>) => {
-    return whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
+  return reader(
+    (context: ConsoleLogContext) => context.set("dispatch", whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
       if (!(level & logLevel)) return;
 
       const log = {
@@ -142,6 +143,6 @@ export const consoleLogger = weakMemo((config: ConsoleLogConfig) => {
       }
 
       log(text);
-    }, downstream);
-  };
-});
+    }, context.dispatch))
+  )
+};
