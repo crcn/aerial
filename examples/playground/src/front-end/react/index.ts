@@ -1,12 +1,38 @@
-import { RootState } from "../state";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { RootComponentProps } from "../components";
-import { Dispatcher, Message } from "aerial-common2";
+import { flowRight } from "lodash";
+import { withContext, compose } from "recompose";
 
-export type Component<P> = React.ComponentClass<P> | React.StatelessComponent<P>
+import { Component } from "../components";
+import { DispatcherContext, Dispatcher, Message, reader } from "aerial-common2";
 
-export const reactDispatcher = <TProps extends RootComponentProps>(state: RootState, BaseComponent: Component<TProps>) => (downstream: Dispatcher<any>) => (message: Message) => {
-  ReactDOM.render(React.createElement(BaseComponent as React.ComponentClass<any>, { appState: state }), state.element);
-  return downstream(message);
-}
+export type ReactServiceConfig = {
+  mainComponentClass: Component<any>,
+  element: HTMLElement
+};
+
+export type ReactServiceContext = DispatcherContext;
+
+type RootComponentProps = {
+  dispatch: Dispatcher<any>
+};
+
+const enhanceRootComponent =  compose(
+  withContext({
+    dispatch: React.PropTypes.func
+  }, ({ dispatch }: RootComponentProps) => ({
+    dispatch
+  }))
+);
+
+export const initReactService = ({ mainComponentClass, element }: ReactServiceConfig) => reader((context: ReactServiceContext) => {
+
+  const RootComponent = enhanceRootComponent(mainComponentClass as any);
+
+  const dispatch = (message: Message) => {
+    ReactDOM.render(React.createElement(RootComponent, { dispatch } as any), element);
+    context.dispatch(message);
+  };
+  
+  return context.set("dispatch", dispatch);
+});

@@ -1,9 +1,18 @@
 import { noop } from "lodash";
-import { documentReady } from "./events";
-import { createRootState } from "./state";
-import { bootstrapFrontend } from "./index";
+import { immutable, LogLevel, loadAppAction } from "aerial-common2";
+import { initApplication } from "./index";
 
-window.onload = () => {
-  const dispatch = window["_dispatch"] = bootstrapFrontend()({}, createRootState(document.getElementById("application")))(noop);
-  documentReady(dispatch);
-}
+window.onload = () => 
+  Promise.resolve(
+    initApplication({
+      element: document.querySelector("#application") as HTMLElement,
+      log: {
+        level: LogLevel.VERBOSE
+      }
+    }).run(immutable({
+      dispatch: noop
+    }))
+  ).then((context) => {
+    window["_appContext"] = context;
+    context.dispatch(loadAppAction());
+  });
