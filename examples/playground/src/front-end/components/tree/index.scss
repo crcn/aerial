@@ -1,0 +1,12 @@
+@import "variables";
+
+.tree-component {
+  .tree-node {
+    .tree-node-label {
+      padding: $padding-base * 2 0;
+    }
+    .tree-node-children {
+
+    }
+  }
+}

@@ -241,7 +241,7 @@ class WebpackDependencyLoader implements IDependencyLoader {
     const { config } = this.strategy;
 
     // find the matching loaders
-    const usableConfigLoaders = [];
+    const usableConfigLoaders: IWebpackLoaderConfig[] = [];
 
     if (!this.options.disableAllLoaders) {
       if (!this.options.disablePreloaders) usableConfigLoaders.push(...(config.module.preLoaders || []));

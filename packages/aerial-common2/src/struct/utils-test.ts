@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { identity } from "lodash";
-import { typed, idd } from "./index";
+import { typed, idd } from "./utils";
 
 describe(__filename + "#", () => {
   describe("typed#", () => {

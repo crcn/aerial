@@ -1,5 +1,10 @@
 .text-editor-component {
   color: red;
-  width: 50vw;
+  width: 100%;
   flex: 1;
+
+  .CodeMirror {
+    height: 100%;
+  }
+  border-right: 1px solid red;
 }
