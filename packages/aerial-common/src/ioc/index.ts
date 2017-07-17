@@ -1,4 +1,4 @@
-import { Bus } from "../bus";
+import { BrokerBus } from "../busses";
 import { ICommand } from "../commands";
 import {Observable } from "../observable";
 import { CoreEvent } from "../messages";
@@ -20,19 +20,19 @@ export * from "./base";
 /**
  */
 
-export function createSingletonBusProviderClass(name: string): { getInstance(providers:Kernel): Bus, ID: string, new(bus: Bus): Provider<Bus> } {
+export function createSingletonBusProviderClass(name: string): { getInstance(providers:Kernel): BrokerBus, ID: string, new(bus: BrokerBus): Provider<BrokerBus> } {
 
   const id = ["bus", name].join("/");
 
-  return class BusProvider extends Provider<Bus> {
+  return class BusProvider extends Provider<BrokerBus> {
 
     static readonly ID = id;
 
-    constructor(bus: Bus) {
+    constructor(bus: BrokerBus) {
       super(id, bus);
     }
 
-    static getInstance(providers: Kernel): Bus {
+    static getInstance(providers: Kernel): BrokerBus {
       const provider = providers.query<any>(id);
       if (!provider) {
         throw new Error(`Cannot get a singleton provider instance of "${id}"`);
