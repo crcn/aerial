@@ -4,7 +4,6 @@ import { FileCacheSynchronizer } from "./synchronizer";
 import {
   inject,
   Kernel,
-  IBrokerBus,
   Observable,
   createDataUrl,
   KernelProvider,
@@ -43,7 +42,7 @@ export class FileCache extends Observable {
   private _kernel: Kernel;
 
   @inject(PrivateBusProvider.ID)
-  private _bus: IBrokerBus;
+  private _bus: any;
 
   private _synchronizer: FileCacheSynchronizer;
   private _collection: ActiveRecordCollection<FileCacheItem, IFileCacheItemData>;

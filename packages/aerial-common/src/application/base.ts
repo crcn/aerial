@@ -1,4 +1,4 @@
-import { Dispatcher } from "../bus";
+
 import { SequenceBus } from "mesh";
 import { ApplicationServiceProvider } from "./providers";
 import { LoadApplicationRequest, InitializeApplicationRequest, ApplicationReadyMessage } from "../messages";
@@ -15,7 +15,7 @@ import {
 
 export class Application {
 
-  readonly dispatch: Dispatcher;
+  readonly dispatch: any;
   private _initialized: boolean;
 
   constructor(readonly kernel: Kernel) {
