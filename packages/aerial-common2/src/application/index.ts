@@ -1,19 +1,30 @@
 import { reader } from "../monad";
-import { createAction } from "../bus";
+import { parallel } from "mesh";
+import { flowRight } from "lodash";
 import { ImmutableObject } from "../immutable";
-import { createLogger, Logger, logInfoAction, initConsoleLogService, ConsoleLogContext, ConsoleLogConfig } from "../log";
+import { initStoreService } from "../store";
+import { createStore, Reducer, Store } from "redux";
+import { createAction, loopedDispatcher, Dispatcher, whenType } from "../bus";
+import { 
+  logger, 
+  logInfoAction, 
+  ConsoleLogConfig,
+  ConsoleLogContext, 
+  consoleLogDispatcher, 
+} from "../log";
 
 export type BaseApplicationConfig = ConsoleLogConfig;
-export type BaseApplicationContext = ImmutableObject<{
-  log: Logger
-} & ConsoleLogContext>;
 
 export const LOAD_APP = "LOAD_APP";
 export const loadAppAction = () => createAction(LOAD_APP);
 
-export const initBaseApplication = (config: BaseApplicationConfig) => (
-  initConsoleLogService(config).then((context: BaseApplicationContext) => {
-    context.log((logInfoAction(`config: ${JSON.stringify(config, null, 2)}`)));
-    return context;
-  })
-)
+export type ChildBootstrapper<T extends BaseApplicationConfig> = (config: BaseApplicationConfig, upsteam: Dispatcher<any>) => (downstream: Dispatcher<any>) => Dispatcher<any>;
+
+export const initBaseApplication = <TState>(config: BaseApplicationConfig, initialState: TState, reducer: Reducer<TState>, child: ChildBootstrapper<any>) => loopedDispatcher((upstream) => flowRight(
+  consoleLogDispatcher(config),
+  initStoreService(initialState, reducer, upstream),
+  (downstream: Dispatcher<any>) => parallel(whenType(LOAD_APP, () => {
+    logger(upstream)(logInfoAction(`config: ${JSON.stringify(config, null, 2)}`));
+  }), downstream),
+  child(config, upstream)
+));

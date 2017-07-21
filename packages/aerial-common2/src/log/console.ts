@@ -6,8 +6,8 @@ import { weakMemo } from "../memo";
 import AnsiUp from "ansi_up";
 import { reader } from "../monad";
 import { ImmutableObject, createImmutableObject } from "../immutable";
-import { whenType, Dispatcher, Message, DispatcherContext } from "../bus";
-import { LogLevel, LogAction, LogActionTypes, Logger, createLogger } from "./base";
+import { LogLevel, LogAction, LogActionTypes, Logger } from "./base";
+import { whenType, Dispatcher, Message, DispatcherContext, DispatcherContextIdentity } from "../bus";
 
 // beat TS type checking
 chalk.enabled = true;
@@ -117,42 +117,35 @@ const PREFIXES = {
   [LogLevel.ERROR]: "ERR ",
 };
 
-export type ConsoleLogContext = ImmutableObject<{
+export type ConsoleLogServiceState = {
   log: Logger
-} & DispatcherContext>;
+};
 
-export const initConsoleLogService = (config: ConsoleLogConfig) => {
+export type ConsoleLogContext = ImmutableObject<ConsoleLogServiceState>;
+
+export const consoleLogDispatcher = (config: ConsoleLogConfig) => (downstream: Dispatcher<any>) => {
   const logConfig = config.log || { level: null, prefix: null };
   const logLevel  = logConfig.level == null ? LogLevel.ALL : logConfig.level;
   const logPrefix = logConfig.prefix || "";
 
-  return reader(
-    (context: DispatcherContext): ConsoleLogContext => {
-      const dispatch = whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
-        if (!(level & logLevel)) return;
+  return whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
+    if (!(level & logLevel)) return;
 
-        const log = {
-          [LogLevel.DEBUG]: console.log.bind(console),
-          [LogLevel.LOG]: console.log.bind(console),
-          [LogLevel.INFO]: console.info.bind(console),
-          [LogLevel.WARNING]: console.warn.bind(console),
-          [LogLevel.ERROR]: console.error.bind(console)
-        }[level];
+    const log = {
+      [LogLevel.DEBUG]: console.log.bind(console),
+      [LogLevel.LOG]: console.log.bind(console),
+      [LogLevel.INFO]: console.info.bind(console),
+      [LogLevel.WARNING]: console.warn.bind(console),
+      [LogLevel.ERROR]: console.error.bind(console)
+    }[level];
 
-        text = PREFIXES[level] + logPrefix + text;
-        text = colorize(text);
+    text = PREFIXES[level] + logPrefix + text;
+    text = colorize(text);
 
-        if (typeof window !== "undefined" && !window["$synthetic"]) {
-          return styledConsoleLog(new AnsiUp().ansi_to_html(text));
-        }
-
-        log(text);
-      }, context.dispatch)
-
-      return createImmutableObject({
-        dispatch: dispatch,
-        log: createLogger(dispatch)
-      });
+    if (typeof window !== "undefined" && !window["$synthetic"]) {
+      return styledConsoleLog(new AnsiUp().ansi_to_html(text));
     }
-  );
+
+    log(text);
+  }, downstream)
 };

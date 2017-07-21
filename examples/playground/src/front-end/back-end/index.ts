@@ -1,10 +1,8 @@
-import { reader, ImmutableObject, ConsoleLogContext, logDebugAction } from "aerial-common2";
+import { reader, ImmutableObject, ConsoleLogContext, ConsoleLogContextIdentity, logDebugAction } from "aerial-common2";
 
-export type BackEndServiceContext = ImmutableObject<{
-  
-}> & ConsoleLogContext;
+export type BackEndServiceContextIdentity = ConsoleLogContextIdentity;
 
-export const initBackEndService = (config: any) => reader((context: BackEndServiceContext) => {
-  context.log(logDebugAction(`test`));
+
+export const initBackEndService = (config: any) => reader(<TContext extends BackEndServiceContextIdentity>(context: TContext) => {
   return context;
 });

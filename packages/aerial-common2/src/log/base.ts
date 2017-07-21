@@ -21,7 +21,7 @@ export type LogAction = {
 } & Action;
 
 export enum LogActionTypes {
-  LOG = "log"
+  LOG = "LOG"
 }
 
 export const logAction = (level: LogLevel, text: string): LogAction => createAction(LogActionTypes.LOG, {
@@ -31,7 +31,7 @@ export const logAction = (level: LogLevel, text: string): LogAction => createAct
 
 export type Logger = (action: LogAction) => any;
 
-export const createLogger = (dispatch: Dispatcher<any>): Logger => (action: LogAction) => readAll(dispatch(action));
+export const logger = (dispatch: Dispatcher<any>): Logger => (action: LogAction) => readAll(dispatch(action));
 
 export const logDebugAction    = (text: string) => logAction(LogLevel.DEBUG, text);
 export const logInfoAction     = (text: string) => logAction(LogLevel.INFO, text);

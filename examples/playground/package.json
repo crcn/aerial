@@ -66,6 +66,7 @@
     "react-codemirror": "^1.0.0",
     "react-dom": "^15.6.1",
     "recompose": "^0.23.5",
+    "redux": "^3.7.2",
     "sift": "3.3.x",
     "systemjs": "^0.20.14",
     "tinycolor2": "^1.4.1"

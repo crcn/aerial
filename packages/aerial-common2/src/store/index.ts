@@ -1,41 +1,36 @@
-import { noop } from "lodash";
-import { Message, Event, Dispatcher } from "../bus";
-import { createDeferredPromise, readAll, proxy, sequence, limit } from "mesh";
+import { reader } from "../monad";
+import { createStore, Reducer, Store } from "redux";
+import { mutable, immutable, ImmutableObject } from "../immutable";
+import { parallel, readAll, proxy, createDeferredPromise } from "mesh";
+import { Dispatcher, DispatcherContextIdentity, Message, whenNotType, Event } from "../bus";
 
-export type Reducer<T> = (state: T, event: Event) => T;
+export const STORE_CHANGED = "STORE_CHANGED";
 
-/*
+export type StoreChangedEvent<TState> = {
+  payload: TState
+} & Event;
 
-// creates stateful dispatchers based on the passed in state
+export const storeChangedEvent = <TState>(state: TState): StoreChangedEvent<TState> => ({ type: STORE_CHANGED, payload: state });
 
-const dispatch = store({}, reduce, (state, dispatch) => {
+export type StoreContextIdentity<T> = {
+  store: Store<T>
+} & DispatcherContextIdentity;
 
-});
-*/
+export type StoreContext<T> = ImmutableObject<StoreContextIdentity<T>>;
 
-export const store = <T>(state: T, reduce: Reducer<T>, dispatcher: (state: T, dispatch: Dispatcher<Message>) => any) => (downstreamDispatch: Dispatcher<any> = noop) => {
+export type DownstreamDispatchFactory<TState> = (currentState: TState, upstream: Dispatcher<any>) => Dispatcher<any>;
 
-  const reset = (currentState: T) => {
-    let locked = false;
-    const { promise, resolve } = createDeferredPromise<Dispatcher<any>>();
-    const upstreamDispatch   = proxy(() => promise);
-    const _upstreamDispatch  = dispatcher(currentState, upstreamDispatch)(downstreamDispatch);
-    resolve((message: Message) => {
-      if (locked) {
-        throw new Error(`Attempting to dispatch ${JSON.stringify(message)} after state change.`);
-      }
-      const newState = reduce(currentState, message);
-      if (currentState !== newState) {
-        locked = true;
-        return reset(newState)(message);
-      } else {
-        return _upstreamDispatch(message);
-      }
-    });
-    return _upstreamDispatch;
-  };
+export const initStoreService = <T>(initialState: T, reducer: Reducer<T>, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
+  const store = createStore(reducer, initialState);
+  
+  store.subscribe(() => {
+    const newState = store.getState();
+    if (initialState !== newState) {
+      readAll(upstream(storeChangedEvent(newState)));
+    }
+  });
 
-  // functionality should be frozen along with the state
-  // passed into the store func.
-  return reset(state);
-}
+  return parallel(whenNotType(STORE_CHANGED, (message) => {
+    store.dispatch(message);
+  }), downstream);
+};

@@ -1,7 +1,8 @@
 import * as path from "path";
 import * as express from "express";
-import { HTTPContext } from "../http";
-import { reader, ImmutableObject, ConsoleLogContext, logDebugAction } from "aerial-common2";
+import { parallel } from "mesh";
+import { HTTP_SERVER_STARTED, HTTPServerStartedEvent } from "../http";
+import { reader, ImmutableObject, ConsoleLogContext, logDebugAction, Dispatcher, routeTypes } from "aerial-common2";
 
 export type FrontEndConfig = {
   frontEnd: {
@@ -9,31 +10,29 @@ export type FrontEndConfig = {
   }
 };
 
-export type FrontEndContext = ImmutableObject<{
-  
-} & HTTPContext & ConsoleLogContext>;
+export const initFrontEndService = (config: FrontEndConfig, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
+  const onHTTPServerStarted = ({ expressServer }: HTTPServerStartedEvent) => {
+    const frontEndEntryBasename = path.basename(config.frontEnd.entryPath);
 
-export const initFrontEndService = (config: FrontEndConfig) => reader((context: FrontEndContext) => {
-  const { log, expressServer } = context;
+    expressServer.all("/index.html", (req, res) => {
+      res.send(`
+        <html>
+          <head>
+          </head>
+          <body>
+            <div id="application"></div>
+            <script type="text/javascript" src="./${frontEndEntryBasename}"></script>
+          </body>
+        </html>
+      `);
+    });
 
-  const frontEndEntryBasename = path.basename(config.frontEnd.entryPath);
+    expressServer.use(
+      express.static(path.dirname(config.frontEnd.entryPath))
+    );
+  };
 
-  expressServer.all("/index.html", (req, res) => {
-    res.send(`
-      <html>
-        <head>
-        </head>
-        <body>
-          <div id="application"></div>
-          <script type="text/javascript" src="./${frontEndEntryBasename}"></script>
-        </body>
-      </html>
-    `);
-  });
-
-  expressServer.use(
-    express.static(path.dirname(config.frontEnd.entryPath))
-  );
-
-  return context;
-});
+  return parallel(routeTypes({
+    [HTTP_SERVER_STARTED]: onHTTPServerStarted
+  }), downstream);
+};
