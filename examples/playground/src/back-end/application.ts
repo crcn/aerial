@@ -1,13 +1,16 @@
 import { noop, flowRight } from "lodash";
-import { initHTTPServer, HTTPConfig } from "./http";
-import { initFrontEndService, FrontEndConfig } from "./front-end";
-import { initBaseApplication, ConsoleLogConfig, Dispatcher } from "aerial-common2";
+import { combineReducers } from "redux";
+const reduceReducers = require("reduce-reducers");
+import { initHTTPServer, HTTPServerState, httpServerReducer } from "./http";
+import { initFrontEndService, FrontEndState } from "./front-end";
+import { initBaseApplication, ConsoleLogState, Dispatcher } from "aerial-common2";
 
-export type BackEndConfig = HTTPConfig & FrontEndConfig & ConsoleLogConfig;
 
-export const initApplication = <T>(config: BackEndConfig, initialState?: T) => (
-  initBaseApplication(config, null, noop, (config: BackEndConfig, upstream: Dispatcher<any>) => flowRight(
-    initHTTPServer(config, upstream),
-    initFrontEndService(config, upstream)
+export type BackEndState = FrontEndState & HTTPServerState  & ConsoleLogState;
+
+export const initApplication = <T>(initialState?: T) => (
+  initBaseApplication(initialState, reduceReducers(httpServerReducer), (upstream: Dispatcher<any>) => flowRight(
+    initHTTPServer(upstream),
+    initFrontEndService(upstream)
   ))
 );

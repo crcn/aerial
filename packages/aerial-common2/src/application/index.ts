@@ -8,23 +8,22 @@ import { createAction, loopedDispatcher, Dispatcher, whenType } from "../bus";
 import { 
   logger, 
   logInfoAction, 
-  ConsoleLogConfig,
-  ConsoleLogContext, 
+  ConsoleLogState,
   consoleLogDispatcher, 
 } from "../log";
 
-export type BaseApplicationConfig = ConsoleLogConfig;
+export type BaseApplicationState = ConsoleLogState;
 
 export const LOAD_APP = "LOAD_APP";
 export const loadAppAction = () => createAction(LOAD_APP);
 
-export type ChildBootstrapper<T extends BaseApplicationConfig> = (config: BaseApplicationConfig, upsteam: Dispatcher<any>) => (downstream: Dispatcher<any>) => Dispatcher<any>;
+export type ChildBootstrapper = (upsteam: Dispatcher<any>) => (downstream: Dispatcher<any>) => Dispatcher<any>;
 
-export const initBaseApplication = <TState>(config: BaseApplicationConfig, initialState: TState, reducer: Reducer<TState>, child: ChildBootstrapper<any>) => loopedDispatcher((upstream) => flowRight(
-  consoleLogDispatcher(config),
+export const initBaseApplication = <TState>(initialState: BaseApplicationState, reducer: Reducer<TState>, child: ChildBootstrapper) => loopedDispatcher((upstream) => flowRight(
   initStoreService(initialState, reducer, upstream),
+  consoleLogDispatcher,
   (downstream: Dispatcher<any>) => parallel(whenType(LOAD_APP, () => {
-    logger(upstream)(logInfoAction(`config: ${JSON.stringify(config, null, 2)}`));
+    logger(upstream)(logInfoAction(`initial state: ${JSON.stringify(initialState, null, 2)}`));
   }), downstream),
-  child(config, upstream)
+  child(upstream)
 ));

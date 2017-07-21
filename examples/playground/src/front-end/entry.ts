@@ -1,18 +1,13 @@
 import { noop } from "lodash";
-import { immutable, LogLevel, loadAppAction } from "aerial-common2";
-import { initApplication } from "./index";
+import { readAll } from "mesh";
+import { LogLevel, loadAppAction } from "aerial-common2";
+import { initApplication, createApplicationState } from "./index";
 
-window.onload = () => 
-  Promise.resolve(
-    initApplication(immutable({
-      element: document.querySelector("#application") as HTMLElement,
-      log: {
-        level: LogLevel.VERBOSE
-      }
-    })).run(immutable({
-      dispatch: noop
-    }))
-  ).then((context) => {
-    window["_appContext"] = context;
-    context.dispatch(loadAppAction());
-  });
+window.onload = () => {
+ readAll(initApplication(createApplicationState({
+    element: document.querySelector("#application") as HTMLElement,
+    log: {
+      level: LogLevel.VERBOSE
+    }
+  }))(noop)(loadAppAction()));
+};

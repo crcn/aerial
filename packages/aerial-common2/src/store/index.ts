@@ -1,7 +1,8 @@
 import { reader } from "../monad";
+import { Selector } from "reselect";
 import { createStore, Reducer, Store } from "redux";
 import { mutable, immutable, ImmutableObject } from "../immutable";
-import { parallel, readAll, proxy, createDeferredPromise } from "mesh";
+import { parallel, readAll, proxy, createDeferredPromise, when } from "mesh";
 import { Dispatcher, DispatcherContextIdentity, Message, whenNotType, Event } from "../bus";
 
 export const STORE_CHANGED = "STORE_CHANGED";
@@ -20,13 +21,30 @@ export type StoreContext<T> = ImmutableObject<StoreContextIdentity<T>>;
 
 export type DownstreamDispatchFactory<TState> = (currentState: TState, upstream: Dispatcher<any>) => Dispatcher<any>;
 
+export const whenStoreChanged = (selector: Selector<any, any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => {
+  let currentState;
+  return when((event: StoreChangedEvent<any>) => {
+    if (event.type === STORE_CHANGED) {
+      const newState = selector(event.payload);
+      if (newState !== currentState) {
+        currentState = newState;
+        return true;
+      }
+    }
+
+    return false;
+  }, _then, _else);
+}
+
 export const initStoreService = <T>(initialState: T, reducer: Reducer<T>, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
   const store = createStore(reducer, initialState);
+  let initialized = false;
   
   store.subscribe(() => {
     const newState = store.getState();
-    if (initialState !== newState) {
+    if (initialState !== newState || !initialized) {
       readAll(upstream(storeChangedEvent(newState)));
+      return initialized;
     }
   });
 

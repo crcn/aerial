@@ -1,18 +1,23 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { flowRight } from "lodash";
-import { readAll } from "mesh";
+import { flowRight, identity } from "lodash";
+import { readAll, parallel } from "mesh";
 import { withContext, compose } from "recompose";
-
 import { Component } from "../components";
-import { DispatcherContext, Dispatcher, Message, reader } from "aerial-common2";
+import { 
+  Dispatcher, 
+  StoreChangedEvent, 
+  reader, 
+  whenType, 
+  STORE_CHANGED, 
+  whenStoreChanged,
+  weakMemo,
+} from "aerial-common2";
 
-export type ReactServiceConfig = {
+export type ReactServiceState = {
   mainComponentClass: Component<any>,
   element: HTMLElement
 };
-
-export type ReactServiceContext = DispatcherContext;
 
 type RootComponentProps = {
   dispatch: Dispatcher<any>
@@ -26,20 +31,8 @@ const enhanceRootComponent =  compose(
   }))
 );
 
-export const initReactService = ({ mainComponentClass, element }: ReactServiceConfig) => reader(<TContext extends ReactServiceContext>(context: TContext) => {
+const getEnhancedRootComponent = weakMemo((state: ReactServiceState) => enhanceRootComponent(state.mainComponentClass as any));
 
-  const RootComponent = enhanceRootComponent(mainComponentClass as any);
-
-
-  const downstream = (message: Message) => {
-    console.log(message);
-    ReactDOM.render(React.createElement(RootComponent, { dispatch: context.upstream } as any), element);
-    context.downstream(message);
-  };
-
-  setTimeout(() => {
-    readAll(context.upstream({ type: "TEST" }));
-  })
-  
-  return context.set("downstream", downstream);
-});
+export const initReactService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(whenStoreChanged(identity, ({ payload: state }: StoreChangedEvent<ReactServiceState>) => {
+  ReactDOM.render(React.createElement(getEnhancedRootComponent(state), { dispatch: upstream } as any), state.element);
+}), downstream);

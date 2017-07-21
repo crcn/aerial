@@ -3,6 +3,7 @@ import {
   TreeNode,
   ImmutableArray, 
   ImmutableObject,
+  BaseApplicationState,
   createImmutableObject,
   createImmutableArray,
   ImmutableArrayIdentity,
@@ -13,6 +14,9 @@ import {
 import {
   SyntheticBrowser,
 } from "aerial-synthetic-browser";
+
+import { ReactServiceState } from "../react";
+
 
 export namespace Types {
   export const FILE              = "FILE";
@@ -60,7 +64,7 @@ export type Workspace = {
 
 export type ApplicationState = {
   workspaces: Workspace[]
-} & Struct;
+} & BaseApplicationState & ReactServiceState & Struct;
 
 /**
  * Factories

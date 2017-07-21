@@ -1,18 +1,26 @@
 import * as path from "path";
 import * as express from "express";
 import { parallel } from "mesh";
-import { HTTP_SERVER_STARTED, HTTPServerStartedEvent } from "../http";
-import { reader, ImmutableObject, ConsoleLogContext, logDebugAction, Dispatcher, routeTypes } from "aerial-common2";
+import { HTTP_SERVER_STARTED, HTTPServerStartedEvent, HTTPServerState } from "../http";
+import { 
+  ImmutableObject, 
+  logDebugAction, 
+  Dispatcher, 
+  routeTypes, 
+  StoreChangedEvent,
+  whenStoreChanged,
+} from "aerial-common2";
 
-export type FrontEndConfig = {
+export type FrontEndState = {
   frontEnd: {
     entryPath: string
   }
-};
+} & HTTPServerState;
 
-export const initFrontEndService = (config: FrontEndConfig, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
-  const onHTTPServerStarted = ({ expressServer }: HTTPServerStartedEvent) => {
-    const frontEndEntryBasename = path.basename(config.frontEnd.entryPath);
+export const initFrontEndService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
+
+  const addFrontEndRoutes = ({ payload: { frontEnd, http: { expressServer } } }: StoreChangedEvent<FrontEndState>) => {
+    const frontEndEntryBasename = path.basename(frontEnd.entryPath);
 
     expressServer.all("/index.html", (req, res) => {
       res.send(`
@@ -28,11 +36,12 @@ export const initFrontEndService = (config: FrontEndConfig, upstream: Dispatcher
     });
 
     expressServer.use(
-      express.static(path.dirname(config.frontEnd.entryPath))
+      express.static(path.dirname(frontEnd.entryPath))
     );
   };
 
-  return parallel(routeTypes({
-    [HTTP_SERVER_STARTED]: onHTTPServerStarted
-  }), downstream);
+  return parallel(
+    whenStoreChanged((state: FrontEndState) => state.http && state.http.expressServer, addFrontEndRoutes),
+    downstream
+  );
 };

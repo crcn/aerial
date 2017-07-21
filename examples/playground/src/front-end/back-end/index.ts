@@ -1,8 +1,3 @@
-import { reader, ImmutableObject, ConsoleLogContext, ConsoleLogContextIdentity, logDebugAction } from "aerial-common2";
+import { reader, ImmutableObject, Dispatcher, logDebugAction } from "aerial-common2";
 
-export type BackEndServiceContextIdentity = ConsoleLogContextIdentity;
-
-
-export const initBackEndService = (config: any) => reader(<TContext extends BackEndServiceContextIdentity>(context: TContext) => {
-  return context;
-});
+export const initBackEndService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => downstream;

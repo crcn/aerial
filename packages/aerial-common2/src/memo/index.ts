@@ -2,21 +2,30 @@
 
 export function weakMemo<TFunc extends (...args: any[]) => any>(func: TFunc): TFunc {
   const memos = new Map();
-  const key   = Symbol();
   let count = 1;
   return function() {
     let hash = "";
 
+    let cmemo = memos;
+
     for (let i = 0, n = arguments.length; i < n; i++) {
       const arg = arguments[i];
-      hash += ":" + (arg[key] || (arg[key] = count++)) && arg[key] || arg;
+
+      let nmemo = cmemo.get(arg);
+      
+      if (!nmemo) {
+        nmemo = new Map();
+        cmemo.set(arg, nmemo);
+      }
+
+      cmemo = nmemo;
     }
 
-    if (memos.has(hash)) {
-      return memos.get(hash);
+    if (cmemo.has(hash)) {
+      return cmemo.get(hash);
     } else {
       const result = func.apply(this, arguments);
-      memos.set(hash, result);
+      cmemo.set(hash, result);
       return result;
     }
   } as any as TFunc;

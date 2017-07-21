@@ -36,13 +36,17 @@ export function mapImmutable<T>(target: T, map: ObjectMap<T>): T;
 export function mapImmutable<T>(target: T, map: ObjectMap<T>): T {
   if (typeof map === 'function') {
     return immutable(map(target));
-  } else if (typeof map === 'object') {
-    let result = immutable(target);
+  } else if (typeof map === 'object' && map && map.constructor === Object) {
+    let result = immutable(target || {} as T);
     for (const key in map) {
-      result = result.set(key, mapImmutable(result[key], map[key]));
+      try {
+        result = result.set(key, mapImmutable(result[key], map[key]));
+      } catch(e) {
+        throw e;
+      }
     }
     return result;
   } else {
-    return map;
+    return map as any;
   }
 }

@@ -2,11 +2,14 @@ import chalk =  require("chalk");
 import path = require("path");
 import moment = require("moment");
 import { titleize } from "inflection";
+import { parallel } from "mesh";
 import { weakMemo } from "../memo";
 import AnsiUp from "ansi_up";
 import { reader } from "../monad";
+import { noop } from "lodash";
 import { ImmutableObject, createImmutableObject } from "../immutable";
 import { LogLevel, LogAction, LogActionTypes, Logger } from "./base";
+import { whenStoreChanged, StoreChangedEvent } from "../store";
 import { whenType, Dispatcher, Message, DispatcherContext, DispatcherContextIdentity } from "../bus";
 
 // beat TS type checking
@@ -19,7 +22,7 @@ function createLogColorizer(tester: RegExp, replaceValue: any) {
   }
 }
 
-export type ConsoleLogConfig = {
+export type ConsoleLogState = {
   argv?: {
     color?: boolean,
     hlog?: boolean
@@ -116,36 +119,38 @@ const PREFIXES = {
   [LogLevel.WARNING]: "WRN ",
   [LogLevel.ERROR]: "ERR ",
 };
+const defaultState = { level: LogLevel.ALL, prefix: "" };
 
-export type ConsoleLogServiceState = {
-  log: Logger
-};
+export const consoleLogDispatcher = (downstream: Dispatcher<any>) => {
+  let dispatcher = noop;
 
-export type ConsoleLogContext = ImmutableObject<ConsoleLogServiceState>;
+  const setLogger = ({ payload: { log: { level, prefix }}}: StoreChangedEvent<ConsoleLogState>) => {
+    dispatcher = ({ text, level }: LogAction) => {
+      if (!(level & level)) return;
 
-export const consoleLogDispatcher = (config: ConsoleLogConfig) => (downstream: Dispatcher<any>) => {
-  const logConfig = config.log || { level: null, prefix: null };
-  const logLevel  = logConfig.level == null ? LogLevel.ALL : logConfig.level;
-  const logPrefix = logConfig.prefix || "";
+      const log = {
+        [LogLevel.DEBUG]: console.log.bind(console),
+        [LogLevel.LOG]: console.log.bind(console),
+        [LogLevel.INFO]: console.info.bind(console),
+        [LogLevel.WARNING]: console.warn.bind(console),
+        [LogLevel.ERROR]: console.error.bind(console)
+      }[level];
 
-  return whenType(LogActionTypes.LOG, ({ text, level }: LogAction) => {
-    if (!(level & logLevel)) return;
 
-    const log = {
-      [LogLevel.DEBUG]: console.log.bind(console),
-      [LogLevel.LOG]: console.log.bind(console),
-      [LogLevel.INFO]: console.info.bind(console),
-      [LogLevel.WARNING]: console.warn.bind(console),
-      [LogLevel.ERROR]: console.error.bind(console)
-    }[level];
+      text = PREFIXES[level] + (prefix || "") + text;
+      text = colorize(text);
 
-    text = PREFIXES[level] + logPrefix + text;
-    text = colorize(text);
+      if (typeof window !== "undefined" && !window["$synthetic"]) {
+        return styledConsoleLog(new AnsiUp().ansi_to_html(text));
+      }
 
-    if (typeof window !== "undefined" && !window["$synthetic"]) {
-      return styledConsoleLog(new AnsiUp().ansi_to_html(text));
-    }
+      log(text);
+    };
+  };
 
-    log(text);
-  }, downstream)
+  return parallel(
+    whenStoreChanged(state => state.log || defaultState, setLogger),
+    (m) => dispatcher(m),
+    downstream
+  );
 };
