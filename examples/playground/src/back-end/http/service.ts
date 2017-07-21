@@ -1,6 +1,6 @@
 import * as http from "http";
 import * as express from "express";
-import { readAll, parallel } from "mesh";
+import { parallel } from "mesh";
 import { 
   routeTypes, 
   LOAD_APP, 
@@ -58,7 +58,7 @@ export const initHTTPServer = (upstream: Dispatcher<any>) => (downstream: Dispat
     log(logInfoAction(`starting HTTP server on port ${http.port}`));
     const expressServer = express();
     const httpServer    = expressServer.listen(http.port);
-    readAll(upstream(httpServerStartedEvent(expressServer, httpServer)));
+    return upstream(httpServerStartedEvent(expressServer, httpServer));
   };
 
   return parallel(
