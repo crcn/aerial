@@ -12,20 +12,20 @@ import {
 
 // TODO - move these over to aei
 export type TreeNodeBaseProps = {
-  getLabel: (node: TreeNode<{}>) => string,
-  collapsible?: (node: TreeNode<{}>) => boolean,
+  getLabel: (node: TreeNode<any>) => string,
+  collapsible?: (node: TreeNode<any>) => boolean,
   children?: any
 };
 
 export type TreeNodeProps = {
-  rootNode: TreeNode<{}>,
+  rootNode: TreeNode<any>,
   collapsed?: boolean,
   onLabelClick?: () => any,
-  node: TreeNode<{}>,
+  node: TreeNode<any>,
 } & TreeNodeBaseProps;
 
 export type TreeComponentProps = {
-  rootNode: TreeNode<{}>
+  rootNode: TreeNode<any>
 } & TreeNodeBaseProps;
 
 const TreeNodeComponentBase = ({ rootNode, node, getLabel, collapsed, collapsible, onLabelClick }: TreeNodeProps) => {

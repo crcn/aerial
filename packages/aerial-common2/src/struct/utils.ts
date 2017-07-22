@@ -36,7 +36,7 @@ export const idd = <UProps, VInst>(factory: (props?: UProps) => VInst, generateI
  * @param type 
  */
 
-export const createImmutableStructFactory = <T>(type: string, defaults: Partial<T>) => {
+export const createImmutableStructFactory = <T>(type: string, defaults: Partial<T> = {}) => {
   return idd(typed(type, ((props: Partial<T> = {}) => {
     return mapImmutable(defaults, props)
   }) as ((props?: Partial<T>) => ImmutableObject<T>)))

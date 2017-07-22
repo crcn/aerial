@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import { TreeNode, getTreeNodeParent, walkTree, findTreeNode } from "./tree";
 
-type TestTreeNode = TreeNode<{
+interface TestTreeNode extends TreeNode<TestTreeNode> {
   id: number
-}>;
+};
 
 describe(__filename + "#", () => {
   describe("getParentNode", () => {

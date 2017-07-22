@@ -24,14 +24,14 @@ export namespace Types {
   export const WORKSPACE         = "WORKSPACE";
   export const APPLICATION_STATE = "APPLICATION_STATE";
 }
-export type File = {
-  name: string
-} & Struct;
 
-export type Directory = TreeNode<{
-  name: string,
-  files: Array<Directory | File>[];
-}> & Struct;
+export interface File extends Struct, TreeNode<any> {
+  name: string;
+}
+
+export interface Directory extends Struct, File {
+  
+}
 
 export type Editor = { }
 
@@ -63,7 +63,8 @@ export type Workspace = {
  */
 
 export type ApplicationState = {
-  workspaces: Workspace[]
+  workspaces: Workspace[],
+  currentWorkspace?: Workspace,
 } & BaseApplicationState & ReactServiceState & Struct;
 
 /**
@@ -78,10 +79,9 @@ export const createApplicationState = createImmutableStructFactory<ApplicationSt
   workspaces: []
 });
 
-
 export const createFile             = createImmutableStructFactory<File>(Types.FILE);
 export const createDirectory        = createImmutableStructFactory<Directory>(Types.DIRECTORY, { 
-  files: [] 
+  childNodes: [] 
 });
 
 /*

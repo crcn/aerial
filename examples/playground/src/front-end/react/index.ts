@@ -1,17 +1,17 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { flowRight, identity } from "lodash";
-import { readAll, parallel } from "mesh";
-import { withContext, compose } from "recompose";
 import { Component } from "../components";
+import * as ReactDOM from "react-dom";
+import { readAll, parallel } from "mesh";
+import { flowRight, identity } from "lodash";
+import { withContext, compose } from "recompose";
 import { 
-  Dispatcher, 
-  StoreChangedEvent, 
   reader, 
   whenType, 
+  weakMemo,
+  Dispatcher, 
   STORE_CHANGED, 
   whenStoreChanged,
-  weakMemo,
+  StoreChangedEvent, 
 } from "aerial-common2";
 
 export type ReactServiceState = {
@@ -34,5 +34,5 @@ const enhanceRootComponent =  compose(
 const getEnhancedRootComponent = weakMemo((state: ReactServiceState) => enhanceRootComponent(state.mainComponentClass as any));
 
 export const initReactService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(whenStoreChanged(identity, ({ payload: state }: StoreChangedEvent<ReactServiceState>) => {
-  ReactDOM.render(React.createElement(getEnhancedRootComponent(state), { dispatch: upstream } as any), state.element);
+  ReactDOM.render(React.createElement(getEnhancedRootComponent(state), { dispatch: upstream, state } as any), state.element);
 }), downstream);

@@ -1,12 +1,12 @@
 import { weakMemo } from "../memo";
 
-export type TreeNode<TProps> = TProps & {
-  childNodes: TreeNode<TProps>[]
-};
+export interface TreeNode<TChild extends TreeNode<any>> {
+  childNodes: TChild[]
+}
 
 
-export const findTreeNode = <T>(node: TreeNode<T>, filter: (node: TreeNode<T>) => any) => {
-  let found: TreeNode<T>;
+export const findTreeNode = <TTree extends TreeNode<any>>(node: TTree, filter: (node: TTree) => any) => {
+  let found: TTree;
   walkTree(node, (node) => {
     if (filter(node)) {
       found = node;
@@ -16,7 +16,7 @@ export const findTreeNode = <T>(node: TreeNode<T>, filter: (node: TreeNode<T>) =
   return found;
 };
 
-export const getTreeNodeDepth = weakMemo(<T>(child: TreeNode<T>, root: TreeNode<T>) => {
+export const getTreeNodeDepth = weakMemo(<TTree extends TreeNode<any>>(child: TTree, root: TTree) => {
   let depth = 0;
   walkTree(root, (parent) => {
     depth++;
@@ -25,11 +25,11 @@ export const getTreeNodeDepth = weakMemo(<T>(child: TreeNode<T>, root: TreeNode<
     }
   });
   return depth;
-}) as <T>(child: TreeNode<T>, root: TreeNode<T>) => number;
+}) as <TTree extends TreeNode<any>>(child: TTree, root: TTree) => number;
 
-export const getTreeNodeParent = weakMemo(<T>(child: TreeNode<T>, root: TreeNode<T>) => findTreeNode(root, (node) => node.childNodes.indexOf(child) !== -1)) as <T>(child: TreeNode<T>, root: TreeNode<T>) => TreeNode<T>;
+export const getTreeNodeParent = weakMemo(<TTree extends TreeNode<any>>(child: TTree, root: TTree) => findTreeNode(root, (node) => node.childNodes.indexOf(child) !== -1)) as <TTree extends TreeNode<any>>(child: TTree, root: TTree) => TTree;
 
-export const walkTree = <T>(node: TreeNode<T>, eachNode: (node: TreeNode<T>) => void | boolean) => {
+export const walkTree = <TTree extends TreeNode<any>>(node: TTree, eachNode: (node: TTree) => void | boolean) => {
   if (eachNode(node) !== false) {
     node.childNodes.forEach(node => walkTree(node, eachNode));
   }

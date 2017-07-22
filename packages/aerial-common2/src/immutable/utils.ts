@@ -6,7 +6,7 @@ export function immutable<T extends T[]>(value: T[]): ImmutableArray<T>;
 export function immutable<T extends Object>(value: T): ImmutableObject<T>;
 
 export function immutable(value) {
-  if (value.$$immutable) return value;
+  if (!value || value.$$immutable) return value;
   return Array.isArray(value) ? 
     new ImmutableArray(...value.map(immutable)) : 
       value != null && value.constructor === Object ?
