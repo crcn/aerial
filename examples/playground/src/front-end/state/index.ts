@@ -27,6 +27,7 @@ export namespace Types {
 
 export interface File extends Struct, TreeNode<any> {
   name: string;
+  content?: string;
 }
 
 export interface Directory extends Struct, File {
@@ -36,6 +37,11 @@ export interface Directory extends Struct, File {
 export type Editor = { }
 
 export type Workspace = {
+
+  /**
+   */
+
+  selectedFile?: File;
 
   /**
    * directory to the source files of this
@@ -64,7 +70,7 @@ export type Workspace = {
 
 export type ApplicationState = {
   workspaces: Workspace[],
-  currentWorkspace?: Workspace,
+  selectedWorkspace?: Workspace
 } & BaseApplicationState & ReactServiceState & Struct;
 
 /**

@@ -11,12 +11,13 @@ import {
 
 window.onload = () => {
   readAll(initApplication(createApplicationState({
-    currentWorkspace: createWorkspace({
+    selectedWorkspace: createWorkspace({
       sourceFilesDirectory: createDirectory({
         name: "/",
         childNodes: [
           createFile({
             name: "index.html",
+            content: "HTML",
             childNodes: []
           }),
           createDirectory({
@@ -24,6 +25,7 @@ window.onload = () => {
             childNodes: [
               createFile({
                 name: "main.js",
+                content: "JS",
                 childNodes: []
               })
             ]
@@ -33,6 +35,7 @@ window.onload = () => {
             childNodes: [
               createFile({
                 name: "main.css",
+                content: "CSS",
                 childNodes: []
               })
             ]

@@ -1,7 +1,8 @@
 import "./index.scss";
 
 import * as React from "react";
-import { TreeNode, getTreeNodeDepth } from "aerial-common2";
+import { readAll } from "mesh";
+import { TreeNode, getTreeNodeDepth, Dispatcher, Event } from "aerial-common2";
 import { 
   pure, 
   compose, 
@@ -9,6 +10,13 @@ import {
   defaultProps, 
   withHandlers, 
 } from "recompose";
+
+export const TREE_NODE_LABEL_CLICKED = "TREE_NODE_LABE_CLICKED";
+export type TreeNodeLabelClickedEvent = {
+  node: TreeNode<any>
+} & Event;
+
+export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClickedEvent => ({ type: TREE_NODE_LABEL_CLICKED, node });
 
 // TODO - move these over to aei
 export type TreeNodeBaseProps = {
@@ -18,6 +26,7 @@ export type TreeNodeBaseProps = {
 };
 
 export type TreeNodeProps = {
+  dispatch: Dispatcher<any>,
   rootNode: TreeNode<any>,
   collapsed?: boolean,
   onLabelClick?: () => any,
@@ -25,22 +34,23 @@ export type TreeNodeProps = {
 } & TreeNodeBaseProps;
 
 export type TreeComponentProps = {
+  dispatch: Dispatcher<any>,
   rootNode: TreeNode<any>
 } & TreeNodeBaseProps;
 
-const TreeNodeComponentBase = ({ rootNode, node, getLabel, collapsed, collapsible, onLabelClick }: TreeNodeProps) => {
+const TreeNodeComponentBase = ({ rootNode, node, getLabel, collapsed, collapsible, onLabelClick, dispatch }: TreeNodeProps) => {
   const isCollapsible = collapsible(node);
 
  return <div className="tree-node">
     <div className="tree-node-label" onClick={onLabelClick} style={{
-      cursor: isCollapsible ? "pointer" : "default",
+      cursor: "pointer",
       paddingLeft: (getTreeNodeDepth(node, rootNode) - 1) * 2
     }}>
       { getLabel(node) }
     </div>
     <div className="tree-node-children">
       {
-        collapsed ? null : node.childNodes.map((child, i) => <TreeNodeComponent key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} />)
+        collapsed ? null : node.childNodes.map((child, i) => <TreeNodeComponent key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} dispatch={dispatch} />)
       }
     </div>
   </div>
@@ -50,15 +60,20 @@ const TreeNodeComponent = compose(
   pure,
   withState("collapsed", "setCollapsed", () => false),
   withHandlers({
-    onLabelClick: ({ node, collapsed, collapsible, setCollapsed }) => () => {
-      collapsible(node) && setCollapsed(!collapsed);
+    onLabelClick: ({ dispatch, node, collapsed, collapsible, setCollapsed }) => () => {
+      if (collapsible(node)) {
+        setCollapsed(!collapsed);
+      }
+      if (dispatch) {
+        readAll(dispatch(treeNodeLabelClicked(node)));
+      }
     }
   })
 )(TreeNodeComponentBase) as any as (props: TreeNodeProps) => React.Component<TreeNodeProps>;
 
-export const TreeComponentBase = ({ rootNode, getLabel, collapsible }: TreeNodeProps) => <div className="tree-component">
+export const TreeComponentBase = ({ rootNode, getLabel, collapsible, dispatch }: TreeNodeProps) => <div className="tree-component">
   {
-    rootNode.childNodes.map((child, i) => <TreeNodeComponent key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} />)
+    rootNode.childNodes.map((child, i) => <TreeNodeComponent key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} dispatch={dispatch} />)
   }
 </div>;
 
