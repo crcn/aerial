@@ -1,6 +1,8 @@
 import {
   Struct,
   TreeNode,
+  getPathById,
+  getValueById,
   ImmutableArray, 
   ImmutableObject,
   BaseApplicationState,
@@ -30,6 +32,8 @@ export interface File extends Struct, TreeNode<any> {
   content?: string;
 }
 
+export const getFileExtension = (file: File) => file.name.split(".").pop();
+
 export interface Directory extends Struct, File {
   
 }
@@ -41,7 +45,7 @@ export type Workspace = {
   /**
    */
 
-  selectedFile?: File;
+  selectedFileId?: string;
 
   /**
    * directory to the source files of this
@@ -64,14 +68,19 @@ export type Workspace = {
 
 } & Struct;
 
+export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
+
 /**
  * entire application state
  */
 
 export type ApplicationState = {
   workspaces: Workspace[],
-  selectedWorkspace?: Workspace
+  selectedWorkspaceId?: string
 } & BaseApplicationState & ReactServiceState & Struct;
+
+export const getSelectedWorkspace = (state: ApplicationState): Workspace => state.selectedWorkspaceId && getValueById(state, state.selectedWorkspaceId);
+export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById(state, state.selectedWorkspaceId);
 
 /**
  * Factories

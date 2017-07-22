@@ -9,41 +9,69 @@ import {
   createApplicationState, 
 } from "./index";
 
-window.onload = () => {
-  readAll(initApplication(createApplicationState({
-    selectedWorkspace: createWorkspace({
-      sourceFilesDirectory: createDirectory({
-        name: "/",
+const HTML_CONTENT = 
+`
+<html>
+  <head>
+  </head>
+  <body>
+    <div id="application"></div>
+    <script type="text/javascript" src="js/main.js"></script>
+  </body>
+</html>
+`.trim();
+
+const JS_CONTENT = 
+`
+console.log("Hello!");
+`.trim();
+
+const CSS_CONTENT = 
+`
+html, body {
+  margin: 0;
+  padding: 0;
+}
+`.trim();
+
+const workspace = createWorkspace({
+  sourceFilesDirectory: createDirectory({
+    name: "/",
+    childNodes: [
+      createFile({
+        name: "index.html",
+        content: HTML_CONTENT,
+        childNodes: []
+      }),
+      createDirectory({
+        name: "js",
         childNodes: [
           createFile({
-            name: "index.html",
-            content: "HTML",
+            name: "main.js",
+            content: JS_CONTENT,
             childNodes: []
-          }),
-          createDirectory({
-            name: "js",
-            childNodes: [
-              createFile({
-                name: "main.js",
-                content: "JS",
-                childNodes: []
-              })
-            ]
-          }),
-          createDirectory({
-            name: "css",
-            childNodes: [
-              createFile({
-                name: "main.css",
-                content: "CSS",
-                childNodes: []
-              })
-            ]
           })
         ]
       }),
-      browser: undefined
-    }),
+      createDirectory({
+        name: "css",
+        childNodes: [
+          createFile({
+            name: "main.css",
+            content: CSS_CONTENT,
+            childNodes: []
+          })
+        ]
+      })
+    ]
+  }),
+  browser: undefined
+});
+
+window.onload = () => {
+  readAll(initApplication(createApplicationState({
+    selectedWorkspaceId: workspace.$$id,
+    workspaces: [workspace],
     element: document.querySelector("#application") as HTMLElement,
     log: {
       level: LogLevel.VERBOSE

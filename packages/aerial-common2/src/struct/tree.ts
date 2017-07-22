@@ -1,9 +1,9 @@
 import { weakMemo } from "../memo";
+import { IDd } from "./utils";
 
-export interface TreeNode<TChild extends TreeNode<any>> {
+export interface TreeNode<TChild extends TreeNode<any>> extends IDd {
   childNodes: TChild[]
 }
-
 
 export const findTreeNode = <TTree extends TreeNode<any>>(node: TTree, filter: (node: TTree) => any) => {
   let found: TTree;

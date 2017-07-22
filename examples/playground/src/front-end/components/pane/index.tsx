@@ -9,12 +9,13 @@ const enhancePaneComponent = pure;
 
 export type PaneComponentProps = {
   title: string | Component<any>,
+  controls?: any,
   children: any
 }
 
-export const PaneComponentBase = ({ title, children }: PaneComponentProps) => <div className="pane-component">
+export const PaneComponentBase = ({ title, controls, children }: PaneComponentProps) => <div className="pane-component">
   <div className="pane-header">
-    { title }
+    { title } <span className="pane-header-controls">{ controls }</span>
   </div>
   <div className="pane-body">
     { children }

@@ -3,13 +3,13 @@ import { Selector } from "reselect";
 import { createStore, Reducer, Store } from "redux";
 import { mutable, immutable, ImmutableObject } from "../immutable";
 import { parallel, readAll, proxy, createDeferredPromise, when } from "mesh";
-import { Dispatcher, DispatcherContextIdentity, Message, whenNotType, Event } from "../bus";
+import { Dispatcher, DispatcherContextIdentity, Message, whenNotType, BaseEvent } from "../bus";
 
 export const STORE_CHANGED = "STORE_CHANGED";
 
 export type StoreChangedEvent<TState> = {
   payload: TState
-} & Event;
+} & BaseEvent;
 
 export const storeChangedEvent = <TState>(state: TState): StoreChangedEvent<TState> => ({ type: STORE_CHANGED, payload: state });
 

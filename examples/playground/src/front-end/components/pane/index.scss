@@ -5,6 +5,9 @@
 
   .pane-header {
     padding: $padding-base * 4 $padding-base * 8;
+    .pane-header-controls {
+      float: right;
+    }
   }
   .pane-body {
     padding: $padding-base * 4 $padding-base * 8;

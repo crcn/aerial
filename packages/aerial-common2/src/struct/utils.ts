@@ -1,6 +1,9 @@
 import { 
+  getPath,
+  updateIn,
   immutable,
   mapImmutable,
+  getValueByPath,
   ImmutableObject,
 } from "../immutable";
 
@@ -31,6 +34,21 @@ export const idd = <UProps, VInst>(factory: (props?: UProps) => VInst, generateI
      return immutable({ ...factory(props) as any, $$id: generateDefaultId(props) });
    }
 };
+
+/**
+ */
+
+export const getPathById = (root: any, id: string) => getPath(root, (value: IDd) => value && value.$$id === id);
+
+/**
+ */
+
+export const getValueById = (root: any, id: string) => getValueByPath(root, getPathById(root, id));
+
+/**
+ */
+
+export const updateStruct = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct, key: K, value: any) => updateIn(root, [...getPathById(root, struct.$$id), key], value);
 
 /**
  * @param type 

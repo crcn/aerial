@@ -2,8 +2,8 @@ import "./index.scss";
 import * as React from "react";
 import { pure } from "recompose";
 import { WorkspaceComponent } from "./workspace";
-import { ImmutableObject, Dispatcher } from "aerial-common2";
-import { Workspace, ApplicationState } from "../../state";
+import { ImmutableObject, Dispatcher, getValueById } from "aerial-common2";
+import { Workspace, ApplicationState, getSelectedWorkspace } from "../../state";
 
 export type MainComponentProps = {
   dispatch: Dispatcher<any>
@@ -11,7 +11,7 @@ export type MainComponentProps = {
 };
 
 export const MainComponentBase = ({ state, dispatch }: MainComponentProps) => <div className="main-component">
-  <WorkspaceComponent workspace={state.selectedWorkspace} dispatch={dispatch} />
+  <WorkspaceComponent workspace={getSelectedWorkspace(state)} dispatch={dispatch} />
 </div>;
 
 export const MainComponent = pure(MainComponentBase as any) as typeof MainComponentBase;

@@ -2,24 +2,24 @@ import * as http from "http";
 import * as express from "express";
 import { parallel } from "mesh";
 import { 
-  routeTypes, 
-  LOAD_APP, 
-  Dispatcher, 
-  Event, 
-  ImmutableObject,
-  Message, 
-  initStoreService,
-  immutable,
   logger, 
-  StoreChangedEvent,
+  Message, 
+  LOAD_APP, 
+  BaseEvent, 
+  immutable,
+  Dispatcher, 
+  routeTypes, 
   logInfoAction,
+  ImmutableObject,
   whenStoreChanged,
+  initStoreService,
+  StoreChangedEvent,
 } from "aerial-common2";
 
 export type HTTPServerStartedEvent = {
   httpServer: http.Server,
   expressServer: express.Express,
-} & Event;
+} & BaseEvent;
 
 export type HTTPServerState = {
   http: {
@@ -37,7 +37,7 @@ export const httpServerStartedEvent = (expressServer: express.Express, httpServe
   httpServer,
 });
 
-export const httpServerReducer = (state: HTTPServerState, event: Event) => {
+export const httpServerReducer = (state: HTTPServerState, event: BaseEvent) => {
   switch(event.type) {
     case HTTP_SERVER_STARTED: return immutable({
       ...state,
