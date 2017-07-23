@@ -1,6 +1,6 @@
 import { values } from "lodash";
 import { CoreEvent, MutationEvent } from "aerial-common";
-import { CallbackBus, IBus } from "mesh";
+import { CallbackBus, IBus } from "mesh7";
 import { SyntheticRendererEvent, DOMNodeEvent } from "../messages";
 
 import {

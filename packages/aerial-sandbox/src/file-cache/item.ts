@@ -1,5 +1,5 @@
 import memoize =  require("memoizee");
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 import { btoa, atob } from "abab"
 import { URIProtocolProvider, URIProtocol, IURIProtocolReadResult  } from "../uri";
 

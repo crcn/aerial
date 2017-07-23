@@ -1,7 +1,7 @@
 import { IObservable } from "./base";
 import { Observable } from "./core";
 import { IDisposable } from "../object";
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 import { PropertyMutation, MutationEvent, CoreEvent } from "../messages";
 
 export type propertyChangeCallbackType = (newValue: any, oldValue: any) => void;

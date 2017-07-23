@@ -23,10 +23,13 @@ export type DownstreamDispatchFactory<TState> = (currentState: TState, upstream:
 
 export const whenStoreChanged = (selector: Selector<any, any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => {
   let currentState;
+  let initialized;
   return when((event: StoreChangedEvent<any>) => {
     if (event.type === STORE_CHANGED) {
       const newState = selector(event.payload);
-      if (newState !== currentState) {
+      console.log(initialized);
+      if (newState !== currentState || !initialized) {
+        initialized = true;
         currentState = newState;
         return true;
       }

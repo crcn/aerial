@@ -12,7 +12,7 @@ import {
   CallbackBus, 
   IStreamableBus, 
   ReadableStreamDefaultReader, 
-} from "mesh";
+} from "mesh7";
 import {
   fork,
   Logger,

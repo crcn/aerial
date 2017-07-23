@@ -1,6 +1,6 @@
 import { CoreEvent } from "../messages";
 import { IObservable } from "./base";
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 
 // TODO - change "notify" to "dispatch"
 export class Observable implements IObservable {

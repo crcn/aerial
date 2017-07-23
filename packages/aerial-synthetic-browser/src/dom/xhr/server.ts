@@ -1,6 +1,6 @@
 import { SyntheticWindow } from "../window";
 import { URIProtocolProvider } from "aerial-sandbox";
-import { IStreamableBus, DuplexStream } from "mesh";
+import { IStreamableBus, DuplexStream } from "mesh7";
 import { inject, Kernel, KernelProvider, loggable, Logger } from "aerial-common";
 import { IHTTPHeaders, HTTPRequest, HTTPResponse, HTTPStatusType } from "./messages";
 

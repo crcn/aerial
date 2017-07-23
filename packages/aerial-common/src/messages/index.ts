@@ -1,5 +1,5 @@
 import { CoreEvent } from "./base";
-import { IBus, IStreamableBus, DuplexStream, readOneChunk } from "mesh";
+import { IBus, IStreamableBus, DuplexStream, readOneChunk } from "mesh7";
 
 export * from "./base";
 export * from "./core";

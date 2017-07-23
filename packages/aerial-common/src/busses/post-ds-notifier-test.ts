@@ -1,7 +1,7 @@
-// import { IBus } from "mesh";
+// import { IBus } from "mesh7";
 // import { expect } from "chai";
-// import { CallbackBus, MemoryDataStore, DSFindRequest, DSUpdateRequest, DSInsertRequest, DSRemoveRequest } from "mesh";
-// import { CallbackBus, MemoryDataStore, DSFindRequest, DSUpdateRequest, DSInsertRequest, DSRemoveRequest } from "mesh-ds";
+// import { CallbackBus, MemoryDataStore, DSFindRequest, DSUpdateRequest, DSInsertRequest, DSRemoveRequest } from "mesh7";
+// import { CallbackBus, MemoryDataStore, DSFindRequest, DSUpdateRequest, DSInsertRequest, DSRemoveRequest } from "mesh-ds7";
 // import { PostDsNotifierBus } from "./post-ds-notifier";
 // import {
 //   PostDSMessage,

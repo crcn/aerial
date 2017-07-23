@@ -1,5 +1,5 @@
 
-import { SequenceBus } from "mesh";
+import { SequenceBus } from "mesh7";
 import { ApplicationServiceProvider } from "./providers";
 import { LoadApplicationRequest, InitializeApplicationRequest, ApplicationReadyMessage } from "../messages";
 import {

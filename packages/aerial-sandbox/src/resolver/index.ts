@@ -4,7 +4,7 @@ import fs =  require("fs");
 import memoize =  require("memoizee");
 
 import { IFileResolver } from "../resolver";
-import { IBus, readOneChunk } from "mesh";
+import { IBus, readOneChunk } from "mesh7";
 import {
   inject,
   Logger,

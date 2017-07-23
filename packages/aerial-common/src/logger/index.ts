@@ -1,4 +1,4 @@
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 import { LogLevel } from "./levels";
 import { CoreEvent } from "../messages";
 

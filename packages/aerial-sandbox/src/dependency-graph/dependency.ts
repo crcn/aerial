@@ -19,7 +19,7 @@ import {
 
 
 
-import { CallbackBus, IBus } from "mesh";
+import { CallbackBus, IBus } from "mesh7";
 
 import {
   inject,

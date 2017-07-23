@@ -16,7 +16,7 @@ import {
   FileCacheProvider,
 } from "../providers";
 
-import { CallbackBus, IBus } from "mesh";
+import { CallbackBus, IBus } from "mesh7";
 
 import {
   CoreEvent,

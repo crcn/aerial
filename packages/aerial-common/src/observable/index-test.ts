@@ -1,7 +1,7 @@
 import { CoreEvent } from "../messages";
 import { Observable } from "./index";
 import { expect } from "chai";
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 
 describe(__filename + "#", () => {
   it("can be created", () => {

@@ -1,4 +1,4 @@
-import { IStreamableBus, IBus } from "mesh";
+import { IStreamableBus, IBus } from "mesh7";
 
 export interface IBrokerBus extends IStreamableBus<any> {
   actors: Array<IBus<any, any>>;

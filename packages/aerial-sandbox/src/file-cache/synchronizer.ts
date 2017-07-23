@@ -1,5 +1,5 @@
 import { FileCache } from "./file-cache";
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 import { IURIWatcher, URIProtocolProvider } from "../uri";
 import { IBrokerBus, diffArray, inject, loggable, Logger, Kernel, KernelProvider } from "aerial-common";
 

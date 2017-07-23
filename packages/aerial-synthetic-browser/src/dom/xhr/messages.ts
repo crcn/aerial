@@ -1,4 +1,4 @@
-import { IMessage } from "mesh";
+import { IMessage } from "mesh7";
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
 export interface IHTTPHeaders {

@@ -3,7 +3,7 @@ import { ICommand } from "../commands";
 import {Observable } from "../observable";
 import { CoreEvent } from "../messages";
 import { ITyped, INamed } from "../object";
-import { IBus, IMessage } from "mesh";
+import { IBus, IMessage } from "mesh7";
 
 import {
   IFactory,

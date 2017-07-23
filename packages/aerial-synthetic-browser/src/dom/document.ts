@@ -1,4 +1,4 @@
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 import { SyntheticWindow, SyntheticDOMImplementation } from "./window";
 import { ISyntheticBrowser } from "../browser";
 import { SyntheticLocation } from "../location";

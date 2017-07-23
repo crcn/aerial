@@ -1,6 +1,6 @@
 import net =  require("net");
 import { ISerializer } from "..";
-import { IBus, IMessageTester, IStreamableBus, RemoteBus, RemoteBusMessageTester, DuplexStream, TransformStream } from "mesh";
+import { IBus, IMessageTester, IStreamableBus, RemoteBus, RemoteBusMessageTester, DuplexStream, TransformStream } from "mesh7";
 
 // Important that the boundary is computed is to prevent the case where the boundary is part of the payload. This
 // has happened with Tandem since the app is used to build itself.

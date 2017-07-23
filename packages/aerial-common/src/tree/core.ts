@@ -1,7 +1,7 @@
 import { ITreeNode } from "./base";
 import { ITreeWalker, IWalkable } from "./walker";
 import { Observable, IObservable } from "../observable";
-import { CallbackBus, IBus } from "mesh";
+import { CallbackBus, IBus } from "mesh7";
 import { CoreEvent, Mutation, InsertChildMutation, RemoveChildMutation } from "../messages";
 
 export { ITreeNode };

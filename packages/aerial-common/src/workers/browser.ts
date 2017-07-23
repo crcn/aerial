@@ -1,4 +1,4 @@
-import { IBus, RemoteBus, filterFamilyMessage } from "mesh";
+import { IBus, RemoteBus, filterFamilyMessage } from "mesh7";
 import { serialize, deserialize } from "../serialize";
 import { CoreEvent } from "../messages";
 

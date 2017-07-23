@@ -3,7 +3,7 @@ import { CoreEvent } from "./base";
 import { ITreeNode } from "../tree";
 import { IDisposable } from "../object";
 import { serializable, ISerializer } from "../serialize";
-import {  DSFindRequest, DSInsertRequest, DSRemoveRequest, DSUpdateRequest, DSMessage } from "mesh-ds";
+import {  DSFindRequest, DSInsertRequest, DSRemoveRequest, DSUpdateRequest, DSMessage } from "mesh-ds7";
 
 export class Message {
   constructor(readonly type: string) {

@@ -11,8 +11,8 @@ import { 
   KernelProvider,
   PrivateBusProvider,
 } from "aerial-common";
-import { ReadableStream } from "mesh";
-import { MemoryDataStore } from "mesh-memory-ds";
+import { ReadableStream } from "mesh7";
+import { MemoryDataStore } from "mesh-memory-ds7";
 import { createJavaScriptSandboxProviders } from "aerial-commonjs-extension";
 
 import {

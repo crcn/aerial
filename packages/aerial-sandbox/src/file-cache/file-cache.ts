@@ -12,8 +12,8 @@ import {
   ActiveRecordCollection,
 } from "aerial-common";
 
-import { DSFindRequest } from "mesh-ds";
-import { WritableStream } from "mesh";
+import { DSFindRequest } from "mesh-ds7";
+import { WritableStream } from "mesh7";
 
 import { FileCacheItem, IFileCacheItemData } from "./item";
 

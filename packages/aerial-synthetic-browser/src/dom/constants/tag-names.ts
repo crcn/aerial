@@ -313,7 +313,7 @@ export const SVG_TAG_NAMES = [
   "listener",
   "marker",
   "mask",
-  "mesh",
+  "mesh7",
   "meshpatch",
   "meshrow",
   "metadata",

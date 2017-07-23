@@ -1,6 +1,6 @@
 import fs =  require("fs");
 import { URIProtocol, IURIProtocolReadResult } from "../uri";
-import { ReadableStream } from "mesh";
+import { ReadableStream } from "mesh7";
 import { 
   inject, 
   Kernel, 

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { SequenceBus, CallbackBus, DuplexStream } from "mesh";
+import { SequenceBus, CallbackBus, DuplexStream } from "mesh7";
 import { 
   IHTTPHeaders,
   HTTPResponse,

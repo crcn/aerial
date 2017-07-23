@@ -20,6 +20,8 @@ import {
   FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
 } from "../components";
 
+console.log("OK");
+
 export const initMainDispatcher = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(
   workspaceDispatcher(upstream),
   filesDispatcher(upstream),
@@ -39,12 +41,17 @@ const filesDispatcher = (upstream: Dispatcher<any>) => routeTypes({
 });
 
 const workspaceDispatcher = (upstream: Dispatcher<any>) => parallel(
+  (message) => {
+    console.log(message);
+  },
   whenStoreChanged((state: ApplicationState) => state.selectedWorkspaceId, async ({ payload: state }: StoreChangedEvent<ApplicationState>) => {
+
     const kernel = new Kernel(
       // new FileCacheProvider()
     );
-    // const browser = new SyntheticBrowser(kernel);
-    // console.log("OKK");
+    const browser = new SyntheticBrowser(kernel);
+    console.log("OKK");
+
     // await browser.open({
     //   uri: "file://index.html"
     // });

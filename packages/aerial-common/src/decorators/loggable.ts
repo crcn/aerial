@@ -1,6 +1,6 @@
 import { inject } from "../decorators";
 import { Logger } from "../logger";
-import { noopBusInstance } from "mesh";
+import { noopBusInstance } from "mesh7";
 import { PrivateBusProvider } from "../ioc";
 
 

@@ -8,7 +8,7 @@ import {
   TransformStream,
   FanoutBusTargetsParamType,
   IMessageTester
-} from "mesh";
+} from "mesh7";
 
 /**
  * @deprecated apps should never directly register listeners to a main bus. Instead they should interface

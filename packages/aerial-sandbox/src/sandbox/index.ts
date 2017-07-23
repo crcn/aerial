@@ -1,5 +1,5 @@
 import vm =  require("vm");
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 import { SandboxModuleEvaluatorFactoryProvider } from "./providers";
 
 import {

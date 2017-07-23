@@ -3,7 +3,7 @@ import {
   Kernel,
   ClassFactoryProvider,
 } from "../ioc";
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 
 export class ApplicationServiceProvider<T extends  IBus<any, any>> extends ClassFactoryProvider {
 

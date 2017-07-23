@@ -1,5 +1,5 @@
 import { inject, loggable } from "../decorators";
-import { IBus, IMessage } from "mesh";
+import { IBus, IMessage } from "mesh7";
 import { IBrokerBus } from "../busses";
 import {
   Kernel,

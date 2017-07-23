@@ -19,7 +19,7 @@ import { 
   readOneChunk,
   ReadableStream,
   WritableStream,
-} from "mesh";
+} from "mesh7";
 
 import { IURIProtocolReadResult } from "../uri";
 

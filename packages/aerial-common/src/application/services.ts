@@ -2,7 +2,7 @@ import { Logger } from "../logger";
 import { IBrokerBus } from "../busses";
 import { loggable, inject } from "../decorators";
 import { ApplicationConfigurationProvider } from "./providers";
-import {  IBus, IMessageTester, IMessage } from "mesh";
+import {  IBus, IMessageTester, IMessage } from "mesh7";
 import { Kernel, IInjectable, KernelProvider,  PrivateBusProvider } from "../ioc";
 
 /**

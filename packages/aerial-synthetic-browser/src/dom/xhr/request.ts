@@ -1,6 +1,6 @@
 import { Observable, bindable } from "aerial-common";
 import { bindDOMEventMethods } from "../utils";
-import { IStreamableBus, IMessage, WritableStream, ReadableStream } from "mesh";
+import { IStreamableBus, IMessage, WritableStream, ReadableStream } from "mesh7";
 import { HTTPRequest, HTTPResponse, IHTTPHeaders, HTTPStatusType } from "./messages";
 
 import {

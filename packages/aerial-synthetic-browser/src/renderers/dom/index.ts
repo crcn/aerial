@@ -2,7 +2,7 @@ import assert = require("assert");
 import { decode } from "ent";
 import { camelCase } from "lodash";
 import { BaseRenderer } from "../base";
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 import {
   HTML_XMLNS,
   SVG_XMLNS,

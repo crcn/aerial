@@ -3,7 +3,7 @@ import { IObservable } from "../observable";
 import { ArrayCollection } from "../array-collection";
 import { BubbleDispatcher } from "../busses";
 import { CoreEvent, MetadataChangeEvent } from "../messages";
-import { CallbackBus, IBus } from "mesh";
+import { CallbackBus, IBus } from "mesh7";
 import { ArrayMutation, ArrayInsertMutation, ArrayRemoveMutation, ArrayUpdateMutation } from "../utils";
 
 export class ObservableCollection<T> extends ArrayCollection<T> implements IObservable {

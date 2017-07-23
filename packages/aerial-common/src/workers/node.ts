@@ -9,7 +9,7 @@ import {
   FilterBus, 
   noopBusInstance,
   filterFamilyMessage, 
-} from "mesh";
+} from "mesh7";
 
 export { isMaster };
 

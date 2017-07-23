@@ -1,7 +1,7 @@
 import vm =  require("vm");
 import Url = require("url");
 import path = require("path");
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 import { SyntheticLocation } from "./location";
 import { SyntheticRendererEvent } from "./messages";
 import { SyntheticDocument, SyntheticWindow, SyntheticDOMNode, SyntheticDOMElement } from "./dom";
@@ -50,7 +50,7 @@ import {
   SyntheticDOMElementClassProvider,
 } from "./providers";
 
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 
 export interface ISyntheticBrowserOpenOptions {
 

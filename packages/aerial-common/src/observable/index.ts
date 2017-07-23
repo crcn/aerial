@@ -1,6 +1,6 @@
 import { CoreEvent } from "../messages";
 import { IObservable } from "./base";
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 
 export { IObservable };
 

@@ -81,13 +81,13 @@ export function updateIn(target: any, path: string[], value: any) {
   let current = newTarget;
   let i = 0, n = path.length - 1;
   for (; i < n; i++) {
-    current = current[path[i]] = shallowClone(current[path[i]]);
+    current = current[path[i]] = shallowClone(current[path[i]]) || {};
   }
   current[path[i]] = value;
   return newTarget;
 };
 
-export function flattenObject(target: any) {
+export const flattenObject = weakMemo((target: any) => {
   const keys = new Map();
   const flattened = {};
   traverseObject(target, (value, key, object) => {
@@ -97,7 +97,7 @@ export function flattenObject(target: any) {
     keys.set(value, path);
   });
   return flattened;
-}
+});
 
 export const getPath = weakMemo(<T>(root: any, filter: (a: any) => boolean) => {
   const flattened = flattenObject(root);

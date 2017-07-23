@@ -18,7 +18,7 @@ import { SyntheticDOMElement, DOMNodeType } from "./markup";
 import { SyntheticXMLHttpRequest, XHRServer } from "./xhr";
 import { SyntheticCSSStyle, SyntheticCSSElementStyleRule } from "./css";
 import { Logger, LogEvent, Observable, PrivateBusProvider, PropertyWatcher, MutationEvent } from "aerial-common";
-import { noopBusInstance, IStreamableBus, CallbackBus } from "mesh";
+import { noopBusInstance, IStreamableBus, CallbackBus } from "mesh7";
 import { 
   DOMEventTypes,
   IDOMEventEmitter,

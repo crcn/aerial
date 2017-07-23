@@ -1,6 +1,6 @@
 import { Dependency } from "aerial-sandbox";
 import { kebabCase } from "lodash";
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 import { SyntheticDOMElement } from "../markup";
 import { getSelectorTester } from "../selector";
 import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor } from "aerial-sandbox";

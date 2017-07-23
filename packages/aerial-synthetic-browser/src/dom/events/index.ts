@@ -1,4 +1,4 @@
-import { IMessage, IBus } from "mesh";
+import { IMessage, IBus } from "mesh7";
 import { CoreEvent, Observable, serializable } from "aerial-common";
 import { SyntheticDOMNode } from "../markup";
 

@@ -1,4 +1,4 @@
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 import { throttle, Cancelable } from "lodash";
 import { getSelectorTester, ISelectorTester } from "./tester";
 import { SyntheticDOMNode, SyntheticDOMElement, SyntheticDOMContainer, DOMNodeType } from "../markup";
@@ -22,7 +22,7 @@ import {
 } from "aerial-common";
 
 
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 
 export interface IDOMTreeWalker extends ITreeWalker {
   stop();

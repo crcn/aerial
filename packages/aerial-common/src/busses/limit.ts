@@ -1,5 +1,5 @@
 import { CoreEvent } from "../messages";
-import { IBus, IStreamableBus, DuplexStream, ReadableStream, WritableStream } from "mesh";
+import { IBus, IStreamableBus, DuplexStream, ReadableStream, WritableStream } from "mesh7";
 
 
 // TODO - remove me - use LimitBus from mesh instead

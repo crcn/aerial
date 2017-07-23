@@ -2,7 +2,7 @@ import sift from "sift";
 import { SyntheticCSSObject } from "./base";
 import { kebabCase, camelCase } from "lodash";
 import { SyntheticDOMNode } from "../../dom/markup";
-import { CallbackBus } from "mesh";
+import { CallbackBus } from "mesh7";
 import { SyntheticCSSElementStyleRuleMutationTypes } from "./style-rule";
 import { ISerializable, serializable, diffArray, ITreeWalker, PropertyMutation, serialize, deserialize } from "aerial-common";
 import { IContentEdit , ISyntheticObject, generateSyntheticUID, IEditable, BaseContentEdit } from "aerial-sandbox";

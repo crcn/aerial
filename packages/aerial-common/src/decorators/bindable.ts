@@ -1,4 +1,4 @@
-import { CallbackBus, IBus } from "mesh";
+import { CallbackBus, IBus } from "mesh7";
 import { IObservable, Observable } from "../observable";
 import { CoreEvent, PropertyMutation } from "../messages";
 

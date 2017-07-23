@@ -1,5 +1,5 @@
 import sift from 'sift';
-import { IBus } from "mesh";
+import { IBus } from "mesh7";
 import { inject } from "../decorators";
 import { isMaster } from "../workers";
 import { IBrokerBus } from "../busses";
@@ -13,12 +13,12 @@ import {
   readOneChunk,
   readAllChunks,
   CallbackBus,
-} from "mesh";
+} from "mesh7";
 import {
   DSFindRequest,
   DSUpdateRequest,
   DSInsertRequest 
-} from "mesh-ds";
+} from "mesh-ds7";
 
 // TODO - remove global listener
 // TODO - listen to DS mediator for updates on record collection

@@ -1,7 +1,7 @@
 import { flatten } from "lodash";
 import { FileCache } from "../file-cache";
-import { IBus } from "mesh";
-import { CallbackBus } from "mesh";
+import { IBus } from "mesh7";
+import { CallbackBus } from "mesh7";
 import { FileCacheProvider, ContentEditorFactoryProvider, ProtocolURLResolverProvider } from "../providers";
 import { URIProtocol, URIProtocolProvider } from "../uri";
 import { ISyntheticObject, ISyntheticSourceInfo, syntheticSourceInfoEquals } from "../synthetic";

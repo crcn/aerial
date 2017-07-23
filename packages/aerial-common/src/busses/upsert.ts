@@ -1,5 +1,5 @@
 import sift = require("sift");
-import { DuplexStream, IBus, IStreamableBus, readOneChunk } from "mesh";
+import { DuplexStream, IBus, IStreamableBus, readOneChunk } from "mesh7";
 
 export class UpsertBus implements IStreamableBus<any> {
   constructor(private _child: IStreamableBus<any>) {
