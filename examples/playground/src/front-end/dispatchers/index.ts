@@ -41,9 +41,6 @@ const filesDispatcher = (upstream: Dispatcher<any>) => routeTypes({
 });
 
 const workspaceDispatcher = (upstream: Dispatcher<any>) => parallel(
-  (message) => {
-    console.log(message);
-  },
   whenStoreChanged((state: ApplicationState) => state.selectedWorkspaceId, async ({ payload: state }: StoreChangedEvent<ApplicationState>) => {
 
     const kernel = new Kernel(

@@ -27,7 +27,6 @@ export const whenStoreChanged = (selector: Selector<any, any>, _then: Dispatcher
   return when((event: StoreChangedEvent<any>) => {
     if (event.type === STORE_CHANGED) {
       const newState = selector(event.payload);
-      console.log(initialized);
       if (newState !== currentState || !initialized) {
         initialized = true;
         currentState = newState;
