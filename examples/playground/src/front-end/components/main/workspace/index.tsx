@@ -2,9 +2,9 @@ import "./index.scss";
 import * as React from "react";
 import { Workspace, getSelectedWorkspaceFile } from "../../../state";
 import { Dispatcher, Message, getValueById } from "aerial-common2";
-import { FileNavigatorComponent } from "./file-navigator";
+import { ProjectGutterComponent } from "./project-gutter";
 import { TextEditorComponent, VisualEditorComponent } from "./editors";
-import { VisualGutterComponent } from "./visual-gutter";
+import { VisualGutterComponent } from "./element-gutter";
 
 export type WorkspaceComponentProps = {
   workspace: Workspace,
@@ -13,14 +13,17 @@ export type WorkspaceComponentProps = {
 
 export const WorkspaceComponentBase = ({ workspace, dispatch }: WorkspaceComponentProps) => {
   return <div className="workspace-component">
-    <FileNavigatorComponent directory={workspace.sourceFilesDirectory} dispatch={dispatch} />
-    <TextEditorComponent file={getSelectedWorkspaceFile(workspace)} dispatch={dispatch} />
-    <VisualEditorComponent />
+    <ProjectGutterComponent workspace={workspace} dispatch={dispatch} />
+    <div className="workspace-editors">
+      <TextEditorComponent file={getSelectedWorkspaceFile(workspace)} dispatch={dispatch} />
+      <VisualEditorComponent />
+    </div>
     <VisualGutterComponent />
   </div>
 }
 
 export const WorkspaceComponent = WorkspaceComponentBase;
 
-export * from "./file-navigator";
+export * from "./element-gutter";
+export * from "./project-gutter";
 export * from "./editors";

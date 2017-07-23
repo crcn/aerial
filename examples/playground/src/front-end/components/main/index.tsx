@@ -10,9 +10,12 @@ export type MainComponentProps = {
   state: ApplicationState
 };
 
-export const MainComponentBase = ({ state, dispatch }: MainComponentProps) => <div className="main-component">
-  <WorkspaceComponent workspace={getSelectedWorkspace(state)} dispatch={dispatch} />
-</div>;
+export const MainComponentBase = ({ state, dispatch }: MainComponentProps) => {
+  const workspace = getSelectedWorkspace(state);
+  return <div className="main-component">
+    { workspace && <WorkspaceComponent workspace={workspace} dispatch={dispatch} /> }
+  </div>;
+}
 
 export const MainComponent = pure(MainComponentBase as any) as typeof MainComponentBase;
 

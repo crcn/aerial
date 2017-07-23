@@ -1,6 +1,19 @@
+import { Kernel } from "aerial-common";
 import { parallel } from "mesh";
-import { Dispatcher, routeTypes, BaseEvent, WrappedEvent } from "aerial-common2";
+import { SyntheticBrowser } from "aerial-synthetic-browser";
+import { URIProtocolProvider, FileCacheProtocol } from "aerial-sandbox";
+import { Workspace, ApplicationState } from "../state";
+
 import { 
+  BaseEvent, 
+  Dispatcher, 
+  routeTypes, 
+  WrappedEvent,
+  whenStoreChanged,
+  StoreChangedEvent,
+} from "aerial-common2";
+
+import {
   TREE_NODE_LABEL_CLICKED, 
   TreeNodeLabelClickedEvent,
   FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED,
@@ -8,16 +21,32 @@ import {
 } from "../components";
 
 export const initMainDispatcher = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(
-  routeTypes({
-    [TREE_NODE_LABEL_CLICKED]: (event: TreeNodeLabelClickedEvent) => {
-      // console.log("CLICKED");
-    },
-    [FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED]: (event: WrappedEvent) => {
-      const name = prompt("File name");
-    },
-    [FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED]: (event: WrappedEvent) => {
-      const name = prompt("File name");
-    }
-  }),
+  workspaceDispatcher(upstream),
+  filesDispatcher(upstream),
   downstream
-)
+);
+
+const filesDispatcher = (upstream: Dispatcher<any>) => routeTypes({
+  [TREE_NODE_LABEL_CLICKED]: (event: TreeNodeLabelClickedEvent) => {
+
+  },
+  [FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED]: (event: WrappedEvent) => {
+    const name = prompt("File name");
+  },
+  [FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED]: (event: WrappedEvent) => {
+    const name = prompt("Folder name");
+  }
+});
+
+const workspaceDispatcher = (upstream: Dispatcher<any>) => parallel(
+  whenStoreChanged((state: ApplicationState) => state.selectedWorkspaceId, async ({ payload: state }: StoreChangedEvent<ApplicationState>) => {
+    const kernel = new Kernel(
+      // new FileCacheProvider()
+    );
+    // const browser = new SyntheticBrowser(kernel);
+    // console.log("OKK");
+    // await browser.open({
+    //   uri: "file://index.html"
+    // });
+  })
+);

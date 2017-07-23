@@ -1,6 +1,7 @@
 @import "variables.scss";
 
 .gutter-component {
+  flex: 0;
   min-width: 200px;
   background-color: #f7f7f7;
 }

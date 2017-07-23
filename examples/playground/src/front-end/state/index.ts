@@ -13,6 +13,8 @@ import {
   createImmutableStructFactory,
 } from "aerial-common2";
 
+import { Kernel } from "aerial-common";
+
 import {
   SyntheticBrowser,
 } from "aerial-synthetic-browser";
@@ -75,6 +77,7 @@ export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspac
  */
 
 export type ApplicationState = {
+  kernel: Kernel,
   workspaces: Workspace[],
   selectedWorkspaceId?: string
 } & BaseApplicationState & ReactServiceState & Struct;

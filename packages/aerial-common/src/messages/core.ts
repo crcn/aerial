@@ -4,8 +4,12 @@ import { ITreeNode } from "../tree";
 import { IDisposable } from "../object";
 import { serializable, ISerializer } from "../serialize";
 import {  DSFindRequest, DSInsertRequest, DSRemoveRequest, DSUpdateRequest, DSMessage } from "mesh-ds";
-import { Message } from "mesh";
 
+export class Message {
+  constructor(readonly type: string) {
+    
+  }
+}
 export { CoreEvent };
 
 export class DisposeEvent extends CoreEvent {

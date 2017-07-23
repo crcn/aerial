@@ -1,6 +1,7 @@
 import { noop } from "lodash";
 import { readAll } from "mesh";
 import { LogLevel, loadAppAction } from "aerial-common2";
+import { Kernel } from "aerial-common";
 import { 
   createFile,
   initApplication, 
@@ -68,9 +69,13 @@ const workspace = createWorkspace({
   browser: undefined
 });
 
+const kernel = new Kernel(
+
+);
+
 window.onload = () => {
   readAll(initApplication(createApplicationState({
-    selectedWorkspaceId: workspace.$$id,
+    kernel: kernel,
     workspaces: [workspace],
     element: document.querySelector("#application") as HTMLElement,
     log: {
