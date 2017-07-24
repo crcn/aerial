@@ -2,6 +2,7 @@ import * as React from "react";
 import { Dispatcher } from "aerial-common2";
 import { GutterComponent } from "front-end/components/gutter";
 import { FileNavigatorComponent } from "./file-navigator";
+import { DOMInspectorPaneComponent } from "./dom-inspector";
 import { ApplicationState, Workspace, getSelectedWorkspacePublicDirectory } from "front-end/state";
 
 export type ProjectGutterComponentProps = {
@@ -11,6 +12,7 @@ export type ProjectGutterComponentProps = {
 
 export const ProjectGutterComponentBase = ({ workspace, dispatch }: ProjectGutterComponentProps) => <GutterComponent>
   <FileNavigatorComponent directory={getSelectedWorkspacePublicDirectory(workspace)} dispatch={dispatch} />
+  <DOMInspectorPaneComponent />
 </GutterComponent>;
 
 export const ProjectGutterComponent = ProjectGutterComponentBase;
