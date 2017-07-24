@@ -8,6 +8,10 @@ import {
   ImmutableObject,
 } from "../immutable";
 
+import {
+  weakMemo
+} from "../memo";
+
 /**
  * Creates a typed structure
  */
@@ -39,7 +43,7 @@ export const idd = <VInst>(factory: (...args) => VInst, generateId: (...args) =>
 /**
  */
 
-export const getPathById = (root: any, id: string) => getPath(root, (value: IDd) => value && value.$$id === id);
+export const getPathById = weakMemo((root: any, id: string) => getPath(root, (value: IDd) => value && value.$$id === id));
 
 /**
  */

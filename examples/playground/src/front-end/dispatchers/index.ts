@@ -33,7 +33,17 @@ import {
   WatchUriAction
 } from "aerial-sandbox2";
 
-import { Types, Workspace, ApplicationState, getSelectedWorkspace, Directory, File } from "../state";
+import { 
+  Types, 
+  Workspace, 
+  ApplicationState, 
+  getSelectedWorkspace, 
+  getWorkspaceMainFile,
+  Directory, 
+  File
+  
+} from "../state";
+
 import { 
   Kernel, 
   BrokerBus, 
@@ -98,7 +108,7 @@ const getFileUrls = (state: ApplicationState) => {
   for (const workspace of state.workspaces) {
     urls = {
       ...urls,
-      ...getFileUrls(workspace.sourceFilesDirectory, `local://${workspace.$$id}`)
+      ...getFileUrls(workspace.sourceFiles, `local://${workspace.$$id}`)
     };
   }
 
@@ -116,7 +126,6 @@ const filesDispatcher = (upstream: Dispatcher<any>) => parallel(
       }
       
       const urls = getFileUrls(state);
-      console.log(urls);
 
       return when(actionIsLocalProtocol, routeTypes({
         [READ_URI]({ uri }: ReadUriAction) {
@@ -174,8 +183,17 @@ const workspaceDispatcher = (upstream: Dispatcher<any>) => parallel(
     const browser = new SyntheticBrowser(kernel);
     browser.renderer.start();
 
+    const urls = getFileUrls(state);
+    const mainFile = getWorkspaceMainFile(workspace);
+    console.log(urls);
+    let mainUrl;
+    for (mainUrl in urls) {
+      if (urls[mainUrl] === mainFile) {
+        break;
+      }
+    }
     await browser.open({
-      uri: `local://${state.selectedWorkspaceId}/index.html`
+      uri: mainUrl
     });
 
 

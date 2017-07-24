@@ -54,7 +54,17 @@ export type Workspace = {
    * workspace
    */
 
-  sourceFilesDirectory: Directory;
+  sourceFiles: Directory;
+
+  /**
+   */
+
+  publicDirectoryId: string;
+
+  /**
+   */
+
+  mainFileId: string;
   
   /**
    * The synthetic browser instance.
@@ -71,6 +81,8 @@ export type Workspace = {
 } & Struct;
 
 export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
+export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
+export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.mainFileId);
 
 /**
  * entire application state

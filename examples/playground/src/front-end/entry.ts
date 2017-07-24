@@ -10,6 +10,11 @@ import {
   createApplicationState, 
 } from "./index";
 
+const WORKSPACE_CONTENT = 
+`
+HELLO CONTENT
+`
+
 const HTML_CONTENT = 
 `
 <html>
@@ -36,37 +41,57 @@ html, body {
 }
 `.trim();
 
+const mainFile = createFile({
+  name: "workspace.html",
+  content: WORKSPACE_CONTENT,
+  childNodes: []
+});
+
+const indexFile = createFile({
+  name: "index.html",
+  content: HTML_CONTENT,
+  childNodes: []
+});
+
+const publicDirectory = createDirectory({
+  name: "public",
+  childNodes: [
+    indexFile,
+    createDirectory({
+      name: "js",
+      childNodes: [
+        createFile({
+          name: "main.js",
+          content: JS_CONTENT,
+          childNodes: []
+        })
+      ]
+    }),
+    createDirectory({
+      name: "css",
+      childNodes: [
+        createFile({
+          name: "main.css",
+          content: CSS_CONTENT,
+          childNodes: []
+        })
+      ]
+    })
+  ]
+});
+
+const sourceFiles = createDirectory({
+  name: "root",
+  childNodes: [
+    mainFile,
+    publicDirectory
+  ]
+});
+
 const workspace = createWorkspace({
-  sourceFilesDirectory: createDirectory({
-    name: "/",
-    childNodes: [
-      createFile({
-        name: "index.html",
-        content: HTML_CONTENT,
-        childNodes: []
-      }),
-      createDirectory({
-        name: "js",
-        childNodes: [
-          createFile({
-            name: "main.js",
-            content: JS_CONTENT,
-            childNodes: []
-          })
-        ]
-      }),
-      createDirectory({
-        name: "css",
-        childNodes: [
-          createFile({
-            name: "main.css",
-            content: CSS_CONTENT,
-            childNodes: []
-          })
-        ]
-      })
-    ]
-  }),
+  sourceFiles: sourceFiles,
+  publicDirectoryId: publicDirectory.$$id,
+  mainFileId: indexFile.$$id,
   browser: undefined
 });
 
