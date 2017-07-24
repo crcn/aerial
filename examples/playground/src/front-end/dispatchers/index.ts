@@ -185,7 +185,6 @@ const workspaceDispatcher = (upstream: Dispatcher<any>) => parallel(
 
     const urls = getFileUrls(state);
     const mainFile = getWorkspaceMainFile(workspace);
-    console.log(urls);
     let mainUrl;
     for (mainUrl in urls) {
       if (urls[mainUrl] === mainFile) {
