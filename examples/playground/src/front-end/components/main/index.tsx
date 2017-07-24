@@ -3,7 +3,7 @@ import * as React from "react";
 import { pure } from "recompose";
 import { WorkspaceComponent } from "./workspace";
 import { ImmutableObject, Dispatcher, getValueById } from "aerial-common2";
-import { Workspace, ApplicationState, getSelectedWorkspace } from "../../state";
+import { Workspace, ApplicationState, getSelectedWorkspace } from "front-end/state";
 
 export type MainComponentProps = {
   dispatch: Dispatcher<any>

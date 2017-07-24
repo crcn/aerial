@@ -1,6 +1,6 @@
 import "./index.scss";
 import * as React from "react";
-import { Workspace, getSelectedWorkspaceFile } from "../../../state";
+import { Workspace, getSelectedWorkspaceFile } from "front-end/state";
 import { Dispatcher, Message, getValueById } from "aerial-common2";
 import { ProjectGutterComponent } from "./project-gutter";
 import { TextEditorComponent, VisualEditorComponent } from "./editors";

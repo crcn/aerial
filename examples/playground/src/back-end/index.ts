@@ -1,3 +1,2 @@
-export * from "./front-end";
-export * from "./http";
+export * from "./services";
 export * from "./application";

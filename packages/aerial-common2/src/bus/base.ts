@@ -23,6 +23,7 @@ export const createAction = createMessage;
 export const createEvent = createMessage;
 
 export type Dispatcher<T extends Message> = (message: T) => any;
+export type HODispatcher<T extends Message> = (dispatch: Dispatcher<any>) => (message: T) => any;
 
 export const messageTypeIs = (type: string | string[]) => {
   const types = Array.isArray(type) ? type : [type];
@@ -49,10 +50,3 @@ export type DispatcherContextIdentity = {
 };
 
 export type DispatcherContext = ImmutableObject<DispatcherContextIdentity>;
-
-export const loopedDispatcher = (createDownstreamDispatcher: (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => Dispatcher<any>) => (downstream: Dispatcher<any> = noop) => {
-  const { promise: upstreamPromise, resolve: resolveUpstreamDispatcher } = createDeferredPromise<Dispatcher<any>>();
-  const topDispatcher = createDownstreamDispatcher(proxy(() => upstreamPromise))(downstream);
-  resolveUpstreamDispatcher(topDispatcher);
-  return topDispatcher;
-}

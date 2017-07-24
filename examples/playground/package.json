@@ -61,7 +61,7 @@
     "immutable": "^3.8.1",
     "lodash": "^4.17.4",
     "memoizee": "^0.4.5",
-    "mesh": "8.0.9",
+    "mesh": "8.0.x",
     "monaco-editor": "^0.8.3",
     "monaco-editor-core": "^0.8.2",
     "nwmatcher": "^1.3.9",

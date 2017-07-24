@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Dispatcher } from "aerial-common2";
-import { GutterComponent } from "../../../gutter";
+import { GutterComponent } from "front-end/components/gutter";
 import { FileNavigatorComponent } from "./file-navigator";
-import { ApplicationState, Workspace, getSelectedWorkspacePublicDirectory } from "../../../../state";
+import { ApplicationState, Workspace, getSelectedWorkspacePublicDirectory } from "front-end/state";
 
 export type ProjectGutterComponentProps = {
   workspace: Workspace,

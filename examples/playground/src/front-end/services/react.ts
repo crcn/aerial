@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Component } from "../components";
+import { Component } from "front-end/components";
 import * as ReactDOM from "react-dom";
 import { readAll, parallel } from "mesh";
 import { flowRight, identity } from "lodash";

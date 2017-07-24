@@ -19,8 +19,7 @@ import {
   SyntheticBrowser,
 } from "aerial-synthetic-browser";
 
-import { ReactServiceState } from "../react";
-
+import { MainServiceState } from "front-end/services";
 
 export namespace Types {
   export const FILE              = "FILE";
@@ -80,9 +79,9 @@ export type Workspace = {
 
 } & Struct;
 
+export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.mainFileId);
 export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
 export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
-export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.mainFileId);
 
 /**
  * entire application state
@@ -92,7 +91,7 @@ export type ApplicationState = {
   kernel: Kernel,
   workspaces: Workspace[],
   selectedWorkspaceId?: string
-} & BaseApplicationState & ReactServiceState & Struct;
+} & BaseApplicationState & MainServiceState & Struct;
 
 export const getSelectedWorkspace = (state: ApplicationState): Workspace => state.selectedWorkspaceId && getValueById(state, state.selectedWorkspaceId);
 export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById(state, state.selectedWorkspaceId);

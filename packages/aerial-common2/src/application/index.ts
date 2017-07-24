@@ -1,12 +1,12 @@
 import { reader } from "../monad";
-import { parallel } from "mesh";
+import { parallel, circular } from "mesh";
 import { flowRight } from "lodash";
 import { ImmutableObject } from "../immutable";
 import { initStoreService } from "../store";
 import { createStore, Reducer, Store } from "redux";
-import { createAction, loopedDispatcher, Dispatcher, whenType } from "../bus";
+import { createAction, Dispatcher, whenType } from "../bus";
 import { 
-  logger, 
+  logger,
   logInfoAction, 
   ConsoleLogState,
   consoleLogDispatcher, 
@@ -19,7 +19,7 @@ export const loadAppAction = () => createAction(LOAD_APP);
 
 export type ChildBootstrapper = (upsteam: Dispatcher<any>) => (downstream: Dispatcher<any>) => Dispatcher<any>;
 
-export const initBaseApplication = <TState>(initialState: BaseApplicationState, reducer: Reducer<TState>, child: ChildBootstrapper) => loopedDispatcher((upstream) => flowRight(
+export const initBaseApplication = <TState>(initialState: BaseApplicationState, reducer: Reducer<TState>, child: ChildBootstrapper) => circular((upstream) => flowRight(
   initStoreService(initialState, reducer, upstream),
   consoleLogDispatcher,
   (downstream: Dispatcher<any>) => parallel(whenType(LOAD_APP, () => {

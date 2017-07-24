@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as express from "express";
 import { parallel } from "mesh";
-import { HTTP_SERVER_STARTED, HTTPServerStartedEvent, HTTPServerState } from "../http";
+import { HTTP_SERVER_STARTED, HTTPServerStartedEvent, HTTPServerState } from "./http";
 import { 
   ImmutableObject, 
   logDebugAction, 
@@ -20,6 +20,7 @@ export type FrontEndState = {
 export const initFrontEndService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
 
   const addFrontEndRoutes = ({ payload: { frontEnd, http: { expressServer } } }: StoreChangedEvent<FrontEndState>) => {
+    if (!expressServer) return;
     const frontEndEntryBasename = path.basename(frontEnd.entryPath);
 
     expressServer.all("/index.html", (req, res) => {

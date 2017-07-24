@@ -1,5 +1,5 @@
 import * as React from "react";
-import { GutterComponent } from "../../../gutter";
+import { GutterComponent } from "front-end/components/gutter";
 
 export const VisualGutterComponentBase = () => <GutterComponent>
   styles

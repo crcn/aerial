@@ -1,7 +1,7 @@
 import "./index.scss";
-
 import * as React from "react";
 import { readAll } from "mesh";
+
 import { 
   pure, 
   compose, 
@@ -9,14 +9,38 @@ import {
   defaultProps, 
   withHandlers, 
 } from "recompose";
-import { TreeNode, getTreeNodeDepth, Dispatcher, BaseEvent, wrapEventToDispatch } from "aerial-common2";
+
+import { 
+  TreeNode, 
+  BaseEvent, 
+  Dispatcher, 
+  getTreeNodeDepth, 
+  wrapEventToDispatch,
+} from "aerial-common2";
+
+/**
+ * Event types
+ */
 
 export const TREE_NODE_LABEL_CLICKED = "TREE_NODE_LABE_CLICKED";
+
+/**
+ * Event state
+ */
+
 export type TreeNodeLabelClickedEvent = {
   node: TreeNode<any>
 } & BaseEvent;
 
+/**
+ * Event factories
+ */
+
 export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClickedEvent => ({ type: TREE_NODE_LABEL_CLICKED, node });
+
+/**
+ * React Components
+ */
 
 // TODO - move these over to aei
 export type TreeNodeBaseProps = {

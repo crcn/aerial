@@ -1,7 +1,7 @@
 import "./index.scss";
 import * as React from "react";
 import { pure, compose } from "recompose";
-import { Component } from "../types";
+import { Component } from "front-end/components/types";
 
 // TODOS
 // collapsible

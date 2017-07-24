@@ -1,15 +1,17 @@
 import { 
-  parallel, 
   pump, 
-  readOne, 
   when,
   readAll,
+  readOne, 
+  parallel, 
   createQueue
 } from "mesh";
+
 import { 
   SyntheticBrowser,
   createSyntheticHTMLProviders,
 } from "aerial-synthetic-browser";
+
 import { 
   URIProtocol,
   IFileResolver,
@@ -34,14 +36,13 @@ import {
 } from "aerial-sandbox2";
 
 import { 
+  File,
   Types, 
   Workspace, 
+  Directory, 
   ApplicationState, 
   getSelectedWorkspace, 
   getWorkspaceMainFile,
-  Directory, 
-  File
-  
 } from "../state";
 
 import { 
@@ -55,10 +56,10 @@ import {
   BaseEvent, 
   Dispatcher, 
   routeTypes, 
+  getPathById,
   WrappedEvent,
   withStoreState,
   whenStoreChanged,
-  getPathById,
   StoreChangedEvent,
 } from "aerial-common2";
 
@@ -89,7 +90,6 @@ export const initMainDispatcher = (upstream: Dispatcher<any>) => (downstream: Di
 );
 
 const actionIsLocalProtocol = (action: BaseUriAction) => action.uri && /^local\:\/\//.test(action.uri);
-
 
 const getFileUrls = (state: ApplicationState) => {
   let urls = {};

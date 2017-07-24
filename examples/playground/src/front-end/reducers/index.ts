@@ -1,10 +1,12 @@
 import { BaseEvent, mapImmutable, getPathById, updateIn, getValueByPath, updateStruct } from "aerial-common2";
+
 import { 
   ApplicationState,
   getSelectedWorkspace,
   createApplicationState,
   getSelectedWorkspaceFile,
-} from "../state";
+} from "front-end/state";
+
 import { 
   TEXT_EDITOR_CHANGED,
   TextEditorChangedEvent,
@@ -12,11 +14,13 @@ import {
   FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED,
   FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
   TreeNodeLabelClickedEvent, 
-} from "../components";
+} from "front-end/components";
+
 import { 
   SYNTHETIC_BROWSER_STARTED,
   SyntheticBrowserStartedEvent
-} from "../dispatchers";
+} from "front-end/services";
+
 import reduceReducers = require("reduce-reducers");
 
 export const applicationReducer = (state = createApplicationState(), event: BaseEvent) => {

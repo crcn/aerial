@@ -9,7 +9,7 @@ import * as React from "react";
 import * as CodeMirror from "react-codemirror";
 
 import { readAll } from "mesh";
-import { File, getFileExtension } from "../../../../../state";
+import { File, getFileExtension } from "front-end/state";
 import { Dispatcher, BaseEvent } from "aerial-common2";
 
 export type TextEditorProps = {
