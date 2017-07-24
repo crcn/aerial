@@ -16,7 +16,7 @@ export const WorkspaceComponentBase = ({ workspace, dispatch }: WorkspaceCompone
     <ProjectGutterComponent workspace={workspace} dispatch={dispatch} />
     <div className="workspace-editors">
       <TextEditorComponent file={getSelectedWorkspaceFile(workspace)} dispatch={dispatch} />
-      <VisualEditorComponent />
+      <VisualEditorComponent browser={workspace.browser} />
     </div>
     <VisualGutterComponent />
   </div>

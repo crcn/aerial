@@ -13,6 +13,10 @@ import {
   FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
   TreeNodeLabelClickedEvent, 
 } from "../components";
+import { 
+  SYNTHETIC_BROWSER_STARTED,
+  SyntheticBrowserStartedEvent
+} from "../dispatchers";
 import reduceReducers = require("reduce-reducers");
 
 export const applicationReducer = (state = createApplicationState(), event: BaseEvent) => {
@@ -30,12 +34,17 @@ export const applicationReducer = (state = createApplicationState(), event: Base
 
     case FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED: {
       const changedEvent = event as TextEditorChangedEvent;
-      console.log(event.type)
+      break;
     }
 
     case FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED: {
       const changedEvent = event as TextEditorChangedEvent;
-      console.log(changedEvent.value);
+      break;
+    }
+
+    case SYNTHETIC_BROWSER_STARTED: {
+      const { workspace, browser } = event as SyntheticBrowserStartedEvent;
+      return updateStruct(state, workspace, "browser", browser);
     }
   }
   return state;

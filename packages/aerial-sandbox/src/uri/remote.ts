@@ -7,7 +7,6 @@
 
 // export const createHTTPMiddleware = (kernel: Kernel) => {
 //   (req: http.ClientRequest, res: http.ServerResponse, next) => {
-//     console.log("MIDDLE ME THIS");
 //   }
 // }
 

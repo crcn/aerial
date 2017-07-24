@@ -16,15 +16,16 @@ const HTML_CONTENT =
   <head>
   </head>
   <body>
-    <div id="application"></div>
-    <script type="text/javascript" src="js/main.js"></script>
+    <div id="application">
+      Hello
+    </div>
   </body>
 </html>
 `.trim();
 
 const JS_CONTENT = 
 `
-console.log("Hello!");
+document.getElementById("application").innerHTML = "HELLO";
 `.trim();
 
 const CSS_CONTENT = 
@@ -77,6 +78,7 @@ window.onload = () => {
   readAll(initApplication(createApplicationState({
     kernel: kernel,
     workspaces: [workspace],
+    selectedWorkspaceId: workspace.$$id,
     element: document.querySelector("#application") as HTMLElement,
     log: {
       level: LogLevel.VERBOSE
