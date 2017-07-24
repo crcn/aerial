@@ -21,23 +21,25 @@ import {
 
 import { MainServiceState } from "front-end/services";
 
-export namespace Types {
-  export const FILE              = "FILE";
-  export const DIRECTORY         = "DIRECTORY";
-  export const WORKSPACE         = "WORKSPACE";
-  export const APPLICATION_STATE = "APPLICATION_STATE";
-}
+/**
+ * Types
+ */
+
+export const FILE              = "FILE";
+export const DIRECTORY         = "DIRECTORY";
+export const WORKSPACE         = "WORKSPACE";
+export const APPLICATION_STATE = "APPLICATION_STATE";
+
+/**
+ * Structs
+ */
 
 export interface File extends Struct, TreeNode<any> {
   name: string;
   content?: string;
 }
 
-export const getFileExtension = (file: File) => file.name.split(".").pop();
-
-export interface Directory extends Struct, File {
-  
-}
+export interface Directory extends Struct, File { }
 
 export type Editor = { }
 
@@ -79,19 +81,24 @@ export type Workspace = {
 
 } & Struct;
 
-export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.mainFileId);
-export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
-export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
-
-/**
- * entire application state
- */
 
 export type ApplicationState = {
   kernel: Kernel,
   workspaces: Workspace[],
   selectedWorkspaceId?: string
 } & BaseApplicationState & MainServiceState & Struct;
+
+/**
+ * Utilities
+ */
+
+
+export const getFileExtension = (file: File) => file.name.split(".").pop();
+
+export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.mainFileId);
+export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
+export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
+
 
 export const getSelectedWorkspace = (state: ApplicationState): Workspace => state.selectedWorkspaceId && getValueById(state, state.selectedWorkspaceId);
 export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById(state, state.selectedWorkspaceId);
@@ -100,24 +107,15 @@ export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById
  * Factories
  */
 
-export const createWorkspace        = createImmutableStructFactory<Workspace>(Types.WORKSPACE, {
+export const createWorkspace        = createImmutableStructFactory<Workspace>(WORKSPACE, {
   editors: []
 });
 
-export const createApplicationState = createImmutableStructFactory<ApplicationState>(Types.APPLICATION_STATE, {
+export const createApplicationState = createImmutableStructFactory<ApplicationState>(APPLICATION_STATE, {
   workspaces: []
 });
 
-export const createFile             = createImmutableStructFactory<File>(Types.FILE);
-export const createDirectory        = createImmutableStructFactory<Directory>(Types.DIRECTORY, { 
+export const createFile             = createImmutableStructFactory<File>(FILE);
+export const createDirectory        = createImmutableStructFactory<Directory>(DIRECTORY, { 
   childNodes: [] 
 });
-
-/*
-  const state = createApplicationState();
-
-
-  const reduceApplicationState = combineReducers({
-    workspaces: reduceWorkspace
-  });
-*/

@@ -4,11 +4,11 @@ import { readAll } from "mesh";
 import { compose, pure } from "recompose";
 import { TreeComponent } from "../../../../tree";
 import { PaneComponent } from "../../../../pane";
-import { File, Directory, Types } from "../../../../../state";
+import { File, Directory, DIRECTORY } from "../../../../../state";
 import { immutable, TreeNode, Dispatcher, wrapEventToDispatch } from "aerial-common2";
 
 const getFileLabel = (node: File) => `/${node.name}`;
-const collapsible = (node: File) => node.$$type === Types.DIRECTORY;
+const collapsible = (node: File) => node.$$type === DIRECTORY;
 
 const enhanceFileNavigator = compose(
   pure
