@@ -1,5 +1,7 @@
 const {resolve} = require('path');
 const webpack   = require('webpack');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
 
 module.exports = {
   entry: './src/front-end/entry.ts',
@@ -7,6 +9,9 @@ module.exports = {
     path: resolve(__dirname, 'lib', 'front-end'),
     filename: 'entry.bundle.js'
   },
+  plugins: [
+    new ExtractTextPlugin('entry.bundle.css')
+  ],
   resolve: {
     extensions: ['.ts', '.js', '.tsx'],
     alias: {
@@ -25,23 +30,27 @@ module.exports = {
       { test: /\.tsx?$/, use: 'ts-loader' },
       { 
         test: /\.scss$/, 
-        use: [
-          { loader: 'style-loader' },
-          { loader: 'css-loader'   },
-          { 
-            loader: 'sass-loader',
-            options: {
-              includePaths: [__dirname + "/src/front-end/scss"]
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            { loader: 'css-loader'   },
+            { 
+              loader: 'sass-loader',
+              options: {
+                includePaths: [__dirname + "/src/front-end/scss"]
+              }
             }
-          }
-        ]
+          ]
+        })
       },
       { 
         test: /\.css$/, 
-        use: [
-          { loader: 'style-loader' },
-          { loader: 'css-loader'   }
-        ]
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            { loader: 'css-loader'   }
+          ]
+        })
       },
     ]
   }

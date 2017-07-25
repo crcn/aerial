@@ -1,8 +1,14 @@
+
+import { isMaster, Dispatcher, BaseEvent } from "aerial-common2";
+
 import "./index.scss";
-import "codemirror/lib/codemirror.css";
-import "codemirror/mode/javascript/javascript";
-import "codemirror/mode/xml/xml";
-import "codemirror/mode/css/css";
+
+if (isMaster) {
+  require("codemirror/lib/codemirror.css");
+  require("codemirror/mode/javascript/javascript");
+  require("codemirror/mode/xml/xml");
+  require("codemirror/mode/css/css");
+}
 
 import { pure, lifecycle, compose } from "recompose";
 import * as React from "react";
@@ -10,7 +16,6 @@ import * as CodeMirror from "react-codemirror";
 
 import { readAll } from "mesh";
 import { File, getFileExtension } from "front-end/state";
-import { Dispatcher, BaseEvent } from "aerial-common2";
 
 export type TextEditorProps = {
   file: File,

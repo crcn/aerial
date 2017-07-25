@@ -64,6 +64,7 @@ export const initLocalProtocolService = (upstream: Dispatcher<any>) => (downstre
 
   const watchers = {};
 
+
   return parallel(downstream, withStoreState((state: ApplicationState) => { 
 
     for (const uri in watchers) {

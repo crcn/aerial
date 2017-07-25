@@ -6,13 +6,15 @@ import { createImmutableObject, immutable, LogLevel, loadAppAction, logInfoActio
 
 // // TODO - point to browser prop on package.json
 const FRONT_END_ENTRY_PATH = resolve(__dirname, "..", "front-end", "entry.bundle.js");
+const FRONT_END_CSS_PATH = resolve(__dirname, "..", "front-end", "entry.bundle.css");
 
 readAll(initApplication(immutable({
   http: {
     port: 8080
   },
   frontEnd: {
-    entryPath: FRONT_END_ENTRY_PATH
+    entryPath: FRONT_END_ENTRY_PATH,
+    cssPath: FRONT_END_CSS_PATH
   },
   log: {
     level: LogLevel.VERBOSE

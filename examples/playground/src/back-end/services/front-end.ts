@@ -13,7 +13,8 @@ import {
 
 export type FrontEndState = {
   frontEnd: {
-    entryPath: string
+    entryPath: string,
+    cssPath: string
   }
 } & HTTPServerState;
 
@@ -22,11 +23,13 @@ export const initFrontEndService = (upstream: Dispatcher<any>) => (downstream: D
   const addFrontEndRoutes = ({ payload: { frontEnd, http: { expressServer } } }: StoreChangedEvent<FrontEndState>) => {
     if (!expressServer) return;
     const frontEndEntryBasename = path.basename(frontEnd.entryPath);
+    const frontEndCSSBasename = path.basename(frontEnd.cssPath);
 
     expressServer.all("/index.html", (req, res) => {
       res.send(`
         <html>
           <head>
+            <link rel="stylesheet" href="./${frontEndCSSBasename}">
           </head>
           <body>
             <div id="application"></div>

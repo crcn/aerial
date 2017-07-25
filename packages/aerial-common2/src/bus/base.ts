@@ -1,7 +1,8 @@
 import { reader } from "../monad";
 import { negate, noop } from "lodash";
-import { when, readAll, proxy, createDeferredPromise } from "mesh";
 import { ImmutableObject } from "../immutable";
+
+import { when, readAll, proxy, createDeferredPromise } from "mesh";
 
 export type Message = {
   type: string;
@@ -30,10 +31,6 @@ export const messageTypeIs = (type: string | string[]) => {
   return (m: Message) => types.indexOf(m.type) !== -1;
 }
 
-export const whenType = (type: string | string[], _then?: Dispatcher<any>, _else?: Dispatcher<any>) => {
-  return when(messageTypeIs(type), _then, _else);
-}
-
 export type MessageRoutes = {
   [identifier: string]: Dispatcher<any>
 };
@@ -44,9 +41,26 @@ export const whenNotType = (type: string | string[], _then?: Dispatcher<any>, _e
   return when(negate(messageTypeIs(type)), _then, _else);
 }
 
+export const whenType = (type: string | string[], _then?: Dispatcher<any>, _else?: Dispatcher<any>) => {
+  return when(messageTypeIs(type), _then, _else);
+}
+
 export type DispatcherContextIdentity = {
   upstream: Dispatcher<any>,
   downstream: Dispatcher<any>
 };
 
 export type DispatcherContext = ImmutableObject<DispatcherContextIdentity>;
+
+export const attachMessageMetadata = (name: string, value: any) => <TFactory extends Function>(create: TFactory) => ((...args) => {
+  const value = create(...args);
+  Reflect.defineMetadata(name, value, value);
+  return value;
+});
+
+export const publicObject  = attachMessageMetadata("message:public", true);
+export const isObjectPublic = (value: any) => Reflect.getMetadata("message:public", value) === true;
+
+
+export const whenPublicMessage = (_then: Dispatcher<any>, _else?: Dispatcher<any>) => when(isObjectPublic, _then, _else);
+
