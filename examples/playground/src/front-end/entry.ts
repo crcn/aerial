@@ -1,6 +1,6 @@
 import { noop } from "lodash";
 import { readAll } from "mesh";
-import { LogLevel, loadAppAction, isMaster } from "aerial-common2";
+import { LogLevel, loadAppAction } from "aerial-common2";
 import { Kernel } from "aerial-common";
 
 import { 
@@ -99,7 +99,7 @@ const workspace = createWorkspace({
 readAll(initApplication(createApplicationState({
   workspaces: [workspace],
   selectedWorkspaceId: workspace.$$id,
-  element: isMaster ? document.querySelector("#application") as HTMLElement : undefined,
+  element: typeof document !== "undefined" ? document.querySelector("#application") as HTMLElement : undefined,
   log: {
     level: LogLevel.VERBOSE
   }

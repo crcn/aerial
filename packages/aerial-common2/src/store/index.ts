@@ -28,6 +28,8 @@ export const whenStoreChanged = (selector: Selector<any, any>, _then: Dispatcher
   let currentState;
   let initialized;
   return when((event: StoreChangedEvent<any>) => {
+
+    // TODO - dispatch diffs instead of the entire store here
     if (event.type === STORE_CHANGED) {
       const newState = selector(event.payload);
       if (newState !== currentState || !initialized) {

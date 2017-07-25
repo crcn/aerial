@@ -1,12 +1,27 @@
+import { noop } from "lodash";
 import { Dispatcher } from "../bus";
+import { withStoreState } from "../store";
 import { remote, parallel, when } from "mesh";
 
 let loadedScripts;
 let lastScriptSrc;
 
-export const isMaster = typeof window !== "undefined";
+// globals must be hidden so that apps can manage their own environment
+// manually. I.e: in the application state
+const __isMaster = typeof window !== "undefined";
 
-if (isMaster) {
+export type WorkerAppState = {
+  isMaster: boolean
+};
+
+export const workerReducer = (state: WorkerAppState) => {
+  if (state.isMaster == null) {
+    return {...state, isMaster: __isMaster }
+  }
+  return state;
+}
+
+if (typeof window !== "undefined") {
   loadedScripts = document.querySelectorAll("script");
   lastScriptSrc = loadedScripts.length && loadedScripts[loadedScripts.length - 1].src;
 }
@@ -33,32 +48,33 @@ function worker(worker: any, upstream: Dispatcher<any>): Dispatcher<any> {
         });
       }
     }
-  }), upstream);
+  }), (message) => {
+    return upstream(message);
+  });
 }
 
 /**
  */
 
 export const fork = (upstream: Dispatcher<any>, pathName?: string, argv?: any[], env?: any) => {
-  return worker(new Worker(pathName || lastScriptSrc), upstream);
+  return typeof Worker !== "undefined" ? worker(new Worker(pathName || lastScriptSrc), upstream) : noop;
 }
 
 /**
  */
 
 export const hook = (upstream: Dispatcher<any>) => {
-  return worker(self, upstream);
+  return typeof self !== "undefined" ? worker(self, upstream) : noop;
 }
 
-// TODO - do not access global here -- need to get from state
-export const whenMaster = (_then: Dispatcher<any>, _else?: Dispatcher<any>) => when(() => isMaster, _then, _else);
-export const whenWorker = (_then: Dispatcher<any>, _else?: Dispatcher<any>) => when(() => !isMaster, _then, _else);
+export const whenWorker = (upstream: Dispatcher<any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => withStoreState(({ isMaster }: WorkerAppState) => !isMaster ? _then : _else, upstream);
+export const whenMaster = (upstream: Dispatcher<any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => withStoreState(({ isMaster }: WorkerAppState) => isMaster ? _then : _else, upstream);
 
 /**
  *
  */
 
-if (isMaster) {
+if (__isMaster) {
 
   const KILL_TIMEOUT = 1000 * 60 * 5; // 5 minute
 

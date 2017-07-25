@@ -1,9 +1,9 @@
 
-import { isMaster, Dispatcher, BaseEvent } from "aerial-common2";
+import { Dispatcher, BaseEvent } from "aerial-common2";
 
 import "./index.scss";
 
-if (isMaster) {
+if (typeof window !== "undefined") {
   require("codemirror/lib/codemirror.css");
   require("codemirror/mode/javascript/javascript");
   require("codemirror/mode/xml/xml");

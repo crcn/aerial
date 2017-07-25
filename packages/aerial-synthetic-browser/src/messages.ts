@@ -1,5 +1,6 @@
+import { Action, publicObject } from "aerial-common2"
 import { CoreEvent, MutationEvent, TreeNodeMutationTypes, serializable } from "aerial-common";
-import { ISyntheticBrowserOpenOptions } from "./index";
+import { SyntheticBrowserOpenOptions } from "./index";
 import { SyntheticCSSStyle } from "./dom/css";
 import {
   isCSSMutation,
@@ -31,10 +32,21 @@ export class SyntheticRendererEvent extends CoreEvent {
   }
 }
 
-@serializable("OpenRemoteBrowserRequest")
-export class OpenRemoteBrowserRequest extends CoreEvent {
-  static readonly OPEN_REMOTE_BROWSER = "openRemoteBrowser";
-  constructor(readonly options: ISyntheticBrowserOpenOptions) {
-    super(OpenRemoteBrowserRequest.OPEN_REMOTE_BROWSER);
-  }
-}
+// @serializable("OpenRemoteBrowserRequest")
+// export class OpenRemoteBrowserRequest extends CoreEvent {
+//   static readonly OPEN_REMOTE_BROWSER = "openRemoteBrowser";
+//   constructor(readonly options: SyntheticBrowserOpenOptions) {
+//     super(OpenRemoteBrowserRequest.OPEN_REMOTE_BROWSER);
+//   }
+// }
+
+export const OPEN_REMOTE_BROWSER = "OPEN_REMOTE_BROWSER";
+
+export type OpenRemoteBrowserRequest = {
+  options: SyntheticBrowserOpenOptions
+} & Action; 
+
+export const openRemoteBrowserRequest = publicObject((options: SyntheticBrowserOpenOptions) => ({
+  type: OPEN_REMOTE_BROWSER,
+  options
+}));

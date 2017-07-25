@@ -1,10 +1,11 @@
+import { identity } from "lodash";
 import { getFileUrls } from "./local-protocol";
 import { readUriAction, watchUriAction } from "aerial-sandbox2";
 import { parallel, readOne, readAll, pump } from "mesh";
-import { SyntheticBrowser, createSyntheticHTMLProviders } from "aerial-synthetic-browser";
-import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile } from "front-end/state";
 import { BrokerBus, Kernel, PrivateBusProvider, KernelProvider } from "aerial-common";
-import { BaseEvent, Dispatcher, whenStoreChanged, StoreChangedEvent } from "aerial-common2";
+import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile } from "front-end/state";
+import { SyntheticBrowser, ISyntheticBrowser, createSyntheticHTMLProviders, RemoteSyntheticBrowser, createSyntheticBrowserWorkerProviders, OPEN_REMOTE_BROWSER } from "aerial-synthetic-browser";
+import { BaseEvent, Dispatcher, whenStoreChanged, StoreChangedEvent, whenWorker, whenMaster, whenType, publicObject } from "aerial-common2";
 import { FileCacheProvider, createSandboxProviders, URIProtocolProvider, URIProtocol, IURIProtocolReadResult } from "aerial-sandbox";
 
 /**
@@ -26,7 +27,7 @@ export type SyntheticBrowserStartedEvent = {
  * Event factories
  */
 
-export const syntheticBrowserStarted = (workspace: Workspace, browser: SyntheticBrowser) => ({
+export const syntheticBrowserStarted = (workspace: Workspace, browser: ISyntheticBrowser) => ({
   type: SYNTHETIC_BROWSER_STARTED,
   browser,
   workspace
@@ -38,16 +39,28 @@ export const syntheticBrowserStarted = (workspace: Workspace, browser: Synthetic
 
 export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(
   downstream,
-  whenStoreChanged((state: ApplicationState) => state.selectedWorkspaceId, async ({ payload: state }: StoreChangedEvent<ApplicationState>) => {
+  whenWorker(upstream, whenType("PING_WORKER", async function*() {
+    for (const value of [1, 2, 3, 4, 5]) {
+      yield value;
+    }
+  })),
+  whenMaster(upstream, whenStoreChanged((state: ApplicationState) => state.selectedWorkspaceId, async ({ payload: state }: StoreChangedEvent<ApplicationState>) => {
     
     const workspace = getSelectedWorkspace(state);
 
     // TODO - remove 
     if (!workspace) return;
 
+    const bus = new BrokerBus();
+    bus.register({
+      dispatch(message) {
+        console.log(message);
+      }
+    })
+
     const kernel = new Kernel(
       new KernelProvider(),
-      new PrivateBusProvider(new BrokerBus()),
+      new PrivateBusProvider(bus),
       createSandboxProviders(),
       new URIProtocolProvider("local", createURIProtocolClass(upstream)),
       createSyntheticHTMLProviders()
@@ -55,7 +68,8 @@ export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: 
 
     FileCacheProvider.getInstance(kernel).syncWithLocalFiles();
 
-    const browser = new SyntheticBrowser(kernel);
+    // const browser = new SyntheticBrowser(kernel);
+    const browser = new RemoteSyntheticBrowser(kernel);
     browser.renderer.start();
 
     const urls = getFileUrls(state);
@@ -70,9 +84,14 @@ export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: 
       uri: mainUrl
     });
 
+    // for testing
+    pump(upstream(publicObject(identity)({ type: "PING_WORKER" })), (value) => new Promise((resolve) => {
+      console.log("PUMP", value);
+      setTimeout(resolve, 500);
+    }));
 
     readAll(upstream(syntheticBrowserStarted(workspace, browser)));
-  })
+  }))
 );
 
 

@@ -1,7 +1,9 @@
 import { debounce } from "lodash";
-import { OpenRemoteBrowserRequest, SyntheticRendererEvent } from "./messages";
+import { parallel, createDuplex } from "mesh";
+import { Dispatcher, whenType, whenWorker } from "aerial-common2";
+import { OpenRemoteBrowserRequest, SyntheticRendererEvent, OPEN_REMOTE_BROWSER, openRemoteBrowserRequest } from "./messages";
 import { NoopRenderer, ISyntheticDocumentRenderer } from "./renderers";
-import { ISyntheticBrowser, SyntheticBrowser, BaseSyntheticBrowser, ISyntheticBrowserOpenOptions } from "./browser";
+import { ISyntheticBrowser, SyntheticBrowser, BaseSyntheticBrowser, SyntheticBrowserOpenOptions } from "./browser";
 import { 
   pump, 
   IMessage,
@@ -83,6 +85,7 @@ export class RemoteBrowserDocumentMessage extends CoreEvent {
   }
 }
 
+
 @loggable()
 export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
 
@@ -101,12 +104,12 @@ export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
     this._bus = PrivateBusProvider.getInstance(kernel);
   }
 
-  async open2(options: ISyntheticBrowserOpenOptions) {
+  async open2(options: SyntheticBrowserOpenOptions) {
     this.status = new Status(Status.LOADING);
     this.clearLogs();
     if (this._remoteStreamReader) this._remoteStreamReader.cancel("Re-opened");
 
-    const remoteBrowserStream = this._bus.dispatch(new OpenRemoteBrowserRequest(options));
+    const remoteBrowserStream = this._bus.dispatch(openRemoteBrowserRequest(options));
     this._writer = remoteBrowserStream.writable.getWriter();
     const reader = this._remoteStreamReader = remoteBrowserStream.readable.getReader();
 
@@ -207,6 +210,18 @@ export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
   }, 100);
 }
 
+export const initRemoteSyntheticBrowserService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
+
+  // TODO - this state needs to eventually live in app state
+  // when the remote browser is a bit more stateless
+  const openBrowser = {};
+
+  return parallel(downstream, whenWorker(upstream, whenType(OPEN_REMOTE_BROWSER, (request: OpenRemoteBrowserRequest) => createDuplex((input, output) => {
+    // INIT REMOTE BROWSER SERVICE
+    console.log("INIT REMOTE BROWSER");
+  }))));
+};
+
 @loggable()
 export class RemoteBrowserService extends BaseApplicationService {
 
@@ -219,7 +234,7 @@ export class RemoteBrowserService extends BaseApplicationService {
     this._openBrowsers = {};
   }
 
-  [OpenRemoteBrowserRequest.OPEN_REMOTE_BROWSER](event: OpenRemoteBrowserRequest) {
+  [OPEN_REMOTE_BROWSER](event: OpenRemoteBrowserRequest) {
 
     // TODO - move this to its own class
     return new DuplexStream((input, output) => {

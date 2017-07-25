@@ -1,8 +1,9 @@
 import { reader } from "../monad";
+// import { DuplexStream, pump as pumpLegacy } from "mesh7";
 import { negate, noop } from "lodash";
 import { ImmutableObject } from "../immutable";
 
-import { when, readAll, proxy, createDeferredPromise } from "mesh";
+import { when, readAll, proxy, createDeferredPromise, createDuplex, wrapAsyncIterableIterator } from "mesh";
 
 export type Message = {
   type: string;
@@ -53,9 +54,9 @@ export type DispatcherContextIdentity = {
 export type DispatcherContext = ImmutableObject<DispatcherContextIdentity>;
 
 export const attachMessageMetadata = (name: string, value: any) => <TFactory extends Function>(create: TFactory) => ((...args) => {
-  const value = create(...args);
-  Reflect.defineMetadata(name, value, value);
-  return value;
+  const instance = create(...args);
+  Reflect.defineMetadata(name, value, instance);
+  return instance;
 });
 
 export const publicObject  = attachMessageMetadata("message:public", true);
@@ -64,3 +65,14 @@ export const isObjectPublic = (value: any) => Reflect.getMetadata("message:publi
 
 export const whenPublicMessage = (_then: Dispatcher<any>, _else?: Dispatcher<any>) => when(isObjectPublic, _then, _else);
 
+// export const createLegacyBus = (dispatch: Dispatcher<any>) => class LegacyBus {
+//   dispatch(message: Message) {
+//     const iter = wrapAsyncIterableIterator(dispatch(dispatch));
+//     return new DuplexStream((input, output) => {
+
+//       pumpLegacy(input.getReader(), (value) => {
+//         return iter.
+//       });
+//     });
+//   }
+// }

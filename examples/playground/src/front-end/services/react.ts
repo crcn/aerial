@@ -34,6 +34,6 @@ const enhanceRootComponent =  compose(
 
 const getEnhancedRootComponent = weakMemo((componentClass: Component<any>) => enhanceRootComponent(componentClass as any));
 
-export const initReactService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => whenMaster(parallel(whenStoreChanged(identity, ({ payload: state }: StoreChangedEvent<ReactServiceState>) => {
+export const initReactService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(downstream, whenMaster(upstream, whenStoreChanged(identity, ({ payload: state }: StoreChangedEvent<ReactServiceState>) => {
   ReactDOM.render(React.createElement(getEnhancedRootComponent(state.mainComponentClass), { dispatch: upstream, state } as any), state.element);
-}), downstream));
+})));

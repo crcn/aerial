@@ -10,9 +10,10 @@ import { createApplicationState, ApplicationState } from "./state";
 import { 
   hook,
   fork,
-  isMaster,
+  whenMaster,
   Dispatcher,
   StoreContext,
+  workerReducer,
   ImmutableObject,
   initStoreService,
   whenPublicMessage,
@@ -21,11 +22,12 @@ import { 
 } from "aerial-common2";
 
 const mainReducer = reduceReducers(
+  workerReducer,
   applicationReducer,
   mainServiceReducer
 );
 
 export const initApplication = (initialState: ImmutableObject<ApplicationState>) => circular((upstream: Dispatcher<any>) => flowRight(
     initBaseApplication(initialState.set("mainComponentClass", MainComponent), mainReducer, initMainService),
-    (downstream: Dispatcher<any>) => parallel(downstream, whenPublicMessage(isMaster ? fork(upstream) : hook(upstream)))
+    (downstream: Dispatcher<any>) => parallel(downstream, whenPublicMessage(whenMaster(upstream, fork(upstream), hook(upstream))))
 ));

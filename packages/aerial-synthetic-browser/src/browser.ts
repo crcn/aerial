@@ -52,7 +52,7 @@ import {
 
 import { CallbackBus } from "mesh7";
 
-export interface ISyntheticBrowserOpenOptions {
+export interface SyntheticBrowserOpenOptions {
 
   // URI to load
   uri: string;
@@ -65,7 +65,7 @@ export interface ISyntheticBrowserOpenOptions {
 }
 
 export interface ISyntheticBrowser extends IObservable {
-  open(options: ISyntheticBrowserOpenOptions): Promise<any>;
+  open(options: SyntheticBrowserOpenOptions): Promise<any>;
   window: SyntheticWindow;
   uid: any;
   logs: ObservableCollection<LogEvent>;
@@ -99,7 +99,7 @@ export abstract class BaseSyntheticBrowser extends Observable implements ISynthe
   private _documentObserver: IBus<any, any>;
   private _windowObserver: IBus<any, any>;
   private _location: SyntheticLocation;
-  private _openOptions: ISyntheticBrowserOpenOptions;
+  private _openOptions: SyntheticBrowserOpenOptions;
   private _renderer: ISyntheticDocumentRenderer;
   readonly logs: ObservableCollection<LogEvent>;
 
@@ -181,11 +181,11 @@ export abstract class BaseSyntheticBrowser extends Observable implements ISynthe
     return this._renderer;
   }
 
-  protected get openOptions(): ISyntheticBrowserOpenOptions {
+  protected get openOptions(): SyntheticBrowserOpenOptions {
     return this._openOptions;
   }
 
-  async open(options: ISyntheticBrowserOpenOptions) {
+  async open(options: SyntheticBrowserOpenOptions) {
     if (JSON.stringify(this._openOptions) === JSON.stringify(options) && this._window) {
       return;
     }
@@ -198,7 +198,7 @@ export abstract class BaseSyntheticBrowser extends Observable implements ISynthe
     await this.open2(options2);
   }
 
-  protected abstract async open2(options: ISyntheticBrowserOpenOptions);
+  protected abstract async open2(options: SyntheticBrowserOpenOptions);
 
   protected onDocumentEvent(event: CoreEvent) {
     this.notify(event);
@@ -232,7 +232,7 @@ export class SyntheticBrowser extends BaseSyntheticBrowser {
     return this._sandbox;
   }
 
-  protected async open2({ uri, dependencyGraphStrategyOptions, injectScript }: ISyntheticBrowserOpenOptions) {
+  protected async open2({ uri, dependencyGraphStrategyOptions, injectScript }: SyntheticBrowserOpenOptions) {
     
     // TODO - setup file protocol specific to this CWD
 

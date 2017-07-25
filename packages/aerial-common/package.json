@@ -23,6 +23,7 @@
     "mocha": "^3.4.2"
   },
   "dependencies": {
+    "aerial-common2": "^0.0.1",
     "ansi_up": "^2.0.0",
     "i": "^0.3.5",
     "inflection": "^1.12.0",
