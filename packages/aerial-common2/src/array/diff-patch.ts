@@ -14,9 +14,10 @@ export type ArrayInsertMutation<T> = {
   value: T
 } & ArrayValueMutation<any>;
 
-export type ArrayDeleteMutation = {
+export type ArrayDeleteMutation<T> = {
   index: number;
-} & ArrayValueMutation<any>;
+  value: T;
+} & ArrayValueMutation<T>;
 
 export type ArrayUpdateMutation<T> = {
   originalOldIndex: number;
@@ -42,7 +43,8 @@ export const createArrayUpdateMutation = <T>(originalOldIndex: number, patchedOl
   patchedOldIndex,
 });
 
-export const createArrayDeleteMutation = (index: number): ArrayDeleteMutation => struct(ARRAY_DELETE, {
+export const createArrayDeleteMutation = <T>(value: T, index: number): ArrayDeleteMutation<T> => struct(ARRAY_DELETE, {
+  value,
   index
 });
 
@@ -104,7 +106,7 @@ export function diffArray<T>(oldArray: Array<T>, newArray: Array<T>, countDiffs:
   for (let i = oldPool.length; i--;) {
     const oldValue  = oldPool[i];
     const index     = oldArray.indexOf(oldValue);
-    mutations.push(createArrayDeleteMutation(index));
+    mutations.push(createArrayDeleteMutation(oldValue, index));
     model.splice(index, 1);
   }
 
@@ -147,7 +149,7 @@ export function diffArray<T>(oldArray: Array<T>, newArray: Array<T>, countDiffs:
 
 export type ArrayValueMutationHandlers<T> = {
   insert(mutation: ArrayInsertMutation<T>);
-  delete(mutation: ArrayDeleteMutation);
+  delete(mutation: ArrayDeleteMutation<T>);
   update(mutation: ArrayUpdateMutation<T>);
 }
 
@@ -155,7 +157,7 @@ export const eachArrayValueMutation = <T>(diff: ArrayMutation<T>, handlers: Arra
   diff.mutations.forEach((mutation) => {
     switch(mutation.$$type) {
       case ARRAY_INSERT: return handlers.insert(mutation as ArrayInsertMutation<T>);
-      case ARRAY_DELETE: return handlers.delete(mutation as ArrayDeleteMutation);
+      case ARRAY_DELETE: return handlers.delete(mutation as ArrayDeleteMutation<T>);
       case ARRAY_UPDATE: return handlers.update(mutation as ArrayUpdateMutation<T>);
     }
   })

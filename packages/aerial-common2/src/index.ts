@@ -9,3 +9,5 @@ export * from "./memo";
 export * from "./monad";
 export * from "./dispatchers";
 export * from "./worker";
+export * from "./geom";
+export * from "./array";

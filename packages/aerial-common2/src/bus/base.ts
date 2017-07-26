@@ -12,6 +12,9 @@ export type Message = {
 // trigger something to do
 export type Action = Message;
 
+// trigger something to do
+export type Request = Action;
+
 // Events are things that have happened -- loaded, initialized, and so forth. 
 // BaseEvent is used since Event is already taken
 export type BaseEvent = Message;
