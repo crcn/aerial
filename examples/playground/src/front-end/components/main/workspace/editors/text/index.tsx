@@ -1,5 +1,5 @@
 
-import { Dispatcher, BaseEvent } from "aerial-common2";
+import { Dispatcher, BaseEvent, publicObject } from "aerial-common2";
 
 import "./index.scss";
 
@@ -29,7 +29,7 @@ export type TextEditorChangedEvent = {
   value: string
 } & BaseEvent;
 
-export const textEditorChangedEvent = (file: File, value: string): TextEditorChangedEvent => ({ type: TEXT_EDITOR_CHANGED, file, value });
+export const textEditorChangedEvent = publicObject((file: File, value: string): TextEditorChangedEvent => ({ type: TEXT_EDITOR_CHANGED, file, value }));
 
 const MODES = {
   js: "javascript",

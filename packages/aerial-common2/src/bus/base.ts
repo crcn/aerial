@@ -3,7 +3,7 @@ import { reader } from "../monad";
 import { negate, noop } from "lodash";
 import { ImmutableObject } from "../immutable";
 
-import { when, readAll, proxy, createDeferredPromise, createDuplex, wrapAsyncIterableIterator } from "mesh";
+import { when, readAll, proxy, pump, createQueue, createDeferredPromise, createDuplex, wrapAsyncIterableIterator, remote } from "mesh";
 
 export type Message = {
   type: string;
@@ -65,14 +65,33 @@ export const isObjectPublic = (value: any) => Reflect.getMetadata("message:publi
 
 export const whenPublicMessage = (_then: Dispatcher<any>, _else?: Dispatcher<any>) => when(isObjectPublic, _then, _else);
 
-// export const createLegacyBus = (dispatch: Dispatcher<any>) => class LegacyBus {
-//   dispatch(message: Message) {
-//     const iter = wrapAsyncIterableIterator(dispatch(dispatch));
-//     return new DuplexStream((input, output) => {
+/*
 
-//       pumpLegacy(input.getReader(), (value) => {
-//         return iter.
-//       });
-//     });
-//   }
-// }
+const dispatch = parallel(
+  whenType("keep open", (message) => {
+
+  });
+)
+
+const chan = channel(dispatch({ type: "keep open" }));
+
+*/
+
+// export const channel = (iterable: AsyncIterableIterator<any>, upstream: (...args) => any) => {
+//   const q = createQueue();
+//   return remote(() => ({
+//     adapter: {
+//       send(message) {
+//         iterable.next(message).then(({ value }) => q.unshift(value));
+//       },
+//       addListener(listener) {
+//         pump(q, listener);
+//       }
+//     }
+//   }), upstream);
+// };
+
+// export const channelIterable = (upstream: (...args) => any) => {
+//   const q = createQueue();
+//   channel()
+// };

@@ -4,6 +4,7 @@ import {Observable } from "../observable";
 import { CoreEvent } from "../messages";
 import { ITyped, INamed } from "../object";
 import { IBus, IMessage } from "mesh7";
+import { Dispatcher } from "aerial-common2";
 
 import {
   IFactory,
@@ -50,6 +51,17 @@ export function createSingletonBusProviderClass(name: string): { getInstance(pro
  */
 
 export const PrivateBusProvider   = createSingletonBusProviderClass("private");
+
+export class MainDispatcherProvider extends Provider<Dispatcher<any>> {
+  static readonly ID = "MAIN_DISPATCHER";
+  constructor(dispatcher: Dispatcher<any>) {
+    super(MainDispatcherProvider.ID, dispatcher);
+  }
+  static getInstance(kernel: Kernel): Dispatcher<any> {
+    const provider = kernel.query<any>(this.ID);
+    return provider.value;
+  }
+}
 
 /**
  */

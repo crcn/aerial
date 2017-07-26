@@ -33,7 +33,7 @@ export const applicationReducer = (state = createApplicationState(), event: Base
     case TEXT_EDITOR_CHANGED: {
       const { file, value } = event as TextEditorChangedEvent;
       const path = getPathById(state, file.$$id);
-      return updateStruct(state, getSelectedWorkspaceFile(getSelectedWorkspace(state)), "content", value);
+      return updateStruct(state, file, "content", value);
     }
 
     case FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED: {

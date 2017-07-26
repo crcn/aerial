@@ -1,12 +1,6 @@
 import {BaseSyntheticBrowser} from "./browser";
-import { RemoteBrowserService } from "./remote-browser";
 import { Kernel, ApplicationServiceProvider } from "aerial-common";
 
-export function createSyntheticBrowserWorkerProviders() {
-  return [
-    new ApplicationServiceProvider("remoteBrowserRenderer", RemoteBrowserService)
-  ];
-}
 
 export * from "./dom";
 export * from "./browser";

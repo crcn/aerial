@@ -19,7 +19,7 @@ export const loadAppAction = () => createAction(LOAD_APP);
 
 export type ChildBootstrapper = (upsteam: Dispatcher<any>) => (downstream: Dispatcher<any>) => Dispatcher<any>;
 
-export const initBaseApplication = <TState>(initialState: BaseApplicationState, reducer: Reducer<TState>, child: ChildBootstrapper) => circular((upstream) => flowRight(
+export const initBaseApplication = <TState>(initialState: BaseApplicationState, reducer: Reducer<TState>, child: ChildBootstrapper) => circular((upstream: Dispatcher<any>) => flowRight(
   initStoreService(initialState, reducer, upstream),
   consoleLogDispatcher,
   (downstream: Dispatcher<any>) => parallel(whenType(LOAD_APP, () => {

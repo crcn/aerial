@@ -2,11 +2,27 @@ import { identity } from "lodash";
 import { getFileUrls } from "./local-protocol";
 import { readUriAction, watchUriAction } from "aerial-sandbox2";
 import { parallel, readOne, readAll, pump } from "mesh";
-import { BrokerBus, Kernel, PrivateBusProvider, KernelProvider } from "aerial-common";
+import { initRemoteSyntheticBrowserService } from "aerial-synthetic-browser";
+import { BrokerBus, Kernel, PrivateBusProvider, KernelProvider, MainDispatcherProvider } from "aerial-common";
 import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile } from "front-end/state";
 import { SyntheticBrowser, ISyntheticBrowser, createSyntheticHTMLProviders, RemoteSyntheticBrowser, createSyntheticBrowserWorkerProviders, OPEN_REMOTE_BROWSER } from "aerial-synthetic-browser";
 import { BaseEvent, Dispatcher, whenStoreChanged, StoreChangedEvent, whenWorker, whenMaster, whenType, publicObject } from "aerial-common2";
 import { FileCacheProvider, createSandboxProviders, URIProtocolProvider, URIProtocol, IURIProtocolReadResult } from "aerial-sandbox";
+
+const createKernel = (upstream: Dispatcher<any>, sync?: boolean) => {
+  const kernel = new Kernel(
+    new KernelProvider(),
+    new MainDispatcherProvider(upstream),
+    new PrivateBusProvider(new BrokerBus()),
+    createSandboxProviders(),
+    new URIProtocolProvider("local", createURIProtocolClass(upstream)),
+    createSyntheticHTMLProviders()
+  );
+  if (sync) {
+    FileCacheProvider.getInstance(kernel).syncWithLocalFiles();
+  }
+  return kernel;
+}
 
 /**
  * Event types
@@ -39,11 +55,7 @@ export const syntheticBrowserStarted = (workspace: Workspace, browser: ISyntheti
 
 export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(
   downstream,
-  whenWorker(upstream, whenType("PING_WORKER", async function*() {
-    for (const value of [1, 2, 3, 4, 5]) {
-      yield value;
-    }
-  })),
+  initRemoteSyntheticBrowserService(createKernel(upstream, true), upstream)(downstream),
   whenMaster(upstream, whenStoreChanged((state: ApplicationState) => state.selectedWorkspaceId, async ({ payload: state }: StoreChangedEvent<ApplicationState>) => {
     
     const workspace = getSelectedWorkspace(state);
@@ -51,25 +63,8 @@ export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: 
     // TODO - remove 
     if (!workspace) return;
 
-    const bus = new BrokerBus();
-    bus.register({
-      dispatch(message) {
-        console.log(message);
-      }
-    })
-
-    const kernel = new Kernel(
-      new KernelProvider(),
-      new PrivateBusProvider(bus),
-      createSandboxProviders(),
-      new URIProtocolProvider("local", createURIProtocolClass(upstream)),
-      createSyntheticHTMLProviders()
-    );
-
-    FileCacheProvider.getInstance(kernel).syncWithLocalFiles();
-
     // const browser = new SyntheticBrowser(kernel);
-    const browser = new RemoteSyntheticBrowser(kernel);
+    const browser = new RemoteSyntheticBrowser(createKernel(upstream));
     browser.renderer.start();
 
     const urls = getFileUrls(state);
@@ -84,16 +79,9 @@ export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: 
       uri: mainUrl
     });
 
-    // for testing
-    pump(upstream(publicObject(identity)({ type: "PING_WORKER" })), (value) => new Promise((resolve) => {
-      console.log("PUMP", value);
-      setTimeout(resolve, 500);
-    }));
-
     readAll(upstream(syntheticBrowserStarted(workspace, browser)));
   }))
 );
-
 
 const createURIProtocolClass = (upstream: Dispatcher<any>) => {
   return class extends URIProtocol {

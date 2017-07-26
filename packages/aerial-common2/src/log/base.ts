@@ -32,6 +32,7 @@ export const logAction = (level: LogLevel, text: string): LogAction => createAct
 export type Logger = (action: LogAction) => any;
 
 export const logger = (dispatch: Dispatcher<any>): Logger => (action: LogAction) => readAll(dispatch(action));
+export const prefixedLogger = (prefix: string, dispatch: Dispatcher<any>): Logger => (action: LogAction) => readAll(dispatch({ ...action, text: `${prefix}${action.text}` }));
 
 export const logDebugAction    = (text: string) => logAction(LogLevel.DEBUG, text);
 export const logInfoAction     = (text: string) => logAction(LogLevel.INFO, text);
