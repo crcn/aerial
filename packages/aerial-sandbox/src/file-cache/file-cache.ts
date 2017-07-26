@@ -38,7 +38,10 @@ export const getAllUnsavedFiles = (kernel: Kernel) => {
 // TODO - remove files here after TTL
 export class FileCache extends Observable {
 
-  @inject(KernelProvider.ID)
+  @inject(KernelProvider.ID, (p) => {
+    console.log("INJECT KER", p.value)
+    return p.value;
+  })
   private _kernel: Kernel;
 
   @inject(PrivateBusProvider.ID)
@@ -52,6 +55,7 @@ export class FileCache extends Observable {
   }
 
   public $didInject() {
+
     this._collection = new ActiveRecordCollection(this.collectionName, this._kernel, (source: IFileCacheItemData) => {
       return this._kernel.inject(new FileCacheItem(source, this.collectionName));
     });

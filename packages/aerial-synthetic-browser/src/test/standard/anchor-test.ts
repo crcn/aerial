@@ -1,7 +1,7 @@
+import { loadTestBrowser } from "../utils";
 import { expect } from "chai";
 import { LogLevel } from "aerial-common";
 import { SyntheticBrowser, SyntheticHTMLElement } from "../..";
-import { loadTestBrowser } from "../utils";
 
 // poorly organized DOM spec tests. TODO - move these into sep fiels
 describe(__filename + "#", () => {

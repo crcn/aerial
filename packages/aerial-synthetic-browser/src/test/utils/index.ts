@@ -152,12 +152,14 @@ export const createRandomFileName = (extension) => Math.round(Math.random() * 99
 export const createTestKernel = (options: ITestKernelOptions = {}) => {
   const bus = new BrokerBus();
   const kernel = new Kernel(
-    createTestSandboxProviders(options.sandboxOptions),
     new KernelProvider(),
+    createTestSandboxProviders(options.sandboxOptions),
     new PrivateBusProvider(bus),
     createSyntheticHTMLProviders(),
     createJavaScriptSandboxProviders(),
   );
+
+  console.log("TEST KERN");
   if (options.createTestProviders) {
     kernel.register(options.createTestProviders());
   }

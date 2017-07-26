@@ -13,6 +13,6 @@
     "aerial-common": "0.0.x",
     "aerial-sandbox": "0.0.x",
     "aerial-synthetic-browser": "0.0.x",
-    "typescript": "2.3.4"
+    "typescript": "2.4.1"
   }
 }

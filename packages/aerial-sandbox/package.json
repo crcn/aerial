@@ -28,9 +28,11 @@
     "aerial-common": "0.0.x",
     "md5": "^2.2.1",
     "memoizee": "^0.4.5",
-    "mesh-ds7": "^0.0.5",
-    "mesh-memory-ds7": "^0.0.4",
-    "mesh7": "^7.0.6",
+    "mesh": "7.0.x",
+    "mesh-ds": "0.0.x",
+    "mesh-ds7": "0.0.x",
+    "mesh-memory-ds7": "0.0.x",
+    "mesh7": "7.0.x",
     "package-path": "^1.0.0"
   }
 }

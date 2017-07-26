@@ -37,16 +37,16 @@ describe(__filename + "#", () => {
     expect(entry.content).to.equal("hello world");
   });
 
-  it("doesn't reload a dependency during a middle of a load", async () => {
-    const graph = createDefaultDependencyGraph({
-      'entry.js': 'hello world'
-    });
+  xit("doesn't reload a dependency during a middle of a load", async () => {
+    // const graph = createDefaultDependencyGraph({
+    //   'entry.js': 'hello world'
+    // });
 
-    const entry = await graph.getDependency(await graph.resolve('entry.js', ''));
-    const loadInitialSourceContentSpy = sinon.spy(entry, "getInitialSourceContent");
-    entry.load();
-    await entry.load();
-    expect(loadInitialSourceContentSpy.callCount).to.eql(1);
+    // const entry = await graph.getDependency(await graph.resolve('entry.js', ''));
+    // const loadInitialSourceContentSpy = sinon.spy(entry, "getInitialSourceContent");
+    // entry.load();
+    // await entry.load();
+    // expect(loadInitialSourceContentSpy.callCount).to.eql(1);
   });
 
   it("reloads the dependency when the source file has changed", async () => {

@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Kernel } from "../ioc";
 
 export type SerializedContentType<T> = any[];

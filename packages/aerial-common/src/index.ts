@@ -1,3 +1,4 @@
+import "reflect-metadata";
 
 export * from "./messages";
 export * from "./animate";
