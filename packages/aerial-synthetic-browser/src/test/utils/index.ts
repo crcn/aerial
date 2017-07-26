@@ -159,7 +159,6 @@ export const createTestKernel = (options: ITestKernelOptions = {}) => {
     createJavaScriptSandboxProviders(),
   );
 
-  console.log("TEST KERN");
   if (options.createTestProviders) {
     kernel.register(options.createTestProviders());
   }

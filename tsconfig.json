@@ -1,12 +1,12 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "sourceMap": true,
     "lib": [
       "es2015.promise",
       "dom",
-      "es6"
+      "es5"
     ],
     "module": "commonjs",
     "outDir": "lib",

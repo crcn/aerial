@@ -38,10 +38,7 @@ export const getAllUnsavedFiles = (kernel: Kernel) => {
 // TODO - remove files here after TTL
 export class FileCache extends Observable {
 
-  @inject(KernelProvider.ID, (p) => {
-    console.log("INJECT KER", p.value)
-    return p.value;
-  })
+  @inject(KernelProvider.ID)
   private _kernel: Kernel;
 
   @inject(PrivateBusProvider.ID)

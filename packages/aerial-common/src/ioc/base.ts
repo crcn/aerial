@@ -241,8 +241,8 @@ export class Kernel implements ICloneable {
   }
 
   private getPropertyValues(target: any) {
+
     const __inject = Reflect.getMetadata("injectProperties", target);
-    console.log("GET PROPS", target, __inject);
 
     if (target.$$injected) {
       // console.error(`Ignoring additional dependency injection on ${target.constructor.name}.`);
