@@ -5,6 +5,7 @@ import {
   getValueById,
   ImmutableArray, 
   ImmutableObject,
+  createStructFactory,
   BaseApplicationState,
   createImmutableObject,
   createImmutableArray,
@@ -17,6 +18,7 @@ import { Kernel } from "aerial-common";
 
 import {
   SyntheticBrowser,
+  SyntheticBrowser2,
 } from "aerial-synthetic-browser";
 
 import { MainServiceState } from "front-end/services";
@@ -71,7 +73,7 @@ export type Workspace = {
    * The synthetic browser instance.
    */
 
-  browser: SyntheticBrowser;
+  browser: SyntheticBrowser2;
 
   /**
    * text / visual editor state
@@ -99,7 +101,6 @@ export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById
 export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
 export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
 
-
 export const getSelectedWorkspace = (state: ApplicationState): Workspace => state.selectedWorkspaceId && getValueById(state, state.selectedWorkspaceId);
 export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById(state, state.selectedWorkspaceId);
 
@@ -107,15 +108,15 @@ export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById
  * Factories
  */
 
-export const createWorkspace        = createImmutableStructFactory<Workspace>(WORKSPACE, {
+export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, {
   editors: []
 });
 
-export const createApplicationState = createImmutableStructFactory<ApplicationState>(APPLICATION_STATE, {
+export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {
   workspaces: []
 });
 
-export const createFile             = createImmutableStructFactory<File>(FILE);
-export const createDirectory        = createImmutableStructFactory<Directory>(DIRECTORY, { 
+export const createFile             = createStructFactory<File>(FILE);
+export const createDirectory        = createStructFactory<Directory>(DIRECTORY, { 
   childNodes: [] 
 });

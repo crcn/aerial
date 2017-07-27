@@ -1,13 +1,20 @@
 import { DOMNodeType } from "../../dom";
-import { Struct, Box, Point, createStructFactory } from "aerial-common2";
+import { 
+  Struct, 
+  Box, 
+  Point, 
+  getValueById,
+  createStructFactory,
+} from "aerial-common2";
 
 /**
  * Types
  */
 
-export const DOM_TEXT_NODE              = "TEXT_NODE";
+export const DOM_TEXT_NODE              = "DOM_TEXT_NODE";
 export const DOM_ELEMENT                = "DOM_ELEMENT";
 export const DOM_DOCUMENT               = "DOM_DOCUMENT";
+export const DOM_COMMENT                = "DOM_COMMENT";
 export const SYTNTHETIC_BROWSER_WINDOW  = "SYNTHETIC_BROWSER_WINDOW";
 export const SYNTHETIC_BROWSER          = "SYNTHETIC_BROWSER";
 
@@ -16,23 +23,37 @@ export const SYNTHETIC_BROWSER          = "SYNTHETIC_BROWSER";
  */
 
 export type SyntheticDOMNode2 = {
-  type: DOMNodeType;
+  nodeType: DOMNodeType;
   nodeName: string;
   childNodes: SyntheticDOMNode2[];
 } & Struct;
 
+export type SyntheticDOMValueNode2 = {
+  nodeValue: string;
+} & SyntheticDOMNode2;
+
+export type SyntheticDOMComment2 = {
+  nodeValue: string;
+  nodeName: "#comment";
+} & SyntheticDOMValueNode2;
+
 export type SyntheticDOMTextNode2 = {
   nodeValue: string;
   nodeName: "#text";
-} & SyntheticDOMNode2;
+} & SyntheticDOMValueNode2;
 
 export type SyntheticCSSStyle2 = {
 
 } & Struct;
 
+export type SyntheticDOMElementAttributes2 = {
+  [identifier: string]: string
+} & Struct;
+
 export type SyntheticDOMElement2 = {
   nodeName: string;
   boundingRect: Box;
+  attributes: SyntheticDOMElementAttributes2;
   computedStyle: SyntheticCSSStyle2;
 } & SyntheticDOMNode2;
 
@@ -44,6 +65,7 @@ export type SyntheticBrowserWindow2 = {
   document: SyntheticDOMDocument2;
   location: string;
   title: string;
+  box: Box;
   computedStyles: SyntheticCSSStyle2[];
 } & Struct;
 
@@ -63,4 +85,10 @@ export const createSyntheticBrowserWindow2 = createStructFactory<SyntheticBrowse
   computedStyles: []
 });
 
-createSyntheticBrowserWindow2()
+export const getSyntheticBrowserWindow = (root: any, id: string): SyntheticBrowserWindow2 => {
+  return getValueById(root, id);
+}
+
+export const getSyntheticBrowser = (root: any, id: string): SyntheticBrowser2 => {
+  return getValueById(root, id);
+}

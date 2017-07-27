@@ -68,7 +68,7 @@ export const initLocalProtocolService = (upstream: Dispatcher<any>) => (downstre
   return parallel(downstream, withStoreState((state: ApplicationState) => { 
 
     for (const uri in watchers) {
-      watchers[uri].unshift(true);
+      // watchers[uri].unshift(true);
     }
     
     const urls = getFileUrls(state);

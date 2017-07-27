@@ -8,6 +8,11 @@ import {
 } from "front-end/state";
 
 import { 
+  syntheticBrowserReducer,
+  OPEN_SYNTHETIC_WINDOW_REQUESTED,
+} from "aerial-synthetic-browser";
+
+import { 
   TEXT_EDITOR_CHANGED,
   TextEditorChangedEvent,
   TREE_NODE_LABEL_CLICKED, 
@@ -45,11 +50,26 @@ export const applicationReducer = (state = createApplicationState(), event: Base
       const changedEvent = event as TextEditorChangedEvent;
       break;
     }
+  }
 
+  state = workspaceReducer(state, event);
+
+  return state;
+};
+
+const workspaceReducer = (state: ApplicationState, event: BaseEvent) => {
+  switch(event.type) {
+
+    // DEPRECATED
     case SYNTHETIC_BROWSER_STARTED: {
       const { workspace, browser } = event as SyntheticBrowserStartedEvent;
-      return updateStruct(state, workspace, "browser", browser);
+      state = updateStruct(state, workspace, "browser", browser);
+      break;
     }
   }
-  return state;
+
+  const newState = syntheticBrowserReducer(state, event);
+  console.log(event.type, newState === state, newState);
+
+  return newState;
 };

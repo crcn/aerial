@@ -63,6 +63,7 @@ export function traverseObject(target: any, _each: (value: any, key: any, object
 }
 
 export function update<T, K extends keyof T>(object: T, key: K, value: T[K]) {
+  if (object[key] === value) return object;
   if (Array.isArray(object) && !isNaN(Number(key))) {
     const index = Number(key);
     return [...object.slice(0, index), value, object.slice(index + 1)];
@@ -100,6 +101,7 @@ export const flattenObject = weakMemo((target: any) => {
 });
 
 export const getPath = weakMemo(<T>(root: any, filter: (a: any) => boolean) => {
+  if (filter(root)) return [];
   const flattened = flattenObject(root);
   for (const path in flattened) {
     const value = flattened[path];
@@ -108,4 +110,6 @@ export const getPath = weakMemo(<T>(root: any, filter: (a: any) => boolean) => {
 });
 
 
-export const getValueByPath = weakMemo(<T>(root: any, path: string[] | ReadonlyArray<string>) => path && flattenObject(root)[path.join(".")]);
+export const getValueByPath = weakMemo(<T>(root: any, path: string[] | ReadonlyArray<string>) => {
+  return path ? path.length ? flattenObject(root)[path.join(".")] : root : undefined;
+});

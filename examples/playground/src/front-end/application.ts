@@ -27,7 +27,7 @@ const mainReducer = reduceReducers(
   mainServiceReducer
 );
 
-export const initApplication = (initialState: ImmutableObject<ApplicationState>) => circular((upstream: Dispatcher<any>) => flowRight(
-    initBaseApplication(initialState.set("mainComponentClass", MainComponent), mainReducer, initMainService),
+export const initApplication = (initialState: ApplicationState) => circular((upstream: Dispatcher<any>) => flowRight(
+    initBaseApplication({ ...initialState, mainComponentClass: MainComponent } as ApplicationState, mainReducer, initMainService),
     (downstream: Dispatcher<any>) => parallel(downstream, whenPublicMessage(whenMaster(upstream, fork(upstream), hook(upstream))))
 ));

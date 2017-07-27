@@ -1,5 +1,6 @@
 import parse5 = require("parse5");
-import { sample, sampleSize, random } from "lodash";
+import { sample, sampleSize, random, omit } from "lodash";
+import { ImmutableObject } from "aerial-common2";
 import { createJavaScriptSandboxProviders } from "aerial-commonjs-extension";
 import { ISandboxTestProviderOptions, createTestSandboxProviders } from "aerial-sandbox/test";
 import { 
@@ -139,6 +140,20 @@ export const timeout = (ms = 10) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export const omit$$idDeep = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(omit$$idDeep);
+  } else if (obj && obj.constructor === Object || obj.constructor === ImmutableObject) {
+    const clone = {};
+    for (const k in obj) {
+      if (k === "$$id") continue;
+      clone[k] = omit$$idDeep(obj[k]);
+    }
+    return clone;
+  }
+  return obj;
+}
+
 interface ITestKernelOptions {
   log?: {
     level: LogLevel
@@ -148,6 +163,7 @@ interface ITestKernelOptions {
 }
 
 export const createRandomFileName = (extension) => Math.round(Math.random() * 9999999999) + "." + extension;
+
 
 export const createTestKernel = (options: ITestKernelOptions = {}) => {
   const bus = new BrokerBus();

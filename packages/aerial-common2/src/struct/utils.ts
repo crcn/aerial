@@ -4,6 +4,7 @@ import {
   updateIn,
   immutable,
   mapImmutable,
+  flattenObject,
   getValueByPath,
   ImmutableObject,
 } from "../immutable";
@@ -57,7 +58,23 @@ export const getPathByType = (root: any, type: string) => getPath(root, (value: 
 /**
  */
 
-export const getValueById = (root: any, id: string) => getValueByPath(root, getPathById(root, id));
+export const getValuesByType = (root: any, type: string) => {
+  const flattened = flattenObject(root);
+  const valuesByType = [];
+  for (const k in flattened) {
+    if (flattened[k] && flattened[k].$$type === type) {
+      valuesByType.push(flattened[k]);
+    }
+  }
+  return valuesByType;
+}
+
+/**
+ */
+
+export const getValueById = (root: any, id: string) => {
+  return getValueByPath(root, getPathById(root, id));
+}
 
 /**
  */
@@ -74,7 +91,6 @@ export const structFactory = <TFunc extends (...args) => any>(type: string, crea
 }
 
 export const struct = <TProps>(type: string, props: TProps) => idd(typed(type, () => props))();
-
 
 /**
  * @param type 

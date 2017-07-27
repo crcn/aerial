@@ -5,7 +5,7 @@ import { parallel, readOne, readAll, pump } from "mesh";
 import { initRemoteSyntheticBrowserService } from "aerial-synthetic-browser";
 import { BrokerBus, Kernel, PrivateBusProvider, KernelProvider, MainDispatcherProvider } from "aerial-common";
 import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile } from "front-end/state";
-import { SyntheticBrowser, ISyntheticBrowser, createSyntheticHTMLProviders, RemoteSyntheticBrowser, createSyntheticBrowserWorkerProviders, OPEN_REMOTE_BROWSER } from "aerial-synthetic-browser";
+import { SyntheticBrowser, ISyntheticBrowser, createSyntheticHTMLProviders, RemoteSyntheticBrowser, initSyntheticBrowserService,  OPEN_REMOTE_BROWSER, openSyntheticWindowRequested } from "aerial-synthetic-browser";
 import { BaseEvent, Dispatcher, whenStoreChanged, StoreChangedEvent, whenWorker, whenMaster, whenType, publicObject } from "aerial-common2";
 import { FileCacheProvider, createSandboxProviders, URIProtocolProvider, URIProtocol, IURIProtocolReadResult } from "aerial-sandbox";
 
@@ -55,17 +55,14 @@ export const syntheticBrowserStarted = (workspace: Workspace, browser: ISyntheti
 
 export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(
   downstream,
-  initRemoteSyntheticBrowserService(createKernel(upstream, true), upstream)(downstream),
+  // initRemoteSyntheticBrowserService(createKernel(upstream, true), upstream)(downstream),
+  initSyntheticBrowserService(upstream, createKernel(upstream))(downstream),
   whenMaster(upstream, whenStoreChanged((state: ApplicationState) => state.selectedWorkspaceId, async ({ payload: state }: StoreChangedEvent<ApplicationState>) => {
     
     const workspace = getSelectedWorkspace(state);
-
+    
     // TODO - remove 
     if (!workspace) return;
-
-    // const browser = new SyntheticBrowser(kernel);
-    const browser = new RemoteSyntheticBrowser(createKernel(upstream));
-    browser.renderer.start();
 
     const urls = getFileUrls(state);
     const mainFile = getWorkspaceMainFile(workspace);
@@ -75,11 +72,8 @@ export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: 
         break;
       }
     }
-    await browser.open({
-      uri: mainUrl
-    });
 
-    readAll(upstream(syntheticBrowserStarted(workspace, browser)));
+    await readAll(upstream(openSyntheticWindowRequested(workspace.browser.$$id, mainUrl)));
   }))
 );
 
@@ -103,5 +97,5 @@ const createURIProtocolClass = (upstream: Dispatcher<any>) => {
         }
       };
     }
-  }
-}
+  };
+};
