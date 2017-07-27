@@ -4,7 +4,7 @@ import {
   update, 
   updateIn, 
   BaseEvent, 
-  updateStruct, 
+  updateStructProperty, 
   getValueById, 
   deleteValueById 
 } from "aerial-common2";
@@ -46,7 +46,7 @@ export const syntheticBrowserReducer = (root: any, event: BaseEvent) => {
     case OPEN_SYNTHETIC_WINDOW_REQUESTED: {
       const { location, syntheticBrowserId } = event as OpenSyntheticWindowRequested;
       const browser = getSyntheticBrowser(root, syntheticBrowserId);
-      return updateStruct(root, browser, "windows", browser.windows.concat(createSyntheticBrowserWindow2({
+      return updateStructProperty(root, browser, "windows", browser.windows.concat(createSyntheticBrowserWindow2({
         location
       })));
     }
@@ -69,7 +69,7 @@ const updateDOMFromLegacyMutation = (root: any, { mutation, syntheticWindowId, l
   if (!mutation) {
     const window = getSyntheticBrowserWindow(root, syntheticWindowId);
     if (!window) return root;
-    return updateStruct(root, getSyntheticBrowserWindow(root, syntheticWindowId), "document", mapLegacyDOMNodeToPOJO(legacyDocument));
+    return updateStructProperty(root, getSyntheticBrowserWindow(root, syntheticWindowId), "document", mapLegacyDOMNodeToPOJO(legacyDocument));
   }
 
   return root;

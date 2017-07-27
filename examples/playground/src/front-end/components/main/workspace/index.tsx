@@ -1,5 +1,6 @@
 import "./index.scss";
 import * as React from "react";
+import { pure } from "recompose";
 import { Workspace, getSelectedWorkspaceFile } from "front-end/state";
 import { Dispatcher, Message, getValueById } from "aerial-common2";
 import { ProjectGutterComponent } from "./project-gutter";
@@ -16,13 +17,13 @@ export const WorkspaceComponentBase = ({ workspace, dispatch }: WorkspaceCompone
     <ProjectGutterComponent workspace={workspace} dispatch={dispatch} />
     <div className="workspace-editors">
       <TextEditorComponent file={getSelectedWorkspaceFile(workspace)} dispatch={dispatch} />
-      <VisualEditorComponent browser={workspace.browser} />
+      <VisualEditorComponent workspace={workspace} dispatch={dispatch} />
     </div>
     <VisualGutterComponent />
   </div>
 }
 
-export const WorkspaceComponent = WorkspaceComponentBase;
+export const WorkspaceComponent = pure(WorkspaceComponentBase as any) as typeof WorkspaceComponentBase;
 
 export * from "./element-gutter";
 export * from "./project-gutter";

@@ -3,7 +3,9 @@ import {
   Struct, 
   Box, 
   Point, 
+  weakMemo,
   getValueById,
+  traverseObject,
   createStructFactory,
 } from "aerial-common2";
 
@@ -75,7 +77,12 @@ export type SyntheticBrowserWindow2 = {
   location: string;
   title: string;
   box: Box;
-  computedStyles: SyntheticCSSStyle2[];
+  computedBoxes: {
+    [identifier: string]: Box;
+  };
+  computedStyles: {
+    [identifier: string]: CSSStyleDeclaration
+  }
 } & Struct;
 
 export type SyntheticBrowserRenderer2 = {
@@ -91,6 +98,7 @@ export type SyntheticBrowser2 = {
   windows: SyntheticBrowserWindow2[]
 } & Struct;
 
+export const isSyntheticDOMNode = (value) => value && value.nodeType != null;
 /**
  * Utilities
  */
@@ -100,14 +108,35 @@ export const createSyntheticBrowser2 = createStructFactory<SyntheticBrowser2>(SY
 });
 
 export const createSyntheticBrowserWindow2 = createStructFactory<SyntheticBrowserWindow2>(SYTNTHETIC_BROWSER_WINDOW, {
-  computedStyles: [],
+  computedStyles: {},
+  computedBoxes: {},
   box: DEFAULT_SYNTHETIC_WINDOW_BOX
 });
 
 export const getSyntheticBrowserWindow = (root: any, id: string): SyntheticBrowserWindow2 => {
   return getValueById(root, id);
-}
+};
 
 export const getSyntheticBrowser = (root: any, id: string): SyntheticBrowser2 => {
   return getValueById(root, id);
-}
+};
+
+export const findSyntheticDOMNodes = weakMemo((root: any, filter: (node: SyntheticDOMNode2) => boolean): SyntheticDOMNode2[] => {
+  const found: SyntheticDOMNode2[] = [];
+  traverseObject(root, (item: any) => {
+    if (isSyntheticDOMNode(item) && filter(item)) {
+      found.push(item);
+    }
+  });
+  return found;
+});
+
+export const getAllSyntheticDOMNodes = weakMemo((root: any) => findSyntheticDOMNodes(root, () => true));
+export const getAllSyntheticDOMNodesAsIdMap = weakMemo((root: any): { [identifier: string]: SyntheticDOMNode2 } => {
+  const allNodes = getAllSyntheticDOMNodes(root);
+  const map = {};
+  for (const node of allNodes) {
+    map[node.$$id] = node;
+  }
+  return map;
+});

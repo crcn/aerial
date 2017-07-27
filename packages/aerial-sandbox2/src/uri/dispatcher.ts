@@ -14,7 +14,7 @@ import {
   updateIn, 
   Dispatcher, 
   routeTypes, 
-  updateStruct, 
+  updateStructProperty, 
   getPathByType, 
   whenStoreChanged, 
   StoreChangedEvent,
@@ -45,7 +45,7 @@ export const uriProtocolReducer = (rootState: any, action: Action) => {
   switch(action.type) {
     case WATCH_URI: {
       const { uri } = action as WatchUriAction;
-      return updateStruct(rootState, uriProtocolState, "watchedUris", uniq([...uriProtocolState.watchedUris, uri]));
+      return updateStructProperty(rootState, uriProtocolState, "watchedUris", uniq([...uriProtocolState.watchedUris, uri]));
     }
   }
   return rootState;

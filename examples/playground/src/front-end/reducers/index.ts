@@ -1,4 +1,4 @@
-import { BaseEvent, mapImmutable, getPathById, updateIn, getValueByPath, updateStruct } from "aerial-common2";
+import { BaseEvent, mapImmutable, getPathById, updateIn, getValueByPath, updateStructProperty, updateStruct } from "aerial-common2";
 
 import { 
   ApplicationState,
@@ -9,22 +9,20 @@ import {
 
 import { 
   syntheticBrowserReducer,
+  getSyntheticBrowserWindow,
   OPEN_SYNTHETIC_WINDOW_REQUESTED,
 } from "aerial-synthetic-browser";
 
 import { 
   TEXT_EDITOR_CHANGED,
   TextEditorChangedEvent,
+  CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
+  CanvasElementsComputedPropsChanged,
   TREE_NODE_LABEL_CLICKED, 
   FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED,
   FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
   TreeNodeLabelClickedEvent, 
 } from "front-end/components";
-
-import { 
-  SYNTHETIC_BROWSER_STARTED,
-  SyntheticBrowserStartedEvent
-} from "front-end/services";
 
 import reduceReducers = require("reduce-reducers");
 
@@ -32,13 +30,13 @@ export const applicationReducer = (state = createApplicationState(), event: Base
   switch(event.type) {
     case TREE_NODE_LABEL_CLICKED: {
       const { node } = event as TreeNodeLabelClickedEvent;
-      return updateStruct(state, getSelectedWorkspace(state), "selectedFileId", node.$$id);
+      return updateStructProperty(state, getSelectedWorkspace(state), "selectedFileId", node.$$id);
     }
 
     case TEXT_EDITOR_CHANGED: {
       const { file, value } = event as TextEditorChangedEvent;
       const path = getPathById(state, file.$$id);
-      return updateStruct(state, file, "content", value);
+      return updateStructProperty(state, file, "content", value);
     }
 
     case FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED: {
@@ -52,23 +50,26 @@ export const applicationReducer = (state = createApplicationState(), event: Base
     }
   }
 
-  state = workspaceReducer(state, event);
+  state = canvasReducer(state, event);
+  state = syntheticBrowserReducer(state, event);
 
   return state;
 };
 
-const workspaceReducer = (state: ApplicationState, event: BaseEvent) => {
-  switch(event.type) {
 
-    // DEPRECATED
-    case SYNTHETIC_BROWSER_STARTED: {
-      const { workspace, browser } = event as SyntheticBrowserStartedEvent;
-      state = updateStruct(state, workspace, "browser", browser);
-      break;
+
+const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
+  switch(event.type) {
+    case CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED: {
+      const { computedStyles, computedBoxes, syntheticWindowId } = event as CanvasElementsComputedPropsChanged;
+      const window = getSyntheticBrowserWindow(state, syntheticWindowId);
+      return updateStruct(state, window, {
+        ...window,
+        computedBoxes,
+        computedStyles
+      });
     }
   }
 
-  const newState = syntheticBrowserReducer(state, event);
-
-  return newState;
+  return state;
 };

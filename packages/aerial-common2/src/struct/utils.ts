@@ -79,7 +79,13 @@ export const getValueById = (root: any, id: string) => {
 /**
  */
 
-export const updateStruct = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct, key: K, value: any) => updateIn(root, [...getPathById(root, struct.$$id), key], value);
+export const updateStructProperty = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct, key: K, value: any) => updateIn(root, [...getPathById(root, struct.$$id), key], value);
+
+/**
+ */
+
+export const updateStruct = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct,value: TStruct) => updateIn(root, getPathById(root, struct.$$id), value);
+
 
 
 /**

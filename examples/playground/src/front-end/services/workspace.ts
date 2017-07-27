@@ -24,31 +24,6 @@ const createKernel = (upstream: Dispatcher<any>, sync?: boolean) => {
 }
 
 /**
- * Event types
- */
-
-export const SYNTHETIC_BROWSER_STARTED = "SYNTHETIC_BROWSER_STARTED";
-
-/**
- * Event state
- */
-
-export type SyntheticBrowserStartedEvent = {
-  browser: SyntheticBrowser,
-  workspace: Workspace
-} & BaseEvent;
-
-/**
- * Event factories
- */
-
-export const syntheticBrowserStarted = (workspace: Workspace, browser: ISyntheticBrowser) => ({
-  type: SYNTHETIC_BROWSER_STARTED,
-  browser,
-  workspace
-});
-
-/**
  * Service
  */
 
