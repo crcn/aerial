@@ -69,7 +69,6 @@ const workspaceReducer = (state: ApplicationState, event: BaseEvent) => {
   }
 
   const newState = syntheticBrowserReducer(state, event);
-  console.log(event.type, newState === state, newState);
 
   return newState;
 };

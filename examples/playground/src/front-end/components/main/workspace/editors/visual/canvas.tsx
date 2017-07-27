@@ -1,4 +1,5 @@
-import "./index.scss";
+import "./canvas.scss";
+const VOID_ELEMENTS = require("void-elements");
 import * as React from "react";
 import { lifecycle, compose, withState, pure } from "recompose";
 import { 
@@ -10,6 +11,8 @@ import {
   SyntheticDOMTextNode2,
   SyntheticBrowserWindow2, 
 } from "aerial-synthetic-browser";
+
+import { IsolateComponent } from "front-end/components/isolated";
 
 export type CanvasComponentOuterProps = {
   browser: SyntheticBrowser2;
@@ -36,18 +39,32 @@ const mapSyntheticDOMNodeToJSX = (node: SyntheticDOMNode2) => {
   if (node.nodeType === DOMNodeType.ELEMENT) {
     const element = node as SyntheticDOMElement2;
     const nodeName = NODE_NAME_MAP[element.nodeName] || element.nodeName;
-    return React.createElement(nodeName, { key: element.$$id, ...element.attributes }, element.childNodes.map(mapSyntheticDOMNodeToJSX));
+    return React.createElement(nodeName, { key: element.$$id, ...element.attributes }, VOID_ELEMENTS[nodeName] ? null : element.childNodes.map(mapSyntheticDOMNodeToJSX));
   }
   return null;
 };
 
-const WindowComponentBase = ({ window }: WindowComponentProps) => <div className="visual-editor-canvas-window">
-  { window.document && window.document.childNodes.map(mapSyntheticDOMNodeToJSX) }
-</div>;
+const WindowComponentBase = ({ window: { box, document } }: WindowComponentProps) => {
+  
+  const style = {
+    left: box.left,
+    top: box.top,
+    width: box.right - box.left,
+    height: box.bottom - box.top
+  };
+
+  return <div className="visual-canvas-window-component" style={style}>
+    <IsolateComponent inheritCSS>
+      <span>
+        { document && document.childNodes.map(mapSyntheticDOMNodeToJSX) }
+      </span>
+    </IsolateComponent>
+  </div>;
+}
 
 const WindowComponent = pure(WindowComponentBase as any) as typeof WindowComponentBase;
 
-export const CanvasComponentBase = ({ browser = null, setContainer }: CanvasComponentInnerProps) => browser && <div className="visual-editor-canvas">
+export const CanvasComponentBase = ({ browser = null, setContainer }: CanvasComponentInnerProps) => browser && <div className="visual-canvas-component">
   {
     browser.windows.map((window) => <WindowComponent key={window.$$id} window={window} />)
   }

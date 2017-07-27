@@ -8,7 +8,7 @@ import {
 } from "aerial-common2";
 
 /**
- * Types
+ * Constants
  */
 
 export const DOM_TEXT_NODE              = "DOM_TEXT_NODE";
@@ -17,6 +17,15 @@ export const DOM_DOCUMENT               = "DOM_DOCUMENT";
 export const DOM_COMMENT                = "DOM_COMMENT";
 export const SYTNTHETIC_BROWSER_WINDOW  = "SYNTHETIC_BROWSER_WINDOW";
 export const SYNTHETIC_BROWSER          = "SYNTHETIC_BROWSER";
+
+const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
+  left: 0,
+  top: 0,
+
+  // small screen size
+  right: 800,
+  bottom: 600
+};
 
 /**
  * Shapes
@@ -91,7 +100,8 @@ export const createSyntheticBrowser2 = createStructFactory<SyntheticBrowser2>(SY
 });
 
 export const createSyntheticBrowserWindow2 = createStructFactory<SyntheticBrowserWindow2>(SYTNTHETIC_BROWSER_WINDOW, {
-  computedStyles: []
+  computedStyles: [],
+  box: DEFAULT_SYNTHETIC_WINDOW_BOX
 });
 
 export const getSyntheticBrowserWindow = (root: any, id: string): SyntheticBrowserWindow2 => {

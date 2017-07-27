@@ -10,7 +10,7 @@ export type VisualEditorComponentProps = {
 };
 
 export const VisualEditorComponentBase = ({ browser = null }: VisualEditorComponentProps) => browser && <div className="visual-editor-component">
-  <IsolateComponent>
+  <IsolateComponent inheritCSS>
     <CanvasComponent browser={browser} />
   </IsolateComponent>
 </div>;

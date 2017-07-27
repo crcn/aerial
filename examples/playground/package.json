@@ -77,6 +77,7 @@
     "reselect": "^3.0.1",
     "sift": "3.3.x",
     "systemjs": "^0.20.14",
-    "tinycolor2": "^1.4.1"
+    "tinycolor2": "^1.4.1",
+    "void-elements": "^3.1.0"
   }
 }

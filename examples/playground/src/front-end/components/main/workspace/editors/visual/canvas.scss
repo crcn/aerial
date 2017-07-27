@@ -1,0 +1,14 @@
+
+.visual-canvas-component {
+  background: #EFEFEF;
+  .visual-canvas-window-component {
+    background: white;
+    position: absolute;
+    border: 1px solid red;
+    > iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

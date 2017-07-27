@@ -1,7 +1,20 @@
 import React =  require("react");
 import ReactDOM = require("react-dom");
 
-export class IsolateComponent extends React.Component<any, any> {
+export class IsolateComponent extends React.Component<{ 
+  inheritCSS?: boolean, 
+  onMouseDown?: any, 
+  onKeyDown?: any,
+  onLoad?: any,
+  children: any,
+  onScroll?: any,
+  scrolling?: boolean,
+  style?: any,
+  onWheel?: any,
+  onDragOver?: any,
+  className?: string,
+  onDrop?: any
+}, any> {
 
   private _mountElement: any;
 
@@ -10,8 +23,6 @@ export class IsolateComponent extends React.Component<any, any> {
     if (window["$synthetic"]) {
       return;
     }
-
-    
 
     if (this.props.inheritCSS) {
       const head    = this.head;
@@ -62,12 +73,13 @@ export class IsolateComponent extends React.Component<any, any> {
 
   onLoad = () => {
     if (this.props.onLoad) this.props.onLoad();
-    console.log("LOAD IFRAME");
   }
 
   _render() {
     if (window["$synthetic"]) return;
-    ReactDOM.render(this.props.children, this._mountElement);
+    if (this.props.children && this._mountElement) {
+      ReactDOM.render(this.props.children, this._mountElement);
+    }
   }
 
   _addListeners() {
@@ -92,6 +104,6 @@ export class IsolateComponent extends React.Component<any, any> {
       return <span>{this.props.children}</span>;
     }
 
-    return <iframe ref="container" scrolling={this.props.scrolling} onDragOver={this.props.onDragOver} onDrop={this.props.onDrop} onWheel={this.props.onWheel} onScroll={this.onScroll} onLoad={this.onLoad} className={this.props.className} style={this.props.style} />;
+    return <iframe ref="container" onDragOver={this.props.onDragOver} onDrop={this.props.onDrop} onWheel={this.props.onWheel} onScroll={this.onScroll} onLoad={this.onLoad} className={this.props.className} style={this.props.style} />;
   }
 }
