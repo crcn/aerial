@@ -27,7 +27,8 @@ type WindowComponentProps = {
 
 const NODE_NAME_MAP = {
   "html": "span",
-  "body": "span"
+  "body": "span",
+  "head": "span"
 };
 
 const mapSyntheticDOMNodeToJSX = (node: SyntheticDOMNode2) => {

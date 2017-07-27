@@ -69,6 +69,15 @@ export type SyntheticBrowserWindow2 = {
   computedStyles: SyntheticCSSStyle2[];
 } & Struct;
 
+export type SyntheticBrowserRenderer2 = {
+
+} & Struct;
+
+export type SyntheticBrowserDOMRenderer2 = {
+  syntheticBrowserWindowId: string;
+  nativeDocumentElenent: HTMLElement;
+} & SyntheticBrowserRenderer2;
+
 export type SyntheticBrowser2 = {
   windows: SyntheticBrowserWindow2[]
 } & Struct;

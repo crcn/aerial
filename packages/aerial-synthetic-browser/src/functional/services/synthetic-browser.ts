@@ -82,8 +82,7 @@ export const initSyntheticBrowserService = (upstream: Dispatcher<any>, kernel: K
 
 const observeSyntheticBrowserState = (browser: SyntheticBrowser, window: SyntheticBrowserWindow2, upstream: Dispatcher<any>) => {
   observeSyntheticBrowserDOMState(browser, window, upstream);
-}
-
+};
 
 const observeSyntheticBrowserDOMState = (browser: SyntheticBrowser, state: SyntheticBrowserWindow2, upstream: Dispatcher<any>) => {
 
@@ -109,4 +108,4 @@ const observeSyntheticBrowserDOMState = (browser: SyntheticBrowser, state: Synth
   }
 
   watchProperty(browser, "status", onStatusChange);
-}
+};

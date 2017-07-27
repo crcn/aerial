@@ -1,6 +1,7 @@
 import {
   Struct,
   TreeNode,
+  weakMemo,
   getPathById,
   getValueById,
   ImmutableArray, 
@@ -119,4 +120,43 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
 export const createFile             = createStructFactory<File>(FILE);
 export const createDirectory        = createStructFactory<Directory>(DIRECTORY, { 
   childNodes: [] 
+});
+
+export const getAllFilesByPath = weakMemo((state: ApplicationState|Workspace, prefix: string = "") => {
+  let files = {};
+  const getFilesByUrl2 = (dir: Directory, prefix = '') => {
+    for (const doc of dir.childNodes) {
+      const newPrefix = `${prefix}/${doc.name}`;
+      if (doc.$$type === DIRECTORY) {
+        files = {...files, ...getFilesByUrl2(doc, newPrefix)};
+      } else {
+        files[newPrefix] = doc;
+      }
+    }
+    return files;
+  };
+
+  if (state.$$type === APPLICATION_STATE) {
+    for (const workspace of (state as ApplicationState).workspaces) {
+      files = {
+        ...files,
+        ...getFilesByUrl2(workspace.sourceFiles, `${prefix}${workspace.$$id}`)
+      };
+    }
+  } else if (state.$$type === WORKSPACE) {
+    const workspace = state as Workspace;
+    files = getFilesByUrl2(workspace.sourceFiles, `${prefix}${workspace.$$id}`);
+  }
+
+  return files;
+});
+
+export const getWorkspaceMainFilePath = weakMemo((workspace: Workspace) => {
+  const file = getWorkspaceMainFile(workspace);
+  const allPaths = getAllFilesByPath(workspace);
+  for (const path in allPaths) {
+    if (allPaths[path].$$id === file.$$id) {
+      return path;
+    }
+  }
 });

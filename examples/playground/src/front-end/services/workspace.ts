@@ -1,10 +1,9 @@
 import { identity } from "lodash";
-import { getFileUrls } from "./local-protocol";
 import { readUriAction, watchUriAction } from "aerial-sandbox2";
 import { parallel, readOne, readAll, pump } from "mesh";
 import { initRemoteSyntheticBrowserService } from "aerial-synthetic-browser";
 import { BrokerBus, Kernel, PrivateBusProvider, KernelProvider, MainDispatcherProvider } from "aerial-common";
-import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile } from "front-end/state";
+import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile, getWorkspaceMainFilePath } from "front-end/state";
 import { SyntheticBrowser, ISyntheticBrowser, createSyntheticHTMLProviders, RemoteSyntheticBrowser, initSyntheticBrowserService,  OPEN_REMOTE_BROWSER, openSyntheticWindowRequested } from "aerial-synthetic-browser";
 import { BaseEvent, Dispatcher, whenStoreChanged, StoreChangedEvent, whenWorker, whenMaster, whenType, publicObject } from "aerial-common2";
 import { FileCacheProvider, createSandboxProviders, URIProtocolProvider, URIProtocol, IURIProtocolReadResult } from "aerial-sandbox";
@@ -64,16 +63,7 @@ export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: 
     // TODO - remove 
     if (!workspace) return;
 
-    const urls = getFileUrls(state);
-    const mainFile = getWorkspaceMainFile(workspace);
-    let mainUrl;
-    for (mainUrl in urls) {
-      if (urls[mainUrl] === mainFile) {
-        break;
-      }
-    }
-
-    await readAll(upstream(openSyntheticWindowRequested(workspace.browser.$$id, mainUrl)));
+    await readAll(upstream(openSyntheticWindowRequested(workspace.browser.$$id, "local://" + getWorkspaceMainFilePath(workspace))));
   }))
 );
 

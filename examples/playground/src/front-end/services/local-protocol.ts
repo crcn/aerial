@@ -1,7 +1,8 @@
 import { 
+  weakMemo,
+  routeTypes,
   Dispatcher,
   withStoreState,
-  routeTypes
 } from "aerial-common2";
 
 import { 
@@ -22,6 +23,7 @@ import { 
   DIRECTORY,
   Directory, 
   ApplicationState, 
+  getAllFilesByPath,
 } from "front-end/state";
 
 /**
@@ -30,56 +32,40 @@ import { 
 
 const actionIsLocalProtocol = (action: BaseUriAction) => action.uri && /^local\:\/\//.test(action.uri);
 
-// TODO - move me to workspace
-export const getFileUrls = (state: ApplicationState) => {
-  let urls = {};
-  const getFileUrls = (dir: Directory, prefix = '') => {
-    for (const doc of dir.childNodes) {
-      const newPrefix = `${prefix}/${doc.name}`;
-      if (doc.$$type === DIRECTORY) {
-        urls = {...urls, ...getFileUrls(doc, newPrefix)};
-      } else {
-        urls[newPrefix] = doc;
-      }
-    }
-    return urls;
-  };
-
-  for (const workspace of state.workspaces) {
-    urls = {
-      ...urls,
-      ...getFileUrls(workspace.sourceFiles, `local://${workspace.$$id}`)
-    };
-  }
-
-  return urls;
-};
-
-
 /**
  * Services
  */
+
+const getAllFilesWithLocalProtocol = (state: ApplicationState) => getAllFilesByPath(state, "local://");
+
 
 export const initLocalProtocolService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) =>  {
 
   const watchers = {};
 
-
   return parallel(downstream, withStoreState((state: ApplicationState) => { 
 
     for (const uri in watchers) {
-      // watchers[uri].unshift(true);
+      watchers[uri](state);
     }
     
-    const urls = getFileUrls(state);
+    const files = getAllFilesWithLocalProtocol(state);
 
     return when(actionIsLocalProtocol, routeTypes({
       [READ_URI]({ uri }: ReadUriAction) {
-        return urls[uri];
+        return files[uri];
       },
       [WATCH_URI](action: WatchUriAction) {
         const q = createQueue();
-        watchers[action.uri] = q;
+        let currentFile = files[action.uri];
+
+        watchers[action.uri] = (state) => {
+          const newFiles = getAllFilesWithLocalProtocol(state);
+          if (newFiles[action.uri] !== currentFile) {
+            currentFile = newFiles[action.uri];
+            q.unshift(true);
+          }
+        }
         
         return {
           [Symbol.asyncIterator]: () => this,
