@@ -2,7 +2,6 @@ import {
   updateIn, 
   Translate,
   BaseEvent, 
-  movePoint,
   boxFromRect,
   getPathById, 
   updateStruct,
@@ -11,6 +10,8 @@ import {
   centerTransformZoom,
   updateStructProperty, 
 } from "aerial-common2";
+
+import { clamp } from "lodash";
 
 import { 
   ApplicationState,
@@ -90,6 +91,8 @@ const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
+const MIN_ZOOM = 0.2;
+const MAX_ZOOM = 6400 / 100;
 
 
 const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
@@ -104,7 +107,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         translate = centerTransformZoom(translate, boxFromRect({
           width: canvasWidth,
           height: canvasHeight
-        }), translate.zoom + deltaY / ZOOM_SENSITIVITY, { left: mouseX, top: mouseY });
+        }), clamp(translate.zoom + deltaY / ZOOM_SENSITIVITY, MIN_ZOOM, MAX_ZOOM), { left: mouseX, top: mouseY });
 
       } else {
         translate = {

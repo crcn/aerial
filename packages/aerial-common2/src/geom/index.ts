@@ -5,7 +5,7 @@ export type Box = {
   bottom: number;
 }
 
-export type Rect = {
+export type Rectangle = {
   width: number;
   height: number;
 }
@@ -37,7 +37,7 @@ export const zoomBox = (box: Box, zoom: number): Box => ({
   bottom: box.bottom * zoom
 });
 
-export const boxFromRect = ({ width, height }: Rect): Box => ({
+export const boxFromRect = ({ width, height }: Rectangle): Box => ({
   left: 0,
   top: 0,
   right: width,

@@ -7,7 +7,7 @@ import { Workspace } from "front-end/state";
 import { CanvasComponent } from "./canvas";
 import { IsolateComponent } from "front-end/components/isolated";
 import { VisualToolsComponent } from "./tools";
-import { Dispatcher, BaseEvent } from "aerial-common2";
+import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { SyntheticBrowser2, SyntheticDOMRenderer } from "aerial-synthetic-browser";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
 
@@ -28,11 +28,11 @@ export type VisualEditorWheel = {
   deltaY: number;
 } & BaseEvent;
 
-export const visualEditorWheel = (workspaceId: string, canvasWidth: number, canvasHeight: number, { metaKey, ctrlKey, deltaX, deltaY, clientX, clientY }: React.WheelEvent<any>): VisualEditorWheel => ({
+export const visualEditorWheel = (workspaceId: string, canvasWidth: number, canvasHeight: number, mousePosition: Point, { metaKey, ctrlKey, deltaX, deltaY, clientX, clientY }: React.WheelEvent<any>): VisualEditorWheel => ({
   workspaceId,
   metaKey,
-  mouseX: clientY,
-  mouseY: clientY,
+  mouseX: mousePosition.left,
+  mouseY: mousePosition.top,
   canvasWidth,
   canvasHeight,
   ctrlKey,
@@ -49,6 +49,7 @@ export type VisualEditorOuterComponentProps = {
 export type VisualEditorInnerComponentProps = {
   canvasOuter: HTMLElement;
   onWheel: (event: React.SyntheticEvent<MouseEvent>) => any;
+  mousePosition: Point;
   onDrop: (event: React.SyntheticEvent<any>) => any;
   onMouseEvent: (event: React.SyntheticEvent<any>) => any;
   onMouseDown: (event: React.SyntheticEvent<any>) => any;
@@ -60,10 +61,14 @@ export type VisualEditorInnerComponentProps = {
 const enhanceVisualEditorComponent = compose<VisualEditorOuterComponentProps, VisualEditorInnerComponentProps>(
   pure,
   withState('canvasOuter', 'setCanvasOuter', null),
+  withState('mousePosition', 'setMousePosition', null),
   withHandlers({
-    onWheel: ({ workspace, dispatch, canvasOuter }: VisualEditorInnerComponentProps) => (event: React.WheelEvent<any>) => {
+    onMouseEvent: ({ setMousePosition }) => (event: React.MouseEvent<any>) => {
+      setMousePosition({ left: event.pageX, top: event.pageY });
+    },
+    onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: VisualEditorInnerComponentProps) => (event: React.WheelEvent<any>) => {
       const rect = canvasOuter.getBoundingClientRect();
-      readAll(dispatch(visualEditorWheel(workspace.$$id, rect.width, rect.height, event)));
+      readAll(dispatch(visualEditorWheel(workspace.$$id, rect.width, rect.height, mousePosition, event)));
     }
   })
 );
