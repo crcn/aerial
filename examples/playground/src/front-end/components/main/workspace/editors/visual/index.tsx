@@ -68,6 +68,7 @@ const enhanceVisualEditorComponent = compose<VisualEditorOuterComponentProps, Vi
     },
     onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: VisualEditorInnerComponentProps) => (event: React.WheelEvent<any>) => {
       const rect = canvasOuter.getBoundingClientRect();
+      event.preventDefault();
       readAll(dispatch(visualEditorWheel(workspace.$$id, rect.width, rect.height, mousePosition, event)));
     }
   })
