@@ -4,9 +4,9 @@ import "./index.scss";
 import * as React from "react";
 import { readAll } from "mesh";
 import { Workspace } from "front-end/state";
+import { ToolsLayerComponent } from "./tools";
 import { CanvasComponent } from "./canvas";
 import { IsolateComponent } from "front-end/components/isolated";
-import { VisualToolsComponent } from "./tools";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { SyntheticBrowser2, SyntheticDOMRenderer } from "aerial-synthetic-browser";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
@@ -125,7 +125,7 @@ export const VisualEditorComponentBase = ({
           style={outerStyle}>
           <div style={innerStyle} className="visual-editor-inner">
             <CanvasComponent browser={workspace.browser} dispatch={dispatch} />
-            <VisualToolsComponent workspace={workspace} dispatch={dispatch} />
+            <ToolsLayerComponent workspace={workspace} dispatch={dispatch} />
           </div>
         </div>
       </span>
