@@ -1,7 +1,20 @@
-import { BaseEvent, mapImmutable, getPathById, updateIn, getValueByPath, updateStructProperty, updateStruct } from "aerial-common2";
+import { 
+  updateIn, 
+  Translate,
+  BaseEvent, 
+  movePoint,
+  boxFromRect,
+  getPathById, 
+  updateStruct,
+  mapImmutable, 
+  getValueByPath, 
+  centerTransformZoom,
+  updateStructProperty, 
+} from "aerial-common2";
 
 import { 
   ApplicationState,
+  getWorkspaceById,
   getSelectedWorkspace,
   createApplicationState,
   getSelectedWorkspaceFile,
@@ -21,7 +34,9 @@ import {
   TREE_NODE_LABEL_CLICKED, 
   FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED,
   FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
-  TreeNodeLabelClickedEvent, 
+  TreeNodeLabelClickedEvent,
+  VISUAL_EDITOR_WHEEL,
+  VisualEditorWheel
 } from "front-end/components";
 
 import reduceReducers = require("reduce-reducers");
@@ -52,11 +67,10 @@ export const applicationReducer = (state = createApplicationState(), event: Base
 
   state = canvasReducer(state, event);
   state = syntheticBrowserReducer(state, event);
+  state = visualEditorReducer(state, event);
 
   return state;
 };
-
-
 
 const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
   switch(event.type) {
@@ -73,3 +87,39 @@ const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
 
   return state;
 };
+
+const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
+const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
+
+
+const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
+
+  switch(event.type) {
+    case VISUAL_EDITOR_WHEEL: {
+      const { workspaceId, metaKey, ctrlKey, deltaX, deltaY, mouseX, mouseY, canvasHeight, canvasWidth } = event as VisualEditorWheel;
+      const workspace = getWorkspaceById(state, workspaceId);
+      let translate = workspace.visualEditorSettings.translate;
+
+      if (metaKey || ctrlKey) {
+        translate = centerTransformZoom(translate, boxFromRect({
+          width: canvasWidth,
+          height: canvasHeight
+        }), translate.zoom + deltaY / ZOOM_SENSITIVITY, { left: mouseX, top: mouseY });
+
+      } else {
+        translate = {
+          ...translate,
+          left: translate.left - deltaX,
+          top: translate.top - deltaY
+        };
+      }
+
+      return updateStructProperty(state, workspace, "visualEditorSettings", {
+        ...workspace.visualEditorSettings,
+        translate: translate
+      });
+    }
+  }
+
+  return state;
+}

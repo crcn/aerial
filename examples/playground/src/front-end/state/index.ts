@@ -2,6 +2,7 @@ import {
   Struct,
   TreeNode,
   weakMemo,
+  Translate,
   getPathById,
   getValueById,
   ImmutableArray, 
@@ -42,9 +43,12 @@ export interface File extends Struct, TreeNode<any> {
   content?: string;
 }
 
-export interface Directory extends Struct, File { }
+export type Directory = File;
 
-export type Editor = { }
+export type VisualEditorSettings = {
+  translate: Translate;
+  cursor?: string;
+}
 
 export type Workspace = {
 
@@ -77,10 +81,9 @@ export type Workspace = {
   browser: SyntheticBrowser2;
 
   /**
-   * text / visual editor state
    */
-
-  editors: Editor[];
+  
+  visualEditorSettings: VisualEditorSettings;
 
 } & Struct;
 
@@ -95,14 +98,14 @@ export type ApplicationState = {
  * Utilities
  */
 
-
 export const getFileExtension = (file: File) => file.name.split(".").pop();
 
 export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.mainFileId);
 export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
 export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
 
-export const getSelectedWorkspace = (state: ApplicationState): Workspace => state.selectedWorkspaceId && getValueById(state, state.selectedWorkspaceId);
+export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => getValueById(state, id);
+export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
 export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById(state, state.selectedWorkspaceId);
 
 /**
@@ -110,7 +113,9 @@ export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById
  */
 
 export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, {
-  editors: []
+  visualEditorSettings: {
+    translate: { left: 0, top: 0, zoom: 1 }
+  }
 });
 
 export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {

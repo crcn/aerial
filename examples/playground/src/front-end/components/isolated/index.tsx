@@ -1,5 +1,6 @@
 import React =  require("react");
 import ReactDOM = require("react-dom");
+import { bubbleHTMLIframeEvents } from "aerial-common2";
 
 export class IsolateComponent extends React.Component<{ 
   inheritCSS?: boolean, 
@@ -7,6 +8,8 @@ export class IsolateComponent extends React.Component<{
   onKeyDown?: any,
   onLoad?: any,
   children: any,
+  ignoreInputEvents?: boolean;
+  translateMousePositions?: boolean;
   onScroll?: any,
   scrolling?: boolean,
   style?: any,
@@ -83,10 +86,10 @@ export class IsolateComponent extends React.Component<{
   }
 
   _addListeners() {
-    // bubbleHTMLIframeEvents((this.refs as any).container, {
-    //   ignoreInputEvents: this.props.ignoreInputEvents,
-    //   translateMousePositions: this.props.translateMousePositions
-    // });
+    bubbleHTMLIframeEvents((this.refs as any).container, {
+      ignoreInputEvents: this.props.ignoreInputEvents,
+      translateMousePositions: this.props.translateMousePositions
+    });
   }
 
   onScroll = (event) => {

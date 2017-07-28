@@ -19,6 +19,7 @@ export type Request = Action;
 // BaseEvent is used since Event is already taken
 export type BaseEvent = Message;
 
+
 export const createMessage = (type: string, rest: any = {}): Message => ({
   ...rest,
   type,

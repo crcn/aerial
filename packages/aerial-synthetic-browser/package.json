@@ -22,7 +22,7 @@
     "@types/chai": "^3.5.2",
     "@types/diff": "^3.2.0",
     "@types/mocha": "^2.2.41",
-    "@types/react": "^15.0.24",
+    "@types/react": "15.6.0",
     "@types/socket.io": "^1.4.29",
     "@types/source-map": "^0.5.0",
     "aerial-commonjs-extension": "^0.0.2",
@@ -42,12 +42,13 @@
     "ent": "^2.2.0",
     "jsdiff": "^1.1.1",
     "memoizee": "^0.4.5",
-    "mesh": "8.0.14",
+    "mesh": "8.0.15",
     "mesh7": "7.0.x",
     "nwmatcher": "^1.3.9",
     "parse5": "^3.0.2",
     "pegjs": "^0.10.0",
     "postcss": "^6.0.1",
+    "react": "15.6.0",
     "sift": "3.3.x",
     "tinycolor2": "^1.4.1"
   }

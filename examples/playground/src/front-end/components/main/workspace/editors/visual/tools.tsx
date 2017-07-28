@@ -16,7 +16,6 @@ type ElementOverlayProps = {
   element: SyntheticDOMNode2
 };
 
-
 const ElementOverlayBase = ({ box, element }: ElementOverlayProps) => {
   const style = {
     left: box.left,
