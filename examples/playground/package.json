@@ -57,6 +57,7 @@
     "aerial-synthetic-browser": "0.0.x",
     "ansi_up": "^2.0.2",
     "chalk": "^1.1.3",
+    "classnames": "^2.2.5",
     "ent": "^2.2.0",
     "express": "^4.15.3",
     "immutable": "^3.8.1",
