@@ -107,7 +107,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         translate = centerTransformZoom(translate, boxFromRect({
           width: canvasWidth,
           height: canvasHeight
-        }), clamp(translate.zoom + deltaY / ZOOM_SENSITIVITY, MIN_ZOOM, MAX_ZOOM), { left: mouseX, top: mouseY });
+        }), clamp(translate.zoom + translate.zoom * deltaY / ZOOM_SENSITIVITY, MIN_ZOOM, MAX_ZOOM), { left: mouseX, top: mouseY });
 
       } else {
         translate = {
