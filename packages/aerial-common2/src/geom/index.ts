@@ -48,6 +48,75 @@ export const moveBox = (box: Box, { left, top }: Point): Box => ({
   bottom: top + box.bottom - box.top
 });
 
+export const keepBoxAspectRatio = (newBox: Box, oldBox: Box, anchor: Point, centerPoint = anchor): Box => {
+  const newBoxSize = getBoxSize(newBox);
+  const oldBoxSize = getBoxSize(oldBox);
+  
+  let left   = newBox.left;
+  let top    = newBox.top;
+  let width  = newBoxSize.width;
+  let height = newBoxSize.height;
+
+  if (anchor.top === 0 || anchor.top === 1) {
+    const perc = height / oldBoxSize.height;
+    width = oldBoxSize.width * perc;
+    left = oldBox.left + (oldBoxSize.width - width) * (1 - centerPoint.left);
+  } else if (anchor.top === 0.5) {
+    const perc = width / oldBoxSize.width;
+    height = oldBoxSize.height * perc;
+    top = oldBox.top + (oldBoxSize.height - height) * (1 - centerPoint.top);
+  }
+
+  return {
+    left: left,
+    top: top,
+    right: left + width,
+    bottom: top + height
+  }
+};
+export const keepBoxCenter = (newBox: Box, oldBox: Box, anchor: Point): Box => {
+  const newBoxSize = getBoxSize(newBox);
+  const oldBoxSize = getBoxSize(oldBox);
+  
+  let left   = oldBox.left;
+  let top    = oldBox.top;
+  let width  = oldBoxSize.width;
+  let height = oldBoxSize.height;
+  const delta = { left: newBox.left - oldBox.left, top: newBox.top - oldBox.top };
+
+  if (anchor.top === 0) {
+    top += delta.top;
+    height += delta.top;
+    height = oldBox.top - newBox.top;
+  }
+
+  if (anchor.top === 1) {
+    const hdiff = oldBoxSize.height - newBoxSize.height;
+    top += hdiff;
+    height -= hdiff;
+  }
+
+  if (anchor.left === 0) {
+    left += delta.left;
+    top += delta.top;
+    width += oldBox.left - newBox.left;
+  }
+
+  if (anchor.left === 1) {
+    width += delta.left;
+    const wdiff = oldBoxSize.width - newBoxSize.width;
+    left += wdiff;
+    width -= wdiff;
+  }
+
+  return {
+    left: left,
+    top: top,
+    right: left + width,
+    bottom: top + height
+  }
+};
+
 export const zoomBox = (box: Box, zoom: number): Box => ({
   ...box,
   left: box.left * zoom,

@@ -136,6 +136,16 @@ export const addWorkspaceSelection = (root: any, workspaceId: string, ...selecti
   return setWorkspaceSelection(root, workspaceId, ...workspace.selectionIds, ...selectionIds);
 };
 
+export const removeWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return setWorkspaceSelection(root, workspaceId, ...workspace.selectionIds.filter((id) => selectionIds.indexOf(id) === -1));
+}
+
+export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return setWorkspaceSelection(root, workspaceId, ...difference(selectionIds, workspace.selectionIds));
+};
+
 export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
   return updateStructProperty(root, workspace, "selectionIds", uniq([...selectionIds]));
@@ -143,11 +153,6 @@ export const setWorkspaceSelection = (root: any, workspaceId: string, ...selecti
 
 export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))) as any);
 export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => boxed.box)));
-
-export const removeWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
-  const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "selectionIds", difference(workspace.selectionIds, selectionIds));
-}
 
 export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
   const workspace = getWorkspaceById(root, workspaceId);

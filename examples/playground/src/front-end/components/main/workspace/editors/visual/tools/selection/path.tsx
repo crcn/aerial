@@ -10,15 +10,17 @@ export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
 
 export type ResizerPathMoved = {
   box: Box;
+  anchor: Point;
   workspaceId: string;
-} & WrappedEvent<any>;
+} & WrappedEvent<React.MouseEvent<any>>;
 
 
-export const resizerPathMoved = (workspaceId: string, box: Box, sourceEvent: any): ResizerPathMoved => ({
+export const resizerPathMoved = (workspaceId: string, anchor: Point, box: Box, sourceEvent: React.MouseEvent<any>): ResizerPathMoved => ({
   type: RESIZER_PATH_MOUSE_MOVED,
   workspaceId,
+  anchor,
   box,
-  sourceEvent
+  sourceEvent: {...sourceEvent}
 });
 
 export type PathComponentOuterProps = {
@@ -85,18 +87,19 @@ const enhancePathComponent = compose<PathComponentInnerProps, PathComponentOuter
   withHandlers({
     onPointClick: ({ box, dispatch, zoom, workspace }: PathComponentOuterProps) => (point: Point, event: React.MouseEvent<any>) => {
       event.stopPropagation();
+      const sourceEvent = {...event};
       startDOMDrag(event, (event2, info) => {
         const delta = {
           left: info.delta.x / zoom,
           top: info.delta.y / zoom
         };
         
-        readAll(dispatch(resizerPathMoved(workspace.$$id, {
+        readAll(dispatch(resizerPathMoved(workspace.$$id, point, {
           left: point.left === 0 ? box.left + delta.left : box.left,
           top: point.top === 0 ? box.top + delta.top : box.top,
           right: point.left === 1 ? box.right + delta.left : box.right,
           bottom: point.top === 1 ? box.bottom + delta.top : box.bottom,
-        }, event)));
+        }, sourceEvent)));
       }, () => {
       });
     }

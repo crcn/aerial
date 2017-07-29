@@ -6,4 +6,8 @@ Immediate TODOS:
 - [ ] render DOM elements
 - [ ] delete selection
 - [ ] element attributes pane
+- [ ] chevvron for files
+- [ ] File navigator specific to selected window
+- [ ] proxy url loading from back-end
+- [ ] ability to hide gutters
 

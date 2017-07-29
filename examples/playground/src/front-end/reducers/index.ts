@@ -6,12 +6,14 @@ import {
   Translate,
   BaseEvent, 
   boxFromRect,
+  mergeBoxes,
   getPathById, 
   updateStruct,
   mapImmutable, 
-  mergeBoxes,
+  keepBoxCenter,
   getValueByPath, 
   scaleInnerBox,
+  keepBoxAspectRatio,
   centerTransformZoom,
   updateStructProperty, 
 } from "aerial-common2";
@@ -25,7 +27,7 @@ import {
   addWorkspaceSelection,
   removeWorkspaceSelection,
   createApplicationState,
-  setWorkspaceSelection,
+  toggleWorkspaceSelection,
   getSelectedWorkspaceFile,
   getWorkspaceSelectionBox,
   getBoxedWorkspaceSelection,
@@ -148,11 +150,23 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     }
 
     case RESIZER_PATH_MOUSE_MOVED: {
-      const { workspaceId, box: newBounds } = event as ResizerPathMoved;
+      let { workspaceId, anchor, box: newBounds, sourceEvent } = event as ResizerPathMoved;
       const workspace = getWorkspaceById(state, workspaceId);
 
       // TODO - possibly use BoxStruct instead of Box since there are cases where box prop doesn't exist
       const bounds = getWorkspaceSelectionBox(workspace);
+
+      const keepAspectRatio = sourceEvent.shiftKey;
+      const keepCenter      = sourceEvent.altKey;
+
+      if (keepCenter) {
+        // newBounds = keepBoxCenter(newBounds, bounds, anchor);
+      }
+
+      if (keepAspectRatio) {
+        newBounds = keepBoxAspectRatio(newBounds, bounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
+      }
+
       for (const item of getBoxedWorkspaceSelection(workspace)) {
         const scaledBox = scaleInnerBox(item.box, bounds, newBounds);
         state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, newBounds)));
@@ -185,7 +199,7 @@ const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
     case WINDOW_PANE_ROW_CLICKED: {
       const { windowId, sourceEvent } = event as WindowPaneRowClicked;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, windowId) : setWorkspaceSelection(state, workspace.$$id, windowId);
+      return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, windowId) : toggleWorkspaceSelection(state, workspace.$$id, windowId);
     }
   }
   return state;
