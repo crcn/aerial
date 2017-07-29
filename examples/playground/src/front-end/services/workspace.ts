@@ -80,3 +80,18 @@ const createURIProtocolClass = (upstream: Dispatcher<any>) => {
     }*/
 
 
+
+const workspaceComponentService = (upstream: Dispatcher<any>) => withStoreState((state: any) => routeTypes({
+  [RESIZER_PATH_MOUSE_MOVED]: ({ workspaceId, box: newBounds }: ResizerPathMoved) => {
+      const workspace = getWorkspaceById(state, workspaceId);
+
+      // TODO - possibly use BoxStruct instead of Box since there are cases where box prop doesn't exist
+      const items = getBoxedWorkspaceSelection(workspace);
+      const bounds = mergeBoxes(...items.map(item => item.box));
+      for (const item of items) {
+        const scaledBox = scaleInnerBox(item.box, bounds, newBounds);
+        readAll(upstream(resized(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, newBounds))));
+      }
+    }
+  })
+, upstream);

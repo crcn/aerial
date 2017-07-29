@@ -34,19 +34,22 @@ import {
 import {
   ResizerMoved,
   RESIZER_MOVED,
+  PromptedNewWindowUrl,
+  WindowPaneRowClicked,
+  WINDOW_PANE_ROW_CLICKED,
+  PROMPTED_NEW_WINDOW_URL,
 } from "front-end/messages";
 
 import { 
   syntheticBrowserReducer,
   getSyntheticBrowserWindow,
   OPEN_SYNTHETIC_WINDOW_REQUESTED,
+  openSyntheticWindowRequested,
 } from "aerial-synthetic-browser";
 
 import { 
   RESIZER_PATH_MOUSE_MOVED,
-  WINDOW_PANE_ROW_CLICKED,
   ResizerPathMoved,
-  WindowPaneRowClicked,
   TEXT_EDITOR_CHANGED,
   TextEditorChangedEvent,
   CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
@@ -165,6 +168,11 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         state = applicationReducer(state, moved(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, moveBox(bounds, newPoint))));
       }
       return state;
+    }
+
+    case PROMPTED_NEW_WINDOW_URL: {
+      const { workspaceId, location } = event as PromptedNewWindowUrl;
+      return applicationReducer(state, openSyntheticWindowRequested(getWorkspaceById(state, workspaceId).browser.$$id, location));
     }
   }
 
