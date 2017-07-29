@@ -1,4 +1,7 @@
 import { 
+  moved,
+  resized,
+  moveBox,
   updateIn, 
   Translate,
   BaseEvent, 
@@ -6,7 +9,9 @@ import {
   getPathById, 
   updateStruct,
   mapImmutable, 
+  mergeBoxes,
   getValueByPath, 
+  scaleInnerBox,
   centerTransformZoom,
   updateStructProperty, 
 } from "aerial-common2";
@@ -21,8 +26,15 @@ import {
   removeWorkspaceSelection,
   createApplicationState,
   getSelectedWorkspaceFile,
+  getWorkspaceSelectionBox,
+  getBoxedWorkspaceSelection,
   getSyntheticWindowWorkspace,
 } from "front-end/state";
+
+import {
+  ResizerMoved,
+  RESIZER_MOVED,
+} from "front-end/messages";
 
 import { 
   syntheticBrowserReducer,
@@ -31,8 +43,9 @@ import {
 } from "aerial-synthetic-browser";
 
 import { 
+  RESIZER_PATH_MOUSE_MOVED,
   WINDOW_PANE_ROW_CLICKED,
-  resizerPathReducer,
+  ResizerPathMoved,
   WindowPaneRowClicked,
   TEXT_EDITOR_CHANGED,
   TextEditorChangedEvent,
@@ -76,7 +89,6 @@ export const applicationReducer = (state = createApplicationState(), event: Base
   state = syntheticBrowserReducer(state, event);
   state = visualEditorReducer(state, event);
   state = windowPaneReducer(state, event);
-  state = resizerPathReducer(state, event);
 
   return state;
 };
@@ -129,6 +141,30 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         ...workspace.visualEditorSettings,
         translate: translate
       });
+    }
+
+    case RESIZER_PATH_MOUSE_MOVED: {
+      const { workspaceId, box: newBounds } = event as ResizerPathMoved;
+      const workspace = getWorkspaceById(state, workspaceId);
+
+      // TODO - possibly use BoxStruct instead of Box since there are cases where box prop doesn't exist
+      const bounds = getWorkspaceSelectionBox(workspace);
+      for (const item of getBoxedWorkspaceSelection(workspace)) {
+        const scaledBox = scaleInnerBox(item.box, bounds, newBounds);
+        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, newBounds)));
+      }
+      return state;
+    }
+    
+    case RESIZER_MOVED: {
+      const { point, workspaceId, point: newPoint } = event as ResizerMoved;
+      const workspace = getWorkspaceById(state, workspaceId);
+      const translate = workspace.visualEditorSettings.translate;
+      const bounds = getWorkspaceSelectionBox(workspace);
+      for (const item of getBoxedWorkspaceSelection(workspace)) {
+        state = applicationReducer(state, moved(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, moveBox(bounds, newPoint))));
+      }
+      return state;
     }
   }
 

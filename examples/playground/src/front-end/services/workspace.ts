@@ -3,9 +3,10 @@ import { readUriAction, watchUriAction } from "aerial-sandbox2";
 import { parallel, readOne, readAll, pump } from "mesh";
 import { initRemoteSyntheticBrowserService } from "aerial-synthetic-browser";
 import { BrokerBus, Kernel, PrivateBusProvider, KernelProvider, MainDispatcherProvider } from "aerial-common";
-import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile, getWorkspaceMainFilePath } from "front-end/state";
+import { Workspace, ApplicationState, getSelectedWorkspace, getWorkspaceMainFile, getWorkspaceMainFilePath, getWorkspaceById, getBoxedWorkspaceSelection } from "front-end/state";
 import { SyntheticBrowser, ISyntheticBrowser, createSyntheticHTMLProviders, RemoteSyntheticBrowser, initSyntheticBrowserService,  OPEN_REMOTE_BROWSER, openSyntheticWindowRequested } from "aerial-synthetic-browser";
-import { BaseEvent, Dispatcher, whenStoreChanged, StoreChangedEvent, whenWorker, whenMaster, whenType, publicObject } from "aerial-common2";
+import { RESIZER_PATH_MOUSE_MOVED, ResizerPathMoved } from "front-end/components";
+import { BaseEvent, Dispatcher, whenStoreChanged, StoreChangedEvent, whenWorker, whenMaster, whenType, publicObject, routeTypes, withStoreState, Box, scaleInnerBox, mergeBoxes, resized } from "aerial-common2";
 import { FileCacheProvider, createSandboxProviders, URIProtocolProvider, URIProtocol, IURIProtocolReadResult } from "aerial-sandbox";
 
 const createKernel = (upstream: Dispatcher<any>, sync?: boolean) => {
@@ -64,3 +65,18 @@ const createURIProtocolClass = (upstream: Dispatcher<any>) => {
     }
   };
 };
+
+/*
+
+
+    
+    case RESIZER_MOVED: {
+      const { point, delta, workspaceId } = event as ResizerMoved;
+      const workspace = getWorkspaceById(state, workspaceId);
+      const translate = workspace.visualEditorSettings.translate;
+
+      const ntop = (point.left + delta.left / translate.zoom);
+      const nleft = (point.top + delta.top / translate.zoom);
+    }*/
+
+

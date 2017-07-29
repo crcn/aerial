@@ -87,7 +87,7 @@ function calculateTransform(node: HTMLElement, includeIframes: boolean = true) {
 export function calculateUntransformedBoundingRect(node: HTMLElement) {
   const box: Box = node.getBoundingClientRect();
   const matrix = calculateTransform(node, false);
-  return zoomBox(moveBox(box, -matrix[4], -matrix[5]), 1 / matrix[0]);
+  return zoomBox(moveBox(box, { left: -matrix[4], top: -matrix[5] }), 1 / matrix[0]);
 }
 
 function hasMeasurement(key) {

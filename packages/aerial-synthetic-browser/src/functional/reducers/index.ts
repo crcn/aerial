@@ -1,12 +1,17 @@
 import { Mutation } from "aerial-common";
 
 import { 
+  MOVED,
+  Moved,
   update, 
+  RESIZED,
+  Resized,
   updateIn, 
+  moveBox,
   BaseEvent, 
   updateStructProperty, 
   getValueById, 
-  deleteValueById 
+  deleteValueById,
 } from "aerial-common2";
 
 import { 
@@ -14,6 +19,7 @@ import {
   DOM_ELEMENT,
   DOM_TEXT_NODE,
   DOM_COMMENT,
+  SYTNTHETIC_BROWSER_WINDOW,
   getSyntheticBrowser,
   SyntheticBrowser2, 
   SyntheticDOMElement2,
@@ -61,8 +67,36 @@ export const syntheticBrowserReducer = (root: any, event: BaseEvent) => {
     }
   }
 
+  root = syntheticBrowserWindowReducer(root, event);
+
   return root;
 };
+
+const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
+  switch(event.type) {
+    case RESIZED: {
+      const { itemId, itemType, box } = event as Resized;
+      if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
+        const window = getSyntheticBrowserWindow(root, itemId);
+        if (window) {
+          return updateStructProperty(root, window, "box", box);
+        }
+      }
+      break;
+    }
+    case MOVED: {
+      const { itemId, itemType, point } = event as Moved;
+      if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
+        const window = getSyntheticBrowserWindow(root, itemId);
+        if (window) {
+          return updateStructProperty(root, window, "box", moveBox(window.box, point));
+        }
+      }
+      break;
+    }
+  }
+  return root;
+}
 
 const updateDOMFromLegacyMutation = (root: any, { mutation, syntheticWindowId, legacyDocument }: LegacySyntheticDOMChanged) => {
 

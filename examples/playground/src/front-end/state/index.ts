@@ -1,11 +1,13 @@
 import {
   Struct,
+  Boxed,
   TreeNode,
   weakMemo,
   Translate,
   getPathById,
   filterBoxed,
   getValueById,
+  mergeBoxes,
   updateStruct,
   ImmutableArray, 
   getValueByPath,
@@ -134,7 +136,8 @@ export const addWorkspaceSelection = (root: any, workspaceId: string, ...selecti
   return updateStructProperty(root, workspace, "selectionIds", uniq([...workspace.selectionIds, ...selectionIds]));
 }
 
-export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace) => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))));
+export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))) as any);
+export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => boxed.box)));
 
 export const removeWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
   const workspace = getWorkspaceById(root, workspaceId);

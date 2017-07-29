@@ -12,3 +12,4 @@ export * from "./worker";
 export * from "./geom";
 export * from "./array";
 export * from "./dom";
+export * from "./messages";

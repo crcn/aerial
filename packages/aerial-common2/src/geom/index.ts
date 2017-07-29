@@ -1,4 +1,5 @@
 // import { getV } from "../struct";
+import { weakMemo } from "../memo";
 
 export type Box = {
   left: number;
@@ -6,6 +7,11 @@ export type Box = {
   top: number;
   bottom: number;
 }
+
+export type Size = {
+  width: number;
+  height: number;
+};
 
 export type Boxed = {
   box: Box
@@ -34,12 +40,12 @@ export const createBox = (left: number, right: number, top: number, bottom: numb
   bottom
 });
 
-export const moveBox = (box: Box, left: number, top: number): Box => ({
+export const moveBox = (box: Box, { left, top }: Point): Box => ({
   ...box,
-  left: left + box.left,
-  top: top + box.top,
-  right: left + box.right,
-  bottom: top + box.bottom
+  left: left,
+  top: top,
+  right: left + box.right - box.left,
+  bottom: top + box.bottom - box.top
 });
 
 export const zoomBox = (box: Box, zoom: number): Box => ({
@@ -56,6 +62,37 @@ export const boxFromRect = ({ width, height }: Rectangle): Box => ({
   right: width,
   bottom: height
 });
+
+export const getBoxWidth  = (box: Box) => box.right - box.left;
+export const getBoxHeight = (box: Box) => box.bottom - box.top;
+export const getBoxSize   = weakMemo((box: Box): Size => ({
+  width: getBoxWidth(box),
+  height: getBoxHeight(box)
+}));
+
+export const scaleInnerBox = (inner: Box, oldBounds: Box, newBounds: Box): Box => {
+
+  const oldBoundsSize = getBoxSize(oldBounds);
+  const newBoundsSize = getBoxSize(newBounds);
+  const innerBoundsSize = getBoxSize(inner);
+
+  const percLeft   = (inner.left - oldBounds.left) / oldBoundsSize.width;
+  const percTop    = (inner.top  - oldBounds.top)  / oldBoundsSize.height;
+  const percWidth  = innerBoundsSize.width / oldBoundsSize.width;
+  const percHeight = innerBoundsSize.height / oldBoundsSize.height;
+
+  const left   = newBounds.left + newBoundsSize.width * percLeft;
+  const top    = newBounds.top  + newBoundsSize.height * percTop;
+  const right  = left + newBoundsSize.width * percWidth;
+  const bottom = top + newBoundsSize.height * percHeight;
+
+  return {
+    left,
+    top,
+    right,
+    bottom
+  };
+};
 
 export const isBox = (box: any) => box && box.left != null && box.top != null && box.right != null && box.bottom != null;
 export const filterBoxed = (values: any[]): Boxed[] => values.filter(value => isBox(value.box));

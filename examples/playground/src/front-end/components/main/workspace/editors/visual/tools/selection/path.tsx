@@ -3,53 +3,23 @@ import * as  React from "react";
 import { readAll } from "mesh";
 import { compose, pure, withHandlers } from "recompose";
 import { getWorkspaceById, Workspace } from "front-end/state";
-import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, updateStructProperty } from "aerial-common2";
+import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, updateStructProperty, Box } from "aerial-common2";
 
-export const RESIZER_PATH_MOUSE_DOWN  = "RESIZER_PATH_MOUSE_DOWN";
 export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
-export const RESIZER_PATH_MOUSE_UP    = "RESIZER_PATH_MOUSE_UP";
 
-export type ResizerPathEvent = {
-  point: Point;
+
+export type ResizerPathMoved = {
+  box: Box;
   workspaceId: string;
 } & WrappedEvent;
 
-export type ResizerPathMoved = {
-  delta: Point;
-} & ResizerPathEvent;
 
-export const resizerPathEvent = (type: string, workspaceId: string, point: Point, sourceEvent: any): ResizerPathEvent => ({
-  type,
-  workspaceId,
-  point,
-  sourceEvent
-});
-
-
-export const resizerPathMoved = (workspaceId: string, point: Point, delta: Point, sourceEvent: any): ResizerPathMoved => ({
+export const resizerPathMoved = (workspaceId: string, box: Box, sourceEvent: any): ResizerPathMoved => ({
   type: RESIZER_PATH_MOUSE_MOVED,
   workspaceId,
-  point,
-  delta,
+  box,
   sourceEvent
 });
-
-export const resizerPathReducer = (state: any, event: BaseEvent) => {
-  switch(event.type) {
-    case RESIZER_PATH_MOUSE_DOWN: {
-
-    }
-    case RESIZER_PATH_MOUSE_MOVED: {
-      console.log("MOVED");
-      break;
-    }
-    case RESIZER_PATH_MOUSE_UP: {
-      console.log("FUP");
-      break;
-    }
-  }
-  return state;
-}
 
 export type PathComponentOuterProps = {
   points: Point[];
@@ -58,8 +28,7 @@ export type PathComponentOuterProps = {
   strokeWidth: number;
   workspace: Workspace;
   showPoints?: boolean;
-  width: number;
-  height: number;
+  box: Box;
   dispatch: Dispatcher<any>;
 }
 
@@ -67,7 +36,7 @@ export type PathComponentInnerProps = {
   onPointClick: (point: Point, event: React.MouseEvent<any>) => {};
 } & PathComponentOuterProps;
 
-export const PathComponentBase = ({  width, height, points, zoom, pointRadius, strokeWidth, showPoints = true, onPointClick }: PathComponentInnerProps) => {
+export const PathComponentBase = ({ box , points, zoom, pointRadius, strokeWidth, showPoints = true, onPointClick }: PathComponentInnerProps) => {
 
   let d = "";
 
@@ -78,6 +47,8 @@ export const PathComponentBase = ({  width, height, points, zoom, pointRadius, s
 
   d += "Z";
 
+  const width = box.right - box.left;
+  const height = box.bottom - box.top;
   const cr = pointRadius;
   const crz = cr / zoom;
   const cw = cr * 2;
@@ -112,16 +83,21 @@ export const PathComponentBase = ({  width, height, points, zoom, pointRadius, s
 const enhancePathComponent = compose<PathComponentInnerProps, PathComponentOuterProps>(
   pure,
   withHandlers({
-    onPointClick: ({ dispatch, zoom, workspace }: PathComponentOuterProps) => (point: Point, event: React.MouseEvent<any>) => {
-      readAll(dispatch(resizerPathEvent(RESIZER_PATH_MOUSE_DOWN, workspace.$$id, point, event)));
+    onPointClick: ({ box, dispatch, zoom, workspace }: PathComponentOuterProps) => (point: Point, event: React.MouseEvent<any>) => {
+      event.stopPropagation();
       startDOMDrag(event, (event2, info) => {
         const delta = {
           left: info.delta.x / zoom,
           top: info.delta.y / zoom
         };
-        readAll(dispatch(resizerPathMoved(workspace.$$id, point, delta, event)));
+        
+        readAll(dispatch(resizerPathMoved(workspace.$$id, {
+          left: point.left === 0 ? box.left + delta.left : box.left,
+          top: point.top === 0 ? box.top + delta.top : box.top,
+          right: point.left === 1 ? box.right + delta.left : box.right,
+          bottom: point.top === 1 ? box.bottom + delta.top : box.bottom,
+        }, event)));
       }, () => {
-        readAll(dispatch(resizerPathEvent(RESIZER_PATH_MOUSE_UP, workspace.$$id, point, event)));
       });
     }
   })
