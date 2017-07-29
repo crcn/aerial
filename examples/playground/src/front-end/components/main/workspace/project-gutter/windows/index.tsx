@@ -9,7 +9,7 @@ import { promptedNewWindowUrl, windowPaneRowClicked } from "front-end/messages";
 import { Dispatcher, BaseEvent, wrapEventToDispatch } from "aerial-common2";
 
 const WindowRow = ({ window, dispatch }: { window: SyntheticBrowserWindow2, dispatch: Dispatcher<any> }) => <div className="m-windows-pane-window-row"  onClick={wrapEventToDispatch(dispatch, windowPaneRowClicked.bind(this, window.$$id))}>
-  {window.location} 
+  {window.title || window.location} 
 </div>
 
 const WindowsPaneComponentControlsBase = ({ workspace, dispatch, onAddWindow }: { workspace: Workspace, dispatch: Dispatcher<any>, onAddWindow: any }) => <span>

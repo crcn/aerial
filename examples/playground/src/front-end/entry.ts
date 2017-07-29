@@ -21,6 +21,7 @@ const HTML_CONTENT =
 `
 <html>
   <head>
+    <title>Test document</title>
   </head>
   <body>
     <div id="application">

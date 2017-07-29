@@ -11,24 +11,30 @@ export const EVALUATED_APPLICATION             = "EVALUATED_APPLICATION";
 export const OPEN_SYNTHETIC_WINDOW_REQUESTED   = "OPEN_SYNTHETIC_WINDOW_REQUESTED";
 export const CLOSE_SYNTHETIC_WINDOW_REQUESTED  = "CLOSE_SYNTHETIC_WINDOW_REQUESTED";
 export const LEGACY_SYNTHETIC_DOM_CHANGED      = "LEGACY_SYNTHETIC_DOM_CHANGED";
+export const SYNTHETIC_WINDOW_TITLE_CHANGED    = "SYNTHETIC_WINDOW_TITLE_CHANGED";
 
 /**
  * Shapes
  */
 
 export type OpenSyntheticWindowRequested = {
-  syntheticBrowserId: string,
+  syntheticBrowserId: string;
   location: string
 } & BaseEvent;
 
 export type CloseSyntheticWindowRequested = {
-  syntheticWindowId: string
+  syntheticWindowId: string;
 } & BaseEvent;
 
 export type LegacySyntheticDOMChanged = {
-  syntheticWindowId,
-  mutation: Mutation<any>,
-  legacyDocument: SyntheticDocument,
+  syntheticWindowId;
+  mutation: Mutation<any>;
+  legacyDocument: SyntheticDocument;
+} & BaseEvent;
+
+export type SyntheticWindowTitleChanged = {
+  syntheticWindowId;
+  title: string;
 } & BaseEvent;
 
 /**
@@ -51,4 +57,10 @@ export const legacySyntheticDOMChanged = (syntheticWindowId: string, legacyDocum
   legacyDocument,
   type: LEGACY_SYNTHETIC_DOM_CHANGED,
   mutation,
+});
+
+export const syntheticWindowTitleChanged = (syntheticWindowId: string, title: string): SyntheticWindowTitleChanged => ({
+  syntheticWindowId,
+  title,
+  type: SYNTHETIC_WINDOW_TITLE_CHANGED
 });

@@ -38,6 +38,8 @@ import {
 } from "../../dom";
 
 import { 
+  SYNTHETIC_WINDOW_TITLE_CHANGED,
+  SyntheticWindowTitleChanged,
   OPEN_SYNTHETIC_WINDOW_REQUESTED, 
   OpenSyntheticWindowRequested, 
   CLOSE_SYNTHETIC_WINDOW_REQUESTED,
@@ -61,10 +63,6 @@ export const syntheticBrowserReducer = (root: any, event: BaseEvent) => {
       const { syntheticWindowId } = event as CloseSyntheticWindowRequested;
       return deleteValueById(root, syntheticWindowId);
     }
-
-    case LEGACY_SYNTHETIC_DOM_CHANGED: {
-      return updateDOMFromLegacyMutation(root, event as LegacySyntheticDOMChanged);
-    }
   }
 
   root = syntheticBrowserWindowReducer(root, event);
@@ -74,6 +72,11 @@ export const syntheticBrowserReducer = (root: any, event: BaseEvent) => {
 
 const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
   switch(event.type) {
+
+    case LEGACY_SYNTHETIC_DOM_CHANGED: {
+      return updateDOMFromLegacyMutation(root, event as LegacySyntheticDOMChanged);
+    }
+    
     case RESIZED: {
       const { itemId, itemType, box } = event as Resized;
       if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
@@ -84,6 +87,7 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
       }
       break;
     }
+
     case MOVED: {
       const { itemId, itemType, point } = event as Moved;
       if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
@@ -94,7 +98,14 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
       }
       break;
     }
+
+    case SYNTHETIC_WINDOW_TITLE_CHANGED: {
+      const { title, syntheticWindowId } = event as SyntheticWindowTitleChanged;
+      const window = getSyntheticBrowserWindow(root, syntheticWindowId);
+      return updateStructProperty(root, window, "title", title);
+    }
   }
+  
   return root;
 }
 

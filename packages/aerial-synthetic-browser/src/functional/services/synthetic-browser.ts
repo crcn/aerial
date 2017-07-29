@@ -19,7 +19,11 @@ import {
 import { parallel, readAll } from "mesh";
 import { SyntheticBrowser } from "../../browser";
 import { createSyntheticHTMLProviders } from "../../providers";
-import { SyntheticBrowser2, SyntheticBrowserWindow2, SYTNTHETIC_BROWSER_WINDOW } from "../state";
+import { 
+  SyntheticBrowser2, 
+  SyntheticBrowserWindow2, 
+  SYTNTHETIC_BROWSER_WINDOW
+} from "../state";
 
 import { 
   diffArray,
@@ -33,7 +37,8 @@ import {
 } from "aerial-common2";
 
 import {
-  legacySyntheticDOMChanged
+  legacySyntheticDOMChanged,
+  syntheticWindowTitleChanged
 } from "../messages";
 
 export const initSyntheticBrowserService = (upstream: Dispatcher<any>, kernel: Kernel) => (downstream: Dispatcher<any>) => parallel(
@@ -95,11 +100,20 @@ const observeSyntheticBrowserDOMState = (browser: SyntheticBrowser, state: Synth
       dispatchLegacySyntheticDOMChanged((event as MutationEvent<any>).mutation);
     }
   }
+
+  const dispatchTitleChanged = () => {
+    const titleEl = browser.document.querySelector("title");
+    if (titleEl) {
+      console.log(titleEl);
+      readAll(upstream(syntheticWindowTitleChanged(state.$$id, titleEl.textContent)));
+    }
+  };
   
   const onStatusChange = (status: Status) => {
     if (status) {
       if (status.type === Status.COMPLETED) {
         browser.document.observe({ dispatch: onDocumentEvent });
+        dispatchTitleChanged();
         dispatchLegacySyntheticDOMChanged();
       } else if (status.type === Status.ERROR) {
         // TODO
