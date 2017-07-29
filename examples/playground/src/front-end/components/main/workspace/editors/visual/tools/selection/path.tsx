@@ -11,7 +11,7 @@ export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
 export type ResizerPathMoved = {
   box: Box;
   workspaceId: string;
-} & WrappedEvent;
+} & WrappedEvent<any>;
 
 
 export const resizerPathMoved = (workspaceId: string, box: Box, sourceEvent: any): ResizerPathMoved => ({

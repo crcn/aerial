@@ -65,33 +65,3 @@ const createURIProtocolClass = (upstream: Dispatcher<any>) => {
     }
   };
 };
-
-/*
-
-
-    
-    case RESIZER_MOVED: {
-      const { point, delta, workspaceId } = event as ResizerMoved;
-      const workspace = getWorkspaceById(state, workspaceId);
-      const translate = workspace.visualEditorSettings.translate;
-
-      const ntop = (point.left + delta.left / translate.zoom);
-      const nleft = (point.top + delta.top / translate.zoom);
-    }*/
-
-
-
-const workspaceComponentService = (upstream: Dispatcher<any>) => withStoreState((state: any) => routeTypes({
-  [RESIZER_PATH_MOUSE_MOVED]: ({ workspaceId, box: newBounds }: ResizerPathMoved) => {
-      const workspace = getWorkspaceById(state, workspaceId);
-
-      // TODO - possibly use BoxStruct instead of Box since there are cases where box prop doesn't exist
-      const items = getBoxedWorkspaceSelection(workspace);
-      const bounds = mergeBoxes(...items.map(item => item.box));
-      for (const item of items) {
-        const scaledBox = scaleInnerBox(item.box, bounds, newBounds);
-        readAll(upstream(resized(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, newBounds))));
-      }
-    }
-  })
-, upstream);

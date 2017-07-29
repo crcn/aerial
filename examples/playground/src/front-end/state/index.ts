@@ -133,8 +133,13 @@ export const getSyntheticWindowWorkspace = (root: any, windowId: string): Worksp
 
 export const addWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "selectionIds", uniq([...workspace.selectionIds, ...selectionIds]));
-}
+  return setWorkspaceSelection(root, workspaceId, ...workspace.selectionIds, ...selectionIds);
+};
+
+export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateStructProperty(root, workspace, "selectionIds", uniq([...selectionIds]));
+};
 
 export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))) as any);
 export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => boxed.box)));

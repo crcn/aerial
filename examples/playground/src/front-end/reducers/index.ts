@@ -25,6 +25,7 @@ import {
   addWorkspaceSelection,
   removeWorkspaceSelection,
   createApplicationState,
+  setWorkspaceSelection,
   getSelectedWorkspaceFile,
   getWorkspaceSelectionBox,
   getBoxedWorkspaceSelection,
@@ -182,9 +183,9 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
   switch (event.type) {
     case WINDOW_PANE_ROW_CLICKED: {
-      const { windowId } = event as WindowPaneRowClicked;
+      const { windowId, sourceEvent } = event as WindowPaneRowClicked;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return addWorkspaceSelection(state, workspace.$$id, windowId);
+      return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, windowId) : setWorkspaceSelection(state, workspace.$$id, windowId);
     }
   }
   return state;

@@ -1,4 +1,4 @@
-import { BaseEvent, Point } from "aerial-common2";
+import { BaseEvent, Point, WrappedEvent } from "aerial-common2";
 
 export const RESIZER_MOVED           = "RESIZER_MOVED";
 export const WINDOW_PANE_ROW_CLICKED = "WINDOW_PANE_ROW_CLICKED";
@@ -11,7 +11,7 @@ export type ResizerMoved = {
 
 export type WindowPaneRowClicked = {
   windowId: string
-} & BaseEvent;
+} & WrappedEvent<React.MouseEvent<any>>;
 
 export type PromptedNewWindowUrl = {
   workspaceId: string;
@@ -24,8 +24,9 @@ export const resizerMoved = (workspaceId: string, point: Point): ResizerMoved =>
   type: RESIZER_MOVED,
 });
 
-export const windowPaneRowClicked = (windowId: string): WindowPaneRowClicked => ({
+export const windowPaneRowClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): WindowPaneRowClicked => ({
   windowId,
+  sourceEvent,
   type: WINDOW_PANE_ROW_CLICKED
 });
 
