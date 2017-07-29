@@ -1,0 +1,80 @@
+@import "./vars";
+
+$sides: left, right, top, bottom;
+
+@each $size in $sizes {
+  $i: index($sizes, $size);
+
+  .padding-#{$i} {
+    padding: $size;
+  }
+
+  .padding-#{$i} {
+    padding: $size;
+  }
+
+  @each $side in $sides {
+    .padding-#{$side}-#{$i} {
+      margin-#{$side}: $size;
+    }
+
+    .margin-#{$side}-#{$i} {
+      margin-#{$side}: $size;
+    }
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.flex {
+  display: flex;
+  &.column {
+    flex-direction: column;
+  }
+  &.row {
+    flex-direction: row;
+  }
+}
+
+.no-select-text {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.pull-right {
+  float: right; 
+}
+
+.pull-left {
+  float: left;
+}
+
+.hide {
+  display: none !important;
+}
+
+.dim {
+  opacity: 0.7;
+}
+
+.pull-right {
+  float: right;
+} 
+
+.disabled {
+  color: $disabled-color;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.no-padding {
+  padding: 0;
+}

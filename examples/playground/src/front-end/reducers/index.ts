@@ -17,8 +17,11 @@ import {
   ApplicationState,
   getWorkspaceById,
   getSelectedWorkspace,
+  addWorkspaceSelection,
+  removeWorkspaceSelection,
   createApplicationState,
   getSelectedWorkspaceFile,
+  getSyntheticWindowWorkspace,
 } from "front-end/state";
 
 import { 
@@ -28,6 +31,9 @@ import {
 } from "aerial-synthetic-browser";
 
 import { 
+  WINDOW_PANE_ROW_CLICKED,
+  resizerPathReducer,
+  WindowPaneRowClicked,
   TEXT_EDITOR_CHANGED,
   TextEditorChangedEvent,
   CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
@@ -69,6 +75,8 @@ export const applicationReducer = (state = createApplicationState(), event: Base
   state = canvasReducer(state, event);
   state = syntheticBrowserReducer(state, event);
   state = visualEditorReducer(state, event);
+  state = windowPaneReducer(state, event);
+  state = resizerPathReducer(state, event);
 
   return state;
 };
@@ -126,3 +134,14 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 
   return state;
 }
+
+const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
+  switch (event.type) {
+    case WINDOW_PANE_ROW_CLICKED: {
+      const { windowId } = event as WindowPaneRowClicked;
+      const workspace = getSyntheticWindowWorkspace(state, windowId);
+      return addWorkspaceSelection(state, workspace.$$id, windowId);
+    }
+  }
+  return state;
+};

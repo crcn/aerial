@@ -1,0 +1,44 @@
+@font-face {
+  font-family: "iconfont";
+  src: url('./iconfont.eot');
+  src: url('./iconfont.eot?#iefix') format('eot'),
+    url('./iconfont.woff') format('woff'),
+    url('./iconfont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.s:before {
+  display: inline-block;
+  font-family: "iconfont";
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.s-lg {
+  font-size: 1.3333333333333333em;
+  line-height: 0.75em;
+  vertical-align: -15%;
+}
+.s-2x { font-size: 2em; }
+.s-3x { font-size: 3em; }
+.s-4x { font-size: 4em; }
+.s-5x { font-size: 5em; }
+.s-fw {
+  width: 1.2857142857142858em;
+  text-align: center;
+}
+
+.s-puzzle:before { content: "\EA01" }
+.s-button:before { content: "\EA02" }
+.s-cursor:before { content: "\EA03" }
+.s-shapes:before { content: "\EA04" }
+.s-text:before { content: "\EA05" }
+.s-align-left:before { content: "\EA06" }
+.s-align-center:before { content: "\EA07" }
+.s-align-justify:before { content: "\EA08" }
+.s-align-right:before { content: "\EA09" }
+.s-frame:before { content: "\EA0A" }

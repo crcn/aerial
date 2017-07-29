@@ -1,7 +1,64 @@
-@import "variables.scss";
+@import "front-end/scss/variables.scss";
 
-.gutter-component {
-  flex: 0;
-  min-width: 200px;
-  background-color: #f7f7f7;
+.gutter {
+  
+  flex-shrink:1;
+  flex-grow:0;
+  height: 100%;
+  overflow-y: scroll;
+  
+  & .header {
+    text-transform: uppercase;
+    padding: $padding-base * 3 $padding-base * 6;
+    font-weight: 600;
+    font-size: 0.89em;
+  }
+
+  .section {
+    position: relative;
+    .popup {
+      & .ion-close {
+        cursor: pointer;
+      }
+      min-width: 180px;
+      position:fixed;
+      transform:translateX(-100%);
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+  }
+
+  .controls {
+    float: right;
+    cursor: pointer;
+    &.show {
+      display: block;
+    }
+  }
+
+  &.left, &.right {
+    width: 300px;
+  }
+
+  &.top, &.bottom {
+    height: 300px;
+  }
+
+  &.left {
+    border-right-width: 2px;
+  }
+
+  &.right {
+    border-left-width: 2px;
+  }
+
+  &.top {
+    border-bottom-width: 2px;
+  }
+  border: 0px solid #CACACA;
+  background: #FCFCFC;
+
+  &.bottom {
+    border-top-width: 2px;
+  }
 }

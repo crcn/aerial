@@ -16,8 +16,8 @@ export type PaneComponentProps = {
 }
 
 export const PaneComponentBase = ({ title, controls, children, className }: PaneComponentProps) => <div className={cx("pane-component", className)}>
-  <div className="pane-header">
-    { title } <span className="pane-header-controls">{ controls }</span>
+  <div className="header">
+    { title } <span className="controls">{ controls }</span>
   </div>
   <div className="pane-body">
     { children }

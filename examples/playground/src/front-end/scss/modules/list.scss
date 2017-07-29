@@ -1,0 +1,14 @@
+
+.m-list {
+
+  & li {
+    padding: $padding-0 $padding-1;
+    display: block;
+    width: 100%;
+    padding: $padding-0 $padding-1;
+  }
+
+  & li.alt {
+    background-color: $color-black-offset-1;
+  }
+}

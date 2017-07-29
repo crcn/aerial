@@ -1,0 +1,23 @@
+@import './iconfonts.scss';
+
+.s-text {
+  &:before {
+    content: 'T';
+    line-height: 0;
+    font-family: 'YuMuncho';
+  }
+}
+
+.s-delta {
+  &:before {
+    content: 'δ';
+    font-family: 'Lucida Grande';
+  }
+}
+
+.s-cursor {
+  &:before {
+    position: relative;
+    top: 1px;
+  }
+}

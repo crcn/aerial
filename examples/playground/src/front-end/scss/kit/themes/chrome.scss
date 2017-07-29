@@ -1,0 +1,155 @@
+155 lines (119 sloc)  2.69 KB
+.gutter {
+  background: #ebebeb;
+  color: #333;
+  overflow : hidden;
+}
+
+.print-margin {
+  width: 1px;
+  background: #e8e8e8;
+}
+
+{
+  background-color: #FFFFFF;
+  color: black;
+}
+
+.cursor {
+  color: black;
+}
+
+.invisible {
+  color: rgb(191, 191, 191);
+}
+
+.constant.buildin {
+  color: rgb(88, 72, 246);
+}
+
+.constant.language {
+  color: rgb(88, 92, 246);
+}
+
+.constant.library {
+  color: rgb(6, 150, 14);
+}
+
+.invalid {
+  background-color: rgb(153, 0, 0);
+  color: white;
+}
+
+.fold {
+}
+
+.support.function {
+  color: rgb(60, 76, 114);
+}
+
+.support.constant {
+  color: rgb(6, 150, 14);
+}
+
+.support.type,
+.support.class
+.support.other {
+  color: rgb(109, 121, 222);
+}
+
+.variable.parameter {
+  font-style:italic;
+  color:#FD971F;
+}
+.keyword.operator {
+  color: rgb(104, 118, 135);
+}
+
+.comment {
+  color: #236e24;
+}
+
+.comment.doc {
+  color: #236e24;
+}
+
+.comment.doc.tag {
+  color: #236e24;
+}
+
+.constant.numeric {
+  color: rgb(0, 0, 205);
+}
+
+.variable {
+  color: rgb(49, 132, 149);
+}
+
+.xml-pe {
+  color: rgb(104, 104, 91);
+}
+
+.entity.name.function {
+  color: #0000A2;
+}
+
+
+.heading {
+  color: rgb(12, 7, 255);
+}
+
+.list {
+  color:rgb(185, 6, 144);
+}
+
+.marker-layer .selection {
+  background: rgb(181, 213, 255);
+}
+
+.marker-layer .step {
+  background: rgb(252, 255, 0);
+}
+
+.marker-layer .stack {
+  background: rgb(164, 229, 101);
+}
+
+.marker-layer .bracket {
+  margin: -1px 0 0 -1px;
+  border: 1px solid rgb(192, 192, 192);
+}
+
+.marker-layer .active-line {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.gutter-active-line {
+    background-color : #dcdcdc;
+}
+
+.marker-layer .selected-word {
+  background: rgb(250, 250, 255);
+  border: 1px solid rgb(200, 200, 250);
+}
+
+.storage,
+.keyword,
+.meta.tag {
+  color: rgb(147, 15, 128);
+}
+
+.string.regex {
+  color: rgb(255, 0, 0)
+}
+
+.string {
+  color: #1A1AA6;
+}
+
+.entity.other.attribute-name {
+  color: #994409;
+}
+
+.indent-guide {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;
+}

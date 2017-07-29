@@ -10,6 +10,7 @@ if (typeof window !== "undefined") {
   require("codemirror/mode/css/css");
 }
 
+
 import { pure, lifecycle, compose } from "recompose";
 import * as React from "react";
 import * as CodeMirror from "react-codemirror";
@@ -40,7 +41,6 @@ const MODES = {
 export const TextEditorComponentBase = ({ options, file, dispatch }: TextEditorProps) => {
   return <div className="text-editor-component">
     <CodeMirror value={(file && file.content) || ""} options={{ 
-      lineNumbers: true,
       mode: file && MODES[getFileExtension(file)]
     }} onChange={value => readAll(dispatch(textEditorChangedEvent(file, value)))} />
   </div>

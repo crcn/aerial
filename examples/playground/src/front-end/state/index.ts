@@ -4,17 +4,26 @@ import {
   weakMemo,
   Translate,
   getPathById,
+  filterBoxed,
   getValueById,
+  updateStruct,
   ImmutableArray, 
+  getValueByPath,
   ImmutableObject,
   createStructFactory,
   BaseApplicationState,
+  updateStructProperty,
   createImmutableObject,
   createImmutableArray,
   ImmutableArrayIdentity,
   ImmutableObjectIdentity,
   createImmutableStructFactory,
 } from "aerial-common2";
+
+import {
+  uniq,
+  difference,
+} from "lodash";
 
 import { Kernel } from "aerial-common";
 
@@ -52,6 +61,11 @@ export type VisualEditorSettings = {
 
 export type Workspace = {
 
+  /**
+   */
+
+  selectionIds: string[];
+  
   /**
    */
 
@@ -104,6 +118,34 @@ export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById
 export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
 export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
 
+export const getSyntheticWindowWorkspace = (root: any, windowId: string): Workspace => {
+  const path = getPathById(root, windowId);
+  let current = root;
+  for (const segment of path) {
+    current = current[segment];
+    if (current.$$type === WORKSPACE) {
+      return current as any as Workspace;
+    }
+  }
+}
+
+export const addWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateStructProperty(root, workspace, "selectionIds", uniq([...workspace.selectionIds, ...selectionIds]));
+}
+
+export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace) => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))));
+
+export const removeWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateStructProperty(root, workspace, "selectionIds", difference(workspace.selectionIds, selectionIds));
+}
+
+export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateStructProperty(root, workspace, "selectionIds", []);
+}
+
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => getValueById(state, id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
 export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById(state, state.selectedWorkspaceId);
@@ -115,7 +157,8 @@ export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById
 export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, {
   visualEditorSettings: {
     translate: { left: 0, top: 0, zoom: 1 }
-  }
+  },
+  selectionIds: []
 });
 
 export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {

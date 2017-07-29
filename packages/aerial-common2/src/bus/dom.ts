@@ -13,9 +13,9 @@ export const wrappedEvent = (type: string, sourceEvent: any, map = (event: any) 
   ...map(sourceEvent)
 });
 
-export const wrapEventToDispatch = weakMemo((type: string, dispatch: Dispatcher<any>, map = (event: any) => ({})) => (sourceEvent: any) => {
-  readAll(dispatch(wrappedEvent(type, sourceEvent)));
-});
+export const wrapEventToDispatch = (dispatch: Dispatcher<any>, createEvent = (event: any) => ({})) => (sourceEvent: any) => {
+  readAll(dispatch(createEvent(sourceEvent)));
+};
 
 export const wrapEventToPublicDispatch = weakMemo((type: string, dispatch: Dispatcher<any>, map = (event: any) => ({})) => (sourceEvent: any) => {
   readAll(dispatch(publicObject(identity)(wrappedEvent(type, sourceEvent))));

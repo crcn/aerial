@@ -18,3 +18,4 @@ export const ProjectGutterComponentBase = ({ workspace, dispatch }: ProjectGutte
 export const ProjectGutterComponent = ProjectGutterComponentBase;
 
 export * from "./file-navigator";
+export * from "./windows";

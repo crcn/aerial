@@ -138,3 +138,4 @@ export const VisualEditorComponentBase = ({
 export const VisualEditorComponent = enhanceVisualEditorComponent(VisualEditorComponentBase as any) as any as Component<VisualEditorOuterComponentProps>;
 
 export * from "./canvas";
+export * from "./tools";

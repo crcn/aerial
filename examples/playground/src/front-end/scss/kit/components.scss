@@ -1,0 +1,200 @@
+@import "./elements.scss";
+
+.slider {
+  
+  opacity: 0.9;
+  display: block;
+
+  &::after {
+    content: " ";
+    display: block;
+    width: 100%;
+    height: 4px;
+    top: 50%;
+    position: absolute;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+  }
+
+  /* fixed with here, otherwise the react slider gets a little*/
+  /* buggy when resizing the doc*/
+  width: 100%;
+  height: 22px;
+  position: relative;
+
+  & .handle {
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 1px 2px rgba(255, 255, 255, 0.3);
+    position: absolute;
+    border-radius: 10px;
+    width: 8px;
+    height: 8px;
+    background: #999;
+  }
+}
+
+.input {
+  letter-spacing: inherit;
+  padding: $input-padding;
+  line-height: inherit;
+  height: auto;
+  display: inline-block;
+  background: transparent;
+  border: $input-border;
+  margin: 0;
+  border-radius: $input-radius;
+  width: 100%;
+}
+
+.checkbox {
+  position: relative;
+  top: 22px/2 - 14/2;
+  background: transparent;
+  content: " ";
+  border: $input-border;
+  border-radius: $input-radius;
+  display: block;
+  width: 14px;
+  height: 14px;
+  &-checked {
+    &::before {
+      cursor: default;
+      font-size: 1.5em;
+      content: "✔";
+      display: block;
+      position: relative;
+      top: -5px;
+    }
+  }
+  & input {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+  }
+}
+
+.button-group {
+  @extend .input;
+  border: none;
+  position: relative;
+  line-height: inherit;
+  background: #BFBFBF;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  & .col {
+    padding: $padding-s + 1 $padding-r;
+
+    &:last-child {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+    &:first-child {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+  }
+  cursor: pointer;
+}
+
+.tooltip {
+  background: #333;
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  z-index: 1024;
+  position: relative;
+  filter: drop-shadow(0px 0px 1px rgba(255, 255, 255, 0.4));
+  
+  /* arrow */
+  &:after {
+    z-index: -1;
+    content: " ";
+    display: block;
+    width: 10px;
+    height: 10px;
+    background: #333;
+    position: absolute;
+    transform: rotate(45deg) translateY(-50%);
+  }
+}
+
+.button {
+  @extend .input;
+  font-weight: 100;
+  display: inline-block;
+  border-width: 2px;
+  width: auto;
+  border-color: #777;
+  padding: 4px 8px;
+  border-radius: 32px;
+}
+
+.progress {
+  @extend .input;
+}
+
+
+.Select {
+  width: 100%;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  height: 22px;
+
+  & * {
+    color: inherit !important;
+  }
+
+  .Select-value {
+    line-height: 22px !important;
+    display: inline;
+    position: relative;
+  }
+}
+
+.Select-control {
+  height: 22px;
+  background: transparent;
+  border: none;
+  box-shadow: none !important;
+
+  & .Select-clear {
+    display: none;
+  }
+
+  width: 100%;
+  & .Select-placeholder {
+    @extend .dim;
+    line-height: 22px;
+  }
+  & .Select-input {
+    height: 22px;
+  }
+
+  & .Select-input {
+    & input {
+      padding: 0;
+      line-height: 22px;
+      &:focus {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+
+  & .Select-arrow-zone {
+    & .Select-arrow {
+      border: none;
+      &::before {
+        display: block;
+        position: relative;
+        top: -3px;
+        left: 4px;
+        transform: rotate(90deg);
+        font-family: Ionicons;
+        content: "\F10A";
+      }
+    }
+  }
+}

@@ -1,9 +1,15 @@
+// import { getV } from "../struct";
+
 export type Box = {
   left: number;
   right: number;
   top: number;
   bottom: number;
 }
+
+export type Boxed = {
+  box: Box
+};
 
 export type Rectangle = {
   width: number;
@@ -20,6 +26,13 @@ export type Translate = {
   top: number;
   zoom: number;
 };
+
+export const createBox = (left: number, right: number, top: number, bottom: number): Box => ({
+  left,
+  right,
+  top, 
+  bottom
+});
 
 export const moveBox = (box: Box, left: number, top: number): Box => ({
   ...box,
@@ -43,6 +56,25 @@ export const boxFromRect = ({ width, height }: Rectangle): Box => ({
   right: width,
   bottom: height
 });
+
+export const isBox = (box: any) => box && box.left != null && box.top != null && box.right != null && box.bottom != null;
+export const filterBoxed = (values: any[]): Boxed[] => values.filter(value => isBox(value.box));
+
+export const mergeBoxes = (...boxes: Box[]) => {
+  let left   = Infinity;
+  let bottom = -Infinity;
+  let top    = Infinity;
+  let right  = -Infinity;
+
+  for (const box of boxes) {
+    left   = Math.min(left, box.left);
+    right  = Math.max(right, box.right);
+    top    = Math.min(top, box.top);
+    bottom = Math.max(bottom, box.bottom);
+  }
+
+  return createBox(left, right, top, bottom);
+}
 
 export const centerTransformZoom = (translate: Translate, box: Box, nz: number, point?: Point): Translate => {
   const oz = translate.zoom;

@@ -1,0 +1,58 @@
+@import "../kit/index";
+
+$gutter-background: #444;
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  color: inherit;
+  border: none;
+  background: none;
+}
+
+*:focus {
+  outline: none;
+}
+
+.pull-right {
+  float: right;
+}
+
+
+.font-regular {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.td-container {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.pane {
+  .label {
+    @extend .dim;
+    font-size: 0.8em;
+    vertical-align: bottom;
+    min-width: 15px;
+    text-align: right;
+    line-height: 24px;
+
+    & i {
+      line-height: 22px;
+    }
+  }
+
+
+  .title {
+    @extend .dim;
+    width: 100%;
+
+    padding-bottom: $padding-r;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+}

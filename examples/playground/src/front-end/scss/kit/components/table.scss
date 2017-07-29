@@ -1,0 +1,20 @@
+
+.table {
+
+  .td-cell-key {
+    line-height: inherit;
+    width: 40%;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  input[type="text"]{
+    background: transparent;
+    border: none;
+    border-radius: none;
+    padding: 0px;
+    line-height: inherit;
+    &:disabled{
+      color: rgba(255, 255, 255, 0.5)
+    }
+  }
+}

@@ -1,0 +1,60 @@
+@import "./vars";
+
+.container {
+  position:relative;
+  padding: $padding-r 0;
+}
+
+.row {
+  width: 100%;
+
+  padding: $padding-s $padding-l;
+
+  display: flex;
+  flex-direction: row;
+
+  .no-shrink {
+    flex-shrink: 0;
+  }
+
+  .col {
+    position: relative;
+    flex-grow: 0;
+    flex-shrink: 0;
+    padding-left: $padding-s;
+    padding-right: $padding-s;
+    & > .row {
+      padding-left: 0;
+      padding-right: 0;
+      &:first-child {
+        padding-top: 0;
+      }
+      &:last-child {
+        padding-bottom: 0px;
+      }
+    }
+  }
+
+  &:not(.no-padding) {
+    & .col {
+      &:first-child {
+        padding-left: 0;
+      }
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+  }
+
+  @for $i from 1 through 12 {
+    .col-#{$i} {
+      @extend .col;
+      width: percentage($i/12);
+    }
+
+    .col-#{$i + "-5"} {
+      @extend .col;
+      width: percentage($i/12 + 0.5 / 12);
+    }
+  }
+}

@@ -1,0 +1,55 @@
+$input-radius: 3px;
+$input-top-bottom: 4px;
+$input-left-right: 8px;
+$input-padding: $input-top-bottom $input-left-right;
+$border-color: #CCCCCC;
+$input-border: 1px solid $border-color;
+$input-background: rgba(0,0,0,0.1);
+
+
+/**
+ * built-in element styles.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4 {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+html, body {
+  
+  font-weight: $default-font-weight;
+  font-family: $default-font-family;
+  font-size: $default-font-size;
+  color: $default-font-color;
+  letter-spacing: $default-letter-spacing;
+  padding: 0;
+  margin: 0;
+}
+
+hr {
+  margin: 0;
+  border: none;
+}
+
+ul {
+  padding: 0;
+  margin:0;
+}
+
+a {
+  color: inherit;
+}
+
+
+textarea {
+  @extend .input;
+}
+
+input[type="text"] {
+  @extend .input;
+}

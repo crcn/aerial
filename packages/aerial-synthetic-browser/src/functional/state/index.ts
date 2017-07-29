@@ -63,7 +63,6 @@ export type SyntheticDOMElementAttributes2 = {
 
 export type SyntheticDOMElement2 = {
   nodeName: string;
-  boundingRect: Box;
   attributes: SyntheticDOMElementAttributes2;
   computedStyle: SyntheticCSSStyle2;
 } & SyntheticDOMNode2;

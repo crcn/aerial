@@ -1,0 +1,111 @@
+.editor {
+  background-color: #FFFFFF;
+  color: #333;
+}
+.editor .gutter {
+  background-color: #FFFFFF;
+  color: #666;
+}
+.editor .gutter .line-number.cursor-line {
+  background-color: #FFFBD1;
+  color: #999;
+}
+.editor .gutter .line-number.cursor-line-no-selection {
+  color: #000000;
+}
+.editor .wrap-guide {
+  color: #BFBFBF;
+}
+.editor .indent-guide {
+  color: #BFBFBF;
+}
+.editor .invisible-character {
+  color: #BFBFBF;
+}
+.editor .search-results .marker .region {
+  background-color: transparent;
+  border: #BFBFBF;
+}
+.editor .search-results .marker.current-result .region {
+  border: #000000;
+}
+.editor.is-focused .cursor {
+  border-color: #000000;
+}
+.editor.is-focused .selection .region {
+  background-color: #BDD5FC;
+}
+.editor.is-focused .line-number.cursor-line-no-selection,
+.editor.is-focused .line.cursor-line {
+  background-color: #FFFBD1;
+}
+.comment {
+  color: #A0A0A0;
+}
+.string {
+  color: #5D90CD;
+}
+.constant.numeric {
+  color: #46A609;
+}
+.constant.language {
+  color: #39946A;
+}
+.variable.language,
+.variable.other {
+  color: #C52727;
+}
+.keyword,
+.support.constant.property-value,
+.constant.other.color {
+  color: #AF956F;
+}
+.keyword.other.unit {
+  color: #96DC5F;
+}
+.keyword.operator {
+  color: #484848;
+}
+.storage {
+  color: #C52727;
+}
+.entity.other.inherited-class {
+  color: #858585;
+}
+.entity.name.tag {
+  color: #EF6060;
+}
+.constant.character.entity {
+  color: #BF78CC;
+}
+.support.class.js {
+  color: #BF78CC;
+}
+.entity.other.attribute-name {
+  color: #606060;
+}
+.meta.selector.css,
+.entity.name.tag.css,
+.entity.other.attribute-name.id.css,
+.entity.other.attribute-name.class.css {
+  color: #C52727;
+}
+.meta.property-name.css {
+  color: #484848;
+}
+.support.function {
+  color: #C52727;
+}
+.invalid {
+  background-color: #FF002A;
+}
+.punctuation.section.embedded {
+  color: #C52727;
+}
+.punctuation.definition.tag {
+  color: #606060;
+}
+.constant.other.color.rgb-value.css,
+.support.constant.property-value.css {
+  color: #BF78CC;
+}

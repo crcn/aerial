@@ -1,0 +1,87 @@
+.editor .gutter {
+  background-color: #282828;
+  color: rgba(255, 255, 255, 0.7);
+  border-color: #222;
+}
+
+.layer.selected {
+  background-color: #49483E;
+}
+
+.comment {
+  color: #75715E;
+}
+.constant.character,
+.constant.language,
+.constant.numeric,
+.constant.other {
+  color: #AE81FF;
+}
+.entity.name.class {
+  text-decoration: none;
+  color: #A6E22E;
+}
+.entity.name.function {
+  color: #A6E22E;
+}
+.entity.name.instance {
+  color: #66D9EF;
+}
+.entity.name.tag {
+  color: #F92672;
+}
+.entity.other.attribute-name {
+  color: #A6E22E;
+}
+.entity.other.inherited-class {
+  font-style: italic;
+  text-decoration: none;
+  color: #A6E22E;
+}
+.invalid {
+  color: #F8F8F0;
+  background-color: #F92672;
+}
+.invalid.deprecated {
+  background-color: #AE81FF;
+}
+.keyword {
+  color: #F92672 !important;
+}
+.meta.tag {
+  color: #F8F8F2;
+}
+.storage {
+  color: #F92672;
+}
+.storage.type {
+  font-style: italic;
+  color: #66D9EF;
+}
+.string {
+  color: #E6DB74;
+}
+.support.constant,
+.support.function {
+  color: #66D9EF;
+}
+.support.class,
+.support.type {
+  font-style: italic;
+  color: #66D9EF;
+}
+.variable.parameter {
+  font-style: italic;
+  color: #FD971F;
+}
+.variable.language.python,
+.variable.language.js {
+  color: #F92672;
+}
+.class.jade {
+  color: #AE81FF;
+}
+.leading-whitespace,
+.trailing-whitespace {
+  display: inline-block;
+}
