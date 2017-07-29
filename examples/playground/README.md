@@ -10,4 +10,6 @@ Immediate TODOS:
 - [ ] File navigator specific to selected window
 - [ ] proxy url loading from back-end
 - [ ] ability to hide gutters
+- [ ] siz
+- [ ] key commands
 
