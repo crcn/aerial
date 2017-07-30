@@ -36,6 +36,7 @@
     "npm": "^5.0.3",
     "reduce-reducers": "^0.1.2",
     "redux": "^3.7.2",
+    "redux-saga": "^0.15.6",
     "reflect-metadata": "^0.1.10",
     "reselect": "^3.0.1",
     "sift": "^3.3.12"

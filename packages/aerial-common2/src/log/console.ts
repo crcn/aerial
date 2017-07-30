@@ -1,4 +1,5 @@
 import chalk =  require("chalk");
+import { take, select } from "redux-saga/effects";
 import path = require("path");
 import moment = require("moment");
 import { titleize } from "inflection";
@@ -154,3 +155,29 @@ export const consoleLogDispatcher = (downstream: Dispatcher<any>) => {
     downstream
   );
 };
+
+export function* consoleLogSaga() {
+
+  while(true) {
+    const { log: { level: acceptedLevel, prefix }}: ConsoleLogState = yield select();
+    let { text, level }: LogAction = yield take(LogActionTypes.LOG);
+    if (!(acceptedLevel & level)) continue;
+    const log = {
+      [LogLevel.DEBUG]: console.log.bind(console),
+      [LogLevel.LOG]: console.log.bind(console),
+      [LogLevel.INFO]: console.info.bind(console),
+      [LogLevel.WARNING]: console.warn.bind(console),
+      [LogLevel.ERROR]: console.error.bind(console)
+    }[level];
+
+
+    text = PREFIXES[level] + (prefix || "") + text;
+    text = colorize(text);
+
+    if (typeof window !== "undefined" && !window["$synthetic"]) {
+      return styledConsoleLog(new AnsiUp().ansi_to_html(text));
+    }
+
+    log(text);
+  }
+}
