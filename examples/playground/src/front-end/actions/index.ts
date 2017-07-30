@@ -17,6 +17,8 @@ export const FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED = "FILE_NAVIGATOR_ADD_FOLD
 export const VISUAL_EDITOR_WHEEL = "VISUAL_EDITOR_WHEEL";
 export const STAGE_TOOL_WINDOW_TITLE_CLICKED = "STAGE_TOOL_WINDOW_TITLE_CLICKED";
 export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
+export const STAGE_TOOL_NODE_OVERLAY_CLICKED = "STAGE_TOOL_NODE_OVERLAY_CLICKED";
+export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 
 /**
  * Types
@@ -91,9 +93,14 @@ export type StageWillWindowKeyDown = {
   windowId: string;
 } & WrappedEvent<React.KeyboardEvent<any>>;
 
+export type StageToolNodeOverlayClicked = {
+  workspaceId: string;
+  nodeId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
+
 export type DeleteShortcutPressed = ShortcutEvent;
 
-export type TextEditorChangedEvent = {
+export type textEditorChanged = {
   file: File,
   value: string
 } & BaseEvent;
@@ -119,7 +126,14 @@ export const resizerMoved = (workspaceId: string, point: Point): ResizerMoved =>
   type: RESIZER_MOVED,
 });
 
-export const textEditorChangedEvent = publicObject((file: File, value: string): TextEditorChangedEvent => ({ type: TEXT_EDITOR_CHANGED, file, value }));
+export const textEditorChanged = (file: File, value: string): textEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
+
+export const stageToolNodeOverlayClicked = (workspaceId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayClicked => ({
+  workspaceId,
+  type: STAGE_TOOL_NODE_OVERLAY_CLICKED,
+  nodeId,
+  sourceEvent
+});
 
 export const resizerPathMoved = (workspaceId: string, anchor: Point, box: Box, sourceEvent: React.MouseEvent<any>): ResizerPathMoved => ({
   type: RESIZER_PATH_MOUSE_MOVED,

@@ -25,9 +25,10 @@ import {
 import { clamp } from "lodash";
 
 import { 
-  ShortcutServiceState,
   ApplicationState,
   getWorkspaceById,
+  getAllFilesByPath,
+  ShortcutServiceState,
   getSelectedWorkspace,
   addWorkspaceSelection,
   removeWorkspaceSelection,
@@ -41,6 +42,8 @@ import {
 } from "front-end/state";
 
 import {
+  STAGE_TOOL_NODE_OVERLAY_CLICKED,
+  StageToolNodeOverlayClicked,
   STAGE_TOOL_WINDOW_KEY_DOWN,
   StageWillWindowKeyDown,
   keyboardShortcutAdded,
@@ -56,7 +59,7 @@ import {
   RESIZER_MOVED,
   KeyboardShortcutAdded,
   TEXT_EDITOR_CHANGED,
-  TextEditorChangedEvent,
+  textEditorChanged,
   TOGGLE_LEFT_GUTTER_PRESSED,
   TOGGLE_RIGHT_GUTTER_PRESSED,
   PromptedNewWindowUrl,
@@ -73,6 +76,7 @@ import {
 } from "front-end/actions";
 
 import { 
+  SyntheticDOMNode2,
   SYNTHETIC_BROWSER,
   SYTNTHETIC_BROWSER_WINDOW,
   syntheticBrowserReducer,
@@ -91,18 +95,18 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
     }
 
     case TEXT_EDITOR_CHANGED: {
-      const { file, value } = event as TextEditorChangedEvent;
+      const { file, value } = event as textEditorChanged;
       const path = getPathById(state, file.$$id);
       return updateStructProperty(state, file, "content", value);
     }
 
     case FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED: {
-      const changedEvent = event as TextEditorChangedEvent;
+      const changedEvent = event as textEditorChanged;
       break;
     }
 
     case FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED: {
-      const changedEvent = event as TextEditorChangedEvent;
+      const changedEvent = event as textEditorChanged;
       break;
     }
   }
@@ -241,6 +245,15 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       const e = event as StageWillWindowKeyDown;
       return moveItemFromAction(state, e.windowId, e);
     } 
+
+    case STAGE_TOOL_NODE_OVERLAY_CLICKED: {
+      const { workspaceId, nodeId, sourceEvent } = event as StageToolNodeOverlayClicked;
+      const metaKey = sourceEvent.metaKey;
+      const filesByUri = getAllFilesByPath(state);
+      const { $source: { uri } } = getValueById(state, nodeId) as SyntheticDOMNode2;
+      const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
+      return updateStructProperty(state, getWorkspaceById(state, workspaceId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+    }
   }
 
   return state;

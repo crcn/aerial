@@ -134,8 +134,6 @@ const mapLegacyDOMNodeToPOJO = (node: SyntheticDOMNode) => {
     childNodes: node.childNodes.map(mapLegacyDOMNodeToPOJO)
   };
 
-  console.log(node.$source);
-
   if (node.nodeType === DOMNodeType.DOCUMENT) {
     return {
       ...base,

@@ -1,6 +1,6 @@
 
 import "./index.scss";
-import { textEditorChangedEvent } from "front-end/actions";
+import { textEditorChanged } from "front-end/actions";
 import { Dispatcher, BaseEvent, publicObject } from "aerial-common2";
 
 if (typeof window !== "undefined") {
@@ -33,7 +33,7 @@ export const TextEditorComponentBase = ({ options, file, dispatch }: TextEditorP
     <CodeMirror value={(file && file.content) || ""} options={{ 
       theme: "dracula",
       mode: file && MODES[getFileExtension(file)]
-    }} onChange={value => dispatch(textEditorChangedEvent(file, value))} />
+    }} onChange={value => dispatch(textEditorChanged(file, value))} />
   </div>
 }
 

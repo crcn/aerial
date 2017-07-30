@@ -1,9 +1,10 @@
-import "./tools.scss";
+import "./overlay.scss";
 import * as React from "react";
 import { Workspace } from "front-end/state";
-import { getValueById, Dispatcher, Box } from "aerial-common2";
+import { getValueById, Dispatcher, Box, wrapEventToDispatch } from "aerial-common2";
 import { compose, pure } from "recompose";
 import { mapValues, values } from "lodash";
+import { stageToolNodeOverlayClicked } from "front-end/actions";
 import { SyntheticDOMNode2, getAllSyntheticDOMNodesAsIdMap } from "aerial-synthetic-browser";
 
 export type VisualToolsComponentProps = {
@@ -11,12 +12,14 @@ export type VisualToolsComponentProps = {
   dispatch: Dispatcher<any>;
 };
 
-type ElementOverlayProps = {
+type NodeOverlayProps = {
+  workspace: Workspace;
   box: Box,
-  element: SyntheticDOMNode2
+  node: SyntheticDOMNode2;
+  dispatch: Dispatcher<any>;
 };
 
-const ElementOverlayBase = ({ box, element }: ElementOverlayProps) => {
+const NodeOverlayBase = ({ workspace, box, node, dispatch }: NodeOverlayProps) => {
   const style = {
     left: box.left,
     top: box.top,
@@ -24,14 +27,14 @@ const ElementOverlayBase = ({ box, element }: ElementOverlayProps) => {
     height: box.bottom - box.top
   };
 
-  return <div className="visual-tools-element-overlay" style={style}>
-    
-  </div>
+  return <div className="visual-tools-node-overlay" style={style} onClick={wrapEventToDispatch(dispatch, stageToolNodeOverlayClicked.bind(this, workspace.$$id, node.$$id))}>
+
+  </div>;
 }
 
-const ElementOverlay = pure(ElementOverlayBase as any) as typeof ElementOverlayBase;
+const NodeOverlay = pure(NodeOverlayBase as any) as typeof NodeOverlayBase;
 
-export const VisualToolsComponentBase = ({ workspace }: VisualToolsComponentProps) => {
+export const NodeOverlaysToolComponentBase = ({ workspace, dispatch }: VisualToolsComponentProps) => {
   const allNodes = getAllSyntheticDOMNodesAsIdMap(workspace);
   return <div className="visual-tools-layer-component">
     {
@@ -41,7 +44,7 @@ export const VisualToolsComponentBase = ({ workspace }: VisualToolsComponentProp
           const node = allNodes[nodeId];
           const box  = window.computedBoxes[nodeId];
           if (node && box) {
-            elements.push(<ElementOverlay key={nodeId} element={node} box={box} />);
+            elements.push(<NodeOverlay workspace={workspace} key={nodeId} node={node} box={box} dispatch={dispatch} />);
           }
         }
         return elements;
@@ -50,4 +53,4 @@ export const VisualToolsComponentBase = ({ workspace }: VisualToolsComponentProp
   </div>
 }
 
-export const VisualToolsComponent = pure(VisualToolsComponentBase as any) as typeof VisualToolsComponentBase;
+export const NodeOverlaysToolComponent = pure(NodeOverlaysToolComponentBase as any) as typeof NodeOverlaysToolComponentBase;
