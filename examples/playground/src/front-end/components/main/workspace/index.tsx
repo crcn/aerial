@@ -13,13 +13,14 @@ export type WorkspaceComponentProps = {
 };
 
 export const WorkspaceComponentBase = ({ workspace, dispatch }: WorkspaceComponentProps) => {
+  const visualSettings = workspace.visualEditorSettings;
   return <div className="workspace-component">
-    <ProjectGutterComponent workspace={workspace} dispatch={dispatch} />
+    { visualSettings.showLeftGutter ? <ProjectGutterComponent workspace={workspace} dispatch={dispatch} /> : null }
     <div className="workspace-editors">
       <TextEditorComponent file={getSelectedWorkspaceFile(workspace)} dispatch={dispatch} />
       <VisualEditorComponent workspace={workspace} dispatch={dispatch} />
     </div>
-    <VisualGutterComponent />
+    { visualSettings.showRightGutter ? <VisualGutterComponent /> : null }
   </div>
 }
 

@@ -43,6 +43,8 @@ import {
   ResizerMoved,
   RESIZER_MOVED,
   KeyboardShortcutAdded,
+  TOGGLE_LEFT_GUTTER_PRESSED,
+  TOGGLE_RIGHT_GUTTER_PRESSED,
   PromptedNewWindowUrl,
   WindowPaneRowClicked,
   WINDOW_PANE_ROW_CLICKED,
@@ -202,6 +204,22 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case PROMPTED_NEW_WINDOW_URL: {
       const { workspaceId, location } = event as PromptedNewWindowUrl;
       return applicationReducer(state, openSyntheticWindowRequested(getWorkspaceById(state, workspaceId).browser.$$id, location));
+    }
+
+    case TOGGLE_LEFT_GUTTER_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      return updateStructProperty(state, workspace, "visualEditorSettings", {
+        ...workspace.visualEditorSettings,
+        showLeftGutter: !workspace.visualEditorSettings.showLeftGutter
+      });
+    }
+
+    case TOGGLE_RIGHT_GUTTER_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      return updateStructProperty(state, workspace, "visualEditorSettings", {
+        ...workspace.visualEditorSettings,
+        showRightGutter: !workspace.visualEditorSettings.showRightGutter
+      });
     }
 
     case DELETE_SHORCUT_PRESSED: {

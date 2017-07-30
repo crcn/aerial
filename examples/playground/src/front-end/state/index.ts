@@ -59,6 +59,8 @@ export type Directory = File;
 export type VisualEditorSettings = {
   translate: Translate;
   cursor?: string;
+  showLeftGutter?: boolean;
+  showRightGutter?: boolean;
 }
 
 export type Workspace = {
@@ -168,7 +170,9 @@ export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById
 
 export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, {
   visualEditorSettings: {
-    translate: { left: 0, top: 0, zoom: 1 }
+    translate: { left: 0, top: 0, zoom: 1 },
+    showLeftGutter: true,
+    showRightGutter: true
   },
   selectionIds: []
 });

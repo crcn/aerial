@@ -1,5 +1,5 @@
 import { identity } from "lodash";
-import { keyboardShortcutAdded, deleteShortcutPressed } from "front-end/messages";
+import { keyboardShortcutAdded, deleteShortcutPressed, toggleLeftGutterPressed, toggleRightGutterPressed } from "front-end/messages";
 import { readUriAction, watchUriAction } from "aerial-sandbox2";
 import { parallel, readOne, readAll, pump, once } from "mesh";
 import { initRemoteSyntheticBrowserService } from "aerial-synthetic-browser";
@@ -31,7 +31,11 @@ const createKernel = (upstream: Dispatcher<any>, sync?: boolean) => {
 
 export const initWorkspaceService = (upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => parallel(
   once(() => {
-    readAll(upstream(keyboardShortcutAdded("backspace", deleteShortcutPressed())))
+
+    // TODO - possibly move these to a central location
+    readAll(upstream(keyboardShortcutAdded("backspace", deleteShortcutPressed())));
+    readAll(upstream(keyboardShortcutAdded("alt+\\", toggleLeftGutterPressed())));
+    readAll(upstream(keyboardShortcutAdded("alt+/", toggleRightGutterPressed())));
   }),
   downstream,
   // initRemoteSyntheticBrowserService(createKernel(upstream, true), upstream)(downstream),

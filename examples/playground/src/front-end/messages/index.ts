@@ -1,10 +1,12 @@
 import { Action, BaseEvent, Point, WrappedEvent } from "aerial-common2";
 
-export const RESIZER_MOVED           = "RESIZER_MOVED";
-export const WINDOW_PANE_ROW_CLICKED = "WINDOW_PANE_ROW_CLICKED";
-export const PROMPTED_NEW_WINDOW_URL = "PROMPTED_NEW_WINDOW_URL";
-export const KEYBOARD_SHORTCUT_ADDED = "KEYBOARD_SHORTCUT_ADDED";
-export const DELETE_SHORCUT_PRESSED  = "DELETE_SHORCUT_PRESSED";
+export const RESIZER_MOVED               = "RESIZER_MOVED";
+export const WINDOW_PANE_ROW_CLICKED     = "WINDOW_PANE_ROW_CLICKED";
+export const PROMPTED_NEW_WINDOW_URL     = "PROMPTED_NEW_WINDOW_URL";
+export const KEYBOARD_SHORTCUT_ADDED     = "KEYBOARD_SHORTCUT_ADDED";
+export const DELETE_SHORCUT_PRESSED      = "DELETE_SHORCUT_PRESSED";
+export const TOGGLE_LEFT_GUTTER_PRESSED  = "TOGGLE_LEFT_GUTTER_PRESSED";
+export const TOGGLE_RIGHT_GUTTER_PRESSED = "TOGGLE_RIGHT_GUTTER_PRESSED";
 
 export type ResizerMoved = {
   point: Point;
@@ -61,4 +63,12 @@ export const keyboardShortcutAdded = (keyCombo: string, action: Action): Keyboar
 
 export const deleteShortcutPressed = (): BaseEvent => ({
   type: DELETE_SHORCUT_PRESSED,
+});
+
+export const toggleLeftGutterPressed = (): BaseEvent => ({
+  type: TOGGLE_LEFT_GUTTER_PRESSED,
+});
+
+export const toggleRightGutterPressed = (): BaseEvent => ({
+  type: TOGGLE_RIGHT_GUTTER_PRESSED,
 });

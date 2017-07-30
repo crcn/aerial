@@ -34,6 +34,7 @@ export const initShortcutsService = (upstream: Dispatcher<any>) => (downstream: 
 
       for (const { keyCombo, action } of shortcuts) {
         mt.bind(keyCombo, (sourceEvent) => {
+          sourceEvent.preventDefault();
           readAll(upstream({ ...action, sourceEvent }));
         });
       }
