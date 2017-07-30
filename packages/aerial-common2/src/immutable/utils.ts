@@ -62,16 +62,16 @@ export function traverseObject(target: any, _each: (value: any, key: any, object
   }
 }
 
-export function update<T, K extends keyof T>(object: T, key: K, value: T[K]) {
+export function update<T, K extends keyof T>(object: T, key: K, value: T[K]): T {
   if (object[key] === value) return object;
   if (Array.isArray(object) && !isNaN(Number(key))) {
     const index = Number(key);
-    return [...object.slice(0, index), value, object.slice(index + 1)];
+    return [...object.slice(0, index), value, object.slice(index + 1)] as any as T;
   } else {
     return {
       ...(object as Object),
       [key as string]: value
-    }
+    } as any as T;
   }
 };
 

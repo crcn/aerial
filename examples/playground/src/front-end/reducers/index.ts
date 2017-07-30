@@ -1,6 +1,9 @@
 import { 
   moved,
+  removed,
   resized,
+  update,
+  Struct,
   moveBox,
   updateIn, 
   Translate,
@@ -8,6 +11,7 @@ import {
   boxFromRect,
   mergeBoxes,
   getPathById, 
+  getValueById,
   updateStruct,
   mapImmutable, 
   keepBoxCenter,
@@ -27,6 +31,7 @@ import {
   addWorkspaceSelection,
   removeWorkspaceSelection,
   createApplicationState,
+  clearWorkspaceSelection,
   toggleWorkspaceSelection,
   getSelectedWorkspaceFile,
   getWorkspaceSelectionBox,
@@ -37,11 +42,19 @@ import {
 import {
   ResizerMoved,
   RESIZER_MOVED,
+  KeyboardShortcutAdded,
   PromptedNewWindowUrl,
   WindowPaneRowClicked,
   WINDOW_PANE_ROW_CLICKED,
   PROMPTED_NEW_WINDOW_URL,
+  KEYBOARD_SHORTCUT_ADDED,
+  DELETE_SHORCUT_PRESSED,
+  DeleteShortcutPressed,
 } from "front-end/messages";
+
+import {
+  ShortcutServiceState,
+} from "front-end/services";
 
 import { 
   syntheticBrowserReducer,
@@ -95,6 +108,7 @@ export const applicationReducer = (state = createApplicationState(), event: Base
   state = syntheticBrowserReducer(state, event);
   state = visualEditorReducer(state, event);
   state = windowPaneReducer(state, event);
+  state = shortcutServiceReducer(state, event);
 
   return state;
 };
@@ -189,6 +203,16 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       const { workspaceId, location } = event as PromptedNewWindowUrl;
       return applicationReducer(state, openSyntheticWindowRequested(getWorkspaceById(state, workspaceId).browser.$$id, location));
     }
+
+    case DELETE_SHORCUT_PRESSED: {
+      const { sourceEvent } = event as DeleteShortcutPressed;
+      const workspace = getSelectedWorkspace(state);
+      const selected  = workspace.selectionIds.map(id => getValueById(state, id)) as Struct[];
+      for (const item of selected) {
+        state = applicationReducer(state, removed(item.$$id, item.$$type));
+      }
+      state = clearWorkspaceSelection(state, workspace.$$id);
+    }
   }
 
   return state;
@@ -204,3 +228,14 @@ const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
   }
   return state;
 };
+
+
+const shortcutServiceReducer = <T extends ShortcutServiceState>(state: ApplicationState, event: BaseEvent) => {
+  switch(event.type) {
+    case KEYBOARD_SHORTCUT_ADDED: {
+      const { keyCombo, action } = event as KeyboardShortcutAdded;
+      return update(state, "shortcuts", [...(state.shortcuts || []), { keyCombo, action }]);
+    }
+  }
+  return state;
+}

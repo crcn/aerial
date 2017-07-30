@@ -4,6 +4,8 @@ import {
   MOVED,
   Moved,
   update, 
+  REMOVED,
+  Removed,
   RESIZED,
   Resized,
   updateIn, 
@@ -59,9 +61,11 @@ export const syntheticBrowserReducer = (root: any, event: BaseEvent) => {
       })));
     }
 
-    case CLOSE_SYNTHETIC_WINDOW_REQUESTED: {
-      const { syntheticWindowId } = event as CloseSyntheticWindowRequested;
-      return deleteValueById(root, syntheticWindowId);
+    case REMOVED: {
+      const { itemId, itemType } = event as Removed;
+      if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
+        return deleteValueById(root, itemId);
+      }
     }
   }
 
@@ -84,8 +88,8 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
         if (window) {
           return updateStructProperty(root, window, "box", box);
         }
+        break;
       }
-      break;
     }
 
     case MOVED: {
@@ -95,8 +99,8 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
         if (window) {
           return updateStructProperty(root, window, "box", moveBox(window.box, point));
         }
+        break;
       }
-      break;
     }
 
     case SYNTHETIC_WINDOW_TITLE_CHANGED: {

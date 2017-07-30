@@ -2,6 +2,7 @@ import { flowRight } from "lodash";
 import { Dispatcher, HODispatcher } from "aerial-common2";
 
 import { initBackEndService } from "./back-end";
+import { initShortcutsService } from "./shortcuts";
 import { initWorkspaceService } from "./workspace";
 import { initLocalProtocolService } from "./local-protocol";
 import { initReactService, ReactServiceState } from "./react";
@@ -17,8 +18,10 @@ export const initMainService = (upstream: Dispatcher<any>) => flowRight<HODispat
   initReactService(upstream),
   initWorkspaceService(upstream),
   initLocalProtocolService(upstream),
+  initShortcutsService(upstream)
 );
 
 export * from "./react";
 export * from "./back-end";
 export * from "./workspace";
+export * from "./shortcuts";

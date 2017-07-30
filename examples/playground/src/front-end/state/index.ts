@@ -34,7 +34,7 @@ import {
   SyntheticBrowser2,
 } from "aerial-synthetic-browser";
 
-import { MainServiceState } from "front-end/services";
+import { MainServiceState, ShortcutServiceState } from "front-end/services";
 
 /**
  * Types
@@ -108,7 +108,7 @@ export type ApplicationState = {
   kernel: Kernel,
   workspaces: Workspace[],
   selectedWorkspaceId?: string
-} & BaseApplicationState & MainServiceState & Struct;
+} & BaseApplicationState & MainServiceState & ShortcutServiceState & Struct;
 
 /**
  * Utilities
@@ -146,6 +146,10 @@ export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...sele
   return setWorkspaceSelection(root, workspaceId, ...difference(selectionIds, workspace.selectionIds));
 };
 
+export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
+  return setWorkspaceSelection(root, workspaceId);
+}
+
 export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
   return updateStructProperty(root, workspace, "selectionIds", uniq([...selectionIds]));
@@ -153,11 +157,6 @@ export const setWorkspaceSelection = (root: any, workspaceId: string, ...selecti
 
 export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))) as any);
 export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => boxed.box)));
-
-export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
-  const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "selectionIds", []);
-}
 
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => getValueById(state, id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);

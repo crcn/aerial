@@ -10,6 +10,12 @@ Immediate TODOS:
 - [ ] File navigator specific to selected window
 - [ ] proxy url loading from back-end
 - [ ] ability to hide gutters
-- [ ] siz
 - [ ] key commands
 
+SUNDAY:
+
+- [ ] kotkeys
+  - [ ] hide gutters
+  - [ ] delete selection
+- [ ] clean up CSS
+  - [ ] chevron files
