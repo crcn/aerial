@@ -39,6 +39,7 @@
     "gulp": "^3.9.1",
     "gulp-util": "^3.0.8",
     "highland": "^2.11.0",
+    "html-webpack-plugin": "^2.29.0",
     "mesh-ds7": "^0.0.6",
     "mesh-memory-ds7": "^0.0.5",
     "mesh7": "^7.0.8",
@@ -50,7 +51,8 @@
     "ts-loader": "^2.1.0",
     "typescript": "^2.2.2",
     "url-loader": "^0.5.9",
-    "webpack": "^3.0.0"
+    "webpack": "^3.0.0",
+    "webpack-dev-server": "^2.6.1"
   },
   "dependencies": {
     "abab": "^1.0.3",
@@ -77,11 +79,13 @@
     "react": "^15.6.1",
     "react-codemirror": "git+ssh://git@github.com/crcn/react-codemirror.git",
     "react-dom": "^15.6.1",
+    "react-input-autosize": "^1.1.4",
     "react-redux": "^5.0.5",
     "recompose": "^0.23.5",
     "reduce-reducers": "^0.1.2",
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6",
+    "redux-undo": "1.0.0-beta9-9-6",
     "reselect": "^3.0.1",
     "sift": "3.3.x",
     "systemjs": "^0.20.14",

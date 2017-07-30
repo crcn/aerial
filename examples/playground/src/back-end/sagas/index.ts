@@ -21,24 +21,6 @@ function* getExpressServer() {
 function* frontEndService() {
   const { frontEnd }: FrontEndState = yield select();
   const expressServer = yield call(getExpressServer);
-
-  const frontEndEntryBasename = path.basename(frontEnd.entryPath);
-  const frontEndCSSBasename = path.basename(frontEnd.cssPath);
-
-  expressServer.all("/index.html", (req, res) => {
-    res.send(`
-      <html>
-        <head>
-          <link rel="stylesheet" href="./${frontEndCSSBasename}">
-        </head>
-        <body>
-          <div id="application"></div>
-          <script type="text/javascript" src="./${frontEndEntryBasename}"></script>
-        </body>
-      </html>
-    `);
-  });
-
   expressServer.use(
     express.static(path.dirname(frontEnd.entryPath))
   );

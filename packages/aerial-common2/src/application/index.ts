@@ -6,6 +6,7 @@ import { createStore, Reducer, Store, applyMiddleware } from "redux";
 import { SagaIterator, default as createSagaMiddleware } from "redux-saga";
 import { fork } from "redux-saga/effects";
 import { createAction, Dispatcher } from "../bus";
+import { identify } from "lodash";
 import { 
   logger,
   logInfoAction, 

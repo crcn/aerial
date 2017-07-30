@@ -37,6 +37,7 @@
     "reduce-reducers": "^0.1.2",
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6",
+    "redux-undo": "1.0.0-beta9-9-6",
     "reflect-metadata": "^0.1.10",
     "reselect": "^3.0.1",
     "sift": "^3.3.12"

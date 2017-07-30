@@ -1,6 +1,8 @@
 const {resolve} = require('path');
 const webpack   = require('webpack');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 
 
 module.exports = {
@@ -10,7 +12,10 @@ module.exports = {
     filename: 'entry.bundle.js'
   },
   plugins: [
-    new ExtractTextPlugin('entry.bundle.css')
+    new ExtractTextPlugin('entry.bundle.css'),
+    new HtmlWebpackPlugin({
+      template: './src/index.html'
+    }),
   ],
   resolve: {
     extensions: ['.ts', '.js', '.tsx'],
@@ -41,7 +46,7 @@ module.exports = {
             { 
               loader: 'sass-loader',
               options: {
-                includePaths: [__dirname + "/src"]
+                includePaths: [__dirname + '/src']
               }
             }
           ]

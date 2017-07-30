@@ -123,8 +123,8 @@ const defaultState = { level: LogLevel.ALL, prefix: "" };
 export function* consoleLogSaga() {
 
   while(true) {
-    const { log: { level: acceptedLevel, prefix }}: ConsoleLogState = yield select();
-    let { text, level }: LogAction = (yield take(LogActionTypes.LOG)) || defaultState;
+    const { log: { level: acceptedLevel, prefix }}: ConsoleLogState = (yield select()) || defaultState;
+    let { text, level }: LogAction = (yield take(LogActionTypes.LOG));
     if (!(acceptedLevel & level)) continue;
     const log = {
       [LogLevel.DEBUG]: console.log.bind(console),

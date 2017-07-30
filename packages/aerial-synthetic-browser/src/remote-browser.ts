@@ -1,5 +1,5 @@
 import { debounce } from "lodash";
-import { parallel, createDuplex, pump } from "mesh";
+// import { parallel, createDuplex, pump } from "mesh";
 import { Dispatcher, logger, logDebugAction, logInfoAction, logWarningAction, logErrorAction } from "aerial-common2";
 import { OpenRemoteBrowserRequest, SyntheticRendererEvent, OPEN_REMOTE_BROWSER, openRemoteBrowserRequest } from "./messages";
 import { NoopRenderer, ISyntheticDocumentRenderer } from "./renderers";
@@ -115,14 +115,14 @@ export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
 
     let value, done;
 
-    pump(this._connection, (event) => {
-      this.onRemoteBrowserEvent(event);
-    }).catch((e) => {
-      this.logger.warn("Remote browser connection closed. Re-opening");
-      setTimeout(() => {
-        this.open(options);
-      }, 1000);
-    });
+    // pump(this._connection, (event) => {
+    //   this.onRemoteBrowserEvent(event);
+    // }).catch((e) => {
+    //   this.logger.warn("Remote browser connection closed. Re-opening");
+    //   setTimeout(() => {
+    //     this.open(options);
+    //   }, 1000);
+    // });
   }
 
   onRemoteBrowserEvent(e) {

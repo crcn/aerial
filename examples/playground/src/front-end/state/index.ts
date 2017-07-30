@@ -60,6 +60,7 @@ export interface File extends Struct, TreeNode<any> {
 export type Directory = File;
 
 export type VisualEditorSettings = {
+  backgroundColor?: string;
   translate: Translate;
   cursor?: string;
   showLeftGutter?: boolean;

@@ -22,7 +22,6 @@ import {
   centerTransformZoom,
   updateStructProperty, 
 } from "aerial-common2";
-
 import { clamp } from "lodash";
 
 import { 
@@ -47,6 +46,8 @@ import {
   ResizerPathMoved,
   FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
   FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED,
+  StageWillWindowTitleClicked,
+  STAGE_TOOL_WINDOW_TITLE_CLICKED,
   RESIZER_PATH_MOUSE_MOVED,
   ResizerMoved,
   RESIZER_MOVED,
@@ -77,7 +78,8 @@ import {
 
 import reduceReducers = require("reduce-reducers");
 
-export const applicationReducer = (state = createApplicationState(), event: BaseEvent) => {
+
+export const applicationReducer = (state: ApplicationState = createApplicationState(), event: BaseEvent) => {
   switch(event.type) {
     case TREE_NODE_LABEL_CLICKED: {
       const { node } = event as TreeNodeLabelClickedEvent;
@@ -226,17 +228,25 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       }
       state = clearWorkspaceSelection(state, workspace.$$id);
     }
+
+    case STAGE_TOOL_WINDOW_TITLE_CLICKED: {
+      return selectFromWindowClickAction(state, event as WindowPaneRowClicked);
+    }
   }
 
   return state;
 }
 
+const selectFromWindowClickAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, event: T) => {
+  const { windowId, sourceEvent } = event;
+  const workspace = getSyntheticWindowWorkspace(state, windowId);
+  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, windowId) : toggleWorkspaceSelection(state, workspace.$$id, windowId);
+}
+
 const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
   switch (event.type) {
     case WINDOW_PANE_ROW_CLICKED: {
-      const { windowId, sourceEvent } = event as WindowPaneRowClicked;
-      const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, windowId) : toggleWorkspaceSelection(state, workspace.$$id, windowId);
+      return selectFromWindowClickAction(state, event as WindowPaneRowClicked);
     }
   }
   return state;

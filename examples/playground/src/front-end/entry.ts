@@ -100,7 +100,7 @@ const workspace = createWorkspace({
 initApplication(createApplicationState({
   workspaces: [workspace],
   selectedWorkspaceId: workspace.$$id,
-  element: typeof document !== "undefined" ? document.querySelector("#application") as HTMLElement : undefined,
+  element: typeof document !== "undefined" ? document.getElementById("application") : undefined,
   log: {
     level: LogLevel.VERBOSE
   }

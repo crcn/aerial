@@ -15,6 +15,7 @@ export const TREE_NODE_LABEL_CLICKED = "TREE_NODE_LABE_CLICKED";
 export const FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED   = "FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED";
 export const FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED = "FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED";
 export const VISUAL_EDITOR_WHEEL = "VISUAL_EDITOR_WHEEL";
+export const STAGE_TOOL_WINDOW_TITLE_CLICKED = "STAGE_TOOL_WINDOW_TITLE_CLICKED";
 
 /**
  * Types
@@ -81,6 +82,9 @@ export type ResizerPathMoved = {
   workspaceId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
+export type StageWillWindowTitleClicked = {
+  windowId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
 
 export type DeleteShortcutPressed = ShortcutEvent;
 
@@ -101,6 +105,7 @@ export const canvasElementsComputedPropsChanged = (syntheticWindowId: string, co
 });
 
 export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClickedEvent => ({ type: TREE_NODE_LABEL_CLICKED, node });
+export const stageToolWindowTitleClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageWillWindowTitleClicked => ({ type: STAGE_TOOL_WINDOW_TITLE_CLICKED, windowId, sourceEvent });
 
 export const resizerMoved = (workspaceId: string, point: Point): ResizerMoved => ({
   workspaceId,
