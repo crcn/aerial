@@ -41,6 +41,9 @@ import {
 } from "front-end/state";
 
 import {
+  STAGE_TOOL_WINDOW_KEY_DOWN,
+  StageWillWindowKeyDown,
+  keyboardShortcutAdded,
   CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
   CanvasElementsComputedPropsChanged,
   ResizerPathMoved,
@@ -70,6 +73,8 @@ import {
 } from "front-end/actions";
 
 import { 
+  SYNTHETIC_BROWSER,
+  SYTNTHETIC_BROWSER_WINDOW,
   syntheticBrowserReducer,
   getSyntheticBrowserWindow,
   OPEN_SYNTHETIC_WINDOW_REQUESTED,
@@ -77,7 +82,6 @@ import {
 } from "aerial-synthetic-browser";
 
 import reduceReducers = require("reduce-reducers");
-
 
 export const applicationReducer = (state: ApplicationState = createApplicationState(), event: BaseEvent) => {
   switch(event.type) {
@@ -226,16 +230,45 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       for (const item of selected) {
         state = applicationReducer(state, removed(item.$$id, item.$$type));
       }
-      state = clearWorkspaceSelection(state, workspace.$$id);
+      return clearWorkspaceSelection(state, workspace.$$id);
     }
 
     case STAGE_TOOL_WINDOW_TITLE_CLICKED: {
       return selectFromWindowClickAction(state, event as WindowPaneRowClicked);
     }
+
+    case STAGE_TOOL_WINDOW_KEY_DOWN: {
+      const e = event as StageWillWindowKeyDown;
+      return moveItemFromAction(state, e.windowId, e);
+    } 
   }
 
   return state;
 }
+
+const moveItemFromAction = <T extends { sourceEvent: React.KeyboardEvent<any> }>(state: ApplicationState, itemId: string, event: T) => {
+  const { sourceEvent } = event;
+  const item = getValueById(state, itemId);
+
+  // TODO - prop may not exist here -- need to use getBox instead
+  const box = item.box;
+  switch(sourceEvent.key) {
+    case "ArrowDown": {
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, top: box.top + 1 })));
+    }
+    case "ArrowUp": {
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, top: box.top - 1 })));
+    }
+    case "ArrowLeft": {
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, left: box.left - 1 })));
+    }
+    case "ArrowRight": {
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, left: box.left + 1 })));
+    }
+  }
+
+  return state;
+};
 
 const selectFromWindowClickAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, event: T) => {
   const { windowId, sourceEvent } = event;

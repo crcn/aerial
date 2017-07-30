@@ -1,4 +1,5 @@
 import { DOMNodeType } from "../../dom";
+import { SourceLocation2 } from "aerial-sandbox2";
 import { 
   Struct, 
   Box, 
@@ -29,13 +30,10 @@ const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   bottom: 600
 };
 
-/**
- * Shapes
- */
-
 export type SyntheticDOMNode2 = {
   nodeType: DOMNodeType;
   nodeName: string;
+  $source: SourceLocation2;
   childNodes: SyntheticDOMNode2[];
 } & Struct;
 

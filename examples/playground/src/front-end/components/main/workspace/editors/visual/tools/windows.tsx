@@ -2,8 +2,8 @@ import "./windows.scss";
 import * as React from "react";
 import { compose, pure } from "recompose";
 import { Workspace } from "front-end/state";
-import { stageToolWindowTitleClicked } from "front-end/actions";
 import { SyntheticBrowserWindow2 } from "aerial-synthetic-browser";
+import { stageToolWindowTitleClicked, stageToolWindowKeyDown } from "front-end/actions";
 import { Dispatcher, getBoxSize, Translate, wrapEventToDispatch } from "aerial-common2";
 
 type WindowItemInnerProps = {
@@ -31,7 +31,12 @@ const WindowItemComponentBase = ({ window, translate, dispatch }: WindowItemInne
   };
   
   return <div className="m-windows-stage-tool-item" style={style}>
-    <div className="m-windows-stage-tool-item-title" style={titleStyle} onClick={wrapEventToDispatch(dispatch, stageToolWindowTitleClicked.bind(this, window.$$id))}>
+    <div 
+    className="m-windows-stage-tool-item-title" 
+    tabIndex={-1} 
+    style={titleStyle} 
+    onKeyDown={wrapEventToDispatch(dispatch, stageToolWindowKeyDown.bind(this, window.$$id))} 
+    onClick={wrapEventToDispatch(dispatch, stageToolWindowTitleClicked.bind(this, window.$$id))}>
       { window.title || window.location }
     </div>
     <div className="m-windows-stage-tool-item-content" style={contentStyle}>
