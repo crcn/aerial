@@ -185,8 +185,8 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
   workspaces: [],
   shortcuts:[
     createKeyboardShortcut("backspace", deleteShortcutPressed()),
-    createKeyboardShortcut("alt+\\", toggleLeftGutterPressed()),
-    createKeyboardShortcut("alt+/", toggleRightGutterPressed())
+    createKeyboardShortcut("meta+b", toggleLeftGutterPressed()),
+    createKeyboardShortcut("meta+/", toggleRightGutterPressed())
   ]
 });
 

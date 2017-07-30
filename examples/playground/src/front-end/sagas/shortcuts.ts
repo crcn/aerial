@@ -12,7 +12,7 @@ export function* shortcutsService() {
       mt.bind(keyCombo, (event) => {
         event.preventDefault();
         emit({...action});
-      })
+      });
     }
     return () => {
 
