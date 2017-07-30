@@ -1,6 +1,7 @@
 import {
   Struct,
   Boxed,
+  Action,
   TreeNode,
   weakMemo,
   Translate,
@@ -22,6 +23,10 @@ import {
   createImmutableStructFactory,
 } from "aerial-common2";
 
+import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortcuts";
+import { toggleLeftGutterPressed, toggleRightGutterPressed, deleteShortcutPressed } from "front-end/actions";
+
+
 import {
   uniq,
   difference,
@@ -33,8 +38,6 @@ import {
   SyntheticBrowser,
   SyntheticBrowser2,
 } from "aerial-synthetic-browser";
-
-import { MainServiceState, ShortcutServiceState } from "front-end/services";
 
 /**
  * Types
@@ -105,12 +108,12 @@ export type Workspace = {
 
 } & Struct;
 
-
 export type ApplicationState = {
-  kernel: Kernel,
-  workspaces: Workspace[],
-  selectedWorkspaceId?: string
-} & BaseApplicationState & MainServiceState & ShortcutServiceState & Struct;
+  kernel: Kernel;
+  workspaces: Workspace[];
+  selectedWorkspaceId?: string;
+  element: HTMLElement;
+} & BaseApplicationState &  ShortcutServiceState & Struct;
 
 /**
  * Utilities
@@ -178,7 +181,12 @@ export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, 
 });
 
 export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {
-  workspaces: []
+  workspaces: [],
+  shortcuts:[
+    createKeyboardShortcut("backspace", deleteShortcutPressed()),
+    createKeyboardShortcut("alt+\\", toggleLeftGutterPressed()),
+    createKeyboardShortcut("alt+/", toggleRightGutterPressed())
+  ]
 });
 
 export const createFile             = createStructFactory<File>(FILE);
@@ -224,3 +232,5 @@ export const getWorkspaceMainFilePath = weakMemo((workspace: Workspace) => {
     }
   }
 });
+
+export * from "./shortcuts";

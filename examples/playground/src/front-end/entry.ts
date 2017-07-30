@@ -1,7 +1,6 @@
 import { noop } from "lodash";
-import { readAll } from "mesh";
-import { LogLevel, loadAppAction } from "aerial-common2";
 import { Kernel } from "aerial-common";
+import { LogLevel } from "aerial-common2";
 import { createSyntheticBrowser2 } from "aerial-synthetic-browser";
 
 import { 
@@ -98,11 +97,11 @@ const workspace = createWorkspace({
   mainFileId: indexFile.$$id,
 });
 
-readAll(initApplication(createApplicationState({
+initApplication(createApplicationState({
   workspaces: [workspace],
   selectedWorkspaceId: workspace.$$id,
   element: typeof document !== "undefined" ? document.querySelector("#application") as HTMLElement : undefined,
   log: {
     level: LogLevel.VERBOSE
   }
-}))(noop)(loadAppAction()));
+}));

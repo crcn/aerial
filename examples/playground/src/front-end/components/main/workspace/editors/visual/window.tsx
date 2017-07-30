@@ -1,10 +1,10 @@
 import "./canvas.scss";
 const VOID_ELEMENTS = require("void-elements");
-import { readAll } from "mesh";
 import * as React from "react";
 import { findDOMNode } from "react-dom";
 import { weakMemo, Dispatcher, Box, BaseEvent} from "aerial-common2";
 import { lifecycle, compose, withState, pure, onlyUpdateForKeys } from "recompose";
+import { canvasElementsComputedPropsChanged } from "front-end/actions";
 import { 
   DOMNodeType,
   SyntheticBrowser2, 
@@ -15,26 +15,6 @@ import {
   SyntheticBrowserWindow2, 
 } from "aerial-synthetic-browser";
 import { IsolateComponent } from "front-end/components/isolated";
-
-export const CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED = "CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED";
-
-export type CanvasElementsComputedPropsChanged = {
-  syntheticWindowId: string,
-  computedBoxes: {
-    [identifier: string]: Box
-  },
-  computedStyles: {
-    [identifier: string]: CSSStyleDeclaration
-  }
-} & BaseEvent;
-
-export const canvasElementsComputedPropsChanged = (syntheticWindowId: string, computedBoxes: { [identififer: string]: Box }, computedStyles: { [identifier: string]: CSSStyleDeclaration }): CanvasElementsComputedPropsChanged => ({
-  syntheticWindowId,
-  type: CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
-  computedBoxes,
-  computedStyles
-});
-
 
 export type CanvasComponentOuterProps = {
   browser: SyntheticBrowser2;
@@ -76,7 +56,7 @@ const MeasurererComponent = compose<any, any>(
         computedStyles[element.dataset.sourceid] = window.getComputedStyle(element);
         boxes[element.dataset.sourceid] = element.getBoundingClientRect();
       }
-      readAll((this.props as any).dispatch(canvasElementsComputedPropsChanged((this.props as any).window.$$id, boxes, computedStyles)));
+      (this.props as any).dispatch(canvasElementsComputedPropsChanged((this.props as any).window.$$id, boxes, computedStyles));
     }
   })
 )((({ children }) => {

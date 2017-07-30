@@ -1,9 +1,8 @@
 import "./resizer.scss";
 import React =  require("react");
 import { pure, compose, withHandlers } from "recompose";
-import { readAll } from "mesh";
 import { Workspace, getBoxedWorkspaceSelection, getWorkspaceSelectionBox } from "front-end/state";
-import { resizerMoved } from "front-end/messages";
+import { resizerMoved } from "front-end/actions";
 import { startDOMDrag, Dispatcher, mergeBoxes, moveBox } from "aerial-common2";
 import { PathComponent } from "./path";
 
@@ -75,10 +74,10 @@ const enhanceResizerComponent = compose<ResizerComponentInnerProps, ResizerCompo
       const translateLeft = translate.left;
       const translateTop  = translate.top;
       startDOMDrag(event, (event2, { delta }) => {
-        readAll(dispatch(resizerMoved(workspace.$$id, {
+        dispatch(resizerMoved(workspace.$$id, {
           left: box.left + delta.x / translate.zoom,
           top: box.top + delta.y / translate.zoom,
-        })));
+        }));
       });
     }
   })

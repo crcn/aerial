@@ -2,7 +2,7 @@ import { noop } from "lodash";
 import { resolve } from "path";
 import { readAll } from "mesh";
 import { initApplication } from "./index";
-import { createImmutableObject, immutable, LogLevel, loadAppAction, logInfoAction } from "aerial-common2";
+import { createImmutableObject, immutable, LogLevel, logInfoAction } from "aerial-common2";
 
 // // TODO - point to browser prop on package.json
 const FRONT_END_CSS_PATH = resolve(__dirname, "..", "front-end", "entry.bundle.css");

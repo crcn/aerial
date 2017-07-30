@@ -2,7 +2,6 @@
 
 import "./index.scss";
 import * as React from "react";
-import { readAll } from "mesh";
 import { Workspace } from "front-end/state";
 import { ToolsLayerComponent } from "./tools";
 import { CanvasComponent } from "./canvas";
@@ -10,36 +9,11 @@ import { IsolateComponent } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { SyntheticBrowser2, SyntheticDOMRenderer } from "aerial-synthetic-browser";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
+import { visualEditorWheel } from "front-end/actions";
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
 
-export const VISUAL_EDITOR_WHEEL = "VISUAL_EDITOR_WHEEL";
-export type VisualEditorWheel = {
-  mouseX: number;
-  mouseY: number;
-  workspaceId: string;
-  canvasWidth: number;
-  canvasHeight: number;
-  type: string;
-  metaKey: boolean;
-  ctrlKey: boolean;
-  deltaX: number;
-  deltaY: number;
-} & BaseEvent;
-
-export const visualEditorWheel = (workspaceId: string, canvasWidth: number, canvasHeight: number, mousePosition: Point, { metaKey, ctrlKey, deltaX, deltaY, clientX, clientY }: React.WheelEvent<any>): VisualEditorWheel => ({
-  workspaceId,
-  metaKey,
-  mouseX: mousePosition.left,
-  mouseY: mousePosition.top,
-  canvasWidth,
-  canvasHeight,
-  ctrlKey,
-  deltaX,
-  deltaY,
-  type: VISUAL_EDITOR_WHEEL,
-})
 
 export type VisualEditorOuterComponentProps = {
   workspace: Workspace;
@@ -69,7 +43,7 @@ const enhanceVisualEditorComponent = compose<VisualEditorOuterComponentProps, Vi
     onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: VisualEditorInnerComponentProps) => (event: React.WheelEvent<any>) => {
       const rect = canvasOuter.getBoundingClientRect();
       event.preventDefault();
-      readAll(dispatch(visualEditorWheel(workspace.$$id, rect.width, rect.height, mousePosition, event)));
+      dispatch(visualEditorWheel(workspace.$$id, rect.width, rect.height, mousePosition, event));
     }
   })
 );

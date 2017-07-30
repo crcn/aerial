@@ -4,6 +4,7 @@ import {
   resized,
   update,
   Struct,
+  IDd,
   moveBox,
   updateIn, 
   Translate,
@@ -25,6 +26,7 @@ import {
 import { clamp } from "lodash";
 
 import { 
+  ShortcutServiceState,
   ApplicationState,
   getWorkspaceById,
   getSelectedWorkspace,
@@ -40,23 +42,31 @@ import {
 } from "front-end/state";
 
 import {
+  CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
+  CanvasElementsComputedPropsChanged,
+  ResizerPathMoved,
+  FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
+  FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED,
+  RESIZER_PATH_MOUSE_MOVED,
   ResizerMoved,
   RESIZER_MOVED,
   KeyboardShortcutAdded,
+  TEXT_EDITOR_CHANGED,
+  TextEditorChangedEvent,
   TOGGLE_LEFT_GUTTER_PRESSED,
   TOGGLE_RIGHT_GUTTER_PRESSED,
   PromptedNewWindowUrl,
+  TREE_NODE_LABEL_CLICKED,
+  TreeNodeLabelClickedEvent,
   WindowPaneRowClicked,
   WINDOW_PANE_ROW_CLICKED,
   PROMPTED_NEW_WINDOW_URL,
   KEYBOARD_SHORTCUT_ADDED,
   DELETE_SHORCUT_PRESSED,
   DeleteShortcutPressed,
-} from "front-end/messages";
-
-import {
-  ShortcutServiceState,
-} from "front-end/services";
+  VISUAL_EDITOR_WHEEL,
+  VisualEditorWheel,
+} from "front-end/actions";
 
 import { 
   syntheticBrowserReducer,
@@ -64,21 +74,6 @@ import {
   OPEN_SYNTHETIC_WINDOW_REQUESTED,
   openSyntheticWindowRequested,
 } from "aerial-synthetic-browser";
-
-import { 
-  RESIZER_PATH_MOUSE_MOVED,
-  ResizerPathMoved,
-  TEXT_EDITOR_CHANGED,
-  TextEditorChangedEvent,
-  CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
-  CanvasElementsComputedPropsChanged,
-  TREE_NODE_LABEL_CLICKED, 
-  FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED,
-  FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED,
-  TreeNodeLabelClickedEvent,
-  VISUAL_EDITOR_WHEEL,
-  VisualEditorWheel
-} from "front-end/components";
 
 import reduceReducers = require("reduce-reducers");
 
@@ -105,7 +100,7 @@ export const applicationReducer = (state = createApplicationState(), event: Base
       break;
     }
   }
-
+  
   state = canvasReducer(state, event);
   state = syntheticBrowserReducer(state, event);
   state = visualEditorReducer(state, event);

@@ -1,7 +1,6 @@
 import "./canvas.scss";
 const VOID_ELEMENTS = require("void-elements");
 
-import { readAll } from "mesh";
 import * as React from "react";
 import { findDOMNode } from "react-dom";
 import { weakMemo, Dispatcher, Box, BaseEvent} from "aerial-common2";

@@ -48,7 +48,7 @@ import {
   CloseSyntheticWindowRequested,
   LEGACY_SYNTHETIC_DOM_CHANGED,
   LegacySyntheticDOMChanged
-} from "../messages";
+} from "../actions";
 
 export const syntheticBrowserReducer = (root: any, event: BaseEvent) => {
 

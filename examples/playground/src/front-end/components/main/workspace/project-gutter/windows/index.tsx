@@ -1,11 +1,10 @@
 import "./index.scss";
 import * as React from "react";
-import { readAll } from "mesh";
 import { Workspace } from "front-end/state";
 import { PaneComponent } from "front-end/components/pane";
 import { SyntheticBrowserWindow2 } from "aerial-synthetic-browser";
 import { pure, compose, withHandlers } from "recompose";
-import { promptedNewWindowUrl, windowPaneRowClicked } from "front-end/messages";
+import { promptedNewWindowUrl, windowPaneRowClicked } from "front-end/actions";
 import { Dispatcher, BaseEvent, wrapEventToDispatch } from "aerial-common2";
 
 const WindowRow = ({ window, dispatch }: { window: SyntheticBrowserWindow2, dispatch: Dispatcher<any> }) => <div className="m-windows-pane-window-row"  onClick={wrapEventToDispatch(dispatch, windowPaneRowClicked.bind(this, window.$$id))}>
@@ -21,7 +20,7 @@ const enhanceControls = compose(
     onAddWindow: ({ workspace, dispatch }) => (event: React.MouseEvent<any>) => {
       const location = prompt("Type in a URL");
       if (!location) return;
-      readAll(dispatch(promptedNewWindowUrl(workspace.$$id, location)));
+      dispatch(promptedNewWindowUrl(workspace.$$id, location));
     }
   })
 );

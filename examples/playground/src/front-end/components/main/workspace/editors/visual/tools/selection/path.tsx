@@ -1,27 +1,12 @@
 import "./path.scss";
 import * as  React from "react";
-import { readAll } from "mesh";
 import { compose, pure, withHandlers } from "recompose";
 import { getWorkspaceById, Workspace } from "front-end/state";
+import { resizerPathMoved } from "front-end/actions";
 import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, updateStructProperty, Box } from "aerial-common2";
 
 export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
 
-
-export type ResizerPathMoved = {
-  box: Box;
-  anchor: Point;
-  workspaceId: string;
-} & WrappedEvent<React.MouseEvent<any>>;
-
-
-export const resizerPathMoved = (workspaceId: string, anchor: Point, box: Box, sourceEvent: React.MouseEvent<any>): ResizerPathMoved => ({
-  type: RESIZER_PATH_MOUSE_MOVED,
-  workspaceId,
-  anchor,
-  box,
-  sourceEvent: {...sourceEvent}
-});
 
 export type PathComponentOuterProps = {
   points: Point[];
@@ -94,12 +79,12 @@ const enhancePathComponent = compose<PathComponentInnerProps, PathComponentOuter
           top: info.delta.y / zoom
         };
         
-        readAll(dispatch(resizerPathMoved(workspace.$$id, point, {
+        dispatch(resizerPathMoved(workspace.$$id, point, {
           left: point.left === 0 ? box.left + delta.left : box.left,
           top: point.top === 0 ? box.top + delta.top : box.top,
           right: point.left === 1 ? box.right + delta.left : box.right,
           bottom: point.top === 1 ? box.bottom + delta.top : box.bottom,
-        }, sourceEvent)));
+        }, sourceEvent));
       }, () => {
       });
     }

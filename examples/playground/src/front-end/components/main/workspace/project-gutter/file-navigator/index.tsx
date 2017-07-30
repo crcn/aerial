@@ -1,10 +1,10 @@
 import "./index.scss";
 import * as React from "react";
-import { readAll } from "mesh";
 import { compose, pure } from "recompose";
 import { TreeComponent } from "../../../../tree";
 import { PaneComponent } from "../../../../pane";
 import { File, Directory, DIRECTORY } from "../../../../../state";
+import { FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED, FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED } from "front-end/actions";
 import { immutable, TreeNode, Dispatcher, wrapEventToDispatch, wrappedEvent } from "aerial-common2";
 
 const getFileLabel = (node: File) => `/${node.name}`;
@@ -23,8 +23,6 @@ type FileNavigatorControlsProps = {
   dispatch: Dispatcher<any>
 }
 
-export const FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED   = "FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED";
-export const FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED = "FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED";
 
 const FileNavigatorControlsBase = ({ dispatch }: FileNavigatorControlsProps) => <span className="hide">
   <a href="#" onClick={wrapEventToDispatch(dispatch, wrappedEvent.bind(this, FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED))}><i className="icon ion-document-text" /></a> &nbsp;

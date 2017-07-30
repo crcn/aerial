@@ -1,6 +1,5 @@
 import { noop } from "lodash";
 import { Dispatcher } from "../bus";
-import { withStoreState } from "../store";
 import { remote, parallel, when } from "mesh";
 
 let loadedScripts;
@@ -67,8 +66,8 @@ export const hook = (upstream: Dispatcher<any>) => {
   return typeof self !== "undefined" ? worker(self, upstream) : noop;
 }
 
-export const whenWorker = (upstream: Dispatcher<any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => withStoreState(({ isMaster }: WorkerAppState) => !isMaster ? _then : _else, upstream);
-export const whenMaster = (upstream: Dispatcher<any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => withStoreState(({ isMaster }: WorkerAppState) => isMaster ? _then : _else, upstream);
+// export const whenWorker = (upstream: Dispatcher<any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => withStoreState(({ isMaster }: WorkerAppState) => !isMaster ? _then : _else, upstream);
+// export const whenMaster = (upstream: Dispatcher<any>, _then: Dispatcher<any>, _else?: Dispatcher<any>) => withStoreState(({ isMaster }: WorkerAppState) => isMaster ? _then : _else, upstream);
 
 /**
  *

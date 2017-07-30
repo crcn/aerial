@@ -1,6 +1,5 @@
 import "./index.scss";
 import * as React from "react";
-import { readAll } from "mesh";
 
 import { 
   pure, 
@@ -9,7 +8,7 @@ import {
   defaultProps, 
   withHandlers, 
 } from "recompose";
-
+import { treeNodeLabelClicked } from "front-end/actions";
 import { 
   TreeNode, 
   BaseEvent, 
@@ -17,26 +16,6 @@ import {
   getTreeNodeDepth, 
   wrapEventToDispatch,
 } from "aerial-common2";
-
-/**
- * Event types
- */
-
-export const TREE_NODE_LABEL_CLICKED = "TREE_NODE_LABE_CLICKED";
-
-/**
- * Event state
- */
-
-export type TreeNodeLabelClickedEvent = {
-  node: TreeNode<any>
-} & BaseEvent;
-
-/**
- * Event factories
- */
-
-export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClickedEvent => ({ type: TREE_NODE_LABEL_CLICKED, node });
 
 /**
  * React Components
@@ -90,7 +69,7 @@ const TreeNodeComponent = compose(
         setCollapsed(!collapsed);
       }
       if (dispatch) {
-        readAll(dispatch(treeNodeLabelClicked(node)));
+        dispatch(treeNodeLabelClicked(node));
       }
     }
   })

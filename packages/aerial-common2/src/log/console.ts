@@ -10,8 +10,6 @@ import { reader } from "../monad";
 import { noop } from "lodash";
 import { ImmutableObject, createImmutableObject } from "../immutable";
 import { LogLevel, LogAction, LogActionTypes, Logger } from "./base";
-import { whenStoreChanged, StoreChangedEvent } from "../store";
-import { whenType, Dispatcher, Message, DispatcherContext, DispatcherContextIdentity } from "../bus";
 
 // beat TS type checking
 chalk.enabled = true;
@@ -122,45 +120,11 @@ const PREFIXES = {
 };
 const defaultState = { level: LogLevel.ALL, prefix: "" };
 
-export const consoleLogDispatcher = (downstream: Dispatcher<any>) => {
-  let dispatcher = noop;
-
-  const setLogger = ({ payload: { log: { level, prefix }}}: StoreChangedEvent<ConsoleLogState>) => {
-    dispatcher = ({ text, level }: LogAction) => {
-      if (!(level & level)) return;
-
-      const log = {
-        [LogLevel.DEBUG]: console.log.bind(console),
-        [LogLevel.LOG]: console.log.bind(console),
-        [LogLevel.INFO]: console.info.bind(console),
-        [LogLevel.WARNING]: console.warn.bind(console),
-        [LogLevel.ERROR]: console.error.bind(console)
-      }[level];
-
-
-      text = PREFIXES[level] + (prefix || "") + text;
-      text = colorize(text);
-
-      if (typeof window !== "undefined" && !window["$synthetic"]) {
-        return styledConsoleLog(new AnsiUp().ansi_to_html(text));
-      }
-
-      log(text);
-    };
-  };
-
-  return parallel(
-    whenStoreChanged(state => state.log || defaultState, setLogger),
-    (m) => dispatcher(m),
-    downstream
-  );
-};
-
 export function* consoleLogSaga() {
 
   while(true) {
     const { log: { level: acceptedLevel, prefix }}: ConsoleLogState = yield select();
-    let { text, level }: LogAction = yield take(LogActionTypes.LOG);
+    let { text, level }: LogAction = (yield take(LogActionTypes.LOG)) || defaultState;
     if (!(acceptedLevel & level)) continue;
     const log = {
       [LogLevel.DEBUG]: console.log.bind(console),

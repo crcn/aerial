@@ -1,7 +1,6 @@
-import { noop, flowRight } from "lodash";
-import { combineReducers } from "redux";
 import { mainSaga } from "./sagas";
 import { mainReducer } from "./reducers";
+import { noop, flowRight } from "lodash";
 import { ApplicationState } from "./state";
 import { initBaseApplication2, ConsoleLogState, BaseApplicationState } from "aerial-common2";
 

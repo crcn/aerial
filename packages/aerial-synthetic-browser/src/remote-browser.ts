@@ -1,6 +1,6 @@
 import { debounce } from "lodash";
 import { parallel, createDuplex, pump } from "mesh";
-import { Dispatcher, whenType, whenWorker, logger, logDebugAction, logInfoAction, logWarningAction, logErrorAction } from "aerial-common2";
+import { Dispatcher, logger, logDebugAction, logInfoAction, logWarningAction, logErrorAction } from "aerial-common2";
 import { OpenRemoteBrowserRequest, SyntheticRendererEvent, OPEN_REMOTE_BROWSER, openRemoteBrowserRequest } from "./messages";
 import { NoopRenderer, ISyntheticDocumentRenderer } from "./renderers";
 import { ISyntheticBrowser, SyntheticBrowser, BaseSyntheticBrowser, SyntheticBrowserOpenOptions } from "./browser";
@@ -222,84 +222,84 @@ export class RemoteSyntheticBrowser extends BaseSyntheticBrowser {
 
 const prefixedLogger = (a, b) => (c) => {};
 
-export const initRemoteSyntheticBrowserService = (kernel: Kernel, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
+// export const initRemoteSyntheticBrowserService = (kernel: Kernel, upstream: Dispatcher<any>) => (downstream: Dispatcher<any>) => {
 
-  // TODO - this state needs to eventually live in app state
-  // when the remote browser is a bit more stateless
-  const openBrowsers = {};
+//   // TODO - this state needs to eventually live in app state
+//   // when the remote browser is a bit more stateless
+//   const openBrowsers = {};
 
-  return parallel(downstream, whenWorker(upstream, whenType(OPEN_REMOTE_BROWSER, (request: OpenRemoteBrowserRequest) => createDuplex((input, output) => {
+//   return parallel(downstream, whenWorker(upstream, whenType(OPEN_REMOTE_BROWSER, (request: OpenRemoteBrowserRequest) => createDuplex((input, output) => {
 
-    const id = JSON.stringify(request.options);
+//     const id = JSON.stringify(request.options);
 
-    // TODO - memoize opened browser if same session is up
-    const browser: SyntheticBrowser = openBrowsers[id] || (openBrowsers[id] = new SyntheticBrowser(kernel, new NoopRenderer()));
+//     // TODO - memoize opened browser if same session is up
+//     const browser: SyntheticBrowser = openBrowsers[id] || (openBrowsers[id] = new SyntheticBrowser(kernel, new NoopRenderer()));
 
-    const log = prefixedLogger(`${request.options.uri} `, upstream);
-    let editor: SyntheticObjectTreeEditor;
+//     const log = prefixedLogger(`${request.options.uri} `, upstream);
+//     let editor: SyntheticObjectTreeEditor;
 
-    // return the current logs of the VM in case the front-end reloads
-    if (browser.logs.length) {
-      output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.VM_LOG, browser.logs.map((log) => [log.level, log.text]))) });
-    }
+//     // return the current logs of the VM in case the front-end reloads
+//     if (browser.logs.length) {
+//       output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.VM_LOG, browser.logs.map((log) => [log.level, log.text]))) });
+//     }
 
-    const changeWatcher = new SyntheticObjectChangeWatcher<SyntheticDocument>(async (mutations: Mutation<any>[]) => {
+//     const changeWatcher = new SyntheticObjectChangeWatcher<SyntheticDocument>(async (mutations: Mutation<any>[]) => {
 
-      log(logInfoAction("Sending diffs: << " +  mutations.map(event => event.type).join(", ")));
+//       log(logInfoAction("Sending diffs: << " +  mutations.map(event => event.type).join(", ")));
 
-      browser.sandbox.pause();
-      await output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.DOCUMENT_DIFF, mutations)) });
+//       browser.sandbox.pause();
+//       await output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.DOCUMENT_DIFF, mutations)) });
 
-      browser.sandbox.resume();
-    }, (clone: SyntheticDocument) => {
-      editor = new SyntheticObjectTreeEditor(clone);
-      log(logInfoAction("Sending <<new document"));
-      output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.NEW_DOCUMENT, clone)) });
-    });
+//       browser.sandbox.resume();
+//     }, (clone: SyntheticDocument) => {
+//       editor = new SyntheticObjectTreeEditor(clone);
+//       log(logInfoAction("Sending <<new document"));
+//       output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.NEW_DOCUMENT, clone)) });
+//     });
 
-    if (browser.document) {
-      changeWatcher.target = browser.document;
-    }
+//     if (browser.document) {
+//       changeWatcher.target = browser.document;
+//     }
 
-    pump(input, (payload: any) => {
-      const message = deserialize(payload, kernel) as RemoteBrowserDocumentMessage;
-      if (message.type === RemoteBrowserDocumentMessage.DOCUMENT_DIFF) {
-        editor.applyMutations(message.data as Mutation<any>[]);
-      } else if (message.type === RemoteBrowserDocumentMessage.DOM_EVENT) {
-        const [nodePath, event] = message.data;
-        const found = getNodeByPath(browser.document, nodePath);
-        if (found) {
-          found.dispatchEvent(event);
-        }
-      }
-    }).then(() => {
-      log(logWarningAction("Closed remote browser connection"));
-    });
+//     pump(input, (payload: any) => {
+//       const message = deserialize(payload, kernel) as RemoteBrowserDocumentMessage;
+//       if (message.type === RemoteBrowserDocumentMessage.DOCUMENT_DIFF) {
+//         editor.applyMutations(message.data as Mutation<any>[]);
+//       } else if (message.type === RemoteBrowserDocumentMessage.DOM_EVENT) {
+//         const [nodePath, event] = message.data;
+//         const found = getNodeByPath(browser.document, nodePath);
+//         if (found) {
+//           found.dispatchEvent(event);
+//         }
+//       }
+//     }).then(() => {
+//       log(logWarningAction("Closed remote browser connection"));
+//     });
 
 
-    const onStatusChange = (status: Status) => {
-      if (status) {
-        if (status.type === Status.COMPLETED) {
-          changeWatcher.target = browser.document;
-        } else if (status.type === Status.ERROR) {
-          log(logErrorAction("Sending error status: " + status.data));
-        }
-      }
+//     const onStatusChange = (status: Status) => {
+//       if (status) {
+//         if (status.type === Status.COMPLETED) {
+//           changeWatcher.target = browser.document;
+//         } else if (status.type === Status.ERROR) {
+//           log(logErrorAction("Sending error status: " + status.data));
+//         }
+//       }
 
-      output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.STATUS_CHANGE, status)) });
-    };
+//       output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.STATUS_CHANGE, status)) });
+//     };
 
-    const browserObserver = new CallbackBus((event: CoreEvent) => {
-      if (event.type === LogEvent.LOG) {
-        const logEvent = event as LogEvent;
-        output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.VM_LOG, [[logEvent.level, logEvent.text]])) });
-      }
-    });
+//     const browserObserver = new CallbackBus((event: CoreEvent) => {
+//       if (event.type === LogEvent.LOG) {
+//         const logEvent = event as LogEvent;
+//         output.unshift({ payload: serialize(new RemoteBrowserDocumentMessage(RemoteBrowserDocumentMessage.VM_LOG, [[logEvent.level, logEvent.text]])) });
+//       }
+//     });
 
-    browser.observe(browserObserver);
-    const watcher = watchProperty(browser, "status", onStatusChange);
-    onStatusChange(browser.status);
+//     browser.observe(browserObserver);
+//     const watcher = watchProperty(browser, "status", onStatusChange);
+//     onStatusChange(browser.status);
 
-    browser.open(request.options);
-  }))));
-};
+//     browser.open(request.options);
+//   }))));
+// };
