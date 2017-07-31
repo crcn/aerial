@@ -1,5 +1,5 @@
 import { Action } from "aerial-common2";
-import { URIProtocolReadResult } from "./structs";
+import { URIProtocolReadResult } from "../state";
 
 export const READ_URI    = "READ_URI";
 export const WRITE_URI   = "WRITE_URI";

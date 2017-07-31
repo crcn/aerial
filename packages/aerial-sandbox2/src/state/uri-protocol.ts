@@ -1,25 +1,38 @@
 import { 
   Struct, 
-  weakMemo, 
-  immutable, 
-  getPathByType, 
+  weakMemo,
+  getPathByType,
   getValueByPath,
-  createImmutableStructFactory, 
+  createStructFactory,
 } from "aerial-common2";
+
+/**
+ * Types
+ */
+
+export const URI_PROTOCOL_STATE = "URI_PROTOCOL_STATE";
+
+/**
+ * Structs
+ */
+
 
 export type URIProtocolReadResult = {
   type: string;
   content: string|Buffer;
 };
 
-export const URI_PROTOCOL_STATE = "URI_PROTOCOL_STATE";
-
 export type URIProtocolState = {
   watchedUris: string[]
-} & Struct;
+};
 
-export const createUriProtocolState = createImmutableStructFactory(URI_PROTOCOL_STATE, {
+/**
+ * Factories
+ */
+
+export const createURIProtocolState = createStructFactory(URI_PROTOCOL_STATE, {
   watchedUris: []
 });
+
 
 export const getUriProtocolState = weakMemo((root: any) => getValueByPath(root, getPathByType(root, URI_PROTOCOL_STATE))) as (root) => URIProtocolState;
