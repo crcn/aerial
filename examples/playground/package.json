@@ -55,6 +55,7 @@
     "webpack-dev-server": "^2.6.1"
   },
   "dependencies": {
+    "@types/request": "^2.0.0",
     "abab": "^1.0.3",
     "aerial-common": "0.0.x",
     "aerial-common2": "0.0.x",
@@ -62,8 +63,10 @@
     "aerial-sandbox2": "^0.0.5",
     "aerial-synthetic-browser": "0.0.x",
     "ansi_up": "^2.0.2",
+    "blob-to-buffer": "^1.2.6",
     "chalk": "^1.1.3",
     "classnames": "^2.2.5",
+    "cors": "^2.8.4",
     "ent": "^2.2.0",
     "express": "^4.15.3",
     "immutable": "^3.8.1",
@@ -86,6 +89,7 @@
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6",
     "redux-undo": "1.0.0-beta9-9-6",
+    "request": "^2.81.0",
     "reselect": "^3.0.1",
     "sift": "3.3.x",
     "systemjs": "^0.20.14",

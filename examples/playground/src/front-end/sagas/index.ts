@@ -6,17 +6,20 @@ import { mainWorkspaceSaga } from "./workspace";
 import { fork, call, select } from "redux-saga/effects";
 import { mainSyntheticBrowserSaga } from "aerial-synthetic-browser";
 import { readUriAction, watchUriAction } from "aerial-sandbox2";
-import { createLegacyLocalProtocolAdapter } from "./local-protocol";
 import { Dispatcher, diffArray, eachArrayValueMutation } from "aerial-common2";
+import { createLegacyLocalProtocolAdapter, createLegacyURLProtocolAdapter } from "./protocol";
 
 export function* mainSaga() {
 
-  const { saga: uriProtocolSaga, provider } = createLegacyLocalProtocolAdapter();
+  const { saga: localProtocolSaga, provider: localProtocolProvider } = createLegacyLocalProtocolAdapter();
+  const { saga: urlProtocolSaga, provider: urlProtocolProvider } = createLegacyURLProtocolAdapter();
   
   yield fork(mainWorkspaceSaga);
   yield fork(mainSyntheticBrowserSaga(new Kernel(
-    provider
+    localProtocolProvider,
+    urlProtocolProvider
   )));
-  yield fork(uriProtocolSaga);
+  yield fork(localProtocolSaga);
+  yield fork(urlProtocolSaga);
   yield fork(shortcutsService);
 }

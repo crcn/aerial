@@ -12,7 +12,8 @@ function* openDefaultWindow() {
   yield watch((state: ApplicationState) => state.selectedWorkspaceId, function*(selectedWorkspaceId, state) {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
-    yield put(openSyntheticWindowRequested(workspace.browser.$$id, "local://" + getWorkspaceMainFilePath(workspace)));
+    yield put(openSyntheticWindowRequested(workspace.browser.$$id, `http://www.jisiguo.com/`));
+    // yield put(openSyntheticWindowRequested(workspace.browser.$$id, "local://" + getWorkspaceMainFilePath(workspace)));
     return true;
   });
 }

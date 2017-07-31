@@ -1,6 +1,6 @@
 import { watch, diffArray, getValuesByType, eachArrayValueMutation } from "aerial-common2";
 import { Kernel, KernelProvider, PrivateBusProvider, BrokerBus, Status, watchProperty, Mutation, MutationEvent } from "aerial-common";
-import { createSandboxProviders, FileCacheProvider } from "aerial-sandbox";
+import { createSandboxProviders, FileCacheProvider, URIProtocolProvider } from "aerial-sandbox";
 import { createSyntheticHTMLProviders } from "../../providers";
 import { fork, take, put, spawn } from "redux-saga/effects";
 import { eventChannel } from "redux-saga";
@@ -20,11 +20,11 @@ function syntheticWindowSaga(kernel: Kernel) {
     const openSyntheticBrowsers = new Map<SyntheticBrowserWindow2, SyntheticBrowser>();
 
     kernel = new Kernel(
+      kernel,
       new KernelProvider(),
       new PrivateBusProvider(new BrokerBus()),
       createSandboxProviders(),
       createSyntheticHTMLProviders(),
-      kernel
     );
 
     FileCacheProvider.getInstance(kernel).syncWithLocalFiles();

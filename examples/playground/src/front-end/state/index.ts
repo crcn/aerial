@@ -119,6 +119,7 @@ export type ApplicationState = {
   workspaces: Workspace[];
   selectedWorkspaceId?: string;
   element: HTMLElement;
+  apiHost: string;
 } & BaseApplicationState &  ShortcutServiceState & Struct;
 
 /**

@@ -1,6 +1,8 @@
 import * as path from "path";
 import { delay } from "redux-saga";
+import * as request from "request";
 import * as express from "express";
+const cors = require("cors");
 import { logInfoAction } from "aerial-common2";
 import { httpServerStarted, log } from "../actions";
 import { HTTPServerState, FrontEndState } from "../state";
@@ -21,9 +23,18 @@ function* getExpressServer() {
 function* frontEndService() {
   const { frontEnd }: FrontEndState = yield select();
   const expressServer = yield call(getExpressServer);
+  expressServer.use(cors());
   expressServer.use(
     express.static(path.dirname(frontEnd.entryPath))
   );
+
+  expressServer.use("/proxy/:uri", (req, res) => {
+    const { uri } = req.params;
+    request(decodeURIComponent(uri), (err, response, body) => {
+      res.set(response.headers);
+      res.send(body);
+    });
+  });
 }
 
 function* httpService() {

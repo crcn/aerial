@@ -105,6 +105,7 @@ const workspace = createWorkspace({
 initApplication(createApplicationState({
   workspaces: [workspace],
   selectedWorkspaceId: workspace.$$id,
+  apiHost: `localhost:8080`,
   element: typeof document !== "undefined" ? document.getElementById("application") : undefined,
   log: {
     level: LogLevel.VERBOSE
