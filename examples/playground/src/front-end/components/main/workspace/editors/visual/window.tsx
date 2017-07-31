@@ -31,8 +31,20 @@ type WindowComponentProps = {
 const NODE_NAME_MAP = {
   "html": "span",
   "body": "span",
-  "head": "span"
+  "head": "span",
+  "link": "span",
+  "script": "span"
 };
+
+const mapStyleSheets = weakMemo(((node: SyntheticDOMNode2) => {
+  if (node.nodeType === DOMNodeType.TEXT) return (node as SyntheticDOMTextNode2).nodeValue;
+  if (node.nodeType === DOMNodeType.ELEMENT) {
+    const element = node as SyntheticDOMElement2;
+    const nodeName = NODE_NAME_MAP[element.nodeName] || element.nodeName;
+    return React.createElement(nodeName, { key: element.$$id, "data-sourceId": element.$$id, ...element.attributes }, VOID_ELEMENTS[nodeName] ? null : element.childNodes.map(mapSyntheticDOMNodeToJSX));
+  }
+  return null;
+}));
 
 const mapSyntheticDOMNodeToJSX = weakMemo(((node: SyntheticDOMNode2) => {
   if (node.nodeType === DOMNodeType.TEXT) return (node as SyntheticDOMTextNode2).nodeValue;

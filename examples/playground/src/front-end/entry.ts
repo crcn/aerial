@@ -21,6 +21,7 @@ const HTML_CONTENT =
 <html>
   <head>
     <title>Test document</title>
+    <link rel="stylesheet" href="css/main.css">
   </head>
   <body>
     <div id="application">
@@ -40,6 +41,10 @@ const CSS_CONTENT =
 html, body {
   margin: 0;
   padding: 0;
+}
+
+#application {
+  color: red;
 }
 `.trim();
 

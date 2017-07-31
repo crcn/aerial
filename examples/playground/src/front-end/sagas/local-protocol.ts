@@ -52,6 +52,7 @@ export function createLegacyLocalProtocolAdapter () {
           });
 
           const allFilesByUrl = yield select(getAllFilesWithLocalProtocol);
+          console.log(allFilesByUrl, url);
           resolve(allFilesByUrl[url]);
         }
       });

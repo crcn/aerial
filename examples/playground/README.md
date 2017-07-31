@@ -2,16 +2,13 @@ very simple online playground for visually creating web applications
 
 Immediate TODOS:
 
-- [ ] clean up current CSS
-- [ ] element attributes pane
-- [ ] chevvron for files
 - [ ] File navigator specific to selected window
-- [ ] proxy url loading from back-end
-- [ ] meta click to show source location
+- [ ] proxy remote requests to local server
+- [ ] file pane based on loaded resources
+- [ ] CSS structs
 
 SUNDAY:
 
 - [ ] clean up CSS
   - [ ] chevron files
 - [ ] windows
-- [ ] resize preview & code editor divider
