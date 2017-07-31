@@ -19,6 +19,7 @@ const WindowItemComponentBase = ({ window, translate, dispatch }: WindowItemInne
     top: window.box.top,
     ...getBoxSize(window.box)
   };
+
   const titleScale = Math.max(1 / translate.zoom, 0.03);
 
   const titleStyle = {
