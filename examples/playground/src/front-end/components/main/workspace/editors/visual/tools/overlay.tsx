@@ -14,15 +14,16 @@ export type VisualToolsComponentProps = {
 };
 
 type NodeOverlayProps = {
-  workspaceId: string;
+  windowId: string;
   box: Box;
   zoom: number;
+  selected: boolean;
   hovering: boolean;
   node: SyntheticDOMNode2;
   dispatch: Dispatcher<any>;
 };
 
-const NodeOverlayBase = ({ workspaceId, zoom, box, node, dispatch, hovering }: NodeOverlayProps) => {
+const NodeOverlayBase = ({ windowId, zoom, box, node, dispatch, hovering, selected }: NodeOverlayProps) => {
 
   const borderWidth = 2 / zoom;
 
@@ -37,9 +38,9 @@ const NodeOverlayBase = ({ workspaceId, zoom, box, node, dispatch, hovering }: N
   return <div 
   className={cx("visual-tools-node-overlay", { hovering: hovering })}
   style={style} 
-  onClick={wrapEventToDispatch(dispatch, stageToolNodeOverlayClicked.bind(this, workspaceId, node.$$id))}
-  onMouseEnter={wrapEventToDispatch(dispatch, stageToolNodeOverlayHoverOver.bind(this, workspaceId, node.$$id))}
-  onMouseLeave={wrapEventToDispatch(dispatch, stageToolNodeOverlayHoverOut.bind(this, workspaceId, node.$$id))}>
+  onClick={wrapEventToDispatch(dispatch, stageToolNodeOverlayClicked.bind(this, windowId, node.$$id))}
+  onMouseEnter={wrapEventToDispatch(dispatch, stageToolNodeOverlayHoverOver.bind(this, windowId, node.$$id))}
+  onMouseLeave={wrapEventToDispatch(dispatch, stageToolNodeOverlayHoverOut.bind(this, windowId, node.$$id))}>
 
   </div>;
 }
@@ -56,7 +57,17 @@ export const NodeOverlaysToolComponentBase = ({ workspace, dispatch }: VisualToo
           const node = allNodes[nodeId];
           const box  = window.computedBoxes[nodeId];
           if (node && box) {
-            elements.push(<NodeOverlay workspaceId={workspace.$$id} zoom={workspace.visualEditorSettings.translate.zoom} key={nodeId} node={node} box={box} dispatch={dispatch} hovering={workspace.hoveringIds.indexOf(node.$$id) !== -1} />);
+            elements.push(
+              <NodeOverlay 
+                windowId={window.$$id} 
+                zoom={workspace.visualEditorSettings.translate.zoom} 
+                key={nodeId} 
+                node={node} 
+                box={box} 
+                dispatch={dispatch} 
+                hovering={workspace.hoveringIds.indexOf(node.$$id) !== -1} 
+                selected={workspace.selectionIds.indexOf(node.$$id) !== -1} />
+            );
           }
         }
         return elements;

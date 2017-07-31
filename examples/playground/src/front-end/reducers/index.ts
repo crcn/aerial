@@ -245,7 +245,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     }
 
     case STAGE_TOOL_WINDOW_TITLE_CLICKED: {
-      return selectFromWindowClickAction(state, event as WindowPaneRowClicked);
+      return handleWindowSelectionFromAction(state, (event as WindowPaneRowClicked).windowId, event as WindowPaneRowClicked);
     }
 
     case STAGE_TOOL_WINDOW_KEY_DOWN: {
@@ -254,25 +254,26 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     } 
 
     case STAGE_TOOL_NODE_OVERLAY_CLICKED: {
-      const { workspaceId, nodeId, sourceEvent } = event as StageToolNodeOverlayClicked;
+      const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey;
       if (metaKey) {
         const filesByUri = getAllFilesByPath(state);
         const { $source: { uri } } = getValueById(state, nodeId) as SyntheticDOMNode2;
         const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
-        return updateStructProperty(state, getWorkspaceById(state, workspaceId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+        return updateStructProperty(state, getSyntheticWindowWorkspace(state, windowId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+      } else {
+        return handleWindowSelectionFromAction(state, nodeId, event as StageToolNodeOverlayClicked);
       }
-      break;
     }
 
     case STAGE_TOOL_NODE_OVERLAY_HOVER_OVER: {
-      const { workspaceId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOver;
-      return addWorkspaceHovering(state, workspaceId, nodeId);
+      const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOver;
+      return addWorkspaceHovering(state, getSyntheticWindowWorkspace(state, windowId).$$id, nodeId);
     }
 
     case STAGE_TOOL_NODE_OVERLAY_HOVER_OUT: {
-      const { workspaceId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOut;
-      return removeWorkspaceHovering(state, workspaceId, nodeId);
+      const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOut;
+      return removeWorkspaceHovering(state, getSyntheticWindowWorkspace(state, windowId).$$id, nodeId);
     }
   }
 
@@ -303,16 +304,16 @@ const moveItemFromAction = <T extends { sourceEvent: React.KeyboardEvent<any> }>
   return state;
 };
 
-const selectFromWindowClickAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, event: T) => {
+const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, itemId: string, event: T) => {
   const { windowId, sourceEvent } = event;
   const workspace = getSyntheticWindowWorkspace(state, windowId);
-  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, windowId) : toggleWorkspaceSelection(state, workspace.$$id, windowId);
+  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, itemId) : toggleWorkspaceSelection(state, workspace.$$id, itemId);
 }
 
 const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
   switch (event.type) {
     case WINDOW_PANE_ROW_CLICKED: {
-      return selectFromWindowClickAction(state, event as WindowPaneRowClicked);
+      return handleWindowSelectionFromAction(state, (event as WindowPaneRowClicked).windowId, event as WindowPaneRowClicked);
     }
   }
   return state;

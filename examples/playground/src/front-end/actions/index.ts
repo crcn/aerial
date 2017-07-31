@@ -96,17 +96,17 @@ export type StageWillWindowKeyDown = {
 } & WrappedEvent<React.KeyboardEvent<any>>;
 
 export type StageToolNodeOverlayClicked = {
-  workspaceId: string;
+  windowId: string;
   nodeId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
 export type StageToolNodeOverlayHoverOver = {
-  workspaceId: string;
+  windowId: string;
   nodeId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
 export type StageToolNodeOverlayHoverOut = {
-  workspaceId: string;
+  windowId: string;
   nodeId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
@@ -140,20 +140,20 @@ export const resizerMoved = (workspaceId: string, point: Point): ResizerMoved =>
 
 export const textEditorChanged = (file: File, value: string): textEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
 
-export const stageToolNodeOverlayClicked = (workspaceId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayClicked => ({
-  workspaceId,
+export const stageToolNodeOverlayClicked = (windowId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayClicked => ({
+  windowId,
   type: STAGE_TOOL_NODE_OVERLAY_CLICKED,
   nodeId,
   sourceEvent
 });
-export const stageToolNodeOverlayHoverOver = (workspaceId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayHoverOver => ({
-  workspaceId,
+export const stageToolNodeOverlayHoverOver = (windowId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayHoverOver => ({
+  windowId,
   type: STAGE_TOOL_NODE_OVERLAY_HOVER_OVER,
   nodeId,
   sourceEvent
 });
-export const stageToolNodeOverlayHoverOut = (workspaceId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayHoverOut => ({
-  workspaceId,
+export const stageToolNodeOverlayHoverOut = (windowId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayHoverOut => ({
+  windowId,
   type: STAGE_TOOL_NODE_OVERLAY_HOVER_OUT,
   nodeId,
   sourceEvent
