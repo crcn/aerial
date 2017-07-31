@@ -48,6 +48,15 @@ export const moveBox = (box: Box, { left, top }: Point): Box => ({
   bottom: top + box.bottom - box.top
 });
 
+
+export const shiftBox = (box: Box, { left, top }: Point): Box => ({
+  ...box,
+  left: box.left + left,
+  top: box.top + top,
+  right: box.right + left,
+  bottom: box.bottom + top
+});
+
 export const keepBoxAspectRatio = (newBox: Box, oldBox: Box, anchor: Point, centerPoint = anchor): Box => {
   const newBoxSize = getBoxSize(newBox);
   const oldBoxSize = getBoxSize(oldBox);

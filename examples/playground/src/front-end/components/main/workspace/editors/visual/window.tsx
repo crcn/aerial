@@ -2,7 +2,7 @@ import "./canvas.scss";
 const VOID_ELEMENTS = require("void-elements");
 import * as React from "react";
 import { findDOMNode } from "react-dom";
-import { weakMemo, Dispatcher, Box, BaseEvent} from "aerial-common2";
+import { weakMemo, Dispatcher, Box, BaseEvent, calculateAbsoluteBounds, shiftBox} from "aerial-common2";
 import { lifecycle, compose, withState, pure, onlyUpdateForKeys } from "recompose";
 import { canvasElementsComputedPropsChanged } from "front-end/actions";
 import { 
@@ -12,6 +12,7 @@ import {
   SyntheticDOMRenderer,
   SyntheticDOMElement2,
   SyntheticDOMTextNode2,
+  
   SyntheticBrowserWindow2, 
 } from "aerial-synthetic-browser";
 import { IsolateComponent } from "front-end/components/isolated";
@@ -58,7 +59,7 @@ const mapSyntheticDOMNodeToJSX = weakMemo(((node: SyntheticDOMNode2) => {
 }));
 
 const MeasurererComponent = compose<any, any>(
-  onlyUpdateForKeys(["dispatch", "document"]),
+  onlyUpdateForKeys(["dispatch", "document", "windowBox"]),
   lifecycle({
     componentDidUpdate() {
       const element = findDOMNode(this as any);
@@ -67,7 +68,9 @@ const MeasurererComponent = compose<any, any>(
       const boxes          = {};
       for (const element of elements) {
         computedStyles[element.dataset.sourceid] = window.getComputedStyle(element);
-        boxes[element.dataset.sourceid] = element.getBoundingClientRect();
+
+        // bounding rect is based on the embedded iframe, so we need to add the window location as well 
+        boxes[element.dataset.sourceid] = shiftBox(element.getBoundingClientRect(), (this.props as any).windowBox);
       }
       (this.props as any).dispatch(canvasElementsComputedPropsChanged((this.props as any).window.$$id, boxes, computedStyles));
     }
@@ -90,7 +93,7 @@ const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
 
   return <div className="visual-canvas-window-component" style={style}>
     <IsolateComponent inheritCSS>
-      <MeasurererComponent document={document} dispatch={dispatch} window={window}>
+      <MeasurererComponent document={document} dispatch={dispatch} window={window} windowBox={box}>
         { document && document.childNodes.map(mapSyntheticDOMNodeToJSX) }
       </MeasurererComponent>
     </IsolateComponent>
