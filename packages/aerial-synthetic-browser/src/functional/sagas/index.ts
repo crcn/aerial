@@ -77,14 +77,12 @@ function* observeSyntheticBrowserDOMState(browser: SyntheticBrowser, state: Synt
     const onDocumentEvent = (event) => {
       if (event.type === MutationEvent.MUTATION) {
         dispatchLegacySyntheticDOMChanged((event as MutationEvent<any>).mutation);
-      }
+      };
     }
 
     const dispatchTitleChanged = () => {
       const titleEl = browser.document.querySelector("title");
-      if (titleEl) {
-        emit(syntheticWindowTitleChanged(state.$$id, titleEl.textContent));
-      }
+      emit(syntheticWindowTitleChanged(state.$$id, titleEl && titleEl.textContent));
     };
     
     const onStatusChange = (status: Status) => {
