@@ -73,6 +73,11 @@ export type Workspace = {
    */
 
   selectionIds: string[];
+
+  /**
+   */
+
+  hoveringIds: string[];
   
   /**
    */
@@ -154,11 +159,21 @@ export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...sele
 
 export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
   return setWorkspaceSelection(root, workspaceId);
-}
+};
 
 export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
   return updateStructProperty(root, workspace, "selectionIds", uniq([...selectionIds]));
+};
+
+export const addWorkspaceHovering = (root: any, workspaceId: string, ...hoveringIds: string[]) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateStructProperty(root, workspace, "hoveringIds", uniq([...hoveringIds]));
+};
+
+export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hoveringIds: string[]) => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateStructProperty(root, workspace, "hoveringIds", difference(workspace.hoveringIds, hoveringIds));
 };
 
 export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))) as any);
@@ -178,7 +193,8 @@ export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, 
     showLeftGutter: true,
     showRightGutter: true
   },
-  selectionIds: []
+  selectionIds: [],
+  hoveringIds: []
 });
 
 export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {

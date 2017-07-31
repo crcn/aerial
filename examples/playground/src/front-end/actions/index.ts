@@ -18,6 +18,8 @@ export const VISUAL_EDITOR_WHEEL = "VISUAL_EDITOR_WHEEL";
 export const STAGE_TOOL_WINDOW_TITLE_CLICKED = "STAGE_TOOL_WINDOW_TITLE_CLICKED";
 export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
 export const STAGE_TOOL_NODE_OVERLAY_CLICKED = "STAGE_TOOL_NODE_OVERLAY_CLICKED";
+export const STAGE_TOOL_NODE_OVERLAY_HOVER_OVER = "STAGE_TOOL_NODE_OVERLAY_HOVER_OVER";
+export const STAGE_TOOL_NODE_OVERLAY_HOVER_OUT = "STAGE_TOOL_NODE_OVERLAY_HOVER_OUT";
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 
 /**
@@ -98,6 +100,16 @@ export type StageToolNodeOverlayClicked = {
   nodeId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
+export type StageToolNodeOverlayHoverOver = {
+  workspaceId: string;
+  nodeId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
+
+export type StageToolNodeOverlayHoverOut = {
+  workspaceId: string;
+  nodeId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
+
 export type DeleteShortcutPressed = ShortcutEvent;
 
 export type textEditorChanged = {
@@ -131,6 +143,18 @@ export const textEditorChanged = (file: File, value: string): textEditorChanged 
 export const stageToolNodeOverlayClicked = (workspaceId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayClicked => ({
   workspaceId,
   type: STAGE_TOOL_NODE_OVERLAY_CLICKED,
+  nodeId,
+  sourceEvent
+});
+export const stageToolNodeOverlayHoverOver = (workspaceId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayHoverOver => ({
+  workspaceId,
+  type: STAGE_TOOL_NODE_OVERLAY_HOVER_OVER,
+  nodeId,
+  sourceEvent
+});
+export const stageToolNodeOverlayHoverOut = (workspaceId: string, nodeId: string, sourceEvent: React.MouseEvent<any>): StageToolNodeOverlayHoverOut => ({
+  workspaceId,
+  type: STAGE_TOOL_NODE_OVERLAY_HOVER_OUT,
   nodeId,
   sourceEvent
 });

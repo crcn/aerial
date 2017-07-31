@@ -22,9 +22,12 @@ import {
   centerTransformZoom,
   updateStructProperty, 
 } from "aerial-common2";
+
 import { clamp } from "lodash";
 
 import { 
+  addWorkspaceHovering,
+  removeWorkspaceHovering,
   ApplicationState,
   getWorkspaceById,
   getAllFilesByPath,
@@ -42,6 +45,10 @@ import {
 } from "front-end/state";
 
 import {
+  STAGE_TOOL_NODE_OVERLAY_HOVER_OUT,
+  StageToolNodeOverlayHoverOut,
+  StageToolNodeOverlayHoverOver,
+  STAGE_TOOL_NODE_OVERLAY_HOVER_OVER,
   STAGE_TOOL_NODE_OVERLAY_CLICKED,
   StageToolNodeOverlayClicked,
   STAGE_TOOL_WINDOW_KEY_DOWN,
@@ -249,10 +256,23 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_NODE_OVERLAY_CLICKED: {
       const { workspaceId, nodeId, sourceEvent } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey;
-      const filesByUri = getAllFilesByPath(state);
-      const { $source: { uri } } = getValueById(state, nodeId) as SyntheticDOMNode2;
-      const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
-      return updateStructProperty(state, getWorkspaceById(state, workspaceId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+      if (metaKey) {
+        const filesByUri = getAllFilesByPath(state);
+        const { $source: { uri } } = getValueById(state, nodeId) as SyntheticDOMNode2;
+        const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
+        return updateStructProperty(state, getWorkspaceById(state, workspaceId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+      }
+      break;
+    }
+
+    case STAGE_TOOL_NODE_OVERLAY_HOVER_OVER: {
+      const { workspaceId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOver;
+      return addWorkspaceHovering(state, workspaceId, nodeId);
+    }
+
+    case STAGE_TOOL_NODE_OVERLAY_HOVER_OUT: {
+      const { workspaceId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOut;
+      return removeWorkspaceHovering(state, workspaceId, nodeId);
     }
   }
 

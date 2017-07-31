@@ -1,11 +1,12 @@
 import "./overlay.scss";
+const cx = require("classnames");
 import * as React from "react";
 import { Workspace } from "front-end/state";
-import { getValueById, Dispatcher, Box, wrapEventToDispatch } from "aerial-common2";
 import { compose, pure } from "recompose";
 import { mapValues, values } from "lodash";
-import { stageToolNodeOverlayClicked } from "front-end/actions";
 import { SyntheticDOMNode2, getAllSyntheticDOMNodesAsIdMap } from "aerial-synthetic-browser";
+import { getValueById, Dispatcher, Box, wrapEventToDispatch } from "aerial-common2";
+import { stageToolNodeOverlayClicked, stageToolNodeOverlayHoverOver, stageToolNodeOverlayHoverOut } from "front-end/actions";
 
 export type VisualToolsComponentProps = {
   workspace: Workspace;
@@ -13,21 +14,32 @@ export type VisualToolsComponentProps = {
 };
 
 type NodeOverlayProps = {
-  workspace: Workspace;
-  box: Box,
+  workspaceId: string;
+  box: Box;
+  zoom: number;
+  hovering: boolean;
   node: SyntheticDOMNode2;
   dispatch: Dispatcher<any>;
 };
 
-const NodeOverlayBase = ({ workspace, box, node, dispatch }: NodeOverlayProps) => {
+const NodeOverlayBase = ({ workspaceId, zoom, box, node, dispatch, hovering }: NodeOverlayProps) => {
+
+  const borderWidth = 2 / zoom;
+
   const style = {
     left: box.left,
     top: box.top,
     width: box.right - box.left,
-    height: box.bottom - box.top
+    height: box.bottom - box.top,
+    boxShadow: `inset 0 0 0 ${borderWidth}px #00B5FF`,
   };
 
-  return <div className="visual-tools-node-overlay" style={style} onClick={wrapEventToDispatch(dispatch, stageToolNodeOverlayClicked.bind(this, workspace.$$id, node.$$id))}>
+  return <div 
+  className={cx("visual-tools-node-overlay", { hovering: hovering })}
+  style={style} 
+  onClick={wrapEventToDispatch(dispatch, stageToolNodeOverlayClicked.bind(this, workspaceId, node.$$id))}
+  onMouseEnter={wrapEventToDispatch(dispatch, stageToolNodeOverlayHoverOver.bind(this, workspaceId, node.$$id))}
+  onMouseLeave={wrapEventToDispatch(dispatch, stageToolNodeOverlayHoverOut.bind(this, workspaceId, node.$$id))}>
 
   </div>;
 }
@@ -44,7 +56,7 @@ export const NodeOverlaysToolComponentBase = ({ workspace, dispatch }: VisualToo
           const node = allNodes[nodeId];
           const box  = window.computedBoxes[nodeId];
           if (node && box) {
-            elements.push(<NodeOverlay workspace={workspace} key={nodeId} node={node} box={box} dispatch={dispatch} />);
+            elements.push(<NodeOverlay workspaceId={workspace.$$id} zoom={workspace.visualEditorSettings.translate.zoom} key={nodeId} node={node} box={box} dispatch={dispatch} hovering={workspace.hoveringIds.indexOf(node.$$id) !== -1} />);
           }
         }
         return elements;

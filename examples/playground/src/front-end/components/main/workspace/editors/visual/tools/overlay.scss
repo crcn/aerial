@@ -1,5 +1,9 @@
 
 .visual-tools-node-overlay {
   position: absolute;
-  border: 2px solid blue;
+  opacity: 0;
+  background: transparent;
+  &.hovering {
+    opacity: 1;
+  }
 }
