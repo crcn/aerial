@@ -37,7 +37,7 @@ export const typed = <TType extends string, VInst>($$type: TType, factory: (...a
 
 let _idCount: number = 0;
 
-const generateDefaultId = (...args) => String(++_idCount);
+export const generateDefaultId = (...args) => String(++_idCount);
 
 export const idd = <VInst>(factory: (...args) => VInst, generateId: (...args) => string = generateDefaultId): ((...args) => VInst & IDd) => {
    return (...args) => {

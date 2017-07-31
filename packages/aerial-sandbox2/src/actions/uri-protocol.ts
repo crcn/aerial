@@ -1,34 +1,51 @@
-import { Action } from "aerial-common2";
+import { identify } from "lodash";
 import { URIProtocolReadResult } from "../state";
+import { Request, createStructFactory, generateDefaultId, takeResponse } from "aerial-common2";
 
-export const READ_URI    = "READ_URI";
-export const WRITE_URI   = "WRITE_URI";
-export const URI_EXISTS  = "URI_EXISTS";
-export const WATCH_URI   = "WATCH_URI";
+export const READ_URI = "READ_URI";
+export const WRITE_URI = "WRITE_URI";
+export const DELETE_URI = "DELETE_URI";
+export const URI_EXISTS = "URI_EXISTS";
+export const WATCH_URI = "WATCH_URI";
+export const UNWATCH_URI = "UNWATCH_URI";
 
-export type BaseUriAction = {
+export type BaseUriRequest = {
   uri: string
-} & Action;
+} & Request;
 
-export type ReadUriAction   = BaseUriAction;
-export type UriExistsAction = BaseUriAction;
-export type WatchUriAction  = BaseUriAction;
-export type WriteUriAction  = {
-  content: string | Buffer
-} & BaseUriAction;
+export type ReadUriRequest   = BaseUriRequest;
+export type UriExistsRequest = BaseUriRequest;
+export type DeleteUriRequest = BaseUriRequest;
+export type WatchUriRequest  = BaseUriRequest;
+export type UnwatchUriRequest  = {
+  watchRequestId: string
+} & Request;
+export type WriteUriRequest  = {
+  content: string | Buffer;
+  contentType?: string;
+} & BaseUriRequest;
 
-const uriActionFactory = <T extends BaseUriAction>(type: string) => (uri: string): BaseUriAction => ({
+const createUriActionFactory = <T extends BaseUriRequest>(type: string) => (uri: string): BaseUriRequest => ({
   type,
-  uri
+  uri,
+  $$id: generateDefaultId()
 });
 
-export const readUriAction   = uriActionFactory<ReadUriAction>(READ_URI);
-export const uriExistsAction = uriActionFactory<UriExistsAction>(URI_EXISTS);
-export const watchUriAction  = uriActionFactory<WatchUriAction>(WATCH_URI);
+export const createReadUriRequest = createUriActionFactory<ReadUriRequest>(READ_URI);
+export const createDeleteUriRequest = createUriActionFactory<DeleteUriRequest>(DELETE_URI);
+export const createUriExistsRequest = createUriActionFactory<UriExistsRequest>(URI_EXISTS);
+export const createWatchUriRequest = createUriActionFactory<WatchUriRequest>(WATCH_URI);
+export const createUnwatchUriRequest = (watchRequestId: string): UnwatchUriRequest => ({
+  type: UNWATCH_URI,
+  watchRequestId,
+  $$id: generateDefaultId()
+});
 
-export const writeUriAction  = (uri: string, content: string|Buffer): WriteUriAction => ({
+export const createWriteUriRequest = (uri: string, content: string|Buffer, contentType?: string): WriteUriRequest => ({
   type: WRITE_URI,
+  contentType,
   content: content,
-  uri: uri
+  uri: uri,
+  $$id: generateDefaultId()
 });
 
