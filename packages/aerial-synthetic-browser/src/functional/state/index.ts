@@ -70,6 +70,7 @@ export type SyntheticDOMDocument2 = {
 } & SyntheticDOMNode2;
 
 export type SyntheticBrowserWindow2 = {
+  mount: HTMLElement;
   document: SyntheticDOMDocument2;
   location: string;
   title: string;

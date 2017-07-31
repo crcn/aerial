@@ -6,7 +6,12 @@ import { fork, take, put, spawn } from "redux-saga/effects";
 import { eventChannel } from "redux-saga";
 import { SyntheticBrowser } from "../../browser";
 import {  SyntheticBrowserWindow2, SYTNTHETIC_BROWSER_WINDOW } from "../state";
-import { OPEN_SYNTHETIC_WINDOW_REQUESTED, legacySyntheticDOMChanged, syntheticWindowTitleChanged } from "../actions";
+import { 
+  legacySyntheticDOMChanged, 
+  syntheticWindowTitleChanged, 
+  syntheticWindowMountChanged,
+  OPEN_SYNTHETIC_WINDOW_REQUESTED, 
+} from "../actions";
 
 export function mainSyntheticBrowserSaga(kernel: Kernel) {
   return function*() {
@@ -70,8 +75,13 @@ function* observeSyntheticBrowserState(browser: SyntheticBrowser, window: Synthe
 
 function* observeSyntheticBrowserDOMState(browser: SyntheticBrowser, state: SyntheticBrowserWindow2) {
   const chan = eventChannel((emit) => {
+    
     const dispatchLegacySyntheticDOMChanged = (mutation?: Mutation<any>) => {
       emit(legacySyntheticDOMChanged(state.$$id, browser.document, mutation));
+    };
+
+    const dispatchSyntheticDOMMount = (window: SyntheticBrowserWindow2, mount: HTMLElement) => {
+      emit(syntheticWindowMountChanged(window.$$id, mount));
     };
 
     const onDocumentEvent = (event) => {
@@ -90,7 +100,10 @@ function* observeSyntheticBrowserDOMState(browser: SyntheticBrowser, state: Synt
         if (status.type === Status.COMPLETED) {
           browser.document.observe({ dispatch: onDocumentEvent });
           dispatchTitleChanged();
+          dispatchSyntheticDOMMount(state, browser.renderer.element);
           dispatchLegacySyntheticDOMChanged();
+          // TODO - need to start this after mounted dispatched
+          browser.renderer.start();
         } else if (status.type === Status.ERROR) {
           // TODO
         }

@@ -6,12 +6,13 @@ import { SyntheticDocument } from "../../dom";
  * Types
  */
 
-export const RENDERED_DOCUMENT                 = "RENDERED_DOCUMENT";
-export const EVALUATED_APPLICATION             = "EVALUATED_APPLICATION";
-export const OPEN_SYNTHETIC_WINDOW_REQUESTED   = "OPEN_SYNTHETIC_WINDOW_REQUESTED";
-export const CLOSE_SYNTHETIC_WINDOW_REQUESTED  = "CLOSE_SYNTHETIC_WINDOW_REQUESTED";
-export const LEGACY_SYNTHETIC_DOM_CHANGED      = "LEGACY_SYNTHETIC_DOM_CHANGED";
-export const SYNTHETIC_WINDOW_TITLE_CHANGED    = "SYNTHETIC_WINDOW_TITLE_CHANGED";
+export const RENDERED_DOCUMENT                = "RENDERED_DOCUMENT";
+export const EVALUATED_APPLICATION            = "EVALUATED_APPLICATION";
+export const OPEN_SYNTHETIC_WINDOW_REQUESTED  = "OPEN_SYNTHETIC_WINDOW_REQUESTED";
+export const CLOSE_SYNTHETIC_WINDOW_REQUESTED = "CLOSE_SYNTHETIC_WINDOW_REQUESTED";
+export const LEGACY_SYNTHETIC_DOM_CHANGED     = "LEGACY_SYNTHETIC_DOM_CHANGED";
+export const SYNTHETIC_WINDOW_TITLE_CHANGED   = "SYNTHETIC_WINDOW_TITLE_CHANGED";
+export const SYNTHETIC_WINDOW_MOUNT_CHANGED   = "SYNTHETIC_WINDOW_MOUNT_CHANGED";
 
 /**
  * Shapes
@@ -33,8 +34,13 @@ export type LegacySyntheticDOMChanged = {
 } & BaseEvent;
 
 export type SyntheticWindowTitleChanged = {
-  syntheticWindowId;
+  syntheticWindowId: string;
   title: string;
+} & BaseEvent;
+
+export type SyntheticWindowMountChanged = {
+  syntheticWindowId: string;
+  mount: HTMLElement;
 } & BaseEvent;
 
 /**
@@ -57,6 +63,12 @@ export const legacySyntheticDOMChanged = (syntheticWindowId: string, legacyDocum
   legacyDocument,
   type: LEGACY_SYNTHETIC_DOM_CHANGED,
   mutation,
+});
+
+export const syntheticWindowMountChanged = (syntheticWindowId: string, mount: HTMLElement): SyntheticWindowMountChanged => ({
+  mount,
+  syntheticWindowId,
+  type: SYNTHETIC_WINDOW_MOUNT_CHANGED,
 });
 
 export const syntheticWindowTitleChanged = (syntheticWindowId: string, title: string): SyntheticWindowTitleChanged => ({

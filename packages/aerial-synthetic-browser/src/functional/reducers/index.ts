@@ -40,6 +40,8 @@ import {
 } from "../../dom";
 
 import { 
+  SYNTHETIC_WINDOW_MOUNT_CHANGED,
+  SyntheticWindowMountChanged,
   SYNTHETIC_WINDOW_TITLE_CHANGED,
   SyntheticWindowTitleChanged,
   OPEN_SYNTHETIC_WINDOW_REQUESTED, 
@@ -107,6 +109,12 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
       const { title, syntheticWindowId } = event as SyntheticWindowTitleChanged;
       const window = getSyntheticBrowserWindow(root, syntheticWindowId);
       return updateStructProperty(root, window, "title", title);
+    }
+
+    case SYNTHETIC_WINDOW_MOUNT_CHANGED: {
+      const { syntheticWindowId, mount } = event as SyntheticWindowMountChanged;
+      const window = getSyntheticBrowserWindow(root, syntheticWindowId);
+      return updateStructProperty(root, window, "mount", mount);
     }
   }
   

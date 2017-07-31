@@ -3,7 +3,7 @@ const VOID_ELEMENTS = require("void-elements");
 import * as React from "react";
 import { findDOMNode } from "react-dom";
 import { weakMemo, Dispatcher, Box, BaseEvent, calculateAbsoluteBounds, shiftBox} from "aerial-common2";
-import { lifecycle, compose, withState, pure, onlyUpdateForKeys } from "recompose";
+import { lifecycle, compose, withState, pure, onlyUpdateForKeys, withHandlers } from "recompose";
 import { canvasElementsComputedPropsChanged } from "front-end/actions";
 import { 
   DOMNodeType,
@@ -81,6 +81,35 @@ const MeasurererComponent = compose<any, any>(
   </span>
 }) as any) as any;
 
+type WindowMountOuterProps = {
+  mount: HTMLElement;
+}
+
+type WindowMountInnerProps = {
+  setContainer(element: HTMLElement);
+  mount: HTMLElement;
+  container: HTMLElement;
+}
+
+const WindowMountBase = ({ setContainer }: WindowMountInnerProps) => {
+  return <div ref={setContainer} />;
+}
+
+const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>(
+  // pure,
+  withState("container", "setContainer", null),
+  lifecycle({
+    componentDidUpdate({ container, mount }: WindowMountInnerProps) {
+      if (container && mount) {
+        container.appendChild(mount);
+        // TODO - dispatch mounted here
+      }
+    }
+  })
+);
+
+const WindowMount = enhanceWindowMount(WindowMountBase);
+
 const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
   const { box, document } = window;
   
@@ -93,9 +122,7 @@ const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
 
   return <div className="visual-canvas-window-component" style={style}>
     <IsolateComponent inheritCSS>
-      <MeasurererComponent document={document} dispatch={dispatch} window={window} windowBox={box}>
-        { document && document.childNodes.map(mapSyntheticDOMNodeToJSX) }
-      </MeasurererComponent>
+      <WindowMount mount={window.mount} />
     </IsolateComponent>
   </div>;
 }
