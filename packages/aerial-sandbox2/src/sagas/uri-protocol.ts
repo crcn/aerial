@@ -23,6 +23,7 @@ export type URIProtocolAdapter = {
   delete(uri: string): Promise<any>;
 }
 
+
 const hasProtocol = (name: string, uri: string) => {
   return uri.split(":")[0] === name;
 };

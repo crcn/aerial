@@ -25,6 +25,11 @@ export type Typed  = { $$type: string };
 export type IDd    = { $$id: string };
 export type Struct = Typed & IDd;
 
+export type ErrorShape = {
+  type: string;
+  message: string;
+}
+
 export const typed = <TType extends string, VInst>($$type: TType, factory: (...args) => VInst): ((...args) => VInst & Typed) => {
    return (...args) => {
      return { ...factory(...args) as any, $$type };
@@ -36,8 +41,9 @@ export const typed = <TType extends string, VInst>($$type: TType, factory: (...a
  */
 
 let _idCount: number = 0;
+const ID_SEED = Math.round(Math.random() * 9999);
 
-export const generateDefaultId = (...args) => String(++_idCount);
+export const generateDefaultId = (...args) => `${ID_SEED}.${String(++_idCount)}`;
 
 export const idd = <VInst>(factory: (...args) => VInst, generateId: (...args) => string = generateDefaultId): ((...args) => VInst & IDd) => {
    return (...args) => {
@@ -58,16 +64,19 @@ export const getPathByType = (root: any, type: string) => getPath(root, (value: 
 /**
  */
 
-export const getValuesByType = (root: any, type: string) => {
+export const getValuesByType = weakMemo((root: any, type: string) => {
   const flattened = flattenObject(root);
   const valuesByType = [];
+  if (root.$$type === type) {
+    valuesByType.push(root);
+  }
   for (const k in flattened) {
     if (flattened[k] && flattened[k].$$type === type) {
       valuesByType.push(flattened[k]);
     }
   }
   return valuesByType;
-}
+});
 
 /**
  */
@@ -84,7 +93,7 @@ export const updateStructProperty = <TStruct extends IDd, K extends keyof TStruc
 /**
  */
 
-export const updateStruct = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct,value: TStruct) => updateIn(root, getPathById(root, struct.$$id), value);
+export const updateStruct = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct, value: Partial<TStruct>) => updateIn(root, getPathById(root, struct.$$id), Object.assign({}, struct, value));
 
 
 

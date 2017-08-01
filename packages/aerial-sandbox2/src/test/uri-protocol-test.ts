@@ -16,9 +16,8 @@ import {
   createURIProtocolState,
 } from "../index";
 
-import { timeout } from "./utils"
+import { timeout, createTestProtocolAdapter } from "./utils"
 
-const removeProtocolName = (uri: string) => uri.replace(/^\w+:\/\//, "");
 
 describe(__filename + "#", () => {
 
@@ -37,35 +36,6 @@ describe(__filename + "#", () => {
     }
   });
 
-  const createTestProtocolAdapter = (name: string, testFiles = createTestFiles(name)) => {
-    const listeners = {};
-    return {
-      name: name,
-      async read(uri: string) {
-        return testFiles[removeProtocolName(uri)];
-      },
-      async write(uri: string, content: any, type?: string) {
-        const oldFile = testFiles[removeProtocolName(uri)];
-        const newContent = testFiles[removeProtocolName(uri)] = {
-          type: type || oldFile,
-          content: content
-        };
-        if (listeners[uri]) {
-          listeners[uri](newContent);
-        }
-      },
-      async delete(uri: string) {
-        delete testFiles[removeProtocolName(uri)];
-      },
-      watch(uri: string, onChange: any) {
-        listeners[uri] = onChange;
-        return () => {
-          
-        };
-      },
-    };
-  }
-
   const createTestStore = (testSaga = (() => {})) => {
     const sagas = createSagaMiddleware();
     const store = createStore(
@@ -74,8 +44,8 @@ describe(__filename + "#", () => {
       applyMiddleware(sagas)
     );
 
-    const localProtocolSaga  = createURIProtocolSaga(createTestProtocolAdapter("local"));
-    const local2ProtocolSaga = createURIProtocolSaga(createTestProtocolAdapter("local2"));
+    const localProtocolSaga  = createURIProtocolSaga(createTestProtocolAdapter("local", createTestFiles("local")));
+    const local2ProtocolSaga = createURIProtocolSaga(createTestProtocolAdapter("local2", createTestFiles("local2")));
 
     sagas.run(function*() {
       yield fork(localProtocolSaga);

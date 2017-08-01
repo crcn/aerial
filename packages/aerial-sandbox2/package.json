@@ -26,6 +26,7 @@
   "dependencies": {
     "abab": "^1.0.3",
     "aerial-common2": "^0.0.1",
+    "detective": "^4.5.0",
     "lodash": "^4.17.4",
     "md5": "^2.2.1",
     "memoizee": "^0.4.5",
