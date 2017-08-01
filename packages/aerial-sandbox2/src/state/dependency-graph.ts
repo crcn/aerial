@@ -1,5 +1,6 @@
 import { 
   Struct, 
+  getPath,
   weakMemo,
   ErrorShape, 
   getValueById,
@@ -149,19 +150,36 @@ export const createDependencyGraph = createStructFactory(DEPENDENCY_GRAPH, {
 
 export const getDependencyGraph = (root: any): DependencyGraph => getValuesByType(root, DEPENDENCY_GRAPH)[0];
 
-export const getDependency = (root: any, dependencyId: string): Dependency => getValueById(root, dependencyId);
 
-export const isDependencyTreeLoaded = weakMemo((root: any, hash: string) => {
+export const getDependency = (root: any, dependencyIdOrHash: string): Dependency => { 
   const graph = getDependencyGraph(root);
-  const checked = [];
+  return graph.allDependencies[dependencyIdOrHash] || getValueById(root, dependencyIdOrHash);
+}
+
+export const getAllDependencies = weakMemo((root: any, hash: string, filter: ((dep: Dependency) => boolean) = (dep) => true) => {
+  const graph = getDependencyGraph(root);
+  const hashes = [];
+  const deps   = [];
   const toCheck = [hash];
   while(toCheck.length) {
     const dep = graph.allDependencies[toCheck.shift()];
-    if (!dep || dep.status !== DependencyStatus.READY) {
-      return false;
-    }
-    toCheck.push(...difference(dep.importedDependencyHashes, checked));
-    checked.push(...dep.importedDependencyHashes);
+    if (!filter(dep)) return null;
+    toCheck.push(...difference(dep.importedDependencyHashes, hashes));
+    hashes.push(...dep.importedDependencyHashes);
+    deps.push(dep);
   }
-  return true;
+  return deps;
 });
+
+export const dependencyTreeContainsHash = weakMemo((root: any, entryHash: string, childHash: string) => {
+  getAllDependencies(root, entryHash, dep => dep.hash != childHash) == null
+});
+
+export const isDependencyTreeLoaded = weakMemo((root: any, hash: string) => (
+  getAllDependencies(root, hash, dep => dep.status === DependencyStatus.READY) != null
+));
+
+
+export const getAllDependencyHashes = weakMemo((root: any, hash: string) => (
+  getAllDependencies(root, hash)
+));

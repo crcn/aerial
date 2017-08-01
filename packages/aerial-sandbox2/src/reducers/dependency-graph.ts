@@ -19,7 +19,7 @@ import {
   DependencyStatus 
 } from "../state";
 
-export const dependencyGraphReducer = (root: any, event: BaseEvent) => {
+export const dependencyGraphReducer = (root: any = createDependencyGraph(), event: BaseEvent) => {
   switch(event.type) {
 
     case DEPENDENCY_CREATED: {
