@@ -7,6 +7,10 @@ import { waitUntil, request } from "aerial-common2";
 import { createCommonJSLoaderSaga } from "aerial-commonjs-extension2";
 
 import { 
+  getFileCache,
+  createWriteUriRequest,
+  getFileCacheItemByUri,
+  createReadUriRequest,
   sandboxEnvironmentSaga,
   createAddDependencyRequest,
   createAddSandboxEnvironmentRequest,
@@ -25,11 +29,17 @@ import { createTestProtocolAdapter } from "./utils";
 describe(__filename + "#", () => {
 
   const TEST_FILES_1 = {
-    "/entry.js": {
-      type: "application/javascript",
-      content: `
-        modue.exports = "hello";
-      `
+    "/a": {
+      type: "text/plain",
+      content: `a content`
+    },
+    "/b": {
+      type: "text/plain",
+      content: `b content`
+    },
+    "/c": {
+      type: "text/plain",
+      content: `c content`
     }
   };
   
@@ -49,16 +59,51 @@ describe(__filename + "#", () => {
   
   it("loads the URI data into the file cache", (next) => {
     const { getState, dispatch } = createTestStore(TEST_FILES_1, function*() {
+      const uri = "local:///a";
+      const { payload: { content, type }} = yield yield request(createReadUriRequest(uri));
+      expect(content).to.eql("a content");
+      expect(type).to.eql("text/plain");
+      yield call(delay, 10);
+      const item = getFileCacheItemByUri(yield select(), uri);
+      expect(item.content).to.eql("a content");
+      expect(item.contentType).to.eql("text/plain");
       next();
     });
   });
 
   it("uses the file cache if the URI exists", (next) => {
     const { getState, dispatch } = createTestStore(TEST_FILES_1, function*() {
+      const uri = "local:///a";
+      const { payload: { content, type }} = yield yield request(createReadUriRequest(uri));
+      expect(content).to.eql("a content");
+      expect(type).to.eql("text/plain");
+      yield call(delay, 2);
+
+      const { payload: { content2, type2, cached }} = yield yield request(createReadUriRequest(uri));
+
+      expect(content).to.eql("a content");
+      expect(type).to.eql("text/plain");
+      expect(cached).to.eql(true);
       next();
     });
   });
 
-  xit("updates the cached file if the source URI changes");
+  it("updates the cached file if the source URI changes", (next) => {
+    const { getState, dispatch } = createTestStore(TEST_FILES_1, function*() {
+      const uri = "local:///a";
+      const { payload: { content, type }} = yield yield request(createReadUriRequest(uri));
+      expect(content).to.eql("a content");
+      expect(type).to.eql("text/plain");
+      yield call(delay, 1);
 
+      yield yield request(createWriteUriRequest(uri, "a2 content"));
+
+      const { payload: { content: content2, type: type2, cached } } = yield yield request(createReadUriRequest(uri));
+
+      expect(content2).to.eql("a2 content");
+      expect(type2).to.eql("text/plain");
+      expect(cached).to.eql(true);
+      next();
+    });
+  });
 });

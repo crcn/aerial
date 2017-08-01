@@ -1,9 +1,10 @@
 import { identify } from "lodash";
 import { URIProtocolReadResult } from "../state";
-import { Request, createStructFactory, generateDefaultId, takeResponse } from "aerial-common2";
+import { BaseEvent, Request, createStructFactory, generateDefaultId, takeResponse } from "aerial-common2";
 
 export const READ_URI = "READ_URI";
 export const WRITE_URI = "WRITE_URI";
+export const URI_WRITTEN = "URI_WRITTEN";
 export const DELETE_URI = "DELETE_URI";
 export const URI_EXISTS = "URI_EXISTS";
 export const WATCH_URI = "WATCH_URI";
@@ -24,6 +25,12 @@ export type WriteUriRequest  = {
   content: string | Buffer;
   contentType?: string;
 } & BaseUriRequest;
+
+export type UriWrittenEvent = {
+  uri: string;
+  content: string | Buffer;
+  contentType?: string
+} & BaseEvent;
 
 const createUriActionFactory = <T extends BaseUriRequest>(type: string) => (uri: string): BaseUriRequest => ({
   type,
@@ -47,5 +54,12 @@ export const createWriteUriRequest = (uri: string, content: string|Buffer, conte
   content: content,
   uri: uri,
   $$id: generateDefaultId()
+});
+
+export const createUriWrittenEvent = (uri: string, content: string|Buffer, contentType?: string): UriWrittenEvent => ({
+  type: URI_WRITTEN,
+  uri,
+  content,
+  contentType
 });
 

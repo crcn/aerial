@@ -1,20 +1,16 @@
 import { BaseEvent, Request } from "aerial-common2";
 
-export const READ_CACHED    = "READ_FILE_CACHE";
-export const WRITE_CACHED_URI   = "WRITE_FILE_CACHE";
-export const FILE_CACHE_CHANGED = "FILE_CACHE_CHANGED";
+export const URI_CACHE_BUSTED = "URI_CACHE_BUSTED";
 
-export type ReadFileCacheRequest = {
+export type UriCacheBustedEvent = {
   uri: string;
-} & Request;
-
-export type WriteFileCacheRequest = {
-  uri: string;
-  content: Buffer;
-  contentType?: string;
-} & Request;
-
-export type FileCacheChangedEvent = {
-  cachedFileId: string;
+  content: string|Buffer;
+  contentType: string;
 } & BaseEvent;
 
+export const createUriCacheBustedEvent = (uri: string, content: string|Buffer, contentType: string): UriCacheBustedEvent => ({
+  uri,
+  content, 
+  contentType, 
+  type: URI_CACHE_BUSTED
+})

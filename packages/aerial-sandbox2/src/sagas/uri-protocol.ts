@@ -11,9 +11,13 @@ import {
   ReadUriRequest, 
   WriteUriRequest, 
   WatchUriRequest,
+  DeleteUriRequest,
   UnwatchUriRequest,
-  DeleteUriRequest 
+  createUriWrittenEvent,
 } from "../actions";
+
+// TODOS:
+// - support HTTP headers
 
 export type URIProtocolAdapter = {
   name: string;
@@ -48,7 +52,9 @@ function* handleReadRequest(adapter: URIProtocolAdapter) {
 function* handleWriteRequest(adapter: URIProtocolAdapter) {
   while(true) {
     yield takeRequest((request: WriteUriRequest) => request.type === WRITE_URI && hasProtocol(adapter.name, request.uri), function*({ uri, contentType, content }: WriteUriRequest) {
-      return yield call(adapter.write, uri, content, contentType);
+      const result = yield call(adapter.write, uri, content, contentType);
+      yield put(createUriWrittenEvent(uri, content, contentType));
+      return result;
     });
   }
 }

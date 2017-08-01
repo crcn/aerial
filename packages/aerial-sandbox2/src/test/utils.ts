@@ -24,7 +24,7 @@ export const createTestProtocolAdapter = (name: string, testFiles) => {
     async write(uri: string, content: any, type?: string) {
       const oldFile = testFiles[removeProtocolName(uri)];
       const newContent = testFiles[removeProtocolName(uri)] = {
-        type: type || oldFile,
+        type: type || oldFile.type,
         content: content
       };
       if (listeners[uri]) {

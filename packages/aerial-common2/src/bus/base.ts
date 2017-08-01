@@ -2,8 +2,9 @@ import { reader } from "../monad";
 // import { DuplexStream, pump as pumpLegacy } from "mesh7";
 import { negate, noop } from "lodash";
 import { ImmutableObject } from "../immutable";
-import { take, fork, call, put } from "redux-saga/effects";
-import { IDd } from "../struct";
+import { take, fork, call, put, spawn } from "redux-saga/effects";
+import { IDd, generateDefaultId } from "../struct";
+
 
 export type Message = {
   type: string;
@@ -58,9 +59,15 @@ export const takeResponse = (requestId: string) => {
     return response.type === RESPONSE && response.requestId === requestId;
   });
 }
+
 export const request = (request: Request) => call(function*() {
   yield put(request);
   return takeResponse(request.$$id);
+});
+
+export const reuseRequest = (request: Request): Request => ({ 
+  ...(request as any), 
+  $$id: generateDefaultId()
 });
 
 export const takeRequest = (test: string | ((action: Action) => boolean), handleRequest: (request: Request) => any) => call(function*() {
