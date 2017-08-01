@@ -1,6 +1,7 @@
 import { Struct, createStructFactory } from "aerial-common2";
 
 export const CACHED_FILE = "CACHED_FILE";
+export const FILE_CACHE  = "FILE_CACHE";
 
 /**
  * Cache for files so that the dependency graph doesn't go back to the 
@@ -35,6 +36,7 @@ export type FileCache = {
   allFiles: {
     [identifier: string]: CachedFile
   }
-}
+} & Struct;
 
-export const createCachedFile = createStructFactory(CACHED_FILE);
+export const createCachedFile = createStructFactory<CachedFile>(CACHED_FILE);
+export const createFileCache  = createStructFactory<FileCache>(FILE_CACHE);
