@@ -4,10 +4,9 @@ import { delay } from "redux-saga";
 import { createStore, applyMiddleware } from "redux";
 import { default as createSagaMiddleware } from "redux-saga";
 import { waitUntil, request } from "aerial-common2";
-import { createCommonJSLoaderSaga } from "aerial-commonjs-extension2";
+import { createCommonJSSaga } from "aerial-commonjs-extension2";
 
 import { 
-  createCachedFile,
   createDependency,
   createDependencyGraph,
   createURIProtocolSaga,
@@ -68,7 +67,7 @@ describe(__filename + "#", () => {
       applyMiddleware(sagas)
     )
     sagas.run(function*() {
-      yield fork(createCommonJSLoaderSaga());
+      yield fork(createCommonJSSaga());
       yield fork(createDependencyGraphSaga());
       yield fork(createURIProtocolSaga(createTestProtocolAdapter("local", TEST_FILES)));
       yield call(run);

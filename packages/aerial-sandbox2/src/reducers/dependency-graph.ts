@@ -36,7 +36,7 @@ export const dependencyGraphReducer = (root: any = createDependencyGraph(), even
       const { dependencyId, result } = event as DependencyContentLoadedEvent;
       const dependency = getDependency(root, dependencyId);
       return updateStruct(root, dependency, {
-        importedDependencyIds: result.importedDependencyUris,
+        importedDependencyUris: result.importedDependencyUris,
         content: result.content,
         contentType: result.contentType,
         status: DependencyStatus.CONTENT_LOADED

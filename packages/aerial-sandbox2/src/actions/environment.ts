@@ -1,10 +1,11 @@
 import { Request, BaseEvent, generateDefaultId } from "aerial-common2";
-import { Dependency } from "../state";
+import { DependencyGraph, Dependency } from "../state";
 
 export const ADD_SANDBOX_ENVIRONMENT     = "ADD_SANDBOX_ENVIRONMENT";
 export const SANDBOX_ENVIRONMENT_CREATED = "SANDBOX_ENVIRONMENT_CREATED";
 export const EVALUATE_DEPENDENCY         = "EVALUATE_DEPENDENCY";
 export const SANDBOX_ENVIRONMENT_EVALUATED = "SANDBOX_ENVIRONMENT_EVALUATED";
+export const EVALUATE_SANDBOX_ENVIRONMENT  = "EVALUATE_SANDBOX_ENVIRONMENT";
 
 export type AddSandboxEnvironmentRequest = {
   uri: string
@@ -19,8 +20,11 @@ export type SandboxEnvironmentEvaluatedEvent = {
   exports: any;
 } & BaseEvent;
 
+
 export type EvaluateDependencyRequest = {
-  entryHash: string;
+  context: any;
+  graph: DependencyGraph;
+  entry: Dependency;
 } & Request;
 
 export const createAddSandboxEnvironmentRequest = (uri: string): AddSandboxEnvironmentRequest => ({
@@ -38,4 +42,12 @@ export const createSandboxEnvironmentEvaluatedEvent = (sandboxEnvironmentId: str
   exports: _exports,
   sandboxEnvironmentId,
   type: SANDBOX_ENVIRONMENT_EVALUATED,
+});
+
+export const createEvaluateDependencyRequest = (context: any, entry: Dependency, graph: DependencyGraph): EvaluateDependencyRequest => ({
+  context,
+  graph,
+  entry,
+  type: EVALUATE_DEPENDENCY,
+  $$id: generateDefaultId()
 });

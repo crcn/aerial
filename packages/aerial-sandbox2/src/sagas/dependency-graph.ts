@@ -70,7 +70,7 @@ function* loadDependency(dep: Dependency) {
 
 function* loadChildDependencies(dep: Dependency) {
   const importedDependencyHashes = [];
-  for (const uri of dep.importedDependencyIds) {
+  for (const uri of dep.importedDependencyUris) {
     const { payload: { hash } } = (yield yield request(createAddDependencyRequest(uri, dep.uri))) as ResolveDependencyResponse;
     importedDependencyHashes.push(hash);
   }

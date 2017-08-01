@@ -49,7 +49,7 @@ export type Dependency = {
   /**
    */
 
-  importedDependencyIds: string[];
+  importedDependencyUris: string[];
 
   /**
    */

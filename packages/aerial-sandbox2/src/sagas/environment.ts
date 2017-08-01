@@ -1,7 +1,9 @@
 import { fork, put, all, call, select } from "redux-saga/effects";
+import { createContext } from "vm";
 import { takeRequest, request, watch, waitUntil } from "aerial-common2";
-import { ADD_SANDBOX_ENVIRONMENT, AddSandboxEnvironmentRequest, createAddDependencyRequest, createSandboxEnvironmentCreatedEvent, createSandboxEnvironmentEvaluatedEvent } from "../actions";
-import { getSandbox, getDependency, SandboxEnvironment, isDependencyTreeLoaded } from "../state";
+import { ADD_SANDBOX_ENVIRONMENT, AddSandboxEnvironmentRequest, createAddDependencyRequest, createSandboxEnvironmentCreatedEvent, createSandboxEnvironmentEvaluatedEvent,
+createEvaluateDependencyRequest } from "../actions";
+import { getSandbox, getDependency, SandboxEnvironment, isDependencyTreeLoaded, getDependencyGraph } from "../state";
 
 
 export function* sandboxEnvironmentSaga() {
@@ -28,7 +30,9 @@ function* handleSandboxEnvironments() {
 function* runSandboxEnvironment(environment: SandboxEnvironment) {
   yield waitUntil(root => isDependencyTreeLoaded(root, environment.entryHash));
   const root = yield select();
-  const dep  = getDependency(root, environment.entryHash);
+  const context = createContext({});
 
-  yield put(createSandboxEnvironmentEvaluatedEvent(environment.$$id, "test"));
+  const { payload: exports } = yield yield request(createEvaluateDependencyRequest(context, getDependency(root, environment.entryHash), getDependencyGraph(root)));
+
+  yield put(createSandboxEnvironmentEvaluatedEvent(environment.$$id, exports));
 }
