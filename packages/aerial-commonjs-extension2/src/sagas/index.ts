@@ -1,9 +1,9 @@
 import { take, fork } from "redux-saga/effects";
-import { DefaultGraphStrategyLoadContentRequest, DEFAULT_GRAPH_STRATEGY_LOAD_CONTENT } from "../actions";
+import { DefaultGraphStrategyLoadContentRequest, DEFAULT_GRAPH_STRATEGY_LOAD_CONTENT } from "aerial-sandbox2";
 import detective = require("detective");
 import { request, takeRequest } from "aerial-common2";
 
-export function commonJSLoaderSaga(mimeTypes = "application/javascript") {
+export function createCommonJSLoaderSaga(mimeTypes = "application/javascript") {
   return function*() {
     yield fork(function*() {
       while(true) {

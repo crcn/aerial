@@ -1,6 +1,6 @@
 {
   "name": "aerial-sandbox2",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "sandbox environment for running javascript",
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.31",
     "@types/sinon": "^2.3.1",
-    "aerial-commonjs-extension": "0.0.x",
+    "aerial-commonjs-extension2": "^0.0.x",
     "chai": "^4.0.2",
     "mocha": "^3.4.2",
     "sinon": "^2.3.4"

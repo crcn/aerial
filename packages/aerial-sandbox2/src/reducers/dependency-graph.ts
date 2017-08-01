@@ -47,7 +47,7 @@ export const dependencyGraphReducer = (root: any, event: BaseEvent) => {
       const { dependencyId, importedDependencyHashes } = event as DependencyChildrenAddedEvent;
       const dependency = getDependency(root, dependencyId);
       return updateStruct(root, dependency, {
-        importedDependencyHashes: importedDependencyHashes,
+        importedDependencyHashes: [...importedDependencyHashes],
         status: DependencyStatus.READY
       });
     }

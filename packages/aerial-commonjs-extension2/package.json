@@ -1,0 +1,23 @@
+{
+  "name": "aerial-commonjs-extension2",
+  "version": "0.0.3",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo ''",
+    "build": "rm -rf lib; tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aerial-common2": "0.0.x",
+    "aerial-sandbox": "0.0.x",
+    "aerial-sandbox2": "0.0.x",
+    "detective": "^4.5.0",
+    "redux": "^3.7.2",
+    "redux-saga": "^0.15.6"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.31"
+  }
+}

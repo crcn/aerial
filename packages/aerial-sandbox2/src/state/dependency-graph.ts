@@ -7,7 +7,7 @@ import {
   createStructFactory, 
 } from "aerial-common2";
 import {
-  pullAll,
+  difference,
 } from "lodash";
 
 /**
@@ -160,7 +160,7 @@ export const isDependencyTreeLoaded = weakMemo((root: any, hash: string) => {
     if (!dep || dep.status !== DependencyStatus.READY) {
       return false;
     }
-    toCheck.push(...pullAll(dep.importedDependencyHashes, checked));
+    toCheck.push(...difference(dep.importedDependencyHashes, checked));
     checked.push(...dep.importedDependencyHashes);
   }
   return true;
