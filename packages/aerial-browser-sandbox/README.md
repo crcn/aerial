@@ -6,3 +6,15 @@ HI PRIO:
 LITMUS:
 
 - [ ] run all TODOMVC examples
+
+
+
+```javascirpt
+
+function*() {
+  const window = new SyntheticEnvWindow();
+  yield fork(window.saga);
+  yield fork(window.open, "http://google.com");
+  const loadedUris = window.$network.loadedUris;
+}
+```
