@@ -11,10 +11,23 @@ LITMUS:
 
 ```javascirpt
 
+let loadedUris = [];
 function*() {
   const window = new SyntheticEnvWindow();
   yield fork(window.saga);
   yield fork(window.open, "http://google.com");
-  const loadedUris = window.$network.loadedUris;
+
+  // need to combine all loaded URIs from all windows.
+  eachDiff(
+    diffArray(loadedUris, window.$network.loadedUris),
+    function insert(uri) {
+      // watch uri
+    },
+    function delete(uri) {
+      // unwatch URI
+    }
+  );
+
+  loadedUris = window.$network.loadedUris;
 }
 ```
