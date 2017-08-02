@@ -1,19 +1,29 @@
-import { SyntheticDocument } from "./document";
 import { Dispatcher } from "aerial-common2";
+import { SyntheticLocation } from "./location";
+import { SyntheticEnvDocument } from "./document";
+
+type OpenTarget = "_self" | "_blank";
 
 /**
  */
 
 export class SyntheticEnvWindow /*implements Window*/ {
 
-  readonly document: SyntheticDocument;
+  readonly document: SyntheticEnvDocument;
+  readonly location: SyntheticLocation;
   
-  constructor(readonly $$id: string, readonly $$dispatch: Dispatcher<any>) {
-    this.document = new SyntheticDocument(this);
+  constructor(readonly $$id: string, location: string, readonly $$dispatch: Dispatcher<any>) {
+    this.document = new SyntheticEnvDocument(this);
+    this.location = new SyntheticLocation(location);
+    // this.location
   }
 
   public close() {
     // TODO - close environment
+  }
+  
+  public open(location: string, target: OpenTarget = "_blank") {
+
   }
 
   /* 

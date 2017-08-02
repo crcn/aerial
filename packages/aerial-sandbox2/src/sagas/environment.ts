@@ -5,7 +5,6 @@ import { ADD_SANDBOX_ENVIRONMENT, AddSandboxEnvironmentRequest, createAddDepende
 createEvaluateDependencyRequest } from "../actions";
 import { getSandbox, getDependency, SandboxEnvironment, isDependencyTreeLoaded, getDependencyGraph } from "../state";
 
-
 export function* sandboxEnvironmentSaga() {
   yield fork(handleAddSandboxEnvironment);
   yield fork(handleSandboxEnvironments);

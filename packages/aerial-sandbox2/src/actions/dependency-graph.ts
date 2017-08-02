@@ -1,4 +1,4 @@
-import { ResolvedDependencyInfo, LoadedDependencyContentResult } from "../state";
+import { ResolvedDependencyInfo, LoadedDependencyContentResult, Dependency } from "../state";
 import { Request, BaseEvent, Response, generateDefaultId } from "aerial-common2";
 
 /**
@@ -27,6 +27,8 @@ export type AddDependencyRequest = {
   originUri: string;
 } & Request;
 
+export type AddDependencyResponse = Response<Dependency>;
+
 export type ResolveDependencyRequest = {
   uri: string;
   originUri?: string;
@@ -37,13 +39,15 @@ export type DependencyCreatedEvent = {
 } & BaseEvent;
 
 export type LoadDependencyContentRequest = {
-  content: Buffer;
+  dependency: Dependency;
+  content: string|Buffer;
   contentType: string;
   options: any;
 } & Request;
 
 export type DefaultGraphStrategyLoadContentRequest = {
-  content: Buffer;
+  dependency: Dependency;
+  content: string|Buffer;
   contentType: string;
 } & Request;
 
@@ -88,7 +92,8 @@ export const createResolveDependencyRequest = (uri: string, originUri?: string):
   $$id: generateDefaultId()
 });
 
-export const createLoadDependencyContentRequest = (content: Buffer, contentType: string, options: any): LoadDependencyContentRequest => ({
+export const createLoadDependencyContentRequest = (dependency: Dependency, content: string|Buffer, contentType: string, options: any): LoadDependencyContentRequest => ({
+  dependency,
   content,
   options,
   contentType,
@@ -108,7 +113,8 @@ export const createDependencyChildrenAddedEvent = (dependencyId: string, importe
   type: DEPENDENCY_CHILDREN_ADDED
 });
 
-export const createDefaultGraphStrategyLoadContentRequest = (content: Buffer, contentType: string): DefaultGraphStrategyLoadContentRequest => ({
+export const createDefaultGraphStrategyLoadContentRequest = (dependency: Dependency, content: string|Buffer, contentType: string): DefaultGraphStrategyLoadContentRequest => ({
+  dependency,
   content,
   contentType,
   type: DEFAULT_GRAPH_STRATEGY_LOAD_CONTENT,

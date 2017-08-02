@@ -1,7 +1,14 @@
-import { Struct } from "aerial-common2";
+import { Struct, createStructFactory, Box, getValuesByType, getValueById, updateStructProperty, updateStruct } from "aerial-common2";
 import { SyntheticEnvWindow } from "../environment";
 
-export enum DOMNodeTypes = {
+export const SYNTHETIC_BROWSER_STORE = "SYNTHETIC_BROWSER_STORE";
+export const SYNTHETIC_BROWSER = "SYNTHETIC_BROWSER";
+export const SYNTHETIC_DOCUMENT = "SYNTHETIC_DOCUMENT";
+export const SYNTHETIC_TEXT_NODE = "SYNTHETIC_TEXT_NODE";
+export const SYNTHETIC_WINDOW = "SYNTHETIC_WINDOW";
+export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
+
+export enum DOMNodeTypes {
   
 }
 
@@ -12,15 +19,15 @@ export type SyntheticNode = {
 
 export type SyntheticDocument = {
 
-} & SyntheticDOMNode;
+} & SyntheticNode;
 
 export type SyntheticHTMLElement = {
 
-} & SyntheticDOMNode;
+} & SyntheticNode;
 
 export type SyntheticValueNode = {
   nodeValue: string;
-} & SyntheticDOMNode;
+} & SyntheticNode;
 
 export type SyntheticComment = {
 
@@ -32,7 +39,9 @@ export type SyntheticTextNode = {
 
 export type SyntheticWindow = {
   context: SyntheticEnvWindow;
+  location: string;
   document: SyntheticDocument;
+  box: Box;
 } & Struct;
 
 export type SyntheticBrowser = {
@@ -40,6 +49,35 @@ export type SyntheticBrowser = {
 } & Struct;
 
 export type SyntheticBrowserStore = {
-  syntheticBrowsers: SyntheticBrowser[]
+  browsers: SyntheticBrowser[]
 } & Struct;
 
+export const createSyntheticWindow = createStructFactory<SyntheticWindow>(SYNTHETIC_WINDOW, {
+
+});
+
+export const createSyntheticBrowser = createStructFactory<SyntheticBrowser>(SYNTHETIC_BROWSER, {
+  windows: []
+});
+
+
+export const createSyntheticBrowserStore = createStructFactory<SyntheticBrowserStore>(SYNTHETIC_BROWSER_STORE, {
+  browsers: []
+});
+
+export const addNewSyntheticBrowser = (root: any) => {
+  const store = getSyntheticBrowserStore(root);
+  const syntheticBrowser = createSyntheticBrowser();
+  return {
+    root: updateStruct(root, store, {
+      ...store,
+      browsers: [...store.browsers, syntheticBrowser]
+    }),
+    syntheticBrowser
+  };
+}
+
+export const getSyntheticBrowserStore = (root: any): SyntheticBrowserStore => getValuesByType(root, SYNTHETIC_BROWSER_STORE)[0];
+
+export const getSyntheticBrowser = (root: any, id: string): SyntheticBrowser => getValueById(root, id);
+export const getSyntheticWindow = (root: any, id: string): SyntheticWindow => getValueById(root, id);

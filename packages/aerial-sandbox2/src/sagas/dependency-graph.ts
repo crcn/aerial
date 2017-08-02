@@ -1,6 +1,6 @@
-import { fork, take, put, call } from "redux-saga/effects";
+import { fork, take, put, call, select } from "redux-saga/effects";
 import { takeRequest, request, getValuesByType, watch } from "aerial-common2";
-import { hasURIProtocol, getDependencyGraph, DependencyGraph, Dependency, LoadedDependencyContentResult, DependencyStatus } from "../state";
+import { hasURIProtocol, getDependencyGraph, DependencyGraph, Dependency, LoadedDependencyContentResult, DependencyStatus, getDependency } from "../state";
 import * as Url from "url";
 import * as md5 from "md5";
 import * as path from "path";
@@ -40,7 +40,8 @@ function* handleAddDependency() {
     yield takeRequest(ADD_DEPENDENCY, function*({ uri, originUri }: AddDependencyRequest) {
       const { payload: resolvedDependencyInfo } = (yield yield request(createResolveDependencyRequest(uri, originUri))) as ResolveDependencyResponse;
       yield put(createDependencyCreatedEvent(resolvedDependencyInfo));
-      return resolvedDependencyInfo;
+      
+      return getDependency(yield select(), resolvedDependencyInfo.hash);
     });
   }
 }
@@ -62,7 +63,7 @@ function* handleIdleDependencies() {
 function* loadDependency(dep: Dependency) {
   const { payload: readResult } = yield yield request(createReadUriRequest(dep.uri));
   
-  const { payload: loadedResult } = (yield yield request(createLoadDependencyContentRequest(readResult.content, readResult.type, dep.contentLoaderOptions))) as LoadedDependencyContentResponse;
+  const { payload: loadedResult } = (yield yield request(createLoadDependencyContentRequest(dep, readResult.content, readResult.type, dep.contentLoaderOptions))) as LoadedDependencyContentResponse;
 
   // save current snapshot
   yield put(createDependencyContentLoadedEvent(dep.$$id, loadedResult));
@@ -128,12 +129,12 @@ function* handleDefaultDependencyGraphStragy(options = { rootDirectoryUri: null 
 
   yield fork(function* handleLoadContent() {
     while(true) {
-      yield takeRequest(LOAD_DEPENDENCY_CONTENT, function*({ content, contentType, options }: LoadDependencyContentRequest) {
+      yield takeRequest(LOAD_DEPENDENCY_CONTENT, function*({ dependency, content, contentType, options }: LoadDependencyContentRequest) {
         let currentContent     = content;
         let currentContentType = contentType;
         let importedDependencyUris = [];
         while(true) {
-          const { payload } = yield yield request(createDefaultGraphStrategyLoadContentRequest(content, contentType));
+          const { payload } = yield yield request(createDefaultGraphStrategyLoadContentRequest(dependency, content, contentType));
 
           importedDependencyUris = [...importedDependencyUris, ...(payload.importedDependencyUris || [])];
           
