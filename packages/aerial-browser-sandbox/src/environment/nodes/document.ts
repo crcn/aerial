@@ -2,11 +2,16 @@ import { weakMemo } from "aerial-common2";
 import { getSEnvNodeClass } from "./node";
 import {getSEnvParentNodeClass } from "./parent-node";
 import { getL3EventClasses } from "../level3";
+import { getSEnvTextClass } from "./text";
+import { getSEnvCommentClass } from "./comment";
+import { SEnvNodeTypes } from "../constants";
 
-export const getSEnvDocumentClass = weakMemo((window: Window) => {
-  const SEnvNode = getSEnvNodeClass(window);
-  const SEnvParentNode = getSEnvParentNodeClass(window);
-  const { SEnvMutationEvent } = getL3EventClasses(window);
+export const getSEnvDocumentClass = weakMemo((context: any) => {
+  const SEnvNode = getSEnvNodeClass(context);
+  const SEnvParentNode = getSEnvParentNodeClass(context);
+  const SEnvText = getSEnvTextClass(context);
+  const SEnvComment = getSEnvCommentClass(context);
+  const { SEnvMutationEvent } = getL3EventClasses(context);
 
   const eventMap = {
     MutationEvent:  SEnvMutationEvent
@@ -19,6 +24,7 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
     alinkColor: string;
     
     readonly all: HTMLAllCollection;
+    readonly nodeType: number = SEnvNodeTypes.DOCUMENT;
     
     anchors: HTMLCollectionOf<HTMLAnchorElement>;
     
@@ -40,8 +46,6 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
     dir: string;
     
     readonly doctype: DocumentType;
-    
-    documentElement: HTMLElement;
     
     domain: string;
     
@@ -71,7 +75,6 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
     msCapsLockWarningOff: boolean;
     msCSSOMElementFloatMetrics: boolean;
 
-    readonly children: HTMLCollection;
     readonly firstElementChild: Element | null;
     readonly lastElementChild: Element | null;
     readonly childElementCount: number;
@@ -82,10 +85,13 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
       super();
     }
 
+    get documentElement(): HTMLElement {
+      return this.children[0] as HTMLElement;
+    }
+
     elementsFromPoint(x: number, y: number) {
       return null;
     }
-    
     
     onabort: (this: Document, ev: UIEvent) => any;
     
@@ -306,7 +312,7 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
     }
     
     createComment(data: string): Comment {
-      return null;
+      return new SEnvComment(data);
     }
     
     createDocumentFragment(): DocumentFragment {
@@ -479,7 +485,7 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
     }
     
     createTextNode(data: string): Text {
-      return null;
+      return new SEnvText(data);
     }
     createTouch(view: Window, target: EventTarget, identifier: number, pageX: number, pageY: number, screenX: number, screenY: number): Touch {
       return null;
@@ -602,10 +608,6 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
     
     writeln(...content: string[]): void {
       
-    }
-    addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, useCapture?: boolean): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void {
-
     }
   };
 })

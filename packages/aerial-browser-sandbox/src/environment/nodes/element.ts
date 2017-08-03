@@ -1,9 +1,27 @@
 import { weakMemo } from "aerial-common2";
 import { getSEnvNodeClass } from "./node";
+import { SEnvNodeTypes } from "../constants";
+import { getSEnvHTMLCollectionClasses } from "./collections";
+import { getSEnvParentNodeClass } from "./parent-node";
 
-export const getSEnvElementClass = weakMemo((window: Window) => {
-  const SEnvNode = getSEnvNodeClass(window);
-  return class SEnvElement extends SEnvNode implements Element {
+export const getSEnvAttr = weakMemo((context: any) => {
+  const SEnvNode = getSEnvNodeClass(context);
+  return class SEnvAttr extends SEnvNode implements Attr {
+    readonly prefix: string | null;
+    readonly specified: boolean;
+    constructor(readonly name: string, public value: string, readonly ownerElement: Element) {
+      super();
+    }
+  }
+});
+
+export const getSEnvElementClass = weakMemo((context: any) => {
+  const SEnvAttr = getSEnvAttr(context);
+  const SEnvNode = getSEnvNodeClass(context);
+  const SEnvParentNode = getSEnvParentNodeClass(context);
+  const { SEnvNamedNodeMap } = getSEnvHTMLCollectionClasses(context);
+
+  return class SEnvElement extends SEnvParentNode implements Element {
 
     readonly classList: DOMTokenList;
     className: string;
@@ -11,8 +29,10 @@ export const getSEnvElementClass = weakMemo((window: Window) => {
     readonly clientLeft: number;
     readonly clientTop: number;
     readonly clientWidth: number;
+    readonly attributes: NamedNodeMap;
+    readonly nodeType: number = SEnvNodeTypes.ELEMENT;
     id: string;
-    innerHTML: string;
+
     msContentZoomFactor: number;
     readonly msRegionOverflow: string;
     readonly children: HTMLCollection;
@@ -66,7 +86,6 @@ export const getSEnvElementClass = weakMemo((window: Window) => {
     ontouchstart: (ev: TouchEvent) => any;
     onwebkitfullscreenchange: (this: Element, ev: Event) => any;
     onwebkitfullscreenerror: (this: Element, ev: Event) => any;
-    outerHTML: string;
     readonly prefix: string | null;
     readonly scrollHeight: number;
     scrollLeft: number;
@@ -76,6 +95,21 @@ export const getSEnvElementClass = weakMemo((window: Window) => {
     readonly assignedSlot: HTMLSlotElement | null;
     slot: string;
     readonly shadowRoot: ShadowRoot | null;
+
+    constructor() {
+      super();
+      this.nodeType = SEnvNodeTypes.ELEMENT;
+
+      this.attributes = new Proxy(new SEnvNamedNodeMap(), {
+        get: (target: NamedNodeMap, key: string)  => {
+          return target.getNamedItem(key);
+        },
+        set: (target, key: string, value: string, receiver)  => {
+          target.setNamedItem(new SEnvAttr(key, value, this));
+          return true;
+        }
+      });
+    }
 
     getAttribute(name: string): string | null { 
       return null;
@@ -99,6 +133,26 @@ export const getSEnvElementClass = weakMemo((window: Window) => {
     
     getClientRects(): ClientRectList { 
       return null;
+    }
+
+    get outerHTML(): string {
+      let buffer = `<${this.nodeName}`;
+      for (const name in this.attributes) {
+        buffer += ` ${name}=${this.attributes[name].value}`;
+      }
+      buffer += `>${this.innerHTML}</${this.nodeName}>`;
+      return buffer;
+    }
+
+    get innerHTML(): string {
+      return Array.prototype.map.call(this.childNodes, (child: Node) => {
+        switch(child.nodeType) {
+          case SEnvNodeTypes.TEXT: return (child as Text).nodeValue;
+          case SEnvNodeTypes.COMMENT: return `<!--${(child as Comment).nodeValue}-->`;
+          case SEnvNodeTypes.ELEMENT: return (child as Element).outerHTML;
+        }
+        return "";
+      }).join("");
     }
     
     getElementsByTagName<K extends keyof ElementListTagNameMap>(name: K): ElementListTagNameMap[K];

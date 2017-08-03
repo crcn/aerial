@@ -4,12 +4,12 @@ import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getL3EventClasses } from "../level3";
 
-export const getSEnvParentNodeClass = weakMemo((window: Window) => {
+export const getSEnvParentNodeClass = weakMemo((context: any) => {
 
-  const SEnvNode = getSEnvNodeClass(window);
-  const { SEnvDOMException } = getDOMExceptionClasses(window);
-  const { SEnvHTMLCollection } =  getSEnvHTMLCollectionClasses(window);
-  const { SEnvMutationEvent } = getL3EventClasses(window);
+  const SEnvNode = getSEnvNodeClass(context);
+  const { SEnvDOMException } = getDOMExceptionClasses(context);
+  const { SEnvHTMLCollection } =  getSEnvHTMLCollectionClasses(context);
+  const { SEnvMutationEvent } = getL3EventClasses(context);
 
 
   return class SEnvParentNode extends SEnvNode implements ParentNode {
@@ -20,6 +20,9 @@ export const getSEnvParentNodeClass = weakMemo((window: Window) => {
     }
     appendChild<T extends Node>(child: T) {
       this.$childNodesArray.push(child);
+      const event = new  SEnvMutationEvent();
+      event.initMutationEvent("DOMNodeInserted", true, true, child, null, null, null, -1);
+      this.dispatchEvent(event);
       return child;
     }
     removeChild<T extends Node>(child: T) {
@@ -28,9 +31,8 @@ export const getSEnvParentNodeClass = weakMemo((window: Window) => {
         throw new SEnvDOMException("The node to be removed is not a child of this node.");
       }
       this.$childNodesArray.splice(index, 1);
-      const event = document.createEvent("MutationEvent");
-      console.log(event);
-      event.initMutationEvent("DOMNodeInserted", true, true, this)
+      const event = new SEnvMutationEvent();
+      event.initMutationEvent("DOMNodeRemoved", true, true, child, null, null, null, -1);
       this.dispatchEvent(event);
       return child;
     }

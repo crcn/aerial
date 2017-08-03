@@ -16,9 +16,6 @@ import {
   createNewSyntheticWindowEntryResolvedEvent
 } from "../actions";
 
-import {
-  SEnvWindow
-} from "../environment";
 
 import { 
   watch,
@@ -77,7 +74,7 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
 
 function* handleSytheticWindowSession(syntheticWindowId: string) {
 
-  let env: SEnvWindow;
+  // let env: SEnvWindow;
 
   yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
     if (!syntheticWindow) return false;

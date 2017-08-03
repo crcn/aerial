@@ -4,12 +4,12 @@ import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 
-export const getSEnvNodeClass = weakMemo((window: Window) => {
+export const getSEnvNodeClass = weakMemo((context: any) => {
   
-  const SEnvEventTarget = getSEnvEventTargetClass(window);
-  const SEnvNamedNodeMap = getSEnvNamedNodeMapClass(window);
-  const { SEnvNodeList } =  getSEnvHTMLCollectionClasses(window);
-  const { SEnvDOMException } =  getDOMExceptionClasses(window);
+  const SEnvEventTarget = getSEnvEventTargetClass(context);
+  const SEnvNamedNodeMap = getSEnvNamedNodeMapClass(context);
+  const { SEnvNodeList } =  getSEnvHTMLCollectionClasses(context);
+  const { SEnvDOMException } =  getDOMExceptionClasses(context);
 
   return class SEnvNode extends SEnvEventTarget implements Node {
 
@@ -24,7 +24,7 @@ export const getSEnvNodeClass = weakMemo((window: Window) => {
     readonly nodeName: string;
     readonly nodeType: number;
     nodeValue: string | null;
-    readonly ownerDocument: Document = window.document;
+    readonly ownerDocument: Document;
     readonly parentElement: HTMLElement | null;
     readonly parentNode: Node | null;
     readonly previousSibling: Node | null;

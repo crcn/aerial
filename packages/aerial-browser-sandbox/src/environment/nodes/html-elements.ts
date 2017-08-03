@@ -2,9 +2,9 @@ import { getSEnvNodeClass } from "./node";
 import { getSEnvElementClass } from "./element";
 import { weakMemo } from "aerial-common2";
 
-export const getSEnvHTMLElementClass = weakMemo((window: Window) => {
-  const SEnvNode = getSEnvNodeClass(window);
-  const SEnvElement = getSEnvElementClass(window);
+export const getSEnvHTMLElementClass = weakMemo((context: any) => {
+  const SEnvNode = getSEnvNodeClass(context);
+  const SEnvElement = getSEnvElementClass(context);
   
   return class SEnvHTMLElement extends SEnvElement implements HTMLElement {
 

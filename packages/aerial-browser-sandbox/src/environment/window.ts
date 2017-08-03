@@ -10,7 +10,16 @@ export type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response
 
 
 export const getSEnvWindowClass = weakMemo((context: any) => {
+
   const SEnvEventTarget = getSEnvEventTargetClass(context);
+  const SEnvDocument = getSEnvDocumentClass(context);
+  const SEnvLocation = getSEnvLocationClass(context);
+  const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(context);
+  const SEnvElement     = getSEnvElementClass(context);
+  const SEnvHTMLElement = getSEnvHTMLElementClass(context);
+
+  // register default HTML tag names
+  const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
   
   return class SEnvWindow extends SEnvEventTarget implements Window {
 
@@ -176,33 +185,21 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
     readonly customElements: CustomElementRegistry;
 
     // classes
-    readonly EventTarget: typeof EventTarget;
-    readonly Location: typeof Location;
-    readonly Element: typeof Element;
-    readonly HTMLElement: typeof HTMLElement;
+    readonly EventTarget: typeof EventTarget = SEnvEventTarget;
+    readonly Element: typeof Element = SEnvElement;
+    readonly HTMLElement: typeof HTMLElement = SEnvHTMLElement;
 
     fetch: Fetch;
     
-    constructor(readonly $$id: string, location: string, readonly $$dispatch: Dispatcher<any>) {
+    constructor(readonly $$id: string, origin: string, readonly $$dispatch: Dispatcher<any>) {
       super();
       
-      const SEnvDocument = getSEnvDocumentClass(this);
-      const SEnvLocation = getSEnvLocationClass(this);
-      const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(this);
-
-      // define classes on the window object
-      this.EventTarget = SEnvEventTarget;
-      this.Element     = getSEnvElementClass(this);
-      this.HTMLElement = getSEnvHTMLElementClass(this);
-
-      this.location = new SEnvLocation(location);
+      this.location = new SEnvLocation(origin);
       this.document = new SEnvDocument(this);
-      
-      // register default HTML tag names
-      const tagNameMap = getSEnvHTMLElementClasses(this);
+
       const customElements = this.customElements = new SEnvCustomElementRegistry(this);
-      for (const tagName in tagNameMap) {
-        customElements.define(tagName, tagNameMap[tagName]);
+      for (const tagName in TAG_NAME_MAP) {
+        customElements.define(tagName, TAG_NAME_MAP[tagName]);
       }
     }
     alert(message?: any): void { }

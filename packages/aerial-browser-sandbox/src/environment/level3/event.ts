@@ -1,24 +1,31 @@
 import { weakMemo } from "aerial-common2";
 import { getEventClasses } from "../events";
 
-export const getL3EventClasses = weakMemo((window: Window) => {
-  const { SEnvEvent } = getEventClasses(window);
+export const getL3EventClasses = weakMemo((context: any) => {
+  const { SEnvEvent } = getEventClasses(context);
   class SEnvMutationEvent extends SEnvEvent implements MutationEvent {
-    readonly attrChange: number;
-    readonly attrName: string;
-    readonly newValue: string;
-    readonly prevValue: string;
-    readonly relatedNode: Node;
-    initMutationEvent(typeArg: string, canBubbleArg: boolean, cancelableArg: boolean, relatedNodeArg: Node, prevValueArg: string, newValueArg: string, attrNameArg: string, attrChangeArg: number): void {
-      super.initEvent(typeArg, canBubbleArg, cancelableArg);
-    }
+
+    // public is fine here since MutationEvent interface is used -- these
+    // props are typically readonly
+    public attrChange: number;
+    public attrName: string;
+    public newValue: string;
+    public prevValue: string;
+    public relatedNode: Node;
+
     readonly ADDITION: number;
     readonly MODIFICATION: number;
     readonly REMOVAL: number;
 
-    constructor(type: string, eventInitDict?: EventInit) {
-      super();
+    initMutationEvent(typeArg: string, canBubbleArg: boolean, cancelableArg: boolean, relatedNodeArg: Node, prevValueArg: string, newValueArg: string, attrNameArg: string, attrChangeArg: number): void {
+      super.initEvent(typeArg, canBubbleArg, cancelableArg);
+      this.relatedNode = relatedNodeArg;
+      this.prevValue = prevValueArg;
+      this.newValue = newValueArg;
+      this.attrName = attrNameArg;
+      this.attrChange = attrChangeArg;
     }
+    
   }
 
   return {

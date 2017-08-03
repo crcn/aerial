@@ -1,8 +1,8 @@
 import { weakMemo } from "aerial-common2";
 import { getSEnvEventTargetClass } from "../events";
 
-export const getSEnvNamedNodeMapClass = weakMemo((window: Window) => {
-  const SEnvEventTarget = getSEnvEventTargetClass(window);
+export const getSEnvNamedNodeMapClass = weakMemo((context: any) => {
+  const SEnvEventTarget = getSEnvEventTargetClass(context);
 
   return class SEnvNamedNodeMap implements NamedNodeMap {
     readonly length: number;

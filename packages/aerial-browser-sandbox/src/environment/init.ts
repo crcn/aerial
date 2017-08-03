@@ -19,7 +19,6 @@ const loadSyntheticWindow = async (window: Window) =>{
   const response = await window.fetch(window.location.origin);
   const content  = await response.text();
   await loadDocument(window, window.document, parseHTML(content));
-  console.log(window.document);
 };
 
 const loadDocument = async (window: Window, document: Document, expression: parse5.AST.Default.Document) => {
@@ -47,7 +46,7 @@ const createNode = (document: Document, expression: parse5.AST.Default.Node) => 
     case "#text": {
       return document.createTextNode((expression as parse5.AST.Default.TextNode).value);
     }
-    case "#text": {
+    case "#comment": {
       return document.createComment((expression as parse5.AST.Default.CommentNode).data);
     }
     case "#documentType": {

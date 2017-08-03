@@ -2,7 +2,7 @@ import Url =  require("url");
 import path = require("path");
 import { weakMemo } from "aerial-common2";
 
-export const getSEnvLocationClass = weakMemo((window: Window) => {
+export const getSEnvLocationClass = weakMemo((context: any) => {
 
   return class SEnvLocation implements Location {
 
