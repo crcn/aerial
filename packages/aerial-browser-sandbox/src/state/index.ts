@@ -1,5 +1,5 @@
 import { Struct, createStructFactory, Box, getValuesByType, getValueById, updateStructProperty, updateStruct } from "aerial-common2";
-import { SyntheticEnvWindow } from "../environment";
+import { SEnvWindow } from "../environment";
 
 export const SYNTHETIC_BROWSER_STORE = "SYNTHETIC_BROWSER_STORE";
 export const SYNTHETIC_BROWSER = "SYNTHETIC_BROWSER";
@@ -38,7 +38,7 @@ export type SyntheticTextNode = {
 } & SyntheticValueNode;
 
 export type SyntheticWindow = {
-  context: SyntheticEnvWindow;
+  context: SEnvWindow;
   location: string;
   document: SyntheticDocument;
   box: Box;

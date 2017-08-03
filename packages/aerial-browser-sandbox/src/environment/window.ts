@@ -1,34 +1,27 @@
-import { Dispatcher } from "aerial-common2";
-import { SyntheticLocation } from "./location";
-import { SyntheticEnvDocument } from "./document";
+import { Dispatcher, weakMemo } from "aerial-common2";
+import { getSEnvLocationClass } from "./location";
+import { getSEnvDocumentClass } from "./document";
+import { getSEnvEventTargetClass } from "./events";
+import { getSEnvHTMLElementClasses } from "./html";
+import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 
 type OpenTarget = "_self" | "_blank";
 
-/**
- */
+export type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 
-export class SyntheticEnvWindow /*implements Window*/ {
 
-  readonly document: SyntheticEnvDocument;
-  readonly location: SyntheticLocation;
+export const getSEnvWindowClass = weakMemo((context: any) => {
+  const SEnvEventTarget = getSEnvEventTargetClass(context);
   
-  constructor(readonly $$id: string, location: string, readonly $$dispatch: Dispatcher<any>) {
-    this.document = new SyntheticEnvDocument(this);
-    this.location = new SyntheticLocation(location);
-    // this.location
-  }
+  return class SEnvWindow extends SEnvEventTarget implements Window {
 
-  public close() {
-    // TODO - close environment
-  }
-  
-  public open(location: string, target: OpenTarget = "_blank") {
+    readonly location: Location;
 
-  }
-
-  /* 
-  TO IMPLEMENT:
-  readonly applicationCache: ApplicationCache;
+    readonly sessionStorage: Storage;
+    readonly localStorage: Storage;
+    readonly console: Console;
+    readonly indexedDB: IDBFactory;
+    readonly applicationCache: ApplicationCache;
     readonly caches: CacheStorage;
     readonly clientInformation: Navigator;
     readonly closed: boolean;
@@ -46,7 +39,6 @@ export class SyntheticEnvWindow /*implements Window*/ {
     readonly innerWidth: number;
     readonly isSecureContext: boolean;
     readonly length: number;
-    readonly location: Location;
     readonly locationbar: BarProp;
     readonly menubar: BarProp;
     readonly msContentScript: ExtensionScriptApis;
@@ -145,6 +137,15 @@ export class SyntheticEnvWindow /*implements Window*/ {
     onunload: (this: Window, ev: Event) => any;
     onvolumechange: (this: Window, ev: Event) => any;
     onwaiting: (this: Window, ev: Event) => any;
+    onpointercancel: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onpointerdown: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onpointerenter: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onpointerleave: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onpointermove: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onpointerout: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onpointerover: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onpointerup: (this: GlobalEventHandlers, ev: PointerEvent) => any;
+    onwheel: (this: GlobalEventHandlers, ev: WheelEvent) => any;
     opener: any;
     orientation: string | number;
     readonly outerHeight: number;
@@ -170,47 +171,208 @@ export class SyntheticEnvWindow /*implements Window*/ {
     readonly toolbar: BarProp;
     readonly top: Window;
     readonly window: Window;
+    readonly HTMLElement: typeof HTMLElement;
+    readonly HTMLDivElement: typeof HTMLDivElement;
+    readonly HTMLSpanElement: typeof HTMLSpanElement;;
     URL: typeof URL;
     URLSearchParams: typeof URLSearchParams;
     Blob: typeof Blob;
-    customElements: CustomElementRegistry;
-    alert(message?: any): void;
-    blur(): void;
-    cancelAnimationFrame(handle: number): void;
-    captureEvents(): void;
-    close(): void;
-    confirm(message?: string): boolean;
-    departFocus(navigationReason: NavigationReason, origin: FocusNavigationOrigin): void;
-    focus(): void;
-    getComputedStyle(elt: Element, pseudoElt?: string): CSSStyleDeclaration;
-    getMatchedCSSRules(elt: Element, pseudoElt?: string): CSSRuleList;
-    getSelection(): Selection;
-    matchMedia(mediaQuery: string): MediaQueryList;
-    moveBy(x?: number, y?: number): void;
-    moveTo(x?: number, y?: number): void;
-    msWriteProfilerMark(profilerMarkName: string): void;
-    open(url?: string, target?: string, features?: string, replace?: boolean): Window;
-    postMessage(message: any, targetOrigin: string, transfer?: any[]): void;
-    print(): void;
-    prompt(message?: string, _default?: string): string | null;
-    releaseEvents(): void;
-    requestAnimationFrame(callback: FrameRequestCallback): number;
-    resizeBy(x?: number, y?: number): void;
-    resizeTo(x?: number, y?: number): void;
-    scroll(x?: number, y?: number): void;
-    scrollBy(x?: number, y?: number): void;
-    scrollTo(x?: number, y?: number): void;
-    stop(): void;
-    webkitCancelAnimationFrame(handle: number): void;
-    webkitConvertPointFromNodeToPage(node: Node, pt: WebKitPoint): WebKitPoint;
-    webkitConvertPointFromPageToNode(node: Node, pt: WebKitPoint): WebKitPoint;
-    webkitRequestAnimationFrame(callback: FrameRequestCallback): number;
-    createImageBitmap(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | ImageData | Blob, options?: ImageBitmapOptions): Promise<ImageBitmap>;
-    createImageBitmap(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | ImageData | Blob, sx: number, sy: number, sw: number, sh: number, options?: ImageBitmapOptions): Promise<ImageBitmap>;
-    scroll(options?: ScrollToOptions): void;
-    scrollTo(options?: ScrollToOptions): void;
-    scrollBy(options?: ScrollToOptions): void;
-    addEventListener<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, useCapture?: boolean): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;*/
+    readonly customElements: CustomElementRegistry;
+    
+    constructor(readonly $$id: string, location: string, readonly $$dispatch: Dispatcher<any>) {
+      super();
 
-}
+      const SEnvDocument = getSEnvDocumentClass(this);
+      this.document = new SEnvDocument(this);
+      
+      const SEnvLocation = getSEnvLocationClass(this);
+      const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(this);
+      const {
+        SEnvHTMLElement,
+        SEnvHTMLDivElement,
+        SEnvHTMLSpanElement,
+        SEnvHTMLHeadElement,
+        SEnvHTMLBodyElement,
+        SEnvHTMLHtmlElement,
+        SEnvHTMLTitleElement,
+      } = getSEnvHTMLElementClasses(this);
+
+      this.location = new SEnvLocation(location);
+
+      const customElements = this.customElements = new SEnvCustomElementRegistry(this);
+
+      customElements.define("html", SEnvHTMLHtmlElement);
+      customElements.define("head", SEnvHTMLHeadElement);
+      customElements.define("title", SEnvHTMLTitleElement);
+      customElements.define("body", SEnvHTMLBodyElement);
+      customElements.define("div", SEnvHTMLDivElement);
+      customElements.define("span", SEnvHTMLSpanElement);
+      // this.location
+    }
+
+
+
+    alert(message?: any): void {
+
+    }
+
+    blur(): void {
+
+    }
+
+    cancelAnimationFrame(handle: number): void {
+
+    }
+
+    captureEvents(): void {
+
+    }
+
+    close(): void {
+
+    }
+
+    confirm(message?: string): boolean {
+      return false;
+    }
+
+    atob(encodedString: string): string {
+      return null;
+    }
+
+    btoa(rawString: string): string {
+      return null;
+    }
+
+    fetch: Fetch;
+
+    departFocus(navigationReason: NavigationReason, origin: FocusNavigationOrigin): void {
+      
+    }
+
+    focus(): void {
+
+    }
+    getComputedStyle(elt: Element, pseudoElt?: string): CSSStyleDeclaration {
+      return null;
+    }
+
+    getMatchedCSSRules(elt: Element, pseudoElt?: string): CSSRuleList {
+      return null;
+    }
+
+    getSelection(): Selection {
+      return null;
+    }
+
+    matchMedia(mediaQuery: string): MediaQueryList {
+      return null;
+    }
+
+    clearInterval(handle: number): void {
+
+    }
+
+    clearTimeout(handle: number): void {
+
+    }
+
+    setInterval(...args): number {
+      return 0;
+    }
+
+
+    setTimeout(...args): number {
+      return 0;
+    }
+
+    clearImmediate(handle: number): void {
+
+    }
+
+    setImmediate(): number {
+      return -1;
+    }
+
+    moveBy(x?: number, y?: number): void {
+
+    }
+
+    moveTo(x?: number, y?: number): void {
+
+    }
+
+    msWriteProfilerMark(profilerMarkName: string): void {
+
+    }
+
+    open(url?: string, target?: string, features?: string, replace?: boolean): Window {
+      return null;
+    }
+
+    postMessage(message: any, targetOrigin: string, transfer?: any[]): void {
+
+    }
+
+    print(): void {
+
+    }
+
+    prompt(message?: string, _default?: string): string | null {
+      return null;
+    }
+
+    releaseEvents(): void {
+
+    }
+
+    requestAnimationFrame(callback: FrameRequestCallback): number {
+      return -1;
+    }
+
+    resizeBy(x?: number, y?: number): void {
+
+    }
+
+    resizeTo(x?: number, y?: number): void {
+
+    }
+
+    scroll(...args): void {
+
+    }
+
+    scrollBy(...args): void {
+
+    }
+
+    scrollTo(...args): void {
+
+    }
+
+    stop(): void {
+
+    }
+
+    webkitCancelAnimationFrame(handle: number): void {
+
+    }
+
+    webkitConvertPointFromNodeToPage(node: Node, pt: WebKitPoint): WebKitPoint {
+      return null;
+    }
+
+    webkitConvertPointFromPageToNode(node: Node, pt: WebKitPoint): WebKitPoint {
+      return null;
+    }
+
+    webkitRequestAnimationFrame(callback: FrameRequestCallback): number {
+      return -1;
+    }
+
+    createImageBitmap(...args) {
+      return Promise.reject(null);
+    }
+
+  }
+});

@@ -13,7 +13,7 @@ LITMUS:
 
 let loadedUris = [];
 function*() {
-  const window = new SyntheticEnvWindow();
+  const window = new SEnvWindow();
   yield fork(window.saga);
   yield fork(window.open, "http://google.com");
 
