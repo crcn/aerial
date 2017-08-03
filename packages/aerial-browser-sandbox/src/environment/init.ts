@@ -34,13 +34,13 @@ const loadNode = async (document: Document, expression: parse5.AST.Default.Node)
     await loadChildNodes(node as Element, expression as parse5.AST.Default.Element);
   }
   return node;
-}
+};
 
 const loadChildNodes = async (parentElement: Element, expression: parse5.AST.Default.ParentNode) => {
   for (const childExpression of expression.childNodes) {
     parentElement.appendChild(await loadNode(parentElement.ownerDocument, childExpression));
   }
-}
+};
 
 const createNode = (document: Document, expression: parse5.AST.Default.Node) => {
   switch(expression.nodeName) {
@@ -63,7 +63,7 @@ const createNode = (document: Document, expression: parse5.AST.Default.Node) => 
       return element;
     }
   }
-}
+};
 
 const parseHTML = weakMemo((content: string) => {
   const ast = parse5.parse(content, { locationInfo: true });

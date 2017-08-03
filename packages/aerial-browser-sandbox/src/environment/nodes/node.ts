@@ -1,19 +1,23 @@
 import { weakMemo } from "aerial-common2";
+import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
+import { getSEnvHTMLCollectionClasses } from "./collections";
 
 export const getSEnvNodeClass = weakMemo((window: Window) => {
   
   const SEnvEventTarget = getSEnvEventTargetClass(window);
   const SEnvNamedNodeMap = getSEnvNamedNodeMapClass(window);
+  const { SEnvNodeList } =  getSEnvHTMLCollectionClasses(window);
+  const { SEnvDOMException } =  getDOMExceptionClasses(window);
 
   return class SEnvNode extends SEnvEventTarget implements Node {
 
     readonly attributes: NamedNodeMap;
     readonly baseURI: string | null;
     readonly childNodes: NodeList;
-    readonly firstChild: Node | null;
-    readonly lastChild: Node | null;
+    readonly firstChild: Node | null = null;
+    readonly lastChild: Node | null = null;
     readonly localName: string | null;
     readonly namespaceURI: string | null;
     readonly nextSibling: Node | null;
@@ -44,11 +48,20 @@ export const getSEnvNodeClass = weakMemo((window: Window) => {
     readonly PROCESSING_INSTRUCTION_NODE: number;
     readonly TEXT_NODE: number;
 
+    protected $childNodesArray: Node[];
+
+    constructor() {
+      super();
+      this.childNodes = this.$childNodesArray = new SEnvNodeList();
+    }
+
     appendChild<T extends Node>(newChild: T): T {
+      this._throwUnsupportedMethod();
       return null;
     }
 
     cloneNode(deep?: boolean): Node {
+      this._throwUnsupportedMethod();
       return null;
     }
 
@@ -69,6 +82,7 @@ export const getSEnvNodeClass = weakMemo((window: Window) => {
     }
 
     insertBefore<T extends Node>(newChild: T, refChild: Node | null): T {
+      this._throwUnsupportedMethod();
       return null;
     }
     isDefaultNamespace(namespaceURI: string | null): boolean {
@@ -91,16 +105,20 @@ export const getSEnvNodeClass = weakMemo((window: Window) => {
       return null;
     }
 
-    normalize(): void {
-
-    }
+    normalize(): void { }
 
     removeChild<T extends Node>(oldChild: T): T {
+      this._throwUnsupportedMethod();
       return null;
     }
 
     replaceChild<T extends Node>(newChild: Node, oldChild: T): T {
+      this._throwUnsupportedMethod();
       return null;
+    }
+
+    private _throwUnsupportedMethod() {
+      throw new SEnvDOMException("This node type does not support this method.");
     }
   }
 });

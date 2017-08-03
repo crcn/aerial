@@ -1,8 +1,7 @@
 import { Dispatcher, weakMemo } from "aerial-common2";
 import { getSEnvLocationClass } from "./location";
-import { getSEnvDocumentClass } from "./document";
 import { getSEnvEventTargetClass } from "./events";
-import { getSEnvHTMLElementClasses } from "./html";
+import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 
 type OpenTarget = "_self" | "_blank";
@@ -171,66 +170,46 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
     readonly toolbar: BarProp;
     readonly top: Window;
     readonly window: Window;
-    readonly HTMLElement: typeof HTMLElement;
-    readonly HTMLDivElement: typeof HTMLDivElement;
-    readonly HTMLSpanElement: typeof HTMLSpanElement;;
     URL: typeof URL;
     URLSearchParams: typeof URLSearchParams;
     Blob: typeof Blob;
     readonly customElements: CustomElementRegistry;
+
+    // classes
+    readonly EventTarget: typeof EventTarget;
+    readonly Location: typeof Location;
+    readonly Element: typeof Element;
+    readonly HTMLElement: typeof HTMLElement;
+
+    fetch: Fetch;
     
     constructor(readonly $$id: string, location: string, readonly $$dispatch: Dispatcher<any>) {
       super();
-
-      const SEnvDocument = getSEnvDocumentClass(this);
-      this.document = new SEnvDocument(this);
       
+      const SEnvDocument = getSEnvDocumentClass(this);
       const SEnvLocation = getSEnvLocationClass(this);
       const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(this);
-      const {
-        SEnvHTMLElement,
-        SEnvHTMLDivElement,
-        SEnvHTMLSpanElement,
-        SEnvHTMLHeadElement,
-        SEnvHTMLBodyElement,
-        SEnvHTMLHtmlElement,
-        SEnvHTMLTitleElement,
-      } = getSEnvHTMLElementClasses(this);
+
+      // define classes on the window object
+      this.EventTarget = SEnvEventTarget;
+      this.Element     = getSEnvElementClass(this);
+      this.HTMLElement = getSEnvHTMLElementClass(this);
 
       this.location = new SEnvLocation(location);
-
+      this.document = new SEnvDocument(this);
+      
+      // register default HTML tag names
+      const tagNameMap = getSEnvHTMLElementClasses(this);
       const customElements = this.customElements = new SEnvCustomElementRegistry(this);
-
-      customElements.define("html", SEnvHTMLHtmlElement);
-      customElements.define("head", SEnvHTMLHeadElement);
-      customElements.define("title", SEnvHTMLTitleElement);
-      customElements.define("body", SEnvHTMLBodyElement);
-      customElements.define("div", SEnvHTMLDivElement);
-      customElements.define("span", SEnvHTMLSpanElement);
-      // this.location
+      for (const tagName in tagNameMap) {
+        customElements.define(tagName, tagNameMap[tagName]);
+      }
     }
-
-
-
-    alert(message?: any): void {
-
-    }
-
-    blur(): void {
-
-    }
-
-    cancelAnimationFrame(handle: number): void {
-
-    }
-
-    captureEvents(): void {
-
-    }
-
-    close(): void {
-
-    }
+    alert(message?: any): void { }
+    blur(): void { }
+    cancelAnimationFrame(handle: number): void { }
+    captureEvents(): void { }
+    close(): void { }
 
     confirm(message?: string): boolean {
       return false;
@@ -244,7 +223,6 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
       return null;
     }
 
-    fetch: Fetch;
 
     departFocus(navigationReason: NavigationReason, origin: FocusNavigationOrigin): void {
       

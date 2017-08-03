@@ -1,10 +1,18 @@
 import { weakMemo } from "aerial-common2";
-import { getSEnvNodeClass } from "./base";
+import { getSEnvNodeClass } from "./node";
+import {getSEnvParentNodeClass } from "./parent-node";
+import { getL3EventClasses } from "../level3";
 
 export const getSEnvDocumentClass = weakMemo((window: Window) => {
-  const SEnvNodeClass = getSEnvNodeClass(window);
+  const SEnvNode = getSEnvNodeClass(window);
+  const SEnvParentNode = getSEnvParentNodeClass(window);
+  const { SEnvMutationEvent } = getL3EventClasses(window);
 
-  return class SEnvDocument extends SEnvNodeClass implements Document {
+  const eventMap = {
+    MutationEvent:  SEnvMutationEvent
+  };
+
+  return class SEnvDocument extends SEnvParentNode implements Document {
     
     readonly activeElement: Element;
     
@@ -377,7 +385,8 @@ export const getSEnvDocumentClass = weakMemo((window: Window) => {
     createEvent(eventInterface: "WebGLContextEvent"): WebGLContextEvent;
     createEvent(eventInterface: "WheelEvent"): WheelEvent;
     createEvent(eventInterface: string): Event {
-      return null;
+      const eventClass = eventMap[eventInterface];
+      return eventClass && Object.create(eventClass.prototype);
     }
     
     createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
