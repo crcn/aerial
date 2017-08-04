@@ -220,10 +220,10 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
-    case PROMPTED_NEW_WINDOW_URL: {
-      const { workspaceId, location } = event as PromptedNewWindowUrl;
-      return applicationReducer(state, openSyntheticWindowRequested(getWorkspaceById(state, workspaceId).browser.$$id, location));
-    }
+    // case PROMPTED_NEW_WINDOW_URL: {
+    //   const { workspaceId, location } = event as PromptedNewWindowUrl;
+    //   return applicationReducer(state, openSyntheticWindowRequested(getWorkspaceById(state, workspaceId).browser.$$id, location));
+    // }
 
     case TOGGLE_LEFT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
@@ -260,18 +260,18 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       return moveItemFromAction(state, e.windowId, e);
     } 
 
-    case STAGE_TOOL_NODE_OVERLAY_CLICKED: {
-      const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayClicked;
-      const metaKey = sourceEvent.metaKey;
-      if (metaKey) {
-        const filesByUri = getAllFilesByPath(state);
-        const { $source: { uri } } = getValueById(state, nodeId) as SyntheticDOMNode2;
-        const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
-        return updateStructProperty(state, getSyntheticWindowWorkspace(state, windowId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
-      } else {
-        return handleWindowSelectionFromAction(state, nodeId, event as StageToolNodeOverlayClicked);
-      }
-    }
+    // case STAGE_TOOL_NODE_OVERLAY_CLICKED: {
+    //   const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayClicked;
+    //   const metaKey = sourceEvent.metaKey;
+    //   if (metaKey) {
+    //     const filesByUri = getAllFilesByPath(state);
+    //     const { $source: { uri } } = getValueById(state, nodeId) as SyntheticDOMNode2;
+    //     const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
+    //     return updateStructProperty(state, getSyntheticWindowWorkspace(state, windowId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+    //   } else {
+    //     return handleWindowSelectionFromAction(state, nodeId, event as StageToolNodeOverlayClicked);
+    //   }
+    // }
 
     case STAGE_TOOL_NODE_OVERLAY_HOVER_OVER: {
       const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOver;

@@ -5,7 +5,7 @@ const callEventListener = (listener: EventListenerOrEventListenerObject, event: 
   typeof listener === "function" ? listener(event) : listener.handleEvent(event)
 );
 
-export const getSEnvEventTargetClass = weakMemo((context: any) => {
+export const getSEnvEventTargetClass = weakMemo((context?: any) => {
   return class SEnvEventTarget implements EventTarget {
     private _eventListeners: {
       [identifier: string]: EventListenerOrEventListenerObject | EventListenerOrEventListenerObject[]
@@ -15,11 +15,11 @@ export const getSEnvEventTargetClass = weakMemo((context: any) => {
 
     constructor() {
       if (!this._preconstructed) {
-        this.$preconstruct();
+        this.$$preconstruct();
       }
     }
 
-    $preconstruct() {
+    $$preconstruct() {
       this._preconstructed = true;
       this._eventListeners = {};
     }

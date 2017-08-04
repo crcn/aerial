@@ -4,7 +4,7 @@ import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 import { getSEnvCSSStyleSheetClass } from "../css";
 
 export interface SEnvHTMLElementAddon extends HTMLElement {
-  $preconstruct();
+  $$preconstruct();
 }
 
 export const getSEnvHTMLElementClass = weakMemo((context: any) => {

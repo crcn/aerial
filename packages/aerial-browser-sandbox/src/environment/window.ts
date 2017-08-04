@@ -1,15 +1,25 @@
 import { Dispatcher, weakMemo } from "aerial-common2";
 import { getSEnvLocationClass } from "./location";
 import { getSEnvEventTargetClass } from "./events";
+import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
 import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass, SEnvDocumentAddon } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 
 type OpenTarget = "_self" | "_blank";
 
+export interface SEnvWindowAddon extends Window {
+  renderer:  SyntheticWindowRenderer;
+};
+
 export type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 
+export type SEnvWindowContext = {
+  fetch: Fetch;
+  createRenderer?: SyntheticDOMRendererFactory;
+};
 
-export const getSEnvWindowClass = weakMemo((context: any) => {
+export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
+  const { createRenderer = createNoopRenderer, fetch } = context;
 
   const SEnvEventTarget = getSEnvEventTargetClass(context);
   const SEnvDocument = getSEnvDocumentClass(context);
@@ -21,7 +31,7 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
   // register default HTML tag names
   const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
   
-  return class SEnvWindow extends SEnvEventTarget implements Window {
+  return class SEnvWindow extends SEnvEventTarget implements SEnvWindowAddon {
 
     readonly location: Location;
 
@@ -177,6 +187,7 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
     readonly statusbar: BarProp;
     readonly styleMedia: StyleMedia;
     readonly toolbar: BarProp;
+    readonly renderer: SyntheticWindowRenderer;
     readonly top: Window;
     readonly window: Window;
     URL: typeof URL;
@@ -188,8 +199,7 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
     readonly EventTarget: typeof EventTarget = SEnvEventTarget;
     readonly Element: typeof Element = SEnvElement;
     readonly HTMLElement: typeof HTMLElement = SEnvHTMLElement;
-
-    fetch: Fetch;
+    fetch: Fetch = fetch;
     
     constructor(readonly $$id: string, origin: string, readonly $$dispatch: Dispatcher<any>) {
       super();
@@ -197,6 +207,8 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
       this.location = new SEnvLocation(origin);
       this.document = new SEnvDocument(this);
       this.window   = this;
+      this.renderer = createRenderer(this);
+      
 
       const customElements = this.customElements = new SEnvCustomElementRegistry(this);
       for (const tagName in TAG_NAME_MAP) {
@@ -360,13 +372,12 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
 });
 
 export type SyntheticWindowEnvironmentOptions = {
-  fetch: Fetch
-};
+  fetch: Fetch;
+} & SEnvWindowContext;
 
-export const openSyntheticEnvironmentWindow = (location: string, { fetch }: SyntheticWindowEnvironmentOptions) => {
-  const SEnvWindow = getSEnvWindowClass({});
+export const openSyntheticEnvironmentWindow = (location: string, context: SyntheticWindowEnvironmentOptions) => {
+  const SEnvWindow = getSEnvWindowClass(context);
   const window = new SEnvWindow(null, location, null);
-  window.fetch = fetch;
   window.$load();
   return window;
 }

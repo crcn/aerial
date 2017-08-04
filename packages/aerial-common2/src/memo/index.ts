@@ -1,6 +1,6 @@
 
 
-export function weakMemo<TFunc extends (...args: any[]) => any>(func: TFunc): TFunc {
+export function weakMemo<TFunc extends (...args: any[]) => any>(func: TFunc, mapMemo: (value?: any) => any = (value => value)): TFunc {
   const memos = new Map();
   let count = 1;
   return function() {
@@ -22,11 +22,11 @@ export function weakMemo<TFunc extends (...args: any[]) => any>(func: TFunc): TF
     }
 
     if (cmemo.has(hash)) {
-      return cmemo.get(hash);
+      return mapMemo(cmemo.get(hash));
     } else {
       const result = func.apply(this, arguments);
       cmemo.set(hash, result);
-      return result;
+      return mapMemo(result);
     }
   } as any as TFunc;
 };

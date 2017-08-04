@@ -1,8 +1,9 @@
 import { weakMemo } from "aerial-common2";
-import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 import { SEnvNodeTypes } from "../constants";
-import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvParentNodeClass } from "./parent-node";
+import { evaluateHTMLDocumentFragment } from "./utils";
+import { getSEnvHTMLCollectionClasses } from "./collections";
+import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 
 export const getSEnvAttr = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
@@ -16,7 +17,7 @@ export const getSEnvAttr = weakMemo((context: any) => {
 });
 
 export interface SEnvElementAddon extends Element {
-  $preconstruct();
+  $$preconstruct();
 }
 
 export const getSEnvElementClass = weakMemo((context: any) => {
@@ -100,9 +101,8 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     slot: string;
     readonly shadowRoot: ShadowRoot | null;
 
-
-    $preconstruct() {
-      super.$preconstruct();
+    $$preconstruct() {
+      super.$$preconstruct();
       this.nodeType = SEnvNodeTypes.ELEMENT;
 
       this.attributes = new Proxy(new SEnvNamedNodeMap(), {
@@ -161,18 +161,15 @@ export const getSEnvElementClass = weakMemo((context: any) => {
         return "";
       }).join("");
     }
+
+    set innerHTML(value: string) {
+      this.removeAllChildren();
+      const documentFragment = evaluateHTMLDocumentFragment(value, this.ownerDocument);
+      this.appendChild(documentFragment);
+    }
     
     getElementsByTagName<K extends keyof ElementListTagNameMap>(name: K): ElementListTagNameMap[K];
     getElementsByTagName(name: string): NodeListOf<Element>{ 
-      return null;
-    }
-
-    querySelector(selectors: string): Element | null {
-      return null;
-    }
-    
-    querySelectorAll<K extends keyof ElementListTagNameMap>(selectors: K): ElementListTagNameMap[K];
-    querySelectorAll(selectors: string): NodeListOf<Element> {
       return null;
     }
     

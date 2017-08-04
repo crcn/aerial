@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { timeout } from "../utils";
-import { getSEnvWindowClass, openSyntheticEnvironmentWindow } from "../../index";
+import { getSEnvWindowClass, openSyntheticEnvironmentWindow, SyntheticDOMRendererFactory } from "../../index";
 
-export const openTestWindow = (html: string) => openSyntheticEnvironmentWindow("local://index.html", {
+export const openTestWindow = (html: string, createRenderer?: SyntheticDOMRendererFactory) => openSyntheticEnvironmentWindow("local://index.html", {
   fetch(info: string) {
     expect(info).to.eql("local://index.html");
     return Promise.resolve({
@@ -10,7 +10,8 @@ export const openTestWindow = (html: string) => openSyntheticEnvironmentWindow("
         return Promise.resolve(html);
       }
     } as any);
-  }
+  },
+  createRenderer
 });
 
 export const waitForDocumentComplete = (window: Window) => new Promise((resolve) => {

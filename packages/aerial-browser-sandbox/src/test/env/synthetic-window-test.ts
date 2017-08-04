@@ -4,7 +4,7 @@ import { waitForDocumentComplete } from "./utils";
 import { getSEnvWindowClass, openSyntheticEnvironmentWindow } from "../../index";
 
 describe(__filename + "#", () => {
-  it("can can open a simple page", async () => {
+  it("can open a simple page", async () => {
     const window = openSyntheticEnvironmentWindow("local://index.html", {
       fetch(info: string) {
         expect(info).to.eql("local://index.html");

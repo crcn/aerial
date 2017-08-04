@@ -7,11 +7,13 @@ import { getSEnvTextClass } from "./text";
 import { getSEnvCommentClass } from "./comment";
 import { SEnvHTMLElementAddon } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
+import { parseHTMLDocument, constructNodeTree, mapExpressionToNode } from "./utils";
+import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
 export interface SEnvDocumentAddon extends Document {
   $load(content: string): void;
-  $createElementWithoutConstruct(tagName: string);
+  $createElementWithoutConstruct(tagName: string): HTMLElement;
 }
 
 export const getSEnvDocumentClass = weakMemo((context: any) => {
@@ -21,6 +23,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   const SEnvComment = getSEnvCommentClass(context);
   const { SEnvMutationEvent } = getL3EventClasses(context);
   const { SEnvEvent } = getEventClasses(context);
+  const SEnvDocumentFragment = getSEnvDocumentFragment(context);
 
   const eventMap = {
     MutationEvent:  SEnvMutationEvent
@@ -117,16 +120,26 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     async $load(content: string) {
       this._setReadyState("loading");
-      const expression = parseHTML(content);
-      for (const childExpression of expression.childNodes) {
-        this.appendChild(await loadNode(this, childExpression));
+      const expression = parseHTMLDocument(content);
+      const childNodes = expression.childNodes.map(childExpression => mapExpressionToNode(childExpression, this));
+
+      for (const child of childNodes) {
+        this.appendChild(child);
+        constructNodeTree(child);
       }
+
       this._setReadyState("interactive");
       this._setReadyState("complete");
 
-      const event = new SEnvEvent();
-      event.initEvent("DOMContentLoaded", true, true);
-      this.dispatchEvent(event);
+      const domContentLoadedEvent = new SEnvEvent();
+      domContentLoadedEvent.initEvent("DOMContentLoaded", true, true);
+      this.dispatchEvent(domContentLoadedEvent);
+
+      // TODO - load images, stylesheets, and other external resources
+
+      const loadEvent = new SEnvEvent();
+      loadEvent.initEvent("load", true, true);
+      this.dispatchEvent(loadEvent);
     }
 
     private _setReadyState(state) {
@@ -335,16 +348,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     }
 
-    querySelector<K extends keyof ElementTagNameMap>(selectors: K): ElementTagNameMap[K] | null;
-    querySelector(selectors: string): Element | null {
-      return null;
-    }
-
-    querySelectorAll<K extends keyof ElementListTagNameMap>(selectors: K): ElementListTagNameMap[K];
-    querySelectorAll(selectors: string): NodeListOf<Element> {
-      return null;
-    }
-    
     createAttribute(name: string): Attr {
       return null;
     }
@@ -360,9 +363,9 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     createComment(data: string): Comment {
       return new SEnvComment(data);
     }
-    
+
     createDocumentFragment(): DocumentFragment {
-      return null;
+      return new SEnvDocumentFragment();
     }
 
     createEvent(eventInterface: "AnimationEvent"): AnimationEvent;
@@ -443,9 +446,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     
     createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
     createElement(tagName: string): HTMLElement {
-      const instance = this.$createElementWithoutConstruct(tagName);
-      instance.constructor.call(instance);
-      return instance;
+      return constructNodeTree(this.$createElementWithoutConstruct(tagName));
     }
 
     $createElementWithoutConstruct(tagName: string): HTMLElement {
@@ -454,7 +455,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       instance["" + "ownerDocument"] = this;
       instance["" + "tagName"] = tagName.toUpperCase();
       instance["" + "nodeName"] = tagName.toUpperCase();
-      instance.$preconstruct();
+      instance.$$preconstruct();
       return instance;
     }
     createElementNS(namespaceURI: "http://www.w3.org/1999/xhtml", qualifiedName: string): HTMLElement;
@@ -545,6 +546,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     createTextNode(data: string): Text {
       return new SEnvText(data);
     }
+
     createTouch(view: Window, target: EventTarget, identifier: number, pageX: number, pageY: number, screenX: number, screenY: number): Touch {
       return null;
     }
@@ -707,8 +709,3 @@ const createNode = (document: SEnvDocumentAddon, expression: parse5.AST.Default.
     }
   }
 };
-
-const parseHTML = weakMemo((content: string) => {
-  const ast = parse5.parse(content, { locationInfo: true });
-  return ast as parse5.AST.Default.Document;
-});

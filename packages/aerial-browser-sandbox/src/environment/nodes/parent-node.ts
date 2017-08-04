@@ -3,23 +3,27 @@ import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getL3EventClasses } from "../level3";
+import { SEnvNodeTypes } from "../constants";
 
 export const getSEnvParentNodeClass = weakMemo((context: any) => {
 
   const SEnvNode = getSEnvNodeClass(context);
   const { SEnvDOMException } = getDOMExceptionClasses(context);
-  const { SEnvHTMLCollection } =  getSEnvHTMLCollectionClasses(context);
+  const { SEnvHTMLCollection } = getSEnvHTMLCollectionClasses(context);
   const { SEnvMutationEvent } = getL3EventClasses(context);
 
   return class SEnvParentNode extends SEnvNode implements ParentNode {
     children: HTMLCollection;
 
-    $preconstruct() {
-      super.$preconstruct();
+    $$preconstruct() {
+      super.$$preconstruct();
       this.children = new SEnvHTMLCollection().$init(this);
     }
 
     appendChild<T extends Node>(child: T) {
+      if (child.nodeType === SEnvNodeTypes.DOCUMENT_FRAGMENT) {
+        return Array.prototype.forEach.call(child.childNodes, (child2) => this.appendChild(child2));
+      }
       this._linkChild(child as any as SEnvNodeAddon);
       this.$childNodesArray.push(child);
       if (this.$connectedToDocument) {
@@ -28,7 +32,6 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       const event = new  SEnvMutationEvent();
       event.initMutationEvent("DOMNodeInserted", true, true, child, null, null, null, -1);
       this.dispatchEvent(event);
-      return child;
     }
 
     removeChild<T extends Node>(child: T) {
@@ -43,6 +46,16 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       return child;
     }
 
+    querySelector<K extends keyof ElementTagNameMap>(selectors: K): ElementTagNameMap[K] | null;
+    querySelector(selectors: string): Element | null {
+      return null;
+    }
+
+    querySelectorAll<K extends keyof ElementListTagNameMap>(selectors: K): ElementListTagNameMap[K];
+    querySelectorAll(selectors: string): NodeListOf<Element> {
+      return null;
+    }
+    
     replaceChild<T extends Node>(newChild: Node, oldChild: T): T {
       const index = this.$childNodesArray.indexOf(oldChild);
       if (index === -1) {

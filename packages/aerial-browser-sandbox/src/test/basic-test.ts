@@ -44,14 +44,14 @@ describe(__filename + "#", () => {
     return store;
   }
 
-  it("can open a new synthetic browser window environment", (next) => {
-    const { getState, dispatch } = createTestStore({}, function*() {
-      yield yield request(createOpenSyntheticWindowRequest("http://google.com"));
-      const { browsers } = getSyntheticBrowserStore(yield select());
-      expect(browsers.length).to.eql(1);
-      expect(browsers[0].windows.length).to.eql(1);
-      expect(browsers[0].windows[0].location).to.eql("http://google.com");
-      next();
-    });
-  });
+  // xit("can open a new synthetic browser window environment", (next) => {
+  //   const { getState, dispatch } = createTestStore({}, function*() {
+  //     yield yield request(createOpenSyntheticWindowRequest("http://google.com"));
+  //     const { browsers } = getSyntheticBrowserStore(yield select());
+  //     expect(browsers.length).to.eql(1);
+  //     expect(browsers[0].windows.length).to.eql(1);
+  //     expect(browsers[0].windows[0].location).to.eql("http://google.com");
+  //     next();
+  //   });
+  // });
 });

@@ -34,29 +34,6 @@ const NODE_NAME_MAP = {
   "script": "span"
 };
 
-const MeasurererComponent = compose<any, any>(
-  onlyUpdateForKeys(["dispatch", "document", "windowBox"]),
-  lifecycle({
-    componentDidUpdate() {
-      const element = findDOMNode(this as any);
-      const elements = Array.prototype.slice.call(element.querySelectorAll("*[data-sourceId]")) as HTMLElement[];
-      const computedStyles = {};
-      const boxes          = {};
-      for (const element of elements) {
-        computedStyles[element.dataset.sourceid] = window.getComputedStyle(element);
-
-        // bounding rect is based on the embedded iframe, so we need to add the window location as well 
-        boxes[element.dataset.sourceid] = shiftBox(element.getBoundingClientRect(), (this.props as any).windowBox);
-      }
-      (this.props as any).dispatch(canvasElementsComputedPropsChanged((this.props as any).window.$$id, boxes, computedStyles));
-    }
-  })
-)((({ children }) => {
-  return <span>
-    {children}
-  </span>
-}) as any) as any;
-
 type WindowMountOuterProps = {
   mount: HTMLElement;
 }
@@ -65,7 +42,7 @@ type WindowMountInnerProps = {
   setContainer(element: HTMLElement);
   mount: HTMLElement;
   container: HTMLElement;
-}
+} & WindowMountOuterProps;
 
 const WindowMountBase = ({ setContainer }: WindowMountInnerProps) => {
   return <div ref={setContainer} />;
@@ -75,7 +52,8 @@ const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>
   // pure,
   withState("container", "setContainer", null),
   lifecycle({
-    componentDidUpdate({ container, mount }: WindowMountInnerProps) {
+    componentDidUpdate() {
+      const { container, mount } = this.props as WindowMountInnerProps;
       if (container && mount) {
         container.appendChild(mount);
         // TODO - dispatch mounted here

@@ -11,6 +11,8 @@ import {
 
 import { 
   OPEN_SYNTHETIC_WINDOW,
+  SYNTHETIC_WINDOW_SOURCE_CHANGED,
+  createSyntheticWindowSourceChangedEvent,
   OpenSyntheticBrowserWindowRequest,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
   createNewSyntheticWindowEntryResolvedEvent
@@ -31,7 +33,10 @@ import {
 } from "../state";
 
 import {
-  openSyntheticEnvironmentWindow
+  openSyntheticEnvironmentWindow,
+  SyntheticDOMRenderer,
+  createSyntheticDOMRendererFactory,
+  SEnvWindowAddon
 } from "../environment";
 
 export function* syntheticBrowserSaga() {
@@ -76,8 +81,6 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
 
 function* handleSytheticWindowSession(syntheticWindowId: string) {
 
-  // let env: SEnvWindow;
-
   yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
     if (!syntheticWindow) return false;
     yield handleSyntheticWindowChange(syntheticWindow);
@@ -85,7 +88,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   });
 
   let cwindow: SyntheticWindow;
-  let cenv: Window;
+  let cenv: SEnvWindowAddon;
 
   function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
     if (cwindow && cwindow.location === syntheticWindow.location) {
@@ -102,17 +105,13 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       fetch(info: RequestInfo) {
         return Promise.resolve({
           text() {
-            return Promise.resolve("HELLO");
+            return Promise.resolve("HELLO WORLD");
           }
         } as any);
-      }
+      },
+      createRenderer: createSyntheticDOMRendererFactory(document)
     });
 
-    cenv.document.onreadystatechange = () => {
-      console.log("STATE CHANGE", cenv.document.readyState);
-      if (cenv.document.readyState === "complete") {
-        console.log(cenv.document.body.innerHTML);
-      }
-    };
+    yield put(createSyntheticWindowSourceChangedEvent(syntheticWindow.$$id, cenv));
   }
 }

@@ -3,6 +3,7 @@ import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
+import { SEnvDocumentAddon } from "./document";
 
 export interface SEnvNodeAddon extends Node {
   $connectedToDocument: boolean;
@@ -10,6 +11,7 @@ export interface SEnvNodeAddon extends Node {
   $$parentElement: HTMLElement;
   $$addedToDocument();
   $$removedFromDocument();
+  $$preconstruct();
 };
 
 export const getSEnvNodeClass = weakMemo((context: any) => {
@@ -35,7 +37,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly nodeName: string;
     readonly nodeType: number;
     nodeValue: string | null;
-    readonly ownerDocument: Document;
+    readonly ownerDocument: SEnvDocumentAddon;
     readonly previousSibling: Node | null;
     textContent: string | null;
     readonly ATTRIBUTE_NODE: number;
@@ -61,8 +63,8 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     protected $childNodesArray: Node[];
 
-    $preconstruct() {
-      super.$preconstruct();
+    $$preconstruct() {
+      super.$$preconstruct();
       this.childNodes = this.$childNodesArray = new SEnvNodeList();
     }
 
