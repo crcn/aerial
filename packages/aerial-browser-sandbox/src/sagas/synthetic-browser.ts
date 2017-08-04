@@ -1,7 +1,9 @@
 import { fork, put, call } from "redux-saga/effects";
 import { difference } from "lodash";
+import { createQueue } from "mesh";
 
 import { 
+  createReadUriRequest,
   AddDependencyRequest, 
   AddDependencyResponse, 
   createAddDependencyRequest, 
@@ -11,6 +13,9 @@ import {
 
 import { 
   OPEN_SYNTHETIC_WINDOW,
+  FetchRequest,
+  FETCH_REQUEST,
+  createFetchRequest,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
   createSyntheticWindowSourceChangedEvent,
   OpenSyntheticBrowserWindowRequest,
@@ -42,11 +47,21 @@ import {
 export function* syntheticBrowserSaga() {
   yield fork(handleOpenSyntheticBrowserRequest);
   yield fork(handleBrowserChanges);
+  yield fork(handleFetchRequests);
+}
+
+function* handleFetchRequests() {
+  while(true) {
+    yield takeRequest(FETCH_REQUEST, function*({ info }: FetchRequest) {
+      return (yield yield request(createReadUriRequest(String(info)))).payload;
+    });
+  }
 }
 
 function* handleOpenSyntheticBrowserRequest() {
   while(true) {
     yield takeRequest(OPEN_SYNTHETIC_WINDOW, function*({ uri, syntheticBrowserId }: OpenSyntheticBrowserWindowRequest) {
+
       yield put(createNewSyntheticWindowEntryResolvedEvent(uri, syntheticBrowserId));
     });
   }
@@ -95,6 +110,15 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       return;
     }
 
+    const fetchQueue = createQueue();
+
+    yield fork(function*() {
+      while(true) {
+        const { value: [info, resolve] } = yield call(fetchQueue.next);
+        resolve((yield yield request(createFetchRequest(info))).payload);
+      }
+    })
+
     cwindow = syntheticWindow;
 
     if (cenv) {
@@ -103,11 +127,15 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
     cenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
       fetch(info: RequestInfo) {
-        return Promise.resolve({
-          text() {
-            return Promise.resolve("HELLO WORLD");
-          }
-        } as any);
+        return new Promise((resolve) => {
+          fetchQueue.unshift([info, ({ content, type }) => {
+            resolve({
+              text() {
+                return Promise.resolve(String(content));
+              }
+            } as any);
+          }]);
+        });
       },
       createRenderer: createSyntheticDOMRendererFactory(document)
     });

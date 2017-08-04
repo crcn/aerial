@@ -5,7 +5,7 @@ import { getL3EventClasses } from "../level3";
 import { getEventClasses } from "../events";
 import { getSEnvTextClass } from "./text";
 import { getSEnvCommentClass } from "./comment";
-import { SEnvHTMLElementAddon } from "./html-elements";
+import { SEnvHTMLElementAddon, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, mapExpressionToNode } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
@@ -24,6 +24,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   const { SEnvMutationEvent } = getL3EventClasses(context);
   const { SEnvEvent } = getEventClasses(context);
   const SEnvDocumentFragment = getSEnvDocumentFragment(context);
+  const SENvHTMLElement = getSEnvHTMLElementClass(context);
 
   const eventMap = {
     MutationEvent:  SEnvMutationEvent
@@ -124,6 +125,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       const childNodes = expression.childNodes.map(childExpression => mapExpressionToNode(childExpression, this));
 
       for (const child of childNodes) {
+        if (!child) continue;
         this.appendChild(child);
         constructNodeTree(child);
       }
@@ -450,7 +452,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
 
     $createElementWithoutConstruct(tagName: string): HTMLElement {
-      const elementClass = this.defaultView.customElements.get(tagName);
+      const elementClass = this.defaultView.customElements.get(tagName) || SENvHTMLElement;
       const instance = Object.create(elementClass.prototype) as SEnvHTMLElementAddon;
       instance["" + "ownerDocument"] = this;
       instance["" + "tagName"] = tagName.toUpperCase();

@@ -1,6 +1,7 @@
 HI PRIO:
 
 - [ ] javascript
+- [ ] ability to open external window
 - [ ] watch dependencies that are dynamically loaded in
 - [ ] use DOM mutation API to listen for changes
 - [ ] rendering engine based on DOM mutation API

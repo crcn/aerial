@@ -41,6 +41,9 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
     case "#comment": {
       return document.createComment((expression as parse5.AST.Default.CommentNode).data);
     }
+    case "#documentType": {
+      return null;
+    }
     default: {
       const elementExpression = expression as parse5.AST.Default.Element;
       const element = document.$createElementWithoutConstruct(elementExpression.nodeName);
