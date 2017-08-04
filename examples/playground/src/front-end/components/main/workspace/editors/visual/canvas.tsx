@@ -7,18 +7,15 @@ import { weakMemo, Dispatcher, Box, BaseEvent} from "aerial-common2";
 import { lifecycle, compose, withState, pure, onlyUpdateForKeys } from "recompose";
 import { WindowComponent } from "./window";
 import { 
-  DOMNodeType,
-  SyntheticBrowser2, 
-  SyntheticDOMNode2, 
-  SyntheticDOMRenderer,
-  SyntheticDOMElement2,
-  SyntheticDOMTextNode2,
-  SyntheticBrowserWindow2, 
-} from "aerial-synthetic-browser";
+  SyntheticBrowser,
+  SyntheticWindow, 
+  SyntheticTextNode,
+  SyntheticHTMLElement,
+} from "aerial-browser-sandbox";
 import { IsolateComponent } from "front-end/components/isolated";
 
 export type CanvasComponentOuterProps = {
-  browser: SyntheticBrowser2;
+  browser: SyntheticBrowser;
   dispatch: Dispatcher<any>
 };
 

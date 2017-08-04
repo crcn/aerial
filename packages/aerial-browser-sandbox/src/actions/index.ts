@@ -5,6 +5,7 @@ export const NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED = "NEW_SYNTHETIC_WINDOW_ENTRY_R
 
 export type OpenSyntheticBrowserWindowRequest = {
   uri: string;
+  syntheticBrowserId: string;
 } & Request;
 
 export type NewSyntheticWindowEntryResolvedEvent = {
@@ -12,8 +13,9 @@ export type NewSyntheticWindowEntryResolvedEvent = {
   syntheticBrowserId?: string;
 } & BaseEvent;
 
-export const createOpenSyntheticWindowRequest = (uri: string): OpenSyntheticBrowserWindowRequest => ({
+export const createOpenSyntheticWindowRequest = (uri: string, syntheticBrowserId: string): OpenSyntheticBrowserWindowRequest => ({
   uri,
+  syntheticBrowserId,
   type: OPEN_SYNTHETIC_WINDOW,
   $$id: generateDefaultId()
 });

@@ -359,6 +359,10 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
   }
 });
 
+export type SyntheticWindowEnvironmentOptions = {
+  fetch: Fetch
+};
+
 export const openSyntheticEnvironmentWindow = (location: string, { fetch }: SyntheticWindowEnvironmentOptions) => {
   const SEnvWindow = getSEnvWindowClass({});
   const window = new SEnvWindow(null, location, null);

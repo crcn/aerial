@@ -1,7 +1,7 @@
 import { noop } from "lodash";
 import { Kernel } from "aerial-common";
 import { LogLevel } from "aerial-common2";
-import { createSyntheticBrowser2 } from "aerial-synthetic-browser";
+import { createSyntheticBrowser } from "aerial-browser-sandbox";
 
 import { 
   createFile,
@@ -98,7 +98,7 @@ const sourceFiles = createDirectory({
 const workspace = createWorkspace({
   sourceFiles: sourceFiles,
   publicDirectoryId: publicDirectory.$$id,
-  browser: createSyntheticBrowser2(),
+  browser: createSyntheticBrowser(),
   mainFileId: indexFile.$$id,
 });
 

@@ -4,7 +4,7 @@ import * as React from "react";
 import { Workspace } from "front-end/state";
 import { compose, pure } from "recompose";
 import { mapValues, values } from "lodash";
-import { SyntheticDOMNode2, getAllSyntheticDOMNodesAsIdMap } from "aerial-synthetic-browser";
+import { SyntheticNode, getAllSyntheticDOMNodesAsIdMap } from "aerial-browser-sandbox";
 import { getValueById, Dispatcher, Box, wrapEventToDispatch } from "aerial-common2";
 import { stageToolNodeOverlayClicked, stageToolNodeOverlayHoverOver, stageToolNodeOverlayHoverOut } from "front-end/actions";
 
@@ -19,7 +19,7 @@ type NodeOverlayProps = {
   zoom: number;
   selected: boolean;
   hovering: boolean;
-  node: SyntheticDOMNode2;
+  node: SyntheticNode;
   dispatch: Dispatcher<any>;
 };
 

@@ -6,26 +6,23 @@ import { weakMemo, Dispatcher, Box, BaseEvent, calculateAbsoluteBounds, shiftBox
 import { lifecycle, compose, withState, pure, onlyUpdateForKeys, withHandlers } from "recompose";
 import { canvasElementsComputedPropsChanged } from "front-end/actions";
 import { 
-  DOMNodeType,
-  SyntheticBrowser2, 
-  SyntheticDOMNode2, 
-  SyntheticDOMRenderer,
-  SyntheticDOMElement2,
-  SyntheticDOMTextNode2,
-  
-  SyntheticBrowserWindow2, 
-} from "aerial-synthetic-browser";
+  SEnvNodeTypes,
+  SyntheticNode,
+  SyntheticTextNode,
+  SyntheticWindow,
+  SyntheticBrowser,
+} from "aerial-browser-sandbox";
 import { IsolateComponent } from "front-end/components/isolated";
 
 export type CanvasComponentOuterProps = {
-  browser: SyntheticBrowser2;
+  browser: SyntheticBrowser;
   dispatch: Dispatcher<any>
 };
 
 export type CanvasComponentInnerProps = CanvasComponentOuterProps;
 
 type WindowComponentProps = {
-  window: SyntheticBrowserWindow2,
+  window: SyntheticWindow,
   dispatch: Dispatcher<any>
 };
 
@@ -36,27 +33,6 @@ const NODE_NAME_MAP = {
   "link": "span",
   "script": "span"
 };
-
-const mapStyleSheets = weakMemo(((node: SyntheticDOMNode2) => {
-  if (node.nodeType === DOMNodeType.TEXT) return (node as SyntheticDOMTextNode2).nodeValue;
-  if (node.nodeType === DOMNodeType.ELEMENT) {
-    const element = node as SyntheticDOMElement2;
-    const nodeName = NODE_NAME_MAP[element.nodeName] || element.nodeName;
-    return React.createElement(nodeName, { key: element.$$id, "data-sourceId": element.$$id, ...element.attributes }, VOID_ELEMENTS[nodeName] ? null : element.childNodes.map(mapSyntheticDOMNodeToJSX));
-  }
-  return null;
-}));
-
-const mapSyntheticDOMNodeToJSX = weakMemo(((node: SyntheticDOMNode2) => {
-  if (node.nodeType === DOMNodeType.TEXT) return (node as SyntheticDOMTextNode2).nodeValue;
-  if (node.nodeType === DOMNodeType.ELEMENT) {
-    const element = node as SyntheticDOMElement2;
-    if (element.nodeName === "script") return null;
-    const nodeName = NODE_NAME_MAP[element.nodeName] || element.nodeName;
-    return React.createElement(nodeName, { key: element.$$id, "data-sourceId": element.$$id, ...element.attributes }, VOID_ELEMENTS[nodeName] ? null : element.childNodes.map(mapSyntheticDOMNodeToJSX));
-  }
-  return null;
-}));
 
 const MeasurererComponent = compose<any, any>(
   onlyUpdateForKeys(["dispatch", "document", "windowBox"]),

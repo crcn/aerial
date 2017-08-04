@@ -3,7 +3,6 @@ import { NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED, NewSyntheticWindowEntryResolvedEv
 import { createSyntheticBrowser, createSyntheticBrowserStore, SyntheticBrowserStore, SyntheticBrowser, addNewSyntheticBrowser, getSyntheticBrowserStore, getSyntheticBrowser, createSyntheticWindow } from "../state";
 
 export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(), event: BaseEvent) => {
-
   switch(event.type) {
     case NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED: {
       const { location, syntheticBrowserId } = event as NewSyntheticWindowEntryResolvedEvent;

@@ -26,6 +26,9 @@ import {
 import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortcuts";
 import { toggleLeftGutterPressed, toggleRightGutterPressed, deleteShortcutPressed } from "front-end/actions";
 
+import {
+  SyntheticBrowser
+} from "aerial-browser-sandbox";
 
 import {
   uniq,
@@ -34,10 +37,6 @@ import {
 
 import { Kernel } from "aerial-common";
 
-import {
-  SyntheticBrowser,
-  SyntheticBrowser2,
-} from "aerial-synthetic-browser";
 
 /**
  * Types
@@ -105,7 +104,7 @@ export type Workspace = {
    * The synthetic browser instance.
    */
 
-  browser: SyntheticBrowser2;
+  browser: SyntheticBrowser;
 
   /**
    */

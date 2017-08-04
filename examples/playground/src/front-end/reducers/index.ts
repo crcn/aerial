@@ -82,15 +82,21 @@ import {
   VisualEditorWheel,
 } from "front-end/actions";
 
-import { 
-  SyntheticDOMNode2,
-  SYNTHETIC_BROWSER,
-  SYTNTHETIC_BROWSER_WINDOW,
-  syntheticBrowserReducer,
-  getSyntheticBrowserWindow,
-  OPEN_SYNTHETIC_WINDOW_REQUESTED,
-  openSyntheticWindowRequested,
-} from "aerial-synthetic-browser";
+import { syntheticBrowserReducer } from "aerial-browser-sandbox";
+
+// import { 
+//   SyntheticDOMNode2,
+//   SYNTHETIC_BROWSER,
+//   SYTNTHETIC_BROWSER_WINDOW,
+//   syntheticBrowserReducer,
+//   getSyntheticBrowserWindow,
+//   OPEN_SYNTHETIC_WINDOW_REQUESTED,
+//   openSyntheticWindowRequested,
+// } from "aerial-synthetic-browser";
+
+import {
+  
+} from "aerial-browser-sandbox";
 
 import reduceReducers = require("reduce-reducers");
 
@@ -118,7 +124,8 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
     }
   }
   
-  state = canvasReducer(state, event);
+  // state = canvasReducer(state, event);
+  // state = syntheticBrowserReducer(state, event);
   state = syntheticBrowserReducer(state, event);
   state = visualEditorReducer(state, event);
   state = windowPaneReducer(state, event);
@@ -127,21 +134,21 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
   return state;
 };
 
-const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
-  switch(event.type) {
-    case CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED: {
-      const { computedStyles, computedBoxes, syntheticWindowId } = event as CanvasElementsComputedPropsChanged;
-      const window = getSyntheticBrowserWindow(state, syntheticWindowId);
-      return updateStruct(state, window, {
-        ...window,
-        computedBoxes,
-        computedStyles
-      });
-    }
-  }
+// const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
+//   switch(event.type) {
+//     case CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED: {
+//       const { computedStyles, computedBoxes, syntheticWindowId } = event as CanvasElementsComputedPropsChanged;
+//       const window = getSyntheticBrowserWindow(state, syntheticWindowId);
+//       return updateStruct(state, window, {
+//         ...window,
+//         computedBoxes,
+//         computedStyles
+//       });
+//     }
+//   }
 
-  return state;
-};
+//   return state;
+// };
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;

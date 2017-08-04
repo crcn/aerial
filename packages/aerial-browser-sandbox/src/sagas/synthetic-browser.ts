@@ -16,7 +16,6 @@ import {
   createNewSyntheticWindowEntryResolvedEvent
 } from "../actions";
 
-
 import { 
   watch,
   request,
@@ -28,27 +27,30 @@ import {
   SyntheticBrowser,
   getSyntheticWindow,
   getSyntheticBrowser,
-  SyntheticBrowserStore,
-  getSyntheticBrowserStore, 
+  getSyntheticBrowsers,
 } from "../state";
+
+import {
+  openSyntheticEnvironmentWindow
+} from "../environment";
 
 export function* syntheticBrowserSaga() {
   yield fork(handleOpenSyntheticBrowserRequest);
-  yield fork(handleStoreChanges);
+  yield fork(handleBrowserChanges);
 }
 
 function* handleOpenSyntheticBrowserRequest() {
   while(true) {
-    yield takeRequest(OPEN_SYNTHETIC_WINDOW, function*({ uri }: OpenSyntheticBrowserWindowRequest) {
-      yield put(createNewSyntheticWindowEntryResolvedEvent(uri));
+    yield takeRequest(OPEN_SYNTHETIC_WINDOW, function*({ uri, syntheticBrowserId }: OpenSyntheticBrowserWindowRequest) {
+      yield put(createNewSyntheticWindowEntryResolvedEvent(uri, syntheticBrowserId));
     });
   }
 }
 
-function* handleStoreChanges() {
+function* handleBrowserChanges() {
   let runningSyntheticBrowserIds = [];
-  yield watch((root) => getSyntheticBrowserStore(root), function*(store: SyntheticBrowserStore) {
-    const syntheticBrowserIds = store.browsers.map(item => item.$$id);
+  yield watch((root) => getSyntheticBrowsers(root), function*(browsers: SyntheticBrowser[]) {
+    const syntheticBrowserIds = browsers.map(item => item.$$id);
     yield* difference(syntheticBrowserIds, runningSyntheticBrowserIds).map((id) => (
       call(handleSyntheticBrowserSession, id)
     ));
@@ -82,7 +84,35 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     return true;
   });
 
+  let cwindow: SyntheticWindow;
+  let cenv: Window;
+
   function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
-    
+    if (cwindow && cwindow.location === syntheticWindow.location) {
+      return;
+    }
+
+    cwindow = syntheticWindow;
+
+    if (cenv) {
+      cenv.close();
+    }
+
+    cenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
+      fetch(info: RequestInfo) {
+        return Promise.resolve({
+          text() {
+            return Promise.resolve("HELLO");
+          }
+        } as any);
+      }
+    });
+
+    cenv.document.onreadystatechange = () => {
+      console.log("STATE CHANGE", cenv.document.readyState);
+      if (cenv.document.readyState === "complete") {
+        console.log(cenv.document.body.innerHTML);
+      }
+    };
   }
 }

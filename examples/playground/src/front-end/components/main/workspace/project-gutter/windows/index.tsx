@@ -2,13 +2,13 @@ import "./index.scss";
 import * as React from "react";
 import { Workspace } from "front-end/state";
 import { PaneComponent } from "front-end/components/pane";
-import { SyntheticBrowserWindow2 } from "aerial-synthetic-browser";
+import { SyntheticWindow } from "aerial-browser-sandbox";
 import { pure, compose, withHandlers } from "recompose";
 import { promptedNewWindowUrl, windowPaneRowClicked } from "front-end/actions";
 import { Dispatcher, BaseEvent, wrapEventToDispatch } from "aerial-common2";
 
-const WindowRow = ({ window, dispatch }: { window: SyntheticBrowserWindow2, dispatch: Dispatcher<any> }) => <div className="m-windows-pane-window-row"  onClick={wrapEventToDispatch(dispatch, windowPaneRowClicked.bind(this, window.$$id))}>
-  {window.title || window.location} 
+const WindowRow = ({ window, dispatch }: { window: SyntheticWindow, dispatch: Dispatcher<any> }) => <div className="m-windows-pane-window-row"  onClick={wrapEventToDispatch(dispatch, windowPaneRowClicked.bind(this, window.$$id))}>
+  {window.document && window.document.title || window.location} 
 </div>
 
 const WindowsPaneComponentControlsBase = ({ workspace, dispatch, onAddWindow }: { workspace: Workspace, dispatch: Dispatcher<any>, onAddWindow: any }) => <span>
