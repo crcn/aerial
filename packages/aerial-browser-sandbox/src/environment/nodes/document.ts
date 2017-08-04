@@ -1,10 +1,18 @@
 import { weakMemo } from "aerial-common2";
-import { getSEnvNodeClass } from "./node";
+import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 import {getSEnvParentNodeClass } from "./parent-node";
 import { getL3EventClasses } from "../level3";
+import { getEventClasses } from "../events";
 import { getSEnvTextClass } from "./text";
 import { getSEnvCommentClass } from "./comment";
+import { SEnvHTMLElementAddon } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
+import parse5 = require("parse5");
+
+export interface SEnvDocumentAddon extends Document {
+  $load(content: string): void;
+  $createElementWithoutConstruct(tagName: string);
+}
 
 export const getSEnvDocumentClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
@@ -12,14 +20,16 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   const SEnvText = getSEnvTextClass(context);
   const SEnvComment = getSEnvCommentClass(context);
   const { SEnvMutationEvent } = getL3EventClasses(context);
+  const { SEnvEvent } = getEventClasses(context);
 
   const eventMap = {
     MutationEvent:  SEnvMutationEvent
   };
 
-  return class SEnvDocument extends SEnvParentNode implements Document {
+  return class SEnvDocument extends SEnvParentNode implements SEnvDocumentAddon {
     
     readonly activeElement: Element;
+    private _readyState: string;
     
     alinkColor: string;
     
@@ -32,7 +42,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     
     bgColor: string;
     
-    body: HTMLElement;
     readonly characterSet: string;
     
     charset: string;
@@ -56,7 +65,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     forms: HTMLCollectionOf<HTMLFormElement>;
     readonly fullscreenElement: Element | null;
     readonly fullscreenEnabled: boolean;
-    readonly head: HTMLHeadElement;
     readonly hidden: boolean;
     
     images: HTMLCollectionOf<HTMLImageElement>;
@@ -83,11 +91,51 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     constructor(readonly defaultView: Window) {
       super();
+      this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
+    }
+    
+    get readyState() {
+      return this._readyState;
     }
 
     get documentElement(): HTMLElement {
       return this.children[0] as HTMLElement;
     }
+
+    get head() {
+      return this.documentElement.children[0] as HTMLHeadElement;
+    }
+
+    get body() {
+      return this.documentElement.children[1] as HTMLBodyElement;
+    }
+
+    protected _linkChild(child: SEnvNodeAddon) {
+      super._linkChild(child);
+      child.$$addedToDocument();
+    }
+
+    async $load(content: string) {
+      this._setReadyState("loading");
+      const expression = parseHTML(content);
+      for (const childExpression of expression.childNodes) {
+        this.appendChild(await loadNode(this, childExpression));
+      }
+      this._setReadyState("interactive");
+      this._setReadyState("complete");
+
+      const event = new SEnvEvent();
+      event.initEvent("DOMContentLoaded", true, true);
+      this.dispatchEvent(event);
+    }
+
+    private _setReadyState(state) {
+      this._readyState = state;
+      const event = new SEnvEvent();
+      event.initEvent("readystatechange", true, true);
+      this.dispatchEvent(event);
+    }
+
 
     elementsFromPoint(x: number, y: number) {
       return null;
@@ -243,8 +291,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     plugins: HTMLCollectionOf<HTMLEmbedElement>;
     readonly pointerLockElement: Element;
     
-    readonly readyState: string;
-    
     readonly referrer: string;
     
     readonly rootElement: SVGSVGElement;
@@ -397,8 +443,19 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     
     createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
     createElement(tagName: string): HTMLElement {
+      const instance = this.$createElementWithoutConstruct(tagName);
+      instance.constructor.call(instance);
+      return instance;
+    }
+
+    $createElementWithoutConstruct(tagName: string): HTMLElement {
       const elementClass = this.defaultView.customElements.get(tagName);
-      return new elementClass();
+      const instance = Object.create(elementClass.prototype) as SEnvHTMLElementAddon;
+      instance["" + "ownerDocument"] = this;
+      instance["" + "tagName"] = tagName.toUpperCase();
+      instance["" + "nodeName"] = tagName.toUpperCase();
+      instance.$preconstruct();
+      return instance;
     }
     createElementNS(namespaceURI: "http://www.w3.org/1999/xhtml", qualifiedName: string): HTMLElement;
     createElementNS(namespaceURI: "http://www.w3.org/2000/svg", qualifiedName: "a"): SVGAElement;
@@ -466,6 +523,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     createElementNS(namespaceURI: string | null, qualifiedName: string): Element {
       return null;
     }
+    
     createExpression(expression: string, resolver: XPathNSResolver): XPathExpression {
       return null;
     }
@@ -611,3 +669,46 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
   };
 })
+
+const loadNode = async (document: SEnvDocumentAddon, expression: parse5.AST.Default.Node) => {
+  const node = createNode(document, expression);
+  if (node.nodeType === SEnvNodeTypes.ELEMENT) {
+    await loadChildNodes(node as Element, expression as parse5.AST.Default.Element);
+    node.constructor.call(node);
+  }
+  return node;
+};
+
+const loadChildNodes = async (parentElement: Element, expression: parse5.AST.Default.ParentNode) => {
+  for (const childExpression of expression.childNodes) {
+    parentElement.appendChild(await loadNode(parentElement.ownerDocument as SEnvDocumentAddon, childExpression));
+  }
+};
+
+const createNode = (document: SEnvDocumentAddon, expression: parse5.AST.Default.Node) => {
+  switch(expression.nodeName) {
+    case "#text": {
+      return document.createTextNode((expression as parse5.AST.Default.TextNode).value);
+    }
+    case "#comment": {
+      return document.createComment((expression as parse5.AST.Default.CommentNode).data);
+    }
+    case "#documentType": {
+      return document.createTextNode("");
+    }
+    default: {
+      const elementExpression = expression as parse5.AST.Default.Element;
+      const element = document.$createElementWithoutConstruct(elementExpression.nodeName);
+      for (let i = 0, n = elementExpression.attrs.length; i < n; i++) {
+        const attributeExpression = elementExpression.attrs[i];
+        element.setAttribute(attributeExpression.name, attributeExpression.value);
+      }
+      return element;
+    }
+  }
+};
+
+const parseHTML = weakMemo((content: string) => {
+  const ast = parse5.parse(content, { locationInfo: true });
+  return ast as parse5.AST.Default.Document;
+});

@@ -1,7 +1,7 @@
 import { Dispatcher, weakMemo } from "aerial-common2";
 import { getSEnvLocationClass } from "./location";
 import { getSEnvEventTargetClass } from "./events";
-import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass } from "./nodes";
+import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass, SEnvDocumentAddon } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 
 type OpenTarget = "_self" | "_blank";
@@ -36,7 +36,7 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
     readonly crypto: Crypto;
     defaultStatus: string;
     readonly devicePixelRatio: number;
-    readonly document: Document;
+    readonly document: SEnvDocumentAddon;
     readonly doNotTrack: string;
     event: Event | undefined;
     readonly external: External;
@@ -196,12 +196,14 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
       
       this.location = new SEnvLocation(origin);
       this.document = new SEnvDocument(this);
+      this.window   = this;
 
       const customElements = this.customElements = new SEnvCustomElementRegistry(this);
       for (const tagName in TAG_NAME_MAP) {
         customElements.define(tagName, TAG_NAME_MAP[tagName]);
       }
     }
+
     alert(message?: any): void { }
     blur(): void { }
     cancelAnimationFrame(handle: number): void { }
@@ -349,5 +351,18 @@ export const getSEnvWindowClass = weakMemo((context: any) => {
       return Promise.reject(null);
     }
 
+    async $load() {
+      const response = await this.fetch(this.location.origin);
+      const content  = await response.text();
+      this.document.$load(content);
+    }
   }
 });
+
+export const openSyntheticEnvironmentWindow = (location: string, { fetch }: SyntheticWindowEnvironmentOptions) => {
+  const SEnvWindow = getSEnvWindowClass({});
+  const window = new SEnvWindow(null, location, null);
+  window.fetch = fetch;
+  window.$load();
+  return window;
+}

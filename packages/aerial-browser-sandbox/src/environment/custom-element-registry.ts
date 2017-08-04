@@ -25,9 +25,6 @@ export const getSEnvCustomElementRegistry = weakMemo((options) => {
 
       // TODO - throw error if already registered
       this._registry[name] = constructor;
-      constructor.prototype.ownerDocument = this._window.document;
-      constructor.prototype.tagName = name.toUpperCase();
-      constructor.prototype.nodeName = name.toUpperCase();
       if (this._definedPromiseResolvers[name]) {
         this._definedPromiseResolvers[name]();
       }

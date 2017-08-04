@@ -6,9 +6,18 @@ export const getSEnvTextClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
   return class SEnvText extends SEnvNode implements Text {
     readonly nodeType: number =  SEnvNodeTypes.TEXT;
-    constructor(readonly nodeValue: string) {
+    constructor(public nodeValue: string) {
       super();
     }
+
+    get textContent() {
+      return this.nodeValue;
+    }
+
+    set textContent(value: string) {
+      this.nodeValue = value;
+    }
+    
     data: string;
     readonly length: number;
     readonly wholeText: string;

@@ -1,7 +1,8 @@
 HI PRIO:
 
-- [ ] element class prototype can be manipulated without persisting to next session
 - [ ] watch dependencies that are dynamically loaded in
+- [ ] use DOM mutation API to listen for changes
+- [ ] rendering engine based on DOM mutation API
 
 LITMUS:
 

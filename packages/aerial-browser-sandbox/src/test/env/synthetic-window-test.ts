@@ -1,9 +1,10 @@
 import { expect } from "chai";
 import { timeout } from "../utils";
+import { waitForDocumentComplete } from "./utils";
 import { getSEnvWindowClass, openSyntheticEnvironmentWindow } from "../../index";
 
 describe(__filename + "#", () => {
-  it("can be opened", async () => {
+  it("can can open a simple page", async () => {
     const window = openSyntheticEnvironmentWindow("local://index.html", {
       fetch(info: string) {
         expect(info).to.eql("local://index.html");
@@ -23,15 +24,15 @@ describe(__filename + "#", () => {
       }
     });
 
-    await timeout(10);
+    await waitForDocumentComplete(window);
 
     const content = window.document.documentElement.outerHTML;
-    expect(content).to.eql(`<HTML><HEAD>
-                </HEAD>
-                <BODY>
+    expect(content).to.eql(`<html><head>
+                </head>
+                <body>
                   Test
                 
               
-            </BODY></HTML>`);
+            </body></html>`);
   });
 });

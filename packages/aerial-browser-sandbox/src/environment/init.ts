@@ -1,6 +1,7 @@
 import parse5 = require("parse5");
 import { weakMemo } from "aerial-common2";
 import { SEnvNodeTypes } from "./constants";
+import { SEnvDocumentAddon } from "./nodes";
 import { Fetch, getSEnvWindowClass } from "./window";
 
 export type SyntheticWindowEnvironmentOptions = {
@@ -11,17 +12,19 @@ export const openSyntheticEnvironmentWindow = (location: string, { fetch }: Synt
   const SEnvWindow = getSEnvWindowClass({});
   const window = new SEnvWindow(null, location, null);
   window.fetch = fetch;
-  loadSyntheticWindow(window);
+  window.$load();
+  // loadSyntheticWindow(window);
   return window;
 }
 
 const loadSyntheticWindow = async (window: Window) =>{
   const response = await window.fetch(window.location.origin);
   const content  = await response.text();
-  await loadDocument(window, window.document, parseHTML(content));
+  // await loadDocument(window, window.document, parseHTML(content));
 };
 
-const loadDocument = async (window: Window, document: Document, expression: parse5.AST.Default.Document) => {
+const loadDocument = async (window: Window, document: SEnvDocumentAddon, expression: parse5.AST.Default.Document) => {
+  
   for (const childExpression of expression.childNodes) {
     document.appendChild(await loadNode(document, childExpression));
   }

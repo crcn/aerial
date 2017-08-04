@@ -1,5 +1,5 @@
 import { weakMemo } from "aerial-common2";
-import { getSEnvNodeClass } from "./node";
+import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 import { SEnvNodeTypes } from "../constants";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvParentNodeClass } from "./parent-node";
@@ -15,13 +15,17 @@ export const getSEnvAttr = weakMemo((context: any) => {
   }
 });
 
+export interface SEnvElementAddon extends Element {
+  $preconstruct();
+}
+
 export const getSEnvElementClass = weakMemo((context: any) => {
   const SEnvAttr = getSEnvAttr(context);
   const SEnvNode = getSEnvNodeClass(context);
   const SEnvParentNode = getSEnvParentNodeClass(context);
   const { SEnvNamedNodeMap } = getSEnvHTMLCollectionClasses(context);
 
-  return class SEnvElement extends SEnvParentNode implements Element {
+  return class SEnvElement extends SEnvParentNode implements SEnvElementAddon {
 
     readonly classList: DOMTokenList;
     className: string;
@@ -29,8 +33,8 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     readonly clientLeft: number;
     readonly clientTop: number;
     readonly clientWidth: number;
-    readonly attributes: NamedNodeMap;
-    readonly nodeType: number = SEnvNodeTypes.ELEMENT;
+    attributes: NamedNodeMap;
+    nodeType: number = SEnvNodeTypes.ELEMENT;
     id: string;
 
     msContentZoomFactor: number;
@@ -96,8 +100,9 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     slot: string;
     readonly shadowRoot: ShadowRoot | null;
 
-    constructor() {
-      super();
+
+    $preconstruct() {
+      super.$preconstruct();
       this.nodeType = SEnvNodeTypes.ELEMENT;
 
       this.attributes = new Proxy(new SEnvNamedNodeMap(), {
@@ -136,11 +141,13 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     }
 
     get outerHTML(): string {
-      let buffer = `<${this.nodeName}`;
+      let buffer = `<${this.nodeName.toLowerCase()}`;
       for (const name in this.attributes) {
-        buffer += ` ${name}=${this.attributes[name].value}`;
+        if (this.attributes[name]) {
+          buffer += ` ${name}=${this.attributes[name].value}`;
+        }
       }
-      buffer += `>${this.innerHTML}</${this.nodeName}>`;
+      buffer += `>${this.innerHTML}</${this.nodeName.toLowerCase()}>`;
       return buffer;
     }
 

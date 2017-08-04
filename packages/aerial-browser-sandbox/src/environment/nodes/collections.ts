@@ -3,11 +3,26 @@ import { SEnvNodeTypes } from "../constants";
 
 export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
 
-  class SEnvHTMLCollection extends Array<Element> implements HTMLCollection {
-    constructor(private _target: Node & ParentNode) {
-      super();
-      this._target.addEventListener("DOMNodeInserted", this._onChildAdded);
-      this._target.addEventListener("DOMNodeRemoved", this._onChildRemoved);
+  interface Collection<T> extends Array<T> { } 
+
+  interface CollectionClass {
+    new<T>(...items: T[]): Collection<T>;
+  }
+
+  const _Collection = function() {
+    const _this = [];
+    _this["__proto__"] = this.constructor.prototype;
+    return _this;
+  } as any as CollectionClass;
+
+  _Collection.prototype = [];
+  
+
+  class SEnvHTMLCollection extends _Collection<Element> implements HTMLCollection {
+    $init(target: Node & ParentNode) {
+      target.addEventListener("DOMNodeInserted", this._onChildAdded);
+      target.addEventListener("DOMNodeRemoved", this._onChildRemoved);
+      return this;
     }
     namedItem(name: string) {
       return this.find(element => element.getAttribute("name") === name);
@@ -28,13 +43,13 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     }
   }
 
-  class SEnvNodeList extends Array<Node> implements NodeList {
+  class SEnvNodeList extends _Collection<Node> implements NodeList {
     item(index: number) {
       return this[index];
     }
   }
 
-  class SEnvNamedNodeMap extends Array<Attr> implements NamedNodeMap {
+  class SEnvNamedNodeMap extends _Collection<Attr> implements NamedNodeMap {
     getNamedItem(name: string): Attr {
       return this.find((attr) => attr.name === name);
     }

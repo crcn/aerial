@@ -11,7 +11,16 @@ export const getSEnvEventTargetClass = weakMemo((context: any) => {
       [identifier: string]: EventListenerOrEventListenerObject | EventListenerOrEventListenerObject[]
     }
 
+    private _preconstructed: boolean;
+
     constructor() {
+      if (!this._preconstructed) {
+        this.$preconstruct();
+      }
+    }
+
+    $preconstruct() {
+      this._preconstructed = true;
       this._eventListeners = {};
     }
 

@@ -1,12 +1,17 @@
-import { getSEnvNodeClass } from "./node";
-import { getSEnvElementClass } from "./element";
 import { weakMemo } from "aerial-common2";
+import { getSEnvElementClass, SEnvElementAddon } from "./element";
+import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
+import { getSEnvCSSStyleSheetClass } from "../css";
+
+export interface SEnvHTMLElementAddon extends HTMLElement {
+  $preconstruct();
+}
 
 export const getSEnvHTMLElementClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
   const SEnvElement = getSEnvElementClass(context);
   
-  return class SEnvHTMLElement extends SEnvElement implements HTMLElement {
+  return class SEnvHTMLElement extends SEnvElement implements SEnvHTMLElementAddon {
 
     accessKey: string;
     readonly children: HTMLCollection;
@@ -97,8 +102,9 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
     tabIndex: number;
     title: string;
 
-    constructor() {
-      super();
+    protected _linkChild(child: SEnvNodeAddon) {
+      super._linkChild(child);
+      child.$$parentElement = this;
     }
 
     blur(): void {
@@ -127,8 +133,29 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
   }
 });
 
-export const getSEnvHTMLElementClasses = weakMemo((window: Window) => {
-  const SEnvHTMLElement = getSEnvHTMLElementClass(window);
+export const getSEnvHTMLStyleElementClass = weakMemo((context: any) => {
+  const SEnvHTMLElement = getSEnvHTMLElementClass(context);
+  const SEnvCSSStyleSheet = getSEnvCSSStyleSheetClass(context);
+
+  return class SEnvHTMLStyleElement extends SEnvHTMLElement implements HTMLStyleElement { 
+    sheet: StyleSheet;
+    disabled: boolean;
+    media: string;
+    type: string;
+    constructor() {
+      super();
+      this.sheet = new SEnvCSSStyleSheet();
+      this._load();
+    }
+
+    private _load() {
+      const source = this.textContent;
+    }
+  };
+});
+
+export const getSEnvHTMLElementClasses = weakMemo((context: any) => {
+  const SEnvHTMLElement = getSEnvHTMLElementClass(context);
 
   /*
 
@@ -939,12 +966,7 @@ export const getSEnvHTMLElementClasses = weakMemo((window: Window) => {
       media: string;
       type: string;
     },
-    "style": class SEnvHTMLStyleElement extends SEnvHTMLElement implements HTMLStyleElement { 
-      readonly sheet: StyleSheet;
-      disabled: boolean;
-      media: string;
-      type: string;
-    },
+    "style": getSEnvHTMLStyleElementClass(context),
     "table": class SEnvHTMLTableElement extends SEnvHTMLElement implements HTMLTableElement {
       align: string;
       bgColor: any;

@@ -4,6 +4,14 @@ import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 
+export interface SEnvNodeAddon extends Node {
+  $connectedToDocument: boolean;
+  $$parentNode: Node;
+  $$parentElement: HTMLElement;
+  $$addedToDocument();
+  $$removedFromDocument();
+};
+
 export const getSEnvNodeClass = weakMemo((context: any) => {
   
   const SEnvEventTarget = getSEnvEventTargetClass(context);
@@ -11,11 +19,14 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
   const { SEnvNodeList } =  getSEnvHTMLCollectionClasses(context);
   const { SEnvDOMException } =  getDOMExceptionClasses(context);
 
-  return class SEnvNode extends SEnvEventTarget implements Node {
+  return class SEnvNode extends SEnvEventTarget implements SEnvNodeAddon {
+
+    public $$parentNode: Node;
+    public $$parentElement: HTMLElement;
 
     readonly attributes: NamedNodeMap;
     readonly baseURI: string | null;
-    readonly childNodes: NodeList;
+    childNodes: NodeList;
     readonly firstChild: Node | null = null;
     readonly lastChild: Node | null = null;
     readonly localName: string | null;
@@ -25,8 +36,6 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly nodeType: number;
     nodeValue: string | null;
     readonly ownerDocument: Document;
-    readonly parentElement: HTMLElement | null;
-    readonly parentNode: Node | null;
     readonly previousSibling: Node | null;
     textContent: string | null;
     readonly ATTRIBUTE_NODE: number;
@@ -48,11 +57,21 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly PROCESSING_INSTRUCTION_NODE: number;
     readonly TEXT_NODE: number;
 
+    $connectedToDocument: boolean;
+
     protected $childNodesArray: Node[];
 
-    constructor() {
-      super();
+    $preconstruct() {
+      super.$preconstruct();
       this.childNodes = this.$childNodesArray = new SEnvNodeList();
+    }
+
+    get parentNode() {
+      return this.$$parentNode;
+    }
+
+    get parentElement() {
+      return this.$$parentElement;
     }
 
     appendChild<T extends Node>(newChild: T): T {
@@ -112,13 +131,26 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       return null;
     }
 
+    protected connectedCallback() {
+
+    }
+
     replaceChild<T extends Node>(newChild: Node, oldChild: T): T {
       this._throwUnsupportedMethod();
       return null;
     }
 
-    private _throwUnsupportedMethod() {
+    protected _throwUnsupportedMethod() {
       throw new SEnvDOMException("This node type does not support this method.");
+    }
+
+    $$addedToDocument() {
+      this.$connectedToDocument = true;
+      this.connectedCallback();
+    }
+
+    $$removedFromDocument() {
+      this.$connectedToDocument = false;
     }
   }
 });
