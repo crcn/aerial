@@ -1,0 +1,50 @@
+{
+
+  const { 
+    CSSMediaQueryListExpression, 
+    CSSMediaQueryExpression,
+    CSSMediaFeatureExpression
+  } = require("./ast");
+}
+
+Start = 
+  MediaQueryList
+
+MediaQueryList =
+  _ first: MediaQuery rest:MediaQueryListRest? {
+    return new CSSMediaQueryListExpression([first].concat(rest || []), location());
+  }
+
+MediaQueryListRest =
+  _ "," _ items: MediaQuery*  {
+    return items;
+  }
+
+MediaQuery =
+  operator:Operator? _ rule: (MediaQueryRuleWithType/MediaQueryRuleWithoutType) {
+    return new CSSMediaQueryExpression(operator, rule.type, rule.features, location());
+  }
+
+MediaQueryRuleWithType =
+  type: Identifier features: AndFeature* {
+    return { type: type, features: features };
+  }
+
+MediaQueryRuleWithoutType =
+  features: AndFeature+ {
+    return { features: features };
+  }
+
+Operator = "not" { return text(); }
+
+AndFeature =
+  _ "and"? _ feature:Feature { return feature; }
+
+Feature = 
+  "(" _ name: Identifier _ ":" _ value: Identifier ")" {
+    return new CSSMediaFeatureExpression(name, value, location());
+  }
+
+Identifier = [0-9a-zA-Z\-]+ { return text(); }
+
+_ = [ \r\n\t]*

@@ -80,7 +80,6 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
       spawn(handleSytheticWindowSession, id)
     ));
 
-    console.log(syntheticWindowIds);
     runningSyntheticWindowIds = syntheticWindowIds;
     return true;
   });
