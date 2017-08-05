@@ -1,11 +1,25 @@
-import { BaseEvent, updateStructProperty, updateStruct } from "aerial-common2";
+import { 
+  Moved, 
+  MOVED, 
+  moveBox,
+  Resized, 
+  Removed,
+  REMOVED,
+  RESIZED, 
+  BaseEvent, 
+  updateStruct, 
+  deleteValueById,
+  updateStructProperty, 
+} from "aerial-common2";
 import { 
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
   SyntheticWindowSourceChangedEvent,
-  NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED, 
+  OPEN_SYNTHETIC_WINDOW, 
+  OpenSyntheticBrowserWindowRequest,
   NewSyntheticWindowEntryResolvedEvent,
 } from "../actions";
 import { 
+  SYNTHETIC_WINDOW,
   getSyntheticWindow,
   createSyntheticBrowser, 
   createSyntheticBrowserStore, 
@@ -20,8 +34,8 @@ import {
 
 export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(), event: BaseEvent) => {
   switch(event.type) {
-    case NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED: {
-      const { location, syntheticBrowserId } = event as NewSyntheticWindowEntryResolvedEvent;
+    case OPEN_SYNTHETIC_WINDOW: {
+      const { uri, syntheticBrowserId } = event as OpenSyntheticBrowserWindowRequest;
       let syntheticBrowser: SyntheticBrowser;
       if (!syntheticBrowserId) {
         const result = addNewSyntheticBrowser(root);
@@ -33,7 +47,7 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
       return updateStructProperty(root, syntheticBrowser, "windows", [
         ...syntheticBrowser.windows,
         createSyntheticWindow({
-          location
+          location: uri
         })
       ]);
     }
@@ -43,6 +57,35 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
       return updateStruct(root, syntheticWindow, {
         mount: window.renderer.mount
       });
+    }
+
+    case RESIZED: {
+      const { itemId, itemType, box } = event as Resized;
+      if (itemType === SYNTHETIC_WINDOW) {
+        const window = getSyntheticWindow(root, itemId);
+        if (window) {
+          return updateStructProperty(root, window, "box", box);
+        }
+        break;
+      }
+    }
+
+    case MOVED: {
+      const { itemId, itemType, point } = event as Moved;
+      if (itemType === SYNTHETIC_WINDOW) {
+        const window = getSyntheticWindow(root, itemId);
+        if (window) {
+          return updateStructProperty(root, window, "box", moveBox(window.box, point));
+        }
+        break;
+      }
+    }
+
+    case REMOVED: {
+      const { itemId, itemType } = event as Removed;
+      if (itemType === SYNTHETIC_WINDOW) {
+        return deleteValueById(root, itemId);
+      }
     }
   }
 

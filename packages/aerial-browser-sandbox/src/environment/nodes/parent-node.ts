@@ -26,7 +26,7 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       }
       this._linkChild(child as any as SEnvNodeAddon);
       this.$childNodesArray.push(child);
-      if (this.$connectedToDocument) {
+      if (this.connectedToDocument) {
         (child as any as SEnvNodeAddon).$$addedToDocument();
       }
       const event = new  SEnvMutationEvent();
@@ -100,7 +100,7 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
 
     protected _unlinkChild(child: SEnvNodeAddon) {
       child.$$parentNode = null;
-      if (child.$connectedToDocument) {
+      if (child.connectedToDocument) {
         child.$$removedFromDocument();
       }
     }

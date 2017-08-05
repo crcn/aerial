@@ -16,7 +16,12 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
   } as any as CollectionClass;
 
   _Collection.prototype = [];
-  
+
+  class SEnvStyleSheetList extends _Collection<CSSStyleSheet> implements StyleSheetList {
+    item(index?: number): StyleSheet {
+      return this[index];
+    }
+  }
 
   class SEnvHTMLCollection extends _Collection<Element> implements HTMLCollection {
     $init(target: Node & ParentNode) {
@@ -70,7 +75,14 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
       return null;
     }
     setNamedItem(arg: Attr): Attr {
-      return null;
+      const existing = this.getNamedItem(arg.name);
+      if (existing) {
+        existing.value = arg.value;
+      } else {
+        this.push(arg);
+        this[arg.name] = arg;
+      }
+      return existing;
     }
     setNamedItemNS(arg: Attr): Attr {
       return null;
@@ -81,5 +93,6 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     SEnvNodeList,
     SEnvNamedNodeMap,
     SEnvHTMLCollection,
+    SEnvStyleSheetList,
   }
 });

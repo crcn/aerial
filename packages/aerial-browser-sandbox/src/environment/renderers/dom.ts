@@ -9,8 +9,20 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
 
   protected _onDocumentLoad(event: Event) {
     super._onDocumentLoad(event);
-    console.log("LOAD")
-    this.mount.innerHTML = this.sourceWindow.document.body.innerHTML;
+    const css = Array.prototype.map.call(this.sourceWindow.document.stylesheets, (ss: CSSStyleSheet) => (
+      ss.cssText
+    )).join("\n");
+
+    const html = this.sourceWindow.document.body.innerHTML;
+
+    this.mount.innerHTML = `
+      <style>
+        ${css}
+      </style>
+      <span>
+        ${html}
+      </span>
+    `;
   }
 }
 

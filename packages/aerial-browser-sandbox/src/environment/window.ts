@@ -203,6 +203,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     
     constructor(readonly $$id: string, origin: string, readonly $$dispatch: Dispatcher<any>) {
       super();
+
+      
       
       this.location = new SEnvLocation(origin);
       this.document = new SEnvDocument(this);

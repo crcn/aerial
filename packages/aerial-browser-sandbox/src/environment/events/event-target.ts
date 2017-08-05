@@ -1,4 +1,5 @@
 import { weakMemo } from "aerial-common2";
+import { EventTargetAddon } from "./event";
 
 
 const callEventListener = (listener: EventListenerOrEventListenerObject, event: Event) => (
@@ -35,6 +36,11 @@ export const getSEnvEventTargetClass = weakMemo((context?: any) => {
     }
 
     dispatchEvent(event: Event): boolean {
+      const eva = event as EventTargetAddon;
+      eva.$currentTarget = this;
+      if (!eva.$target) {
+        eva.$target = this;
+      }
       const listeners = this._eventListeners[event.type];
       if (!listeners) return false;
       if (Array.isArray(listeners)) {

@@ -6,9 +6,6 @@ export const getSEnvLocationClass = weakMemo((context: any) => {
 
   return class SEnvLocation implements Location {
 
-    private _ignoreRebuild: boolean;
-
-
     public hash: string = "";
     public hostname: string = "";
     public href: string = "";
@@ -17,14 +14,15 @@ export const getSEnvLocationClass = weakMemo((context: any) => {
     public port: string = "";
     public protocol: string = "";
     public search: string = "";
+    public host: string = "";
 
     constructor(urlStr: string) {
       // super();
-      this.origin = urlStr;
-    }
-
-    get host() {
-      return "";
+      const parts = Url.parse(urlStr);
+      for (const key in parts) {
+        this[key] = parts[key] || "";
+      }
+      this.origin = this.protocol + "//" + this.host;
     }
 
     assign(url: string) {

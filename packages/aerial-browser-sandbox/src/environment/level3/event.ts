@@ -1,8 +1,8 @@
 import { weakMemo } from "aerial-common2";
-import { getEventClasses } from "../events";
+import { getSEnvEventClasses } from "../events";
 
 export const getL3EventClasses = weakMemo((context: any) => {
-  const { SEnvEvent } = getEventClasses(context);
+  const { SEnvEvent } = getSEnvEventClasses(context);
   class SEnvMutationEvent extends SEnvEvent implements MutationEvent {
 
     // public is fine here since MutationEvent interface is used -- these

@@ -1,12 +1,13 @@
 import { weakMemo } from "aerial-common2";
+import { SEnvDocumentAddon } from "./document";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
-import { SEnvDocumentAddon } from "./document";
 
 export interface SEnvNodeAddon extends Node {
-  $connectedToDocument: boolean;
+  loaded: Promise<any>;
+  connectedToDocument: boolean;
   $$parentNode: Node;
   $$parentElement: HTMLElement;
   $$addedToDocument();
@@ -25,6 +26,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     public $$parentNode: Node;
     public $$parentElement: HTMLElement;
+    public loaded: Promise<any>;
 
     readonly attributes: NamedNodeMap;
     readonly baseURI: string | null;
@@ -59,7 +61,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly PROCESSING_INSTRUCTION_NODE: number;
     readonly TEXT_NODE: number;
 
-    $connectedToDocument: boolean;
+    connectedToDocument: boolean;
 
     protected $childNodesArray: Node[];
 
@@ -147,12 +149,20 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     }
 
     $$addedToDocument() {
-      this.$connectedToDocument = true;
+      this.connectedToDocument = true;
       this.connectedCallback();
     }
 
     $$removedFromDocument() {
-      this.$connectedToDocument = false;
+      this.connectedToDocument = false;
+    }
+
+    dispatchEvent(event: Event): boolean {
+      super.dispatchEvent(event);
+      if (event.bubbles && this.parentNode) {
+        this.parentNode.dispatchEvent(event);
+      }
+      return true;
     }
   }
 });

@@ -2,7 +2,7 @@ import { delay } from "redux-saga";
 import { Selector, createSelector } from "reselect";
 import { call, select, fork } from "redux-saga/effects";
 
-const WATCH_DELAY = 5;
+const WATCH_DELAY = 100;
 
 export function* watch<T, U>(selector: Selector<T, U>, onChange: (value: U, state?: T) => any) {
   let currentValue = null;

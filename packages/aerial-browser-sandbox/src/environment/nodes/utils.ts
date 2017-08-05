@@ -1,6 +1,7 @@
 import parse5 = require("parse5");
 import { weakMemo } from "aerial-common2";
 import { SEnvNodeTypes } from "../constants";
+import { SEnvNodeAddon } from "./node";
 import { SEnvDocumentAddon } from "./document";
 
 export const parseHTMLDocument = weakMemo((content: string) => {
@@ -57,3 +58,10 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
     }
   }
 };
+
+export const whenLoaded = async (node: SEnvNodeAddon) => {
+  await node.loaded;
+  await Promise.all(
+    Array.prototype.map.call(node.childNodes, child => whenLoaded(child))
+  );
+}

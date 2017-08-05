@@ -107,7 +107,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
 
       this.attributes = new Proxy(new SEnvNamedNodeMap(), {
         get: (target: NamedNodeMap, key: string)  => {
-          return target.getNamedItem(key);
+          return typeof target[key] === "function" ? target[key].bind(target) : target[key];
         },
         set: (target, key: string, value: string, receiver)  => {
           target.setNamedItem(new SEnvAttr(key, value, this));
@@ -117,7 +117,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     }
 
     getAttribute(name: string): string | null { 
-      return null;
+      return this.hasAttribute(name) ? this.attributes[name].value : null;
     }
 
     getAttributeNode(name: string): Attr { 
@@ -142,10 +142,9 @@ export const getSEnvElementClass = weakMemo((context: any) => {
 
     get outerHTML(): string {
       let buffer = `<${this.nodeName.toLowerCase()}`;
-      for (const name in this.attributes) {
-        if (this.attributes[name]) {
-          buffer += ` ${name}=${this.attributes[name].value}`;
-        }
+      for (let i = 0, n = this.attributes.length; i < n; i++) {
+        const { name, value } = this.attributes[i];
+        buffer += ` ${name}="${value}"`;
       }
       buffer += `>${this.innerHTML}</${this.nodeName.toLowerCase()}>`;
       return buffer;
@@ -178,7 +177,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     }
     
     hasAttribute(name: string): boolean { 
-      return null;
+      return this.attributes[name] != null;
     }
     
     hasAttributeNS(namespaceURI: string, localName: string): boolean{ 
@@ -234,7 +233,11 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     }
 
     setAttribute(name: string, value: string): void { 
-      return null;
+      if (this.hasAttribute(name)) {
+        this.attributes[name] = value;
+      } else {
+        this.attributes.setNamedItem(new SEnvAttr(name, value, this));
+      }
     }
 
     setAttributeNode(newAttr: Attr): Attr { 

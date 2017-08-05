@@ -95,7 +95,7 @@ import { syntheticBrowserReducer } from "aerial-browser-sandbox";
 // } from "aerial-synthetic-browser";
 
 import {
-  
+  createOpenSyntheticWindowRequest
 } from "aerial-browser-sandbox";
 
 import reduceReducers = require("reduce-reducers");
@@ -220,10 +220,10 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
-    // case PROMPTED_NEW_WINDOW_URL: {
-    //   const { workspaceId, location } = event as PromptedNewWindowUrl;
-    //   return applicationReducer(state, openSyntheticWindowRequested(getWorkspaceById(state, workspaceId).browser.$$id, location));
-    // }
+    case PROMPTED_NEW_WINDOW_URL: {
+      const { workspaceId, location } = event as PromptedNewWindowUrl;
+      return applicationReducer(state, createOpenSyntheticWindowRequest(location, getWorkspaceById(state, workspaceId).browser.$$id));
+    }
 
     case TOGGLE_LEFT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);

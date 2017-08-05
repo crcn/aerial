@@ -1,7 +1,8 @@
 import { weakMemo } from "aerial-common2";
-import { getSEnvElementClass, SEnvElementAddon } from "./element";
-import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
+import { getSEnvEventClasses } from "../events";
 import { getSEnvCSSStyleSheetClass } from "../css";
+import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
+import { getSEnvElementClass, SEnvElementAddon } from "./element";
 
 export interface SEnvHTMLElementAddon extends HTMLElement {
   $$preconstruct();
@@ -153,6 +154,96 @@ export const getSEnvHTMLStyleElementClass = weakMemo((context: any) => {
     }
   };
 });
+
+export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
+  const SEnvHTMLElement = getSEnvHTMLElementClass(context);
+  const SEnvCSSStyleSheet = getSEnvCSSStyleSheetClass(context);
+  const { SEnvEvent } = getSEnvEventClasses(context);
+
+  return class SEnvHTMLLinkElement extends SEnvHTMLElement implements HTMLLinkElement {
+
+    sheet: StyleSheet;
+    disabled: boolean;
+    hreflang: string;
+    media: string;
+    rev: string;
+    target: string;
+    type: string;
+    import?: Document;
+    integrity: string;
+    private _resolveLoaded: (value?) => any;
+    private _rejectLoaded: (value?) => any;
+
+    constructor() {
+      super();
+      this.loaded = new Promise((resolve, reject) => {
+        this._resolveLoaded = resolve;
+        this._rejectLoaded  = reject;
+      });
+      this._load();
+    }
+
+    get rel() {
+      return this.getAttribute("rel");
+    }
+
+    get charset() {
+      return this.getAttribute("charset");
+    }
+
+    set charset(value: string) {
+      this.setAttribute("charset", value);
+    }
+
+    set rel(value: string) {
+      this.setAttribute("rel", value);
+      this._load();
+    }
+    
+    get href() {
+      return this.getAttribute("href");
+    }
+
+    set href(value: string) {
+      this.setAttribute("href", value);
+      this._load();
+    }
+
+    private _load() {
+      const { rel } = this;
+      if (rel === "stylesheet") {
+        return this._loadStylesheet();
+      }
+
+      this._resolveLoaded();
+    }
+    private async _loadStylesheet() {
+      const { href } = this;
+      const window = this.ownerDocument.defaultView;
+      const uri = getUri(href, window.location);
+      const response = await window.fetch(uri);
+      const text = await response.text();
+      this._parseStylesheet(text);
+      const event = new SEnvEvent();
+      event.initEvent("load", true, true);
+      this._resolveLoaded();
+      this.dispatchEvent(event);
+    }
+
+    private _parseStylesheet(text: string) {
+      const sheet = this.sheet = new SEnvCSSStyleSheet();
+      const location = this.ownerDocument.defaultView.location;
+      sheet.cssText = text.replace(/url\(.*?\)/g, (url) => {
+        const url2 = url.replace(/(^url\(["']?)/g, "").replace(/(['"]?\)$)/, "");
+        return `url(${getUri(url2, location)})`;
+      });
+    }
+  };
+});
+
+const getUri = (href: string, location: Location) => {
+  return href.charAt(0) === "/" ? location.origin + href : location.origin + location.pathname + href;
+};
 
 export const getSEnvHTMLElementClasses = weakMemo((context: any) => {
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
@@ -740,21 +831,7 @@ export const getSEnvHTMLElementClasses = weakMemo((context: any) => {
       type: string;
       value: number;
     },
-    "link": class SEnvHTMLLinkElement extends SEnvHTMLElement implements HTMLLinkElement {
-
-      readonly sheet: StyleSheet;
-      charset: string;
-      disabled: boolean;
-      href: string;
-      hreflang: string;
-      media: string;
-      rel: string;
-      rev: string;
-      target: string;
-      type: string;
-      import?: Document;
-      integrity: string;
-     },
+    "link": getSEnvHTMLLinkElementClass(context),
     "listing": class SEnvHTMLPreElement extends SEnvHTMLElement implements HTMLPreElement { 
       width: number;
     },

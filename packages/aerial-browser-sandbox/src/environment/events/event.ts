@@ -1,26 +1,40 @@
 import { weakMemo } from "aerial-common2";
 
-export const getEventClasses = weakMemo((window: Window) => {
-  class SEnvEvent implements Event {
+export interface EventTargetAddon extends Event {
+  $target: EventTarget;
+  $currentTarget: EventTarget;
+}
+
+export const getSEnvEventClasses = weakMemo((window: Window) => {
+  class SEnvEvent implements EventTargetAddon {
+
+    $target: any;
+    $currentTarget: any;
 
     private _type: string;
     private _bubbles: boolean;
     private _cancelable: boolean;
 
     cancelBubble: boolean;
-    readonly currentTarget: EventTarget;
     readonly defaultPrevented: boolean;
     readonly eventPhase: number;
     readonly isTrusted: boolean;
     returnValue: boolean;
     readonly srcElement: Element | null;
-    readonly target: EventTarget;
     readonly timeStamp: number;
     readonly scoped: boolean;
     initEvent(eventTypeArg: string, canBubbleArg: boolean, cancelableArg: boolean): void {
       this._type = eventTypeArg;
       this._bubbles = canBubbleArg;
       this._cancelable = cancelableArg;
+    }
+
+    get target() {
+      return this.$target;
+    }
+
+    get currentTarget() {
+      return this.$currentTarget;
     }
 
     get type() {

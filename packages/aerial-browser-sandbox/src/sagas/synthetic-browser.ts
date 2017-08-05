@@ -1,4 +1,4 @@
-import { fork, put, call } from "redux-saga/effects";
+import { fork, put, call, spawn } from "redux-saga/effects";
 import { difference } from "lodash";
 import { createQueue } from "mesh";
 
@@ -45,7 +45,6 @@ import {
 } from "../environment";
 
 export function* syntheticBrowserSaga() {
-  yield fork(handleOpenSyntheticBrowserRequest);
   yield fork(handleBrowserChanges);
   yield fork(handleFetchRequests);
 }
@@ -58,21 +57,12 @@ function* handleFetchRequests() {
   }
 }
 
-function* handleOpenSyntheticBrowserRequest() {
-  while(true) {
-    yield takeRequest(OPEN_SYNTHETIC_WINDOW, function*({ uri, syntheticBrowserId }: OpenSyntheticBrowserWindowRequest) {
-
-      yield put(createNewSyntheticWindowEntryResolvedEvent(uri, syntheticBrowserId));
-    });
-  }
-}
-
 function* handleBrowserChanges() {
   let runningSyntheticBrowserIds = [];
   yield watch((root) => getSyntheticBrowsers(root), function*(browsers: SyntheticBrowser[]) {
     const syntheticBrowserIds = browsers.map(item => item.$$id);
     yield* difference(syntheticBrowserIds, runningSyntheticBrowserIds).map((id) => (
-      call(handleSyntheticBrowserSession, id)
+      spawn(handleSyntheticBrowserSession, id)
     ));
     runningSyntheticBrowserIds = syntheticBrowserIds;
     return true;
@@ -87,23 +77,29 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
     if (!syntheticBrowser) return false;
     const syntheticWindowIds = syntheticBrowser.windows.map(item => item.$$id);
     yield* difference(syntheticWindowIds, runningSyntheticWindowIds).map((id) => (
-      call(handleSytheticWindowSession, id)
+      spawn(handleSytheticWindowSession, id)
     ));
+
+    console.log(syntheticWindowIds);
     runningSyntheticWindowIds = syntheticWindowIds;
     return true;
   });
 }
 
 function* handleSytheticWindowSession(syntheticWindowId: string) {
-
-  yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
-    if (!syntheticWindow) return false;
-    yield handleSyntheticWindowChange(syntheticWindow);
-    return true;
-  });
-
   let cwindow: SyntheticWindow;
   let cenv: SEnvWindowAddon;
+
+  yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
+    if (!syntheticWindow) {
+      if (cenv) {
+        cenv.close();
+      }
+      return false;
+    }
+    yield spawn(handleSyntheticWindowChange, syntheticWindow);
+    return true;
+  });
 
   function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
     if (cwindow && cwindow.location === syntheticWindow.location) {

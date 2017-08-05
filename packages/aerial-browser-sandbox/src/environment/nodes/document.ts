@@ -2,12 +2,13 @@ import { weakMemo } from "aerial-common2";
 import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 import {getSEnvParentNodeClass } from "./parent-node";
 import { getL3EventClasses } from "../level3";
-import { getEventClasses } from "../events";
+import { getSEnvEventClasses } from "../events";
 import { getSEnvTextClass } from "./text";
 import { getSEnvCommentClass } from "./comment";
+import { getSEnvHTMLCollectionClasses } from "./collections";
 import { SEnvHTMLElementAddon, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
-import { parseHTMLDocument, constructNodeTree, mapExpressionToNode } from "./utils";
+import { parseHTMLDocument, constructNodeTree, mapExpressionToNode, whenLoaded } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
@@ -22,9 +23,10 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   const SEnvText = getSEnvTextClass(context);
   const SEnvComment = getSEnvCommentClass(context);
   const { SEnvMutationEvent } = getL3EventClasses(context);
-  const { SEnvEvent } = getEventClasses(context);
+  const { SEnvEvent } = getSEnvEventClasses(context);
   const SEnvDocumentFragment = getSEnvDocumentFragment(context);
   const SENvHTMLElement = getSEnvHTMLElementClass(context);
+  const { SEnvStyleSheetList } = getSEnvHTMLCollectionClasses(context);
 
   const eventMap = {
     MutationEvent:  SEnvMutationEvent
@@ -92,10 +94,13 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     readonly childElementCount: number;
 
     readonly stylesheets: StyleSheetList;
+    readonly styleSheets: StyleSheetList;
 
     constructor(readonly defaultView: Window) {
       super();
+      this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
+      this.addEventListener("load", this._onChildLoad.bind(this));
     }
     
     get readyState() {
@@ -137,7 +142,8 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       domContentLoadedEvent.initEvent("DOMContentLoaded", true, true);
       this.dispatchEvent(domContentLoadedEvent);
 
-      // TODO - load images, stylesheets, and other external resources
+      // wait for images, stylesheets, and other external resources
+      await whenLoaded(this);
 
       const loadEvent = new SEnvEvent();
       loadEvent.initEvent("load", true, true);
@@ -151,6 +157,12 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this.dispatchEvent(event);
     }
 
+    private _onChildLoad({ target }: Event) {
+      const sheet: CSSStyleSheet = target["sheet"];
+      if (sheet) {
+        (this.stylesheets as any as any[]).push(sheet);
+      }
+    }
 
     elementsFromPoint(x: number, y: number) {
       return null;
@@ -313,7 +325,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     scripts: HTMLCollectionOf<HTMLScriptElement>;
     readonly scrollingElement: Element | null;
     
-    readonly styleSheets: StyleSheetList;
     
     title: string;
     
