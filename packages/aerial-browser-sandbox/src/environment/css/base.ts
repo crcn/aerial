@@ -7,8 +7,8 @@ import {
   ITreeWalker,
   sourcePositionEquals
 } from "aerial-common";
-import { SyntheticCSSStyleSheet } from "./style-sheet";
-import { SyntheticDOMNode } from "../../dom/markup";
+// import { SyntheticCSSStyleSheet } from "./style-sheet";
+// import { SyntheticDOMNode } from "../../dom/markup";
 import {
   IEditable,
   IEditor,
@@ -35,9 +35,9 @@ export abstract class SyntheticCSSObject implements ISyntheticObject, IEditable 
 
   public $source: ISyntheticSourceInfo;
   public $uid: any;
-  public $parentStyleSheet: SyntheticCSSStyleSheet;
+  public $parentStyleSheet:CSSStyleSheet;
   public $parentRule: SyntheticCSSObject;
-  public $ownerNode: SyntheticDOMNode;
+  // public $ownerNode: SyntheticDOMNode;
 
   constructor() {
     this.$uid = generateSyntheticUID();
@@ -47,9 +47,9 @@ export abstract class SyntheticCSSObject implements ISyntheticObject, IEditable 
     return this.$parentStyleSheet || this.$parentRule && this.$parentRule.parentStyleSheet;
   }
 
-  get ownerNode() {
-    return this.$ownerNode || this.$parentRule && this.$parentRule.ownerNode || this.$parentStyleSheet && this.$parentStyleSheet.ownerNode;
-  }
+  // get ownerNode() {
+  //   return this.$ownerNode || this.$parentRule && this.$parentRule.ownerNode || this.$parentStyleSheet && this.$parentStyleSheet.ownerNode;
+  // }
 
   get parentRule() {
     return this.$parentRule;

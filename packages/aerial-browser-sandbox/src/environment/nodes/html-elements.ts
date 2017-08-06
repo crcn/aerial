@@ -1,6 +1,5 @@
 import { weakMemo } from "aerial-common2";
 import { getSEnvEventClasses } from "../events";
-import { getSEnvCSSStyleSheetClass } from "../css";
 import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
 import { getSEnvElementClass, SEnvElementAddon } from "./element";
 
