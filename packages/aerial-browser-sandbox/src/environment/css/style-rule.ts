@@ -1,8 +1,8 @@
 import { Dependency } from "aerial-sandbox";
 import { kebabCase } from "lodash";
 import { CallbackBus } from "mesh7";
-// import { SyntheticDOMElement } from "../markup";
-// import { getSelectorTester } from "../selector";
+import { getSelectorTester } from "../selector";
+import { SyntheticDOMElement } from "../markup";
 import { BaseContentEdit, SyntheticObjectChangeTypes, BaseEditor } from "aerial-sandbox";
 import { ISerializedSyntheticCSSStyle, SyntheticCSSStyle, isValidCSSDeclarationProperty } from "./style";
 import { SyntheticCSSObject, SyntheticCSSObjectSerializer, SyntheticCSSObjectEdit, SyntheticCSSObjectEditor } from "./base";
@@ -134,8 +134,8 @@ export abstract class SyntheticCSSStyleRule extends SyntheticCSSObject {
   }
 
   private _onMetadataEvent(event: CoreEvent) {
-    // const ownerNode = this.$ownerNode || (this.$parentStyleSheet && this.$parentStyleSheet.$ownerNode);
-    // if (ownerNode) ownerNode.notify(event);
+    const ownerNode = this.$ownerNode || (this.$parentStyleSheet && this.$parentStyleSheet.$ownerNode);
+    if (ownerNode) ownerNode.notify(event);
   }
 }
 
@@ -192,9 +192,9 @@ export class SyntheticCSSElementStyleRule extends SyntheticCSSStyleRule {
     return new SyntheticCSSElementStyleRule(this.selector, undefined);
   }
 
-  // matchesElement(element: SyntheticDOMElement) {
-  //   return getSelectorTester(this.selector, element).test(element);
-  // }
+  matchesElement(element: SyntheticDOMElement) {
+    return getSelectorTester(this.selector, element).test(element);
+  }
 
   countShallowDiffs(target: SyntheticCSSElementStyleRule): number {
     return this.selector === target.selector ? 0 : -1;

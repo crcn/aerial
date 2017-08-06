@@ -28,16 +28,16 @@ function parseSourceMaps(value) {
   return _smcache[value] = JSON.parse(new Buffer(sourceMappingURL.split(",").pop(), "base64").toString("utf8"));
 }
 
+
 let _cache: {
   [Identifier: string]: SyntheticCSSStyleSheet
 } = {};
 
 export function evaluateCSSSource(source: string, map?: sm.RawSourceMap, module?: SandboxModule) {
-  const hash = source + (module && module.uri);
-  if (_cache[hash]) return _cache[hash].clone(true).regenerateUID();
+  if (_cache[source]) return _cache[source].clone(true).regenerateUID();
   if (!map) map = parseSourceMaps(source);
   const ast = parseCSS(source, map);
-  const styleSheet = _cache[hash] = evaluateCSS(ast, map, module);
+  const styleSheet = _cache[source] = evaluateCSS(ast, map, module);
 
   // re-exec to ensure that the cached version doesn't get mutated
   return evaluateCSSSource(source, map, module);
@@ -46,6 +46,7 @@ export function evaluateCSSSource(source: string, map?: sm.RawSourceMap, module?
 setInterval(() => _cache = {}, 1000 * 60);
 
 export function evaluateCSS(expression: postcss.Root, map?: sm.RawSourceMap, module?: SandboxModule): SyntheticCSSStyleSheet {
+
 
   const dependency = module && module.source;
 
@@ -107,47 +108,45 @@ export function evaluateCSS(expression: postcss.Root, map?: sm.RawSourceMap, mod
     return synthetic;
   }
 
-  const mapRoot = (root: postcss.Root) => {
-    const ret = link(root, new SyntheticCSSStyleSheet(acceptAll(root.nodes)));
-    return ret;
-  };
+  const visitor = {
+    visitRoot(root: postcss.Root) {
+      const ret = link(root, new SyntheticCSSStyleSheet(acceptAll(root.nodes)));
+      return ret;
+    },
+    visitAtRule(atRule: postcss.AtRule): any {
 
-  const mapAtRule = (atRule: postcss.AtRule): any => {
+      if (atRule.name === "keyframes") {
+        return link(atRule, new SyntheticCSSKeyframesRule(atRule.params, acceptAll(atRule.nodes)));
+      } else if (atRule.name === "media") {
+        return link(atRule, new SyntheticCSSMediaRule([atRule.params], acceptAll(atRule.nodes)));
+      } else if (atRule.name === "font-face") {
+        return link(atRule, new SyntheticCSSFontFace(getStyleDeclaration(atRule.nodes as postcss.Declaration[])));
+      }
 
-    if (atRule.name === "keyframes") {
-      return link(atRule, new SyntheticCSSKeyframesRule(atRule.params, acceptAll(atRule.nodes)));
-    } else if (atRule.name === "media") {
-      return link(atRule, new SyntheticCSSMediaRule([atRule.params], acceptAll(atRule.nodes)));
-    } else if (atRule.name === "font-face") {
-      return link(atRule, new SyntheticCSSFontFace(getStyleDeclaration(atRule.nodes as postcss.Declaration[])));
+      return link(atRule, new SyntheticCSSUnknownGroupAtRule(atRule.name, atRule.params, acceptAll(atRule.nodes)));
+    },
+    visitComment(comment: postcss.Comment) {
+      return null;
+    },
+    visitDeclaration(declaration: postcss.Declaration) {
+      return null;
+    },
+    visitRule(rule: postcss.Rule) {
+      return link(rule, new SyntheticCSSElementStyleRule(rule.selector, getStyleDeclaration(rule.nodes as postcss.Declaration[])));
     }
-
-    return link(atRule, new SyntheticCSSUnknownGroupAtRule(atRule.name, atRule.params, acceptAll(atRule.nodes)));
   };
 
-  const mapComment = (comment: postcss.Comment) => {
-    return null;
-  };
-
-  const mapDeclaration = (declaration: postcss.Declaration) => {
-    return null;
-  };
-
-  const mapRule = (rule: postcss.Rule) => {
-    return link(rule, new SyntheticCSSElementStyleRule(rule.selector, getStyleDeclaration(rule.nodes as postcss.Declaration[])));
-  };
-
-  const acceptAll = (nodes: postcss.Node[]) => {
+  function acceptAll(nodes: postcss.Node[]) {
     return without((nodes || []).map((child) => accept(child)), null);
   }
 
   function accept(expression: postcss.Node) {
     switch(expression.type) {
-      case "root": return mapRoot(<postcss.Root>expression);
-      case "rule": return mapRule(<postcss.Rule>expression);
-      case "atrule": return mapAtRule(<postcss.AtRule>expression);
-      case "comment": return mapComment(<postcss.Comment>expression);
-      case "decl": return mapDeclaration(<postcss.Declaration>expression);
+      case "root": return visitor.visitRoot(<postcss.Root>expression);
+      case "rule": return visitor.visitRule(<postcss.Rule>expression);
+      case "atrule": return visitor.visitAtRule(<postcss.AtRule>expression);
+      case "comment": return visitor.visitComment(<postcss.Comment>expression);
+      case "decl": return visitor.visitDeclaration(<postcss.Declaration>expression);
     }
   }
 

@@ -1,385 +1,303 @@
-import { Dispatcher, weakMemo } from "aerial-common2";
-import { getSEnvLocationClass } from "./location";
-import { getSEnvEventTargetClass } from "./events";
-import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
-import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass, SEnvDocumentAddon } from "./nodes";
-import { getSEnvCustomElementRegistry } from "./custom-element-registry";
+import { Sandbox } from "aerial-sandbox";
+import { bindable } from "aerial-common";
+import { btoa, atob } from "abab"
+import { HTML_XMLNS } from "./constants";
+import memoize = require("memoizee");
+import { URL, FakeURL } from "./url";
+import nwmatcher = require("nwmatcher");
+import { Blob, FakeBlob } from "./blob";
+import { SyntheticHistory } from "./history";
+import { SyntheticDocument } from "./document";
+import { SyntheticHTMLElement } from "./html";
+import { SyntheticLocalStorage } from "./local-storage";
+import { SyntheticWindowTimers } from "./timers";
+import { bindDOMNodeEventMethods } from "./utils";
+import { SyntheticDOMElement, DOMNodeType } from "./markup";
+import { SyntheticXMLHttpRequest, XHRServer } from "./xhr";
+import { SyntheticCSSStyle, SyntheticCSSElementStyleRule } from "./css";
+import { Logger, LogEvent, Observable, PrivateBusProvider, PropertyWatcher, MutationEvent } from "aerial-common";
+import { CallbackBus } from "mesh7";
+import { 
+  DOMEventTypes,
+  IDOMEventEmitter,
+  SyntheticDOMEvent,
+  DOMEventDispatcherMap, 
+  DOMEventListenerFunction, 
+} from "./events";
 
-type OpenTarget = "_self" | "_blank";
+export class SyntheticNavigator {
+  readonly appCodeName = "Tandem";
+  readonly platform =  "synthetic";
+  readonly userAgent = "none";
+}
 
-export interface SEnvWindowAddon extends Window {
-  renderer:  SyntheticWindowRenderer;
-};
+export class SyntheticConsole {
+  constructor(private _logger: Logger) {
 
-export type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+    // Ensure that when the logs get dispatched that they are displayed.
+    this._logger.filterable = false;
+  }
 
-export type SEnvWindowContext = {
-  fetch: Fetch;
-  createRenderer?: SyntheticDOMRendererFactory;
-};
+  log(text, ...rest: any[]) {
+    this._logger.debug(text, ...rest);
+  }
+  info(text, ...rest: any[]) {
+    this._logger.info(text, ...rest);
+  }
+  warn(text, ...rest: any[]) {
+    this._logger.warn(text, ...rest);
+  }
+  error(text, ...rest: any[]) {
+    this._logger.error(text, ...rest);
+  }
+}
 
-export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
-  const { createRenderer = createNoopRenderer, fetch } = context;
+// TODO - register element types from kernel
+export class SyntheticDOMImplementation {
+  constructor(private _window: SyntheticWindow) {
 
-  const SEnvEventTarget = getSEnvEventTargetClass(context);
-  const SEnvDocument = getSEnvDocumentClass(context);
-  const SEnvLocation = getSEnvLocationClass(context);
-  const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(context);
-  const SEnvElement     = getSEnvElementClass(context);
-  const SEnvHTMLElement = getSEnvHTMLElementClass(context);
+  }
+  hasFeature(value: string) {
+    return false;
+  }
 
-  // register default HTML tag names
-  const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
-  
-  return class SEnvWindow extends SEnvEventTarget implements SEnvWindowAddon {
+  createHTMLDocument(title?: string) {
+    const document = new SyntheticDocument(HTML_XMLNS, this);
+    document.registerElementNS(HTML_XMLNS, "default", SyntheticHTMLElement);
+    const documentElement = document.createElement("html");
 
-    readonly location: Location;
+    // head
+    documentElement.appendChild(document.createElement("head"));
 
-    readonly sessionStorage: Storage;
-    readonly localStorage: Storage;
-    readonly console: Console;
-    readonly indexedDB: IDBFactory;
-    readonly applicationCache: ApplicationCache;
-    readonly caches: CacheStorage;
-    readonly clientInformation: Navigator;
-    readonly closed: boolean;
-    readonly crypto: Crypto;
-    defaultStatus: string;
-    readonly devicePixelRatio: number;
-    readonly document: SEnvDocumentAddon;
-    readonly doNotTrack: string;
-    event: Event | undefined;
-    readonly external: External;
-    readonly frameElement: Element;
-    readonly frames: Window;
-    readonly history: History;
-    readonly innerHeight: number;
-    readonly innerWidth: number;
-    readonly isSecureContext: boolean;
-    readonly length: number;
-    readonly locationbar: BarProp;
-    readonly menubar: BarProp;
-    readonly msContentScript: ExtensionScriptApis;
-    readonly msCredentials: MSCredentials;
-    name: string;
-    readonly navigator: Navigator;
-    offscreenBuffering: string | boolean;
-    onabort: (this: Window, ev: UIEvent) => any;
-    onafterprint: (this: Window, ev: Event) => any;
-    onbeforeprint: (this: Window, ev: Event) => any;
-    onbeforeunload: (this: Window, ev: BeforeUnloadEvent) => any;
-    onblur: (this: Window, ev: FocusEvent) => any;
-    oncanplay: (this: Window, ev: Event) => any;
-    oncanplaythrough: (this: Window, ev: Event) => any;
-    onchange: (this: Window, ev: Event) => any;
-    onclick: (this: Window, ev: MouseEvent) => any;
-    oncompassneedscalibration: (this: Window, ev: Event) => any;
-    oncontextmenu: (this: Window, ev: PointerEvent) => any;
-    ondblclick: (this: Window, ev: MouseEvent) => any;
-    ondevicelight: (this: Window, ev: DeviceLightEvent) => any;
-    ondevicemotion: (this: Window, ev: DeviceMotionEvent) => any;
-    ondeviceorientation: (this: Window, ev: DeviceOrientationEvent) => any;
-    ondrag: (this: Window, ev: DragEvent) => any;
-    ondragend: (this: Window, ev: DragEvent) => any;
-    ondragenter: (this: Window, ev: DragEvent) => any;
-    ondragleave: (this: Window, ev: DragEvent) => any;
-    ondragover: (this: Window, ev: DragEvent) => any;
-    ondragstart: (this: Window, ev: DragEvent) => any;
-    ondrop: (this: Window, ev: DragEvent) => any;
-    ondurationchange: (this: Window, ev: Event) => any;
-    onemptied: (this: Window, ev: Event) => any;
-    onended: (this: Window, ev: MediaStreamErrorEvent) => any;
-    onerror: ErrorEventHandler;
-    onfocus: (this: Window, ev: FocusEvent) => any;
-    onhashchange: (this: Window, ev: HashChangeEvent) => any;
-    oninput: (this: Window, ev: Event) => any;
-    oninvalid: (this: Window, ev: Event) => any;
-    onkeydown: (this: Window, ev: KeyboardEvent) => any;
-    onkeypress: (this: Window, ev: KeyboardEvent) => any;
-    onkeyup: (this: Window, ev: KeyboardEvent) => any;
-    onload: (this: Window, ev: Event) => any;
-    onloadeddata: (this: Window, ev: Event) => any;
-    onloadedmetadata: (this: Window, ev: Event) => any;
-    onloadstart: (this: Window, ev: Event) => any;
-    onmessage: (this: Window, ev: MessageEvent) => any;
-    onmousedown: (this: Window, ev: MouseEvent) => any;
-    onmouseenter: (this: Window, ev: MouseEvent) => any;
-    onmouseleave: (this: Window, ev: MouseEvent) => any;
-    onmousemove: (this: Window, ev: MouseEvent) => any;
-    onmouseout: (this: Window, ev: MouseEvent) => any;
-    onmouseover: (this: Window, ev: MouseEvent) => any;
-    onmouseup: (this: Window, ev: MouseEvent) => any;
-    onmousewheel: (this: Window, ev: WheelEvent) => any;
-    onmsgesturechange: (this: Window, ev: MSGestureEvent) => any;
-    onmsgesturedoubletap: (this: Window, ev: MSGestureEvent) => any;
-    onmsgestureend: (this: Window, ev: MSGestureEvent) => any;
-    onmsgesturehold: (this: Window, ev: MSGestureEvent) => any;
-    onmsgesturestart: (this: Window, ev: MSGestureEvent) => any;
-    onmsgesturetap: (this: Window, ev: MSGestureEvent) => any;
-    onmsinertiastart: (this: Window, ev: MSGestureEvent) => any;
-    onmspointercancel: (this: Window, ev: MSPointerEvent) => any;
-    onmspointerdown: (this: Window, ev: MSPointerEvent) => any;
-    onmspointerenter: (this: Window, ev: MSPointerEvent) => any;
-    onmspointerleave: (this: Window, ev: MSPointerEvent) => any;
-    onmspointermove: (this: Window, ev: MSPointerEvent) => any;
-    onmspointerout: (this: Window, ev: MSPointerEvent) => any;
-    onmspointerover: (this: Window, ev: MSPointerEvent) => any;
-    onmspointerup: (this: Window, ev: MSPointerEvent) => any;
-    onoffline: (this: Window, ev: Event) => any;
-    ononline: (this: Window, ev: Event) => any;
-    onorientationchange: (this: Window, ev: Event) => any;
-    onpagehide: (this: Window, ev: PageTransitionEvent) => any;
-    onpageshow: (this: Window, ev: PageTransitionEvent) => any;
-    onpause: (this: Window, ev: Event) => any;
-    onplay: (this: Window, ev: Event) => any;
-    onplaying: (this: Window, ev: Event) => any;
-    onpopstate: (this: Window, ev: PopStateEvent) => any;
-    onprogress: (this: Window, ev: ProgressEvent) => any;
-    onratechange: (this: Window, ev: Event) => any;
-    onreadystatechange: (this: Window, ev: ProgressEvent) => any;
-    onreset: (this: Window, ev: Event) => any;
-    onresize: (this: Window, ev: UIEvent) => any;
-    onscroll: (this: Window, ev: UIEvent) => any;
-    onseeked: (this: Window, ev: Event) => any;
-    onseeking: (this: Window, ev: Event) => any;
-    onselect: (this: Window, ev: UIEvent) => any;
-    onstalled: (this: Window, ev: Event) => any;
-    onstorage: (this: Window, ev: StorageEvent) => any;
-    onsubmit: (this: Window, ev: Event) => any;
-    onsuspend: (this: Window, ev: Event) => any;
-    ontimeupdate: (this: Window, ev: Event) => any;
-    ontouchcancel: (ev: TouchEvent) => any;
-    ontouchend: (ev: TouchEvent) => any;
-    ontouchmove: (ev: TouchEvent) => any;
-    ontouchstart: (ev: TouchEvent) => any;
-    onunload: (this: Window, ev: Event) => any;
-    onvolumechange: (this: Window, ev: Event) => any;
-    onwaiting: (this: Window, ev: Event) => any;
-    onpointercancel: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onpointerdown: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onpointerenter: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onpointerleave: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onpointermove: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onpointerout: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onpointerover: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onpointerup: (this: GlobalEventHandlers, ev: PointerEvent) => any;
-    onwheel: (this: GlobalEventHandlers, ev: WheelEvent) => any;
-    opener: any;
-    orientation: string | number;
-    readonly outerHeight: number;
-    readonly outerWidth: number;
-    readonly pageXOffset: number;
-    readonly pageYOffset: number;
-    readonly parent: Window;
-    readonly performance: Performance;
-    readonly personalbar: BarProp;
-    readonly screen: Screen;
-    readonly screenLeft: number;
-    readonly screenTop: number;
-    readonly screenX: number;
-    readonly screenY: number;
-    readonly scrollbars: BarProp;
-    readonly scrollX: number;
-    readonly scrollY: number;
-    readonly self: Window;
-    readonly speechSynthesis: SpeechSynthesis;
-    status: string;
-    readonly statusbar: BarProp;
-    readonly styleMedia: StyleMedia;
-    readonly toolbar: BarProp;
-    readonly renderer: SyntheticWindowRenderer;
-    readonly top: Window;
-    readonly window: Window;
-    URL: typeof URL;
-    URLSearchParams: typeof URLSearchParams;
-    Blob: typeof Blob;
-    readonly customElements: CustomElementRegistry;
+    // body
+    documentElement.appendChild(document.createElement("body"));
 
-    // classes
-    readonly EventTarget: typeof EventTarget = SEnvEventTarget;
-    readonly Element: typeof Element = SEnvElement;
-    readonly HTMLElement: typeof HTMLElement = SEnvHTMLElement;
-    fetch: Fetch = fetch;
+    document.appendChild(documentElement);
+    return document;
+
+  }
+}
+
+export class SyntheticWindow extends Observable {
+
+  readonly navigator = new SyntheticNavigator();
+
+  // TODO - emit events from logs here
+  readonly console: SyntheticConsole;
+
+  @bindable()
+  public location: Location;
+
+  @bindable()
+  public onload: DOMEventListenerFunction;
+
+  @bindable()
+  public onpopstate: DOMEventListenerFunction;
+
+  readonly document: SyntheticDocument;
+  readonly window: SyntheticWindow;
+
+  // TODO - need to wrap around these
+  readonly history: SyntheticHistory;
+  readonly setTimeout: Function;
+  readonly setInterval: Function;
+  readonly setImmediate: Function;
+  readonly clearTimeout: Function;
+  readonly clearInterval: Function;
+  readonly clearImmediate: Function;
+  readonly localStorage: SyntheticLocalStorage;
+  readonly self: SyntheticWindow;
+
+  private _implementation: SyntheticDOMImplementation;
+
+  readonly XMLHttpRequest:  { new(): SyntheticXMLHttpRequest };
+
+  readonly HTMLElement;
+  readonly Element;
+  readonly WebSocket: { new(): any };
+
+  @bindable(true)
+  public innerWidth: number = 0;
+
+  @bindable(true)
+  public innerHeight: number = 0;
+
+  private _windowTimers: SyntheticWindowTimers;
+  private _eventListeners: DOMEventDispatcherMap;
+  private _server: XHRServer;
+
+  readonly Blob = Blob;
+  readonly URL  = URL;
+  readonly btoa = btoa;
+
+  readonly selector: any; 
+
+  readonly $synthetic = true;
+
+  readonly requestAnimationFrame = (tick) => setImmediate(tick);
+
+  constructor(location?: Location, document?: SyntheticDocument) {
+    super();
+
+
+    const bus = null; // kernel && PrivateBusProvider.getInstance(kernel);
     
-    constructor(readonly $$id: string, origin: string, readonly $$dispatch: Dispatcher<any>) {
-      super();
+    // in case proto gets set - don't want the original to get fudged
+    // but doesn't work -- element instanceof HTMLElement 
+    this.HTMLElement = SyntheticHTMLElement;
+    this.Element     = SyntheticDOMElement;
 
-      
-      
-      this.location = new SEnvLocation(origin);
-      this.document = new SEnvDocument(this);
-      this.window   = this;
-      this.renderer = createRenderer(this);
-      
+    const xhrServer = this._server = new XHRServer(this);
 
-      const customElements = this.customElements = new SEnvCustomElementRegistry(this);
-      for (const tagName in TAG_NAME_MAP) {
-        customElements.define(tagName, TAG_NAME_MAP[tagName]);
+    this.WebSocket = class WebSocket { }
+
+    // if (kernel) kernel.inject(xhrServer);
+
+    this.XMLHttpRequest = class extends SyntheticXMLHttpRequest { 
+      constructor() {
+        super(xhrServer);
+      }
+    };
+
+    this.self = this;
+
+    this._implementation = new SyntheticDOMImplementation(this);
+    this._eventListeners = new DOMEventDispatcherMap(this);
+
+    this.localStorage = new SyntheticLocalStorage();
+    this.document = document || this._implementation.createHTMLDocument();
+    this.document.$window = this;
+    // this.location = location || new SyntheticLocation("");
+    this.history = new SyntheticHistory(this.location.toString());
+
+    // this.history.$locationWatcher.connect((newLocation) => {
+
+    //   // copy props over -- changing the location means a redirect.
+    //   // this.location.$copyPropertiesFromUrl(newLocation.toString());
+    // });
+
+    
+    // new PropertyWatcher<SyntheticLocation, string>(this.location, "href").connect((newValue) =>  {
+    //   this.notify(new SyntheticDOMEvent(DOMEventTypes.POP_STATE));
+    // });
+    
+    this.window   = this;
+    this.console  = new SyntheticConsole(
+      new Logger(new CallbackBus(this.onVMLog.bind(this)))
+    );
+
+    const windowTimers  = this._windowTimers = new SyntheticWindowTimers();
+    this.setTimeout     = windowTimers.setTimeout.bind(windowTimers);
+    this.setInterval    = windowTimers.setInterval.bind(windowTimers);
+    this.setImmediate   = windowTimers.setImmediate.bind(windowTimers);
+    this.clearTimeout   = windowTimers.clearTimeout.bind(windowTimers);
+    this.clearInterval  = windowTimers.clearInterval.bind(windowTimers);
+    this.clearImmediate = windowTimers.clearImmediate.bind(windowTimers);
+
+    bindDOMNodeEventMethods(this, DOMEventTypes.POP_STATE);
+
+    this.selector = nwmatcher(this);
+
+    // VERBOSITY = false to prevent breaking on invalid selector rules
+    this.selector.configure({ CACHING: true, VERBOSITY: false });
+    
+    // TODO - register selectors that are specific to the web browser
+  }
+
+  get sandbox() {
+    // return this.browser && this.browser.sandbox;
+    return null;
+  }
+
+  getComputedStyle(element: SyntheticHTMLElement) {
+    const style = new SyntheticCSSStyle();
+    if (element.nodeType !== DOMNodeType.ELEMENT) return style;
+    const copy = (from: SyntheticCSSStyle) => {
+      if (from)
+      for (let i = 0, n = from.length; i < n; i++) {
+        if (style[from[i]]) continue;
+        style[from[i]] = from[from[i]];
       }
     }
+    copy(element.style);
+    for (let i = this.document.styleSheets.length; i--;) {
+      const ss = this.document.styleSheets[i];
+      for (let j = ss.cssRules.length; j--;) {
+        const rule = ss.cssRules[j];
+        if (rule instanceof SyntheticCSSElementStyleRule) {
 
-    alert(message?: any): void { }
-    blur(): void { }
-    cancelAnimationFrame(handle: number): void { }
-    captureEvents(): void { }
-    close(): void { }
+          // may bust if parent is a shadow root
+          try {
+            if (rule.matchesElement(element)) {
+              copy(rule.style);
+            }
+          } catch(e) {
 
-    confirm(message?: string): boolean {
-      return false;
+          }
+        }
+      }
     }
-
-    atob(encodedString: string): string {
-      return null;
-    }
-
-    btoa(rawString: string): string {
-      return null;
-    }
-
-
-    departFocus(navigationReason: NavigationReason, origin: FocusNavigationOrigin): void {
-      
-    }
-
-    focus(): void {
-
-    }
-    getComputedStyle(elt: Element, pseudoElt?: string): CSSStyleDeclaration {
-      return null;
-    }
-
-    getMatchedCSSRules(elt: Element, pseudoElt?: string): CSSRuleList {
-      return null;
-    }
-
-    getSelection(): Selection {
-      return null;
-    }
-
-    matchMedia(mediaQuery: string): MediaQueryList {
-      return null;
-    }
-
-    clearInterval(handle: number): void {
-
-    }
-
-    clearTimeout(handle: number): void {
-
-    }
-
-    setInterval(...args): number {
-      return 0;
-    }
-
-
-    setTimeout(...args): number {
-      return 0;
-    }
-
-    clearImmediate(handle: number): void {
-
-    }
-
-    setImmediate(): number {
-      return -1;
-    }
-
-    moveBy(x?: number, y?: number): void {
-
-    }
-
-    moveTo(x?: number, y?: number): void {
-
-    }
-
-    msWriteProfilerMark(profilerMarkName: string): void {
-
-    }
-
-    open(url?: string, target?: string, features?: string, replace?: boolean): Window {
-      return null;
-    }
-
-    postMessage(message: any, targetOrigin: string, transfer?: any[]): void {
-
-    }
-
-    print(): void {
-
-    }
-
-    prompt(message?: string, _default?: string): string | null {
-      return null;
-    }
-
-    releaseEvents(): void {
-
-    }
-
-    requestAnimationFrame(callback: FrameRequestCallback): number {
-      return -1;
-    }
-
-    resizeBy(x?: number, y?: number): void {
-
-    }
-
-    resizeTo(x?: number, y?: number): void {
-
-    }
-
-    scroll(...args): void {
-
-    }
-
-    scrollBy(...args): void {
-
-    }
-
-    scrollTo(...args): void {
-
-    }
-
-    stop(): void {
-
-    }
-
-    webkitCancelAnimationFrame(handle: number): void {
-
-    }
-
-    webkitConvertPointFromNodeToPage(node: Node, pt: WebKitPoint): WebKitPoint {
-      return null;
-    }
-
-    webkitConvertPointFromPageToNode(node: Node, pt: WebKitPoint): WebKitPoint {
-      return null;
-    }
-
-    webkitRequestAnimationFrame(callback: FrameRequestCallback): number {
-      return -1;
-    }
-
-    createImageBitmap(...args) {
-      return Promise.reject(null);
-    }
-
-    async $load() {
-      const response = await this.fetch(this.location.origin);
-      const content  = await response.text();
-      this.document.$load(content);
-    }
+    style.$updatePropertyIndices();
+    return style;
   }
-});
+  
 
-export type SyntheticWindowEnvironmentOptions = {
-  fetch: Fetch;
-} & SEnvWindowContext;
+  addEventListener(type: string, listener: DOMEventListenerFunction) {
+    this._eventListeners.add(type, listener);
+  }
 
-export const openSyntheticEnvironmentWindow = (location: string, context: SyntheticWindowEnvironmentOptions) => {
-  const SEnvWindow = getSEnvWindowClass(context);
-  const window = new SEnvWindow(null, location, null);
-  window.$load();
-  return window;
+  addEvent(type: string, listener: DOMEventListenerFunction) {
+    this._eventListeners.add(type, listener);
+  }
+
+  removeEventListener(type: string, listener: DOMEventListenerFunction) {
+    this._eventListeners.remove(type, listener);
+  }
+
+  get depth(): number {
+    let i = 0;
+    let c = this;
+    while (c) {
+      i++;
+      c = <any>c.parent;
+    }
+    return i;
+  }
+
+  dispose() {
+    this._windowTimers.dispose();
+  }
+
+  get parent(): SyntheticWindow {
+    return null;
+    // return this.browser.parent && this.browser.parent.window && this.browser.parent.window;
+  }
+
+  /**
+   * overridable method that forces the window to wait for any async 
+   * processing by the loaded application. Useful to ensure that the app is properly
+   * hotswapped.
+   */
+
+  public syntheticDOMReadyCallback = () => {
+
+  }
+
+  private onVMLog = (log: LogEvent) => {
+    this.notify(log);
+  }
+
+  // ugly method invoked by browser to fire load events
+  public whenLoaded = memoize(async () => {
+
+    await this.syntheticDOMReadyCallback();
+
+    // always comes before load event since DOM_CONTENT_LOADED assumes that assets
+    // such as stylesheets have not yet been loaded in
+    this.notify(new SyntheticDOMEvent(DOMEventTypes.DOM_CONTENT_LOADED));
+
+    // sandbox has already mapped & loaded external dependencies, so go ahead and fire
+    // the DOM events
+    this.notify(new SyntheticDOMEvent(DOMEventTypes.LOAD));
+  }, { length: 0, async: true })
 }

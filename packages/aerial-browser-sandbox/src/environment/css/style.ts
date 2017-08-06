@@ -1,7 +1,7 @@
 import sift from "sift";
 import { SyntheticCSSObject } from "./base";
 import { kebabCase, camelCase } from "lodash";
-// import { SyntheticDOMNode } from "../../dom/markup";
+import { SyntheticDOMNode } from "../markup";
 import { CallbackBus } from "mesh7";
 import { SyntheticCSSElementStyleRuleMutationTypes } from "./style-rule";
 import { ISerializable, serializable, diffArray, ITreeWalker, PropertyMutation, serialize, deserialize } from "aerial-common";
@@ -500,11 +500,11 @@ export class SyntheticCSSStyle implements ISyntheticObject {
     // object an observable, and notify changes from here. However, since this particular class is used so often, sending
     // notifications from here would be put a notable bottleneck on the app. So, instead we"re notifying the owner of this node (typically the
     // root document). Less ideal, but achieves the same result of notifying the system of any changes to the synthetic document.
-    // const ownerNode = this.$parentRule && this.$parentRule.ownerNode;
+    const ownerNode = this.$parentRule && this.$parentRule.ownerNode;
 
-    // if (ownerNode) {
-    //   ownerNode.notify(new PropertyMutation(SyntheticCSSElementStyleRuleMutationTypes.SET_DECLARATION, this.$parentRule, name, newValue, undefined, oldName).toEvent(true));
-    // }
+    if (ownerNode) {
+      ownerNode.notify(new PropertyMutation(SyntheticCSSElementStyleRuleMutationTypes.SET_DECLARATION, this.$parentRule, name, newValue, undefined, oldName).toEvent(true));
+    }
   }
 
   public $updatePropertyIndices() {

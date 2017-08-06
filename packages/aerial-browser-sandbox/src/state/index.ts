@@ -1,5 +1,4 @@
 import { Struct, createStructFactory, Box, getValuesByType, getValueById, updateStructProperty, updateStruct, weakMemo, traverseObject } from "aerial-common2";
-import { SEnvWindowAddon } from "../environment";
 
 export const SYNTHETIC_BROWSER_STORE = "SYNTHETIC_BROWSER_STORE";
 export const SYNTHETIC_BROWSER = "SYNTHETIC_BROWSER";

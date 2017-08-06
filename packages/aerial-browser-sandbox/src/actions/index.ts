@@ -1,4 +1,4 @@
-import { SEnvWindowAddon } from "../environment";
+// import { SEnvWindowAddon } from "../environment";
 import { Request, BaseEvent, generateDefaultId } from "aerial-common2";
 
 export const OPEN_SYNTHETIC_WINDOW               = "OPEN_SYNTHETIC_WINDOW";
@@ -13,7 +13,7 @@ export type FetchRequest = {
 export type SyntheticWindowSourceChangedEvent = {
   type: string
   syntheticWindowId;
-  window: SEnvWindowAddon;
+  window: any;
 } & BaseEvent;
 
 export type OpenSyntheticBrowserWindowRequest = {
@@ -27,7 +27,7 @@ export type NewSyntheticWindowEntryResolvedEvent = {
 } & BaseEvent;
 
 
-export const createSyntheticWindowSourceChangedEvent = (syntheticWindowId: string, window: SEnvWindowAddon): SyntheticWindowSourceChangedEvent => ({
+export const createSyntheticWindowSourceChangedEvent = (syntheticWindowId: string, window: any): SyntheticWindowSourceChangedEvent => ({
   window,
   syntheticWindowId,
   type: SYNTHETIC_WINDOW_SOURCE_CHANGED

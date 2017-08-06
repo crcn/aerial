@@ -535,9 +535,9 @@ export class SyntheticCSSStyleGraphics extends Observable {
     this.border = new SyntheticCSSBorder();
     this.margin = new SyntheticCSSBox();
     this.padding = new SyntheticCSSBox();
-    this.backgrounds = new ObservableCollection<SyntheticCSSStyleBackground>();
-    this.boxShadows  = new ObservableCollection<SyntheticCSSStyleBoxShadow>();
-    this.filters     = new ObservableCollection<SyntheticCSSFilter>();
+    // this.backgrounds = ObservableCollection.create() as ObservableCollection<any>;
+    // this.boxShadows  = ObservableCollection.create() as ObservableCollection<any>;
+    // this.filters     = ObservableCollection.create() as ObservableCollection<any>;
     this.fontFamily  = [];
     this.setProperties(style);
   }
@@ -603,7 +603,7 @@ export class SyntheticCSSStyleGraphics extends Observable {
       fontFamily         : (value) => this.fontFamily = flattenDeep<string>(value).map((value) => value),
       opacity            : ([value]) => this.opacity = value,
       mixBlendMode       : ([value]) => this.mixBlendMode = value,
-      filter             : (value) => this.filters = new ObservableCollection(...value),
+      filter             : (value) => this.filters = [] as any,
       background         : (value: any) => {
 
         // check for background: #F60, #F0F

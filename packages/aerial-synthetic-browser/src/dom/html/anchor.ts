@@ -1,11 +1,11 @@
 import Url =  require("url");
 import { bindable, PropertyWatcher } from "aerial-common";
 import { SyntheticHTMLElement } from "./element";
-import { SyntheticLocation } from "../../location";
+// import { SyntheticLocation } from "../../location";
 
 export class SyntheticHTMLAnchorElement extends SyntheticHTMLElement {
 
-  private _location: SyntheticLocation;
+  private _location: Location;
 
   get hostname() { return this._location.hostname; }
   set hostname(value) { this._location.hostname = value; }
@@ -39,16 +39,16 @@ export class SyntheticHTMLAnchorElement extends SyntheticHTMLElement {
 
   createdCallback() {
     super.createdCallback();
-    this._location = new SyntheticLocation(this.href || "");
-    new PropertyWatcher<SyntheticLocation, string>(this._location, "href").connect((value) => {
-      this.setAttribute("href", value);
-    });
+    // this._location = new SyntheticLocation(this.href || "");
+    // new PropertyWatcher<SyntheticLocation, string>(this._location, "href").connect((value) => {
+    //   this.setAttribute("href", value);
+    // });
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     super.attributeChangedCallback(name, oldValue, newValue);
-    if (name === "href" && this._location) {
-      this._location.href = newValue;
-    }
+    // if (name === "href" && this._location) {
+    //   this._location.href = newValue;
+    // }
   }
 }

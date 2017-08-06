@@ -37,12 +37,12 @@ import {
   getSyntheticBrowsers,
 } from "../state";
 
-import {
-  openSyntheticEnvironmentWindow,
-  SyntheticDOMRenderer,
-  createSyntheticDOMRendererFactory,
-  SEnvWindowAddon
-} from "../environment";
+// import {
+//   openSyntheticEnvironmentWindow,
+//   SyntheticDOMRenderer,
+//   createSyntheticDOMRendererFactory,
+//   SEnvWindowAddon
+// } from "../environment";
 
 export function* syntheticBrowserSaga() {
   yield fork(handleBrowserChanges);
@@ -87,13 +87,13 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
 
 function* handleSytheticWindowSession(syntheticWindowId: string) {
   let cwindow: SyntheticWindow;
-  let cenv: SEnvWindowAddon;
+  // let cenv: SEnvWindowAddon;
 
   yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
     if (!syntheticWindow) {
-      if (cenv) {
-        cenv.close();
-      }
+      // if (cenv) {
+      //   cenv.close();
+      // }
       return false;
     }
     yield spawn(handleSyntheticWindowChange, syntheticWindow);
@@ -116,25 +116,25 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
     cwindow = syntheticWindow;
 
-    if (cenv) {
-      cenv.close();
-    }
+    // if (cenv) {
+    //   cenv.close();
+    // }
 
-    cenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
-      fetch(info: RequestInfo) {
-        return new Promise((resolve) => {
-          fetchQueue.unshift([info, ({ content, type }) => {
-            resolve({
-              text() {
-                return Promise.resolve(String(content));
-              }
-            } as any);
-          }]);
-        });
-      },
-      createRenderer: createSyntheticDOMRendererFactory(document)
-    });
+    // cenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
+    //   fetch(info: RequestInfo) {
+    //     return new Promise((resolve) => {
+    //       fetchQueue.unshift([info, ({ content, type }) => {
+    //         resolve({
+    //           text() {
+    //             return Promise.resolve(String(content));
+    //           }
+    //         } as any);
+    //       }]);
+    //     });
+    //   },
+    //   createRenderer: createSyntheticDOMRendererFactory(document)
+    // });
 
-    yield put(createSyntheticWindowSourceChangedEvent(syntheticWindow.$$id, cenv));
+    // yield put(createSyntheticWindowSourceChangedEvent(syntheticWindow.$$id, cenv));
   }
 }

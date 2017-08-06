@@ -21,7 +21,7 @@ import {
   SyntheticObjectSerializer,
  } from "aerial-sandbox";
 
-import { ISyntheticBrowser } from "../../browser";
+// import { ISyntheticBrowser } from "../../browser";
 import { DOMEventDispatcherMap, IDOMEventEmitter, DOMEventListenerFunction } from "../events";
 
 import {
@@ -131,9 +131,9 @@ export abstract class SyntheticDOMNode extends TreeNode<SyntheticDOMNode> implem
     return this.$source;
   }
 
-  get browser(): ISyntheticBrowser {
-    return this.ownerDocument.defaultView.browser;
-  }
+  // get browser(): ISyntheticBrowser {
+  //   return this.ownerDocument.defaultView.browser;
+  // }
 
   get module() {
     return this.$module;

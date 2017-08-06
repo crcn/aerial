@@ -46,7 +46,8 @@ export abstract class VisibleSyntheticDOMElement<T extends { uid: string }> exte
   private _computedVisibility: boolean;
 
   protected get renderer(): ISyntheticDocumentRenderer {
-    return this.browser.renderer;
+    return null;
+    // return this.browser.renderer;
   }
 
   getComputedStyle(): T {

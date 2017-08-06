@@ -1,4 +1,4 @@
-import { SyntheticWindow } from "../window";
+// import { SyntheticWindow } from "../window";
 import { URIProtocolProvider } from "aerial-sandbox";
 import { IStreamableBus, DuplexStream } from "mesh7";
 import { inject, Kernel, KernelProvider, loggable, Logger } from "aerial-common";
@@ -12,7 +12,7 @@ export class XHRServer implements IStreamableBus<HTTPRequest> {
   @inject(KernelProvider.ID)
   private _kernel: Kernel;
 
-  constructor(window: SyntheticWindow) {
+  constructor(window: any) {
     
   }
   

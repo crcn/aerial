@@ -110,8 +110,8 @@ export abstract class SyntheticCSSGroupingRule<T extends syntheticCSSRuleType> e
   deleteRule(index: number) {
     const rule = this.cssRules[index];
     this.cssRules.splice(index, 1);
-    // const owner = this.ownerNode;
-    // if (owner) owner.notify(new RemoveChildMutation(CSSGroupingRuleMutationTypes.REMOVE_RULE_EDIT, this, rule, index).toEvent());
+    const owner = this.ownerNode;
+    if (owner) owner.notify(new RemoveChildMutation(CSSGroupingRuleMutationTypes.REMOVE_RULE_EDIT, this, rule, index).toEvent());
   }
 
   createEditor() {
@@ -139,8 +139,8 @@ export abstract class SyntheticCSSGroupingRule<T extends syntheticCSSRuleType> e
     }
     this.rules.splice(index, 0, ruleInstance);
     this.linkRule(ruleInstance);
-    // const owner = this.ownerNode;
-    // if (owner) owner.notify(new InsertChildMutation(CSSGroupingRuleMutationTypes.INSERT_RULE_EDIT, this, ruleInstance, index).toEvent());
+    const owner = this.ownerNode;
+    if (owner) owner.notify(new InsertChildMutation(CSSGroupingRuleMutationTypes.INSERT_RULE_EDIT, this, ruleInstance, index).toEvent());
     return index;
   }
 

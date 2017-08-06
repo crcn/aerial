@@ -24,7 +24,7 @@ import {
   BaseContentEdit,
 } from "aerial-sandbox";
 
-import {diffStyleSheetRules } from "./utils";
+import { diffStyleSheetRules } from "./utils";
 
 export namespace SyntheticCSSGroupAtRuleMutationTypes {
   export const SET_NAME_EDIT = "setNameEdit";
