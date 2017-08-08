@@ -2,15 +2,14 @@ HI PRIO:
 
 - [ ] javascript
 - [ ] ability to open external window
-- [ ] watch dependencies that are dynamically loaded in
-- [ ] use DOM mutation API to listen for changes
-- [ ] rendering engine based on DOM mutation API
+- [ ] html ast
+- [ ] change urls to point to proxy
+- [ ] flesh out parent-node
+- [ ] change *Interface to Interface
 
 LITMUS:
 
 - [ ] run all TODOMVC examples
-
-
 
 ```javascirpt
 

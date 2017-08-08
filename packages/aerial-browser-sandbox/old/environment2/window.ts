@@ -2,12 +2,12 @@ import { Dispatcher, weakMemo } from "aerial-common2";
 import { getSEnvLocationClass } from "./location";
 import { getSEnvEventTargetClass } from "./events";
 import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
-import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass, SEnvDocumentAddon } from "./nodes";
+import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass, SEnvDocumentInterface } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 
 type OpenTarget = "_self" | "_blank";
 
-export interface SEnvWindowAddon extends Window {
+export interface SEnvWindowInterface extends Window {
   renderer:  SyntheticWindowRenderer;
 };
 
@@ -31,7 +31,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
   // register default HTML tag names
   const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
   
-  return class SEnvWindow extends SEnvEventTarget implements SEnvWindowAddon {
+  return class SEnvWindow extends SEnvEventTarget implements SEnvWindowInterface {
 
     readonly location: Location;
 
@@ -46,7 +46,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly crypto: Crypto;
     defaultStatus: string;
     readonly devicePixelRatio: number;
-    readonly document: SEnvDocumentAddon;
+    readonly document: SEnvDocumentInterface;
     readonly doNotTrack: string;
     event: Event | undefined;
     readonly external: External;
@@ -373,11 +373,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
   }
 });
 
-export type SyntheticWindowEnvironmentOptions = {
-  fetch: Fetch;
-} & SEnvWindowContext;
-
-export const openSyntheticEnvironmentWindow = (location: string, context: SyntheticWindowEnvironmentOptions) => {
+export const openSyntheticEnvironmentWindow = (location: string, context: SEnvWindowContext) => {
   const SEnvWindow = getSEnvWindowClass(context);
   const window = new SEnvWindow(null, location, null);
   window.$load();

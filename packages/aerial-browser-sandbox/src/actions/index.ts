@@ -1,4 +1,4 @@
-// import { SEnvWindowAddon } from "../environment";
+// import { SEnvWindowInterface } from "../environment";
 import { Request, BaseEvent, generateDefaultId } from "aerial-common2";
 
 export const OPEN_SYNTHETIC_WINDOW               = "OPEN_SYNTHETIC_WINDOW";
@@ -39,7 +39,7 @@ export const createFetchRequest = (info: RequestInfo): FetchRequest => ({
   $$id: generateDefaultId()
 });
 
-export const createOpenSyntheticWindowRequest = (uri: string, syntheticBrowserId: string): OpenSyntheticBrowserWindowRequest => ({
+export const createOpenSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string): OpenSyntheticBrowserWindowRequest => ({
   uri,
   syntheticBrowserId,
   type: OPEN_SYNTHETIC_WINDOW,

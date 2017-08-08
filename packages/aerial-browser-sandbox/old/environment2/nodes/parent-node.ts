@@ -1,5 +1,5 @@
 import { weakMemo } from "aerial-common2";
-import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
+import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getL3EventClasses } from "../level3";
@@ -24,10 +24,10 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       if (child.nodeType === SEnvNodeTypes.DOCUMENT_FRAGMENT) {
         return Array.prototype.forEach.call(child.childNodes, (child2) => this.appendChild(child2));
       }
-      this._linkChild(child as any as SEnvNodeAddon);
+      this._linkChild(child as any as SEnvNodeInterface);
       this.$childNodesArray.push(child);
       if (this.connectedToDocument) {
-        (child as any as SEnvNodeAddon).$$addedToDocument();
+        (child as any as SEnvNodeInterface).$$addedToDocument();
       }
       const event = new  SEnvMutationEvent();
       event.initMutationEvent("DOMNodeInserted", true, true, child, null, null, null, -1);
@@ -91,14 +91,14 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       return this.children.length;
     }
 
-    protected _linkChild(child: SEnvNodeAddon) {
+    protected _linkChild(child: SEnvNodeInterface) {
       if (child.$$parentNode) {
         child.$$parentNode.removeChild(child);
       }
       child.$$parentNode = this;
     }
 
-    protected _unlinkChild(child: SEnvNodeAddon) {
+    protected _unlinkChild(child: SEnvNodeInterface) {
       child.$$parentNode = null;
       if (child.connectedToDocument) {
         child.$$removedFromDocument();

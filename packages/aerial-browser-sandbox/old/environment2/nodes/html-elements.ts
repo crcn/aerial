@@ -1,9 +1,9 @@
 import { weakMemo } from "aerial-common2";
 import { getSEnvEventClasses } from "../events";
-import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
-import { getSEnvElementClass, SEnvElementAddon } from "./element";
+import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
+import { getSEnvElementClass, SEnvElementInterface } from "./element";
 
-export interface SEnvHTMLElementAddon extends HTMLElement {
+export interface SEnvHTMLElementInterface extends HTMLElement {
   $$preconstruct();
 }
 
@@ -11,7 +11,7 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
   const SEnvElement = getSEnvElementClass(context);
   
-  return class SEnvHTMLElement extends SEnvElement implements SEnvHTMLElementAddon {
+  return class SEnvHTMLElement extends SEnvElement implements SEnvHTMLElementInterface {
 
     accessKey: string;
     readonly children: HTMLCollection;
@@ -102,7 +102,7 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
     tabIndex: number;
     title: string;
 
-    protected _linkChild(child: SEnvNodeAddon) {
+    protected _linkChild(child: SEnvNodeInterface) {
       super._linkChild(child);
       child.$$parentElement = this;
     }

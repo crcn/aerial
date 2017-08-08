@@ -1,38 +1,14 @@
-// import { expect } from "chai";
-// import { timeout } from "../utils";
-// import { waitForDocumentComplete } from "./utils";
-// import { getSEnvWindowClass, openSyntheticEnvironmentWindow } from "../../index";
+import { expect } from "chai";
+import { timeout } from "../utils";
+import { waitForDocumentComplete, openTestWindow, stripWhitespace } from "./utils";
 
-// describe(__filename + "#", () => {
-//   it("can open a simple page", async () => {
-//     const window = openSyntheticEnvironmentWindow("local://index.html", {
-//       fetch(info: string) {
-//         expect(info).to.eql("local://index.html");
-//         return Promise.resolve({
-//           text() {
-//             return Promise.resolve(`
-//               <html>
-//                 <head>
-//                 </head>
-//                 <body>
-//                   Test
-//                 </body>
-//               </html>
-//             `);
-//           }
-//         } as any);
-//       }
-//     });
+describe(__filename + "#", () => {
+  it("can open a simple page", async () => {
+    const window = openTestWindow(`Test`);
 
-//     await waitForDocumentComplete(window);
+    await waitForDocumentComplete(window);
 
-//     const content = window.document.documentElement.outerHTML;
-//     expect(content).to.eql(`<html><head>
-//                 </head>
-//                 <body>
-//                   Test
-                
-              
-//             </body></html>`);
-//   });
-// });
+    const content = window.document.documentElement.outerHTML;
+    expect(stripWhitespace(content)).to.eql(`<html><head></head><body>Test</body></html>`);
+  })
+});

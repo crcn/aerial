@@ -7,6 +7,10 @@ export const SYNTHETIC_TEXT_NODE = "SYNTHETIC_TEXT_NODE";
 export const SYNTHETIC_WINDOW = "SYNTHETIC_WINDOW";
 export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
 
+export enum DOMNodeTypes {
+  
+}
+
 const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   left: 0,
   top: 0,
@@ -15,10 +19,6 @@ const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   right: 800,
   bottom: 600
 };
-
-export enum DOMNodeTypes {
-  
-}
 
 export type SyntheticNode = {
   nodeType: DOMNodeTypes;
@@ -73,7 +73,6 @@ export const createSyntheticWindow = createStructFactory<SyntheticWindow>(SYNTHE
 export const createSyntheticBrowser = createStructFactory<SyntheticBrowser>(SYNTHETIC_BROWSER, {
   windows: []
 });
-
 
 export const createSyntheticBrowserStore = createStructFactory<SyntheticBrowserStore>(SYNTHETIC_BROWSER_STORE, {
   browsers: []

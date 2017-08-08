@@ -1,18 +1,18 @@
 import { weakMemo } from "aerial-common2";
-import { getSEnvNodeClass, SEnvNodeAddon } from "./node";
+import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import {getSEnvParentNodeClass } from "./parent-node";
 import { getL3EventClasses } from "../level3";
 import { getSEnvEventClasses } from "../events";
 import { getSEnvTextClass } from "./text";
 import { getSEnvCommentClass } from "./comment";
 import { getSEnvHTMLCollectionClasses } from "./collections";
-import { SEnvHTMLElementAddon, getSEnvHTMLElementClass } from "./html-elements";
+import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, mapExpressionToNode, whenLoaded } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
-export interface SEnvDocumentAddon extends Document {
+export interface SEnvDocumentInterface extends Document {
   $load(content: string): void;
   $createElementWithoutConstruct(tagName: string): HTMLElement;
 }
@@ -32,7 +32,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     MutationEvent:  SEnvMutationEvent
   };
 
-  return class SEnvDocument extends SEnvParentNode implements SEnvDocumentAddon {
+  return class SEnvDocument extends SEnvParentNode implements SEnvDocumentInterface {
     
     readonly activeElement: Element;
     private _readyState: string;
@@ -119,35 +119,12 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       return this.documentElement.children[1] as HTMLBodyElement;
     }
 
-    protected _linkChild(child: SEnvNodeAddon) {
+    protected _linkChild(child: SEnvNodeInterface) {
       super._linkChild(child);
       child.$$addedToDocument();
     }
 
     async $load(content: string) {
-      this._setReadyState("loading");
-      const expression = parseHTMLDocument(content);
-      const childNodes = expression.childNodes.map(childExpression => mapExpressionToNode(childExpression, this));
-
-      for (const child of childNodes) {
-        if (!child) continue;
-        this.appendChild(child);
-        constructNodeTree(child);
-      }
-
-      this._setReadyState("interactive");
-      this._setReadyState("complete");
-
-      const domContentLoadedEvent = new SEnvEvent();
-      domContentLoadedEvent.initEvent("DOMContentLoaded", true, true);
-      this.dispatchEvent(domContentLoadedEvent);
-
-      // wait for images, stylesheets, and other external resources
-      await whenLoaded(this);
-
-      const loadEvent = new SEnvEvent();
-      loadEvent.initEvent("load", true, true);
-      this.dispatchEvent(loadEvent);
     }
 
     private _setReadyState(state) {
@@ -464,7 +441,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     $createElementWithoutConstruct(tagName: string): HTMLElement {
       const elementClass = this.defaultView.customElements.get(tagName) || SENvHTMLElement;
-      const instance = Object.create(elementClass.prototype) as SEnvHTMLElementAddon;
+      const instance = Object.create(elementClass.prototype) as SEnvHTMLElementInterface;
       instance["" + "ownerDocument"] = this;
       instance["" + "tagName"] = tagName.toUpperCase();
       instance["" + "nodeName"] = tagName.toUpperCase();
@@ -685,7 +662,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   };
 })
 
-const loadNode = async (document: SEnvDocumentAddon, expression: parse5.AST.Default.Node) => {
+const loadNode = async (document: SEnvDocumentInterface, expression: parse5.AST.Default.Node) => {
   const node = createNode(document, expression);
   if (node.nodeType === SEnvNodeTypes.ELEMENT) {
     await loadChildNodes(node as Element, expression as parse5.AST.Default.Element);
@@ -696,11 +673,11 @@ const loadNode = async (document: SEnvDocumentAddon, expression: parse5.AST.Defa
 
 const loadChildNodes = async (parentElement: Element, expression: parse5.AST.Default.ParentNode) => {
   for (const childExpression of expression.childNodes) {
-    parentElement.appendChild(await loadNode(parentElement.ownerDocument as SEnvDocumentAddon, childExpression));
+    parentElement.appendChild(await loadNode(parentElement.ownerDocument as SEnvDocumentInterface, childExpression));
   }
 };
 
-const createNode = (document: SEnvDocumentAddon, expression: parse5.AST.Default.Node) => {
+const createNode = (document: SEnvDocumentInterface, expression: parse5.AST.Default.Node) => {
   switch(expression.nodeName) {
     case "#text": {
       return document.createTextNode((expression as parse5.AST.Default.TextNode).value);

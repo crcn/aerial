@@ -1,8 +1,8 @@
 import parse5 = require("parse5");
 import { weakMemo } from "aerial-common2";
 import { SEnvNodeTypes } from "../constants";
-import { SEnvNodeAddon } from "./node";
-import { SEnvDocumentAddon } from "./document";
+import { SEnvNodeInterface } from "./node";
+import { SEnvDocumentInterface } from "./document";
 
 export const parseHTMLDocument = weakMemo((content: string) => {
   const ast = parse5.parse(content, { locationInfo: true });
@@ -24,9 +24,9 @@ export const constructNodeTree = <T extends Node>(parentNode: T) => {
   return parentNode;
 }
 
-export const evaluateHTMLDocumentFragment = (source: string, document: SEnvDocumentAddon) => constructNodeTree(mapExpressionToNode(parseHTMLDocumentFragment(source), document));
+export const evaluateHTMLDocumentFragment = (source: string, document: SEnvDocumentInterface) => constructNodeTree(mapExpressionToNode(parseHTMLDocumentFragment(source), document));
 
-export const mapExpressionToNode = (expression: parse5.AST.Default.Node, document: SEnvDocumentAddon) => {
+export const mapExpressionToNode = (expression: parse5.AST.Default.Node, document: SEnvDocumentInterface) => {
   switch(expression.nodeName) {
     case "#document-fragment": {
       const fragmentExpression = expression as parse5.AST.Default.DocumentFragment;
@@ -59,7 +59,7 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
   }
 };
 
-export const whenLoaded = async (node: SEnvNodeAddon) => {
+export const whenLoaded = async (node: SEnvNodeInterface) => {
   await node.loaded;
   await Promise.all(
     Array.prototype.map.call(node.childNodes, child => whenLoaded(child))

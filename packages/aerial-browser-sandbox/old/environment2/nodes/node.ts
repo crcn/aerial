@@ -1,11 +1,11 @@
 import { weakMemo } from "aerial-common2";
-import { SEnvDocumentAddon } from "./document";
+import { SEnvDocumentInterface } from "./document";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 
-export interface SEnvNodeAddon extends Node {
+export interface SEnvNodeInterface extends Node {
   loaded: Promise<any>;
   connectedToDocument: boolean;
   $$parentNode: Node;
@@ -22,7 +22,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
   const { SEnvNodeList } =  getSEnvHTMLCollectionClasses(context);
   const { SEnvDOMException } =  getDOMExceptionClasses(context);
 
-  return class SEnvNode extends SEnvEventTarget implements SEnvNodeAddon {
+  return class SEnvNode extends SEnvEventTarget implements SEnvNodeInterface {
 
     public $$parentNode: Node;
     public $$parentElement: HTMLElement;
@@ -39,7 +39,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly nodeName: string;
     readonly nodeType: number;
     nodeValue: string | null;
-    readonly ownerDocument: SEnvDocumentAddon;
+    readonly ownerDocument: SEnvDocumentInterface;
     readonly previousSibling: Node | null;
     textContent: string | null;
     readonly ATTRIBUTE_NODE: number;

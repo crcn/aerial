@@ -42,3 +42,7 @@ export const createTestProtocolAdapter = (name: string, testFiles) => {
     },
   };
 }
+
+export const stripWhitespace = (content: string) => {
+  return content.replace(/[\n\r]+\s*/g, "");
+}

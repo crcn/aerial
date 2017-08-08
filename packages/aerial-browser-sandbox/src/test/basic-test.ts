@@ -5,13 +5,18 @@ import { fork, call, select } from "redux-saga/effects";
 import { createTestProtocolAdapter } from "./utils";
 import { createStore, applyMiddleware } from "redux";
 import { default as createSagaMiddleware, delay } from "redux-saga";
-import { 
-  getSyntheticBrowserStore,
-  createOpenSyntheticWindowRequest, 
-  syntheticBrowserSaga,
-  syntheticBrowserReducer,
-  createSyntheticBrowserStore
-} from "../index";
+import { getSyntheticBrowserStore, createSyntheticBrowserStore } from "../state";
+import { syntheticBrowserReducer } from "../reducers";
+import { syntheticBrowserSaga } from "../sagas";
+import { getSEnvWindowClass, openSyntheticEnvironmentWindow } from "../environment";
+import { createOpenSyntheticWindowRequest } from "../actions";
+// import { 
+//   getSyntheticBrowserStore,
+//   createOpenSyntheticWindowRequest, 
+//   syntheticBrowserSaga,
+//   syntheticBrowserReducer,
+//   createSyntheticBrowserStore
+// } from "../index";
 
 describe(__filename + "#", () => {
 
@@ -44,14 +49,14 @@ describe(__filename + "#", () => {
     return store;
   }
 
-  // xit("can open a new synthetic browser window environment", (next) => {
-  //   const { getState, dispatch } = createTestStore({}, function*() {
-  //     yield yield request(createOpenSyntheticWindowRequest("http://google.com"));
-  //     const { browsers } = getSyntheticBrowserStore(yield select());
-  //     expect(browsers.length).to.eql(1);
-  //     expect(browsers[0].windows.length).to.eql(1);
-  //     expect(browsers[0].windows[0].location).to.eql("http://google.com");
-  //     next();
-  //   });
-  // });
+  it("can open a new synthetic browser window environment", (next) => {
+    const { getState, dispatch } = createTestStore({}, function*() {
+      yield request(createOpenSyntheticWindowRequest("http://google.com"));
+      const { browsers } = getSyntheticBrowserStore(yield select());
+      expect(browsers.length).to.eql(1);
+      expect(browsers[0].windows.length).to.eql(1);
+      expect(browsers[0].windows[0].location).to.eql("http://google.com");
+      next();
+    });
+  });
 });
