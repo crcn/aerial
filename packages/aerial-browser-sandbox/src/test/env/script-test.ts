@@ -77,4 +77,21 @@ describe(__filename + "#", () => {
     const innerHTML = stripWhitespace(window.document.body.innerHTML);
     expect(innerHTML).to.eql(`<span><script>const script = document.querySelector("script");script.parentElement.appendChild(document.createTextNode("hello"));</script>hello<span></span></span>`);
   });
+
+  it("can load from an external resource", async () => {
+    const window = openTestWindow({
+      "local://index.html": `
+        <span>
+          <script src="local://index.js"></script>
+          <span>a</span>
+        </span>
+      `,
+      "local://index.js": `
+        const script = document.querySelector("script");
+        script.parentElement.appendChild(document.createTextNode("b"));
+      `
+    });
+
+    await waitForDocumentComplete(window);
+  });
 }); 

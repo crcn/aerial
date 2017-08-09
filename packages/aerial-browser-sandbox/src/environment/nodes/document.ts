@@ -8,7 +8,7 @@ import { getSEnvCommentClass, SEnvCommentInterface } from "./comment";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
-import { parseHTMLDocument, constructNodeTree, mapExpressionToNode, whenLoaded } from "./utils";
+import { parseHTMLDocument, constructNodeTree, loadNodeExpression, whenLoaded } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
@@ -132,10 +132,12 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
 
     async $load(content: string) {
+      this._setReadyState("loading");
+
       const expression = parseHTMLDocument(content);
-      expression.childNodes.forEach(childExpression => {
-        mapExpressionToNode(childExpression, this, this)
-      });
+      await Promise.all(expression.childNodes.map(childExpression => {
+        return loadNodeExpression(childExpression, this, this)
+      }));
 
       this._setReadyState("interactive");
 

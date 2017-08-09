@@ -102,8 +102,59 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
   }
 };
 
+export const loadNodeExpression = async (expression: parse5.AST.Default.Node, document: SEnvDocumentInterface, parentNode?: SEnvParentNodeInterface) => {
+  switch(expression.nodeName) {
+    case "#document-fragment": {
+      const fragmentExpression = expression as parse5.AST.Default.DocumentFragment;
+      const fragment = document.createDocumentFragment();
+      for (const childExpression of fragmentExpression.childNodes) {
+        await loadNodeExpression(childExpression, document, fragment);
+      }
+      addNodeSource(fragment, expression);
+      if (parentNode) {
+        parentNode.appendChild(fragment);
+      }
+      return fragment;
+    } 
+    case "#text": {
+      const text = addNodeSource(document.createTextNode((expression as parse5.AST.Default.TextNode).value), expression);
+      if (parentNode) {
+        parentNode.appendChild(text);
+      }
+      return text;
+    }
+    case "#comment": {
+      const comment = addNodeSource(document.createComment((expression as parse5.AST.Default.CommentNode).data), expression);
+      if (parentNode) {
+        parentNode.appendChild(comment);
+      }
+      return comment;
+    }
+    case "#documentType": {
+      return null;
+    }
+    default: {
+      const elementExpression = expression as parse5.AST.Default.Element;
+      const element = document.$createElementWithoutConstruct(elementExpression.nodeName);
+      for (const attr of elementExpression.attrs) {
+        element.setAttribute(attr.name, attr.value);
+      }
+      addNodeSource(element, expression);
+      if (parentNode) {
+        parentNode.appendChild(element);
+      }
+
+      await element.contentLoaded;
+      for (const childExpression of elementExpression.childNodes) {
+        constructNode(await loadNodeExpression(childExpression, document, element));
+      }
+      return element;
+    }
+  }
+};
+
 export const whenLoaded = async (node: SEnvNodeInterface) => {
-  await node.loaded;
+  await node.interactiveLoaded;
   await Promise.all(
     Array.prototype.map.call(node.childNodes, child => whenLoaded(child))
   );

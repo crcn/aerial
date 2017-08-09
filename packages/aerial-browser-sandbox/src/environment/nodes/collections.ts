@@ -24,7 +24,9 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
   }
 
   class SEnvHTMLCollection extends _Collection<Element> implements HTMLCollection {
+    private _target: Node & ParentNode;
     $init(target: Node & ParentNode) {
+      this._target = target;
       target.addEventListener("DOMNodeInserted", this._onChildAdded);
       target.addEventListener("DOMNodeRemoved", this._onChildRemoved);
       return this;
@@ -36,11 +38,17 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
       return this[index];
     }
     private _onChildAdded = (event: MutationEvent) => {
+      if (event.target !== this._target) {
+        return;
+      }
       if (event.relatedNode.nodeType === SEnvNodeTypes.ELEMENT) {
         this.push(event.relatedNode as Element);
       }
     }
     private _onChildRemoved = (event: MutationEvent) => {
+      if (event.target !== this._target) {
+        return;
+      }
       const index = this.indexOf(event.relatedNode as Element);
       if (index !== -1) {
         this.splice(index, 1);

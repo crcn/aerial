@@ -7,7 +7,8 @@ import { getSEnvHTMLCollectionClasses } from "./collections";
 
 export interface SEnvNodeInterface extends Node {
   source: ExpressionLocation;
-  loaded: Promise<any>;
+  contentLoaded: Promise<any>;
+  interactiveLoaded: Promise<any>;
   connectedToDocument: boolean;
   $$parentNode: Node;
   $$parentElement: HTMLElement;
@@ -27,7 +28,8 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     public $$parentNode: Node;
     public $$parentElement: HTMLElement;
-    public loaded: Promise<any>;
+    public contentLoaded: Promise<any>;
+    public interactiveLoaded: Promise<any>;
     public source: any;
 
     readonly attributes: NamedNodeMap;

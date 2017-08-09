@@ -179,7 +179,7 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
 
     constructor() {
       super();
-      this.loaded = new Promise((resolve, reject) => {
+      this.interactiveLoaded = new Promise((resolve, reject) => {
         this._resolveLoaded = resolve;
         this._rejectLoaded  = reject;
       });
@@ -252,19 +252,48 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
       defer: boolean;
       event: string;
       htmlFor: string;
-      src: string;
       text: string;
       type: string;
       integrity: string;
 
+      private _scriptSource: string;
+      private _filename: string;
+      private _resolveContentLoaded: () => any;
+      private _rejectContentLoaded: () => any;
+
+      get src() {
+        return this.getAttribute("src");
+      }
+
       constructor() {
         super();
-        this._evaluate();
+        this._load();
+      }
+
+      private async _load() {
+        const { src } = this;
+        if (src) {
+          const window = this.ownerDocument.defaultView;
+          this.contentLoaded = new Promise((resolve, reject) => {
+            this._resolveContentLoaded = resolve;
+            this._rejectContentLoaded = reject;
+          });
+
+          const response = await window.fetch(getUri(src, window.location));
+          const text = await response.text();
+
+          this._scriptSource = text;
+          this._filename = src;
+        } else {
+          this._scriptSource = this.textContent;
+          this._filename = this.ownerDocument.defaultView.location.toString();
+          this._evaluate();
+        }
       }
 
       private _evaluate() {
-        const script = new vm.Script(this.textContent, {
-          filename: this.ownerDocument.defaultView.location.toString(),
+        const script = new vm.Script(this._scriptSource, {
+          filename: this._filename,
           displayErrors: true,
         });
 
