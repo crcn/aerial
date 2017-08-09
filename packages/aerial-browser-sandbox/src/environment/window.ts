@@ -19,7 +19,7 @@ export type SEnvWindowContext = {
   fetch: Fetch;
   proxyHost?: string;
   createRenderer?: SyntheticDOMRendererFactory;
-  console: Console;
+  console?: Console;
 };
 
 export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {

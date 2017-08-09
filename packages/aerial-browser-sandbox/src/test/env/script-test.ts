@@ -1,4 +1,4 @@
-import { openTestWindow, waitForDocumentComplete } from "./utils";
+import { openTestWindow, waitForDocumentComplete, stripWhitespace } from "./utils";
 import { expect } from "chai";
 
 describe(__filename + "#", () => {
@@ -59,5 +59,22 @@ describe(__filename + "#", () => {
     });
     await waitForDocumentComplete(window);
     expect(logs).to.eql([`console.log(document.querySelector(\"script\").textContent);`]);
+  });
+
+  it("can append an element immediately after the script", async () => {
+    const logs = [];
+    const window = openTestWindow(`<span><script>
+      const script = document.querySelector("script");
+      script.parentElement.appendChild(document.createTextNode("hello"));
+    </script><span></span></span>`, {
+      console: {
+        log(text) {
+          logs.push(text);
+        } 
+      } as any
+    });
+    await waitForDocumentComplete(window);
+    const innerHTML = stripWhitespace(window.document.body.innerHTML);
+    expect(innerHTML).to.eql(`<span><script>const script = document.querySelector("script");script.parentElement.appendChild(document.createTextNode("hello"));</script>hello<span></span></span>`);
   });
 }); 
