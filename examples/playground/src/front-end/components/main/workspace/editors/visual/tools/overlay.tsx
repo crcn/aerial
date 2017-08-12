@@ -81,26 +81,6 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom }: Windo
   </div>
 };
 
-// for (const nodeId in window.computedBoxes) {
-//   const node = allNodes[nodeId];
-
-//   const box  = window.computedBoxes[nodeId];
-//   if (node && box) {
-//     elements.unshift(
-//       <NodeOverlay 
-//         windowId={window.$$id} 
-//         zoom={workspace.visualEditorSettings.translate.zoom} 
-//         key={nodeId} 
-//         node={node} 
-//         box={box} 
-//         dispatch={dispatch} 
-//         hovering={workspace.hoveringIds.indexOf(node.$$id) !== -1} 
-//         selected={workspace.selectionIds.indexOf(node.$$id) !== -1} />
-//     );
-//   }
-// }
-// return elements;
-
 const WindowOverlayTools = pure(WindowOverlayToolsBase as any) as any as typeof WindowOverlayToolsBase;
 
 const getHoveringSyntheticNodes = weakMemo((hoveringIds: string[], window: SyntheticWindow) => {

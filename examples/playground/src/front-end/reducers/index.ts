@@ -58,6 +58,7 @@ import {
   StageToolNodeOverlayHoverOver,
   StageToolNodeOverlayClicked,
   STAGE_TOOL_WINDOW_KEY_DOWN,
+  STAGE_TOOL_WINDOW_BACKGROUND_CLICKED,
   StageWillWindowKeyDown,
   keyboardShortcutAdded,
   CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
@@ -279,6 +280,11 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_WINDOW_KEY_DOWN: {
       const e = event as StageWillWindowKeyDown;
       return moveItemFromAction(state, e.windowId, e);
+    }
+
+    case STAGE_TOOL_WINDOW_BACKGROUND_CLICKED: {
+      const workspace = getSelectedWorkspace(state);
+      return clearWorkspaceSelection(state, workspace.$$id);
     }
   }
 

@@ -3,8 +3,8 @@ import * as React from "react";
 import { compose, pure } from "recompose";
 import { Workspace } from "front-end/state";
 import { SyntheticWindow } from "aerial-browser-sandbox";
-import { stageToolWindowTitleClicked, stageToolWindowKeyDown } from "front-end/actions";
 import { Dispatcher, getBoxSize, Translate, wrapEventToDispatch } from "aerial-common2";
+import { stageToolWindowTitleClicked, stageToolWindowKeyDown, stageToolWindowBackgroundClicked } from "front-end/actions";
 
 type WindowItemInnerProps = {
   window: SyntheticWindow;
@@ -62,7 +62,7 @@ export const WindowsStageToolComponentBase = ({ workspace, dispatch }: WindowsSt
     transformOrigin: "top left"
   };
   return <div className="m-windows-stage-tool">
-    <div style={backgroundStyle} className="m-windows-stage-tool-background" /> 
+    <div style={backgroundStyle} className="m-windows-stage-tool-background" onClick={wrapEventToDispatch(dispatch, stageToolWindowBackgroundClicked)} /> 
     {
       workspace.browser.windows.map((window) => <WindowItemComponent key={window.$$id} window={window} dispatch={dispatch} translate={translate} />)
     }
