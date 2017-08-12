@@ -6,6 +6,8 @@ import {
   getValueById, 
   traverseObject,
   getValuesByType, 
+  ExpressionLocation,
+  ExpressionPosition,
   createStructFactory, 
   updateStructProperty, 
 } from "aerial-common2";
@@ -32,15 +34,20 @@ const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   bottom: 600
 };
 
-export type SyntheticNode = {
+export type SyntheticBaseNode = {
+  source: ExpressionLocation;
   nodeType: SEnvNodeTypes;
   nodeName: string;
 } & Struct;
 
+export type SyntheticNode = {
+  source: ExpressionLocation;
+} & SyntheticBaseNode;
+
 export type SyntheticDocument = {
   title: string;
   documentElement: SyntheticNode;
-} & SyntheticNode;
+} & SyntheticBaseNode;
 
 export type SyntheticAttribute = {
   name: string;

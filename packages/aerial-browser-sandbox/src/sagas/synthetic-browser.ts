@@ -218,6 +218,7 @@ const mapSEnvNodeToStruct = (node: SEnvNodeInterface): SyntheticNode => {
   switch(node.nodeType) {
     case SEnvNodeTypes.ELEMENT: return createSyntheticElement({
       $$id: node.uid,
+      source: node.source,
       nodeName: node.nodeName,
       attributes: Array.prototype.map.call((node as any as SEnvElementInterface).attributes, mapSEnvAttribute),
       childNodes: Array.prototype.map.call((node as any as SEnvElementInterface).childNodes, mapSEnvNodeToStruct)
@@ -225,11 +226,13 @@ const mapSEnvNodeToStruct = (node: SEnvNodeInterface): SyntheticNode => {
 
     case SEnvNodeTypes.TEXT: return createSyntheticTextNode({
       $$id: node.uid,
+      source: node.source,
       nodeValue: (node as any as SEnvTextInterface).nodeValue,
     });
 
     case SEnvNodeTypes.COMMENT: return createSyntheticComment({
       $$id: node.uid,
+      source: node.source,
       nodeValue: (node as any as SEnvCommentInterface).nodeValue,
     });
   }

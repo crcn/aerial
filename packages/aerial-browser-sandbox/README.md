@@ -1,12 +1,25 @@
 HI PRIO:
 
-- [ ] javascript
-- [ ] ability to open external window
+- [ ] ctrl+click to open resource file
+  - [ ] store fetched files in file cache
+  - [ ] trigger reload when a resource changes
+- [ ] css attributes for selected elements
+- [ ] sync text editor changes to file cache
 - [ ] html ast
 - [ ] change urls to point to proxy
 - [ ] flesh out parent-node
-- [ ] change *Interface to Interface
 
+DEMO:
+
+- [ ] sync changes between windows
+- [ ] open & control window
+- [ ] user interactions
+- [ ] store all application state in memory
+
+LOW PRIO:
+
+- [ ] ability to open & control external window
+- [ ] change urls to point to proxy
 - [ ] same diff / patch algorithms for synthetic browser
 
 LITMUS:

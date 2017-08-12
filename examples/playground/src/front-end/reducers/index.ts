@@ -88,7 +88,7 @@ import {
   VisualEditorWheel,
 } from "front-end/actions";
 
-import { syntheticBrowserReducer, getSyntheticWindow } from "aerial-browser-sandbox";
+import { syntheticBrowserReducer, getSyntheticWindow, SyntheticNode } from "aerial-browser-sandbox";
 
 import {
   createOpenSyntheticWindowRequest
@@ -237,8 +237,21 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
+      const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return handleWindowSelectionFromAction(state, getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked), event as StageToolNodeOverlayClicked);
+      const targetUID = getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked);
+      if (metaKey) {
+        // const filesByUri = getAllFilesByPath(state);
+        // console.log(filesByUri);
+        
+        const { source: { uri, start } } = getValueById(state, targetUID) as SyntheticNode;
+        console.log("OPENING", uri, start);
+        // const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
+        // return updateStructProperty(state, getSyntheticWindowWorkspace(state, windowId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+        return state;
+      } else {
+        return handleWindowSelectionFromAction(state, targetUID, event as StageToolNodeOverlayClicked);
+      }
     }
 
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
@@ -266,20 +279,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_WINDOW_KEY_DOWN: {
       const e = event as StageWillWindowKeyDown;
       return moveItemFromAction(state, e.windowId, e);
-    } 
-
-    // case STAGE_TOOL_NODE_OVERLAY_CLICKED: {
-    //   const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayClicked;
-    //   const metaKey = sourceEvent.metaKey;
-    //   if (metaKey) {
-    //     const filesByUri = getAllFilesByPath(state);
-    //     const { $source: { uri } } = getValueById(state, nodeId) as SyntheticDOMNode2;
-    //     const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
-    //     return updateStructProperty(state, getSyntheticWindowWorkspace(state, windowId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
-    //   } else {
-    //     return handleWindowSelectionFromAction(state, nodeId, event as StageToolNodeOverlayClicked);
-    //   }
-    // }
+    }
   }
 
   return state;
