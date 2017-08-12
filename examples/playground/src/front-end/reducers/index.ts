@@ -238,7 +238,6 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      console.log(getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked));
       return handleWindowSelectionFromAction(state, getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked), event as StageToolNodeOverlayClicked);
     }
 

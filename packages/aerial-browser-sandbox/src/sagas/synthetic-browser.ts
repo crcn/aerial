@@ -137,7 +137,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       return;
     }
 
-
     const fetchQueue = createQueue();
 
     yield fork(function*() {
@@ -208,7 +207,9 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 }
 
 const mapSEnvDocumentToStruct = (document: SEnvDocumentInterface): SyntheticDocument => {
+  const titleEl = document.querySelector("title");
   return createSyntheticDocument({
+    title: titleEl ? titleEl.textContent : null,
     documentElement: mapSEnvNodeToStruct(document.documentElement as any as SEnvNodeInterface)
   });
 };

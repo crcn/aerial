@@ -38,6 +38,7 @@ export type SyntheticNode = {
 } & Struct;
 
 export type SyntheticDocument = {
+  title: string;
   documentElement: SyntheticNode;
 } & SyntheticNode;
 
