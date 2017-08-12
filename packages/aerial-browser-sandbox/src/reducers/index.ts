@@ -12,6 +12,10 @@ import {
   updateStructProperty, 
 } from "aerial-common2";
 import { 
+  SyntheticWindowLoadedEvent,
+  SYNTHETIC_WINDOW_LOADED,
+  SYNTHETIC_WINDOW_RECTS_UPDATED,
+  SyntheticWindowRectsUpdatedEvent,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
   SyntheticWindowSourceChangedEvent,
   OPEN_SYNTHETIC_WINDOW, 
@@ -86,6 +90,18 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
       if (itemType === SYNTHETIC_WINDOW) {
         return deleteValueById(root, itemId);
       }
+    }
+
+    case SYNTHETIC_WINDOW_LOADED: {
+      const { syntheticWindowId, document } = event as SyntheticWindowLoadedEvent;
+      const window = getSyntheticWindow(root, syntheticWindowId);
+      return updateStructProperty(root, window, "document", document);
+    }
+
+    case SYNTHETIC_WINDOW_RECTS_UPDATED: {
+      const { rects, syntheticWindowId } = event as SyntheticWindowRectsUpdatedEvent;
+      const window = getSyntheticWindow(root, syntheticWindowId);
+      return updateStructProperty(root, window, "computedBoxes", rects);
     }
   }
 

@@ -1,4 +1,5 @@
-import { fork, put, call, spawn } from "redux-saga/effects";
+import { fork, take, put, call, spawn, actionChannel } from "redux-saga/effects";
+import { eventChannel } from "redux-saga";
 import { difference } from "lodash";
 import { createQueue } from "mesh";
 
@@ -12,14 +13,16 @@ import {
 } from "aerial-sandbox2";
 
 import { 
-  OPEN_SYNTHETIC_WINDOW,
   FetchRequest,
   FETCH_REQUEST,
   createFetchRequest,
+  OPEN_SYNTHETIC_WINDOW,
+  createSyntheticWindowLoadedEvent,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
-  createSyntheticWindowSourceChangedEvent,
+  createSyntheticWindowRectsUpdated,
   OpenSyntheticBrowserWindowRequest,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
+  createSyntheticWindowSourceChangedEvent,
   createNewSyntheticWindowEntryResolvedEvent
 } from "../actions";
 
@@ -30,6 +33,15 @@ import {
 } from "aerial-common2";
 
 import {
+  createSyntheticComment,
+  createSyntheticDocument,
+  createSyntheticElement,
+  createSyntheticTextNode,
+  SyntheticNode,
+  SyntheticHTMLElement,
+  SyntheticTextNode,
+  SyntheticComment,
+  SyntheticDocument,
   SyntheticWindow,
   SyntheticBrowser,
   getSyntheticWindow,
@@ -38,10 +50,17 @@ import {
 } from "../state";
 
 import {
-  openSyntheticEnvironmentWindow,
+  SEnvNodeTypes,
+  SEnvNodeInterface,
+  SEnvCommentInterface,
+  SEnvTextInterface,
+  SEnvElementInterface,
+  SEnvWindowInterface,
   SyntheticDOMRenderer,
+  SEnvDocumentInterface,
+  SyntheticWindowRendererEvent,
+  openSyntheticEnvironmentWindow,
   createSyntheticDOMRendererFactory,
-  SEnvWindowInterface
 } from "../environment";
 
 export function* syntheticBrowserSaga() {
@@ -101,9 +120,23 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   });
 
   function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
+    yield fork(handleSizeChange, syntheticWindow),
+    yield fork(handleLocationChange, syntheticWindow)
+    cwindow = syntheticWindow;
+  }
+
+  function* handleSizeChange(syntheticWindow: SyntheticWindow) {
+    if (!cwindow || cwindow.box === syntheticWindow.box) {
+      return;
+    }
+    cenv.resizeTo(syntheticWindow.box.right - syntheticWindow.box.left, syntheticWindow.box.bottom - syntheticWindow.box.top)
+  }
+
+  function* handleLocationChange(syntheticWindow: SyntheticWindow) {
     if (cwindow && cwindow.location === syntheticWindow.location) {
       return;
     }
+
 
     const fetchQueue = createQueue();
 
@@ -112,15 +145,27 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
         const { value: [info, resolve] } = yield call(fetchQueue.next);
         resolve((yield yield request(createFetchRequest(info))).payload);
       }
-    })
-
-    cwindow = syntheticWindow;
+    });
 
     if (cenv) {
       cenv.close();
     }
 
     cenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
+      console: {
+        warn(...args) {
+          console.warn('VM ', ...args);
+        },
+        log(...args) {
+          console.log('VM ', ...args);
+        },
+        error(...args) {
+          console.error('VM ', ...args);
+        },
+        info(...args) {
+          console.info('VM ', ...args);
+        }
+      } as any,
       fetch(info: RequestInfo) {
         return new Promise((resolve) => {
           fetchQueue.unshift([info, ({ content, type }) => {
@@ -135,6 +180,63 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       createRenderer: typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
     });
 
+    const chan = eventChannel((emit) => {
+
+      cenv.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects }: SyntheticWindowRendererEvent) => {
+        emit(createSyntheticWindowRectsUpdated(syntheticWindowId, rects));
+      });
+
+      cenv.document.addEventListener("readystatechange", () => {
+        if (cenv.document.readyState !== "complete") return;
+        const documentStruct = mapSEnvDocumentToStruct(cenv.document as SEnvDocumentInterface);
+        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, documentStruct));
+      });
+
+      return () => {
+
+      };
+    });
+
+    yield fork(function*() {
+      while(true) {
+        yield put(yield take(chan));
+      }
+    });
+
     yield put(createSyntheticWindowSourceChangedEvent(syntheticWindow.$$id, cenv));
   }
 }
+
+const mapSEnvDocumentToStruct = (document: SEnvDocumentInterface): SyntheticDocument => {
+  return createSyntheticDocument({
+    documentElement: mapSEnvNodeToStruct(document.documentElement as any as SEnvNodeInterface)
+  });
+};
+
+const mapSEnvNodeToStruct = (node: SEnvNodeInterface): SyntheticNode => {
+  switch(node.nodeType) {
+    case SEnvNodeTypes.ELEMENT: return createSyntheticElement({
+      $$id: node.uid,
+      nodeName: node.nodeName,
+      attributes: Array.prototype.map.call((node as any as SEnvElementInterface).attributes, mapSEnvAttribute),
+      childNodes: Array.prototype.map.call((node as any as SEnvElementInterface).childNodes, mapSEnvNodeToStruct)
+    });
+
+    case SEnvNodeTypes.TEXT: return createSyntheticTextNode({
+      $$id: node.uid,
+      nodeValue: (node as any as SEnvTextInterface).nodeValue,
+    });
+
+    case SEnvNodeTypes.COMMENT: return createSyntheticComment({
+      $$id: node.uid,
+      nodeValue: (node as any as SEnvCommentInterface).nodeValue,
+    });
+  }
+
+  return null;
+};
+
+const mapSEnvAttribute = ({name, value}: Attr) => ({
+  name,
+  value
+})

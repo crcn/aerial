@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/sandbox/index.ts"],"names":[],"mappings":";;;;;AAAA,iDAA+D;AAC/D,6DAAgE;AAEhE,mDAGwB;AAEX,QAAA,gCAAgC,GAAG;IAC9C,MAAM,CAAC;QACL,IAAI,gCAAgB,CAAC,IAAI,EAAE,4BAAY,CAAC;QACxC,2EAA2E;QAC3E,IAAI,sDAAqC,CAAC,4BAAY,EAAE,6CAAwB,CAAC;KAClF,CAAC;AACJ,CAAC,CAAA;AAED,0CAAqC"}

@@ -1,6 +1,6 @@
 import { Dispatcher, weakMemo } from "aerial-common2";
 import { getSEnvLocationClass } from "./location";
-import { getSEnvEventTargetClass } from "./events";
+import { getSEnvEventTargetClass, getSEnvEventClasses } from "./events";
 import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
 import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass, SEnvDocumentInterface } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
@@ -31,6 +31,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
   const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(context);
   const SEnvElement     = getSEnvElementClass(context);
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
+  const { SEnvEvent } = getSEnvEventClasses(context);
 
   // register default HTML tag names
   const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
@@ -342,7 +343,9 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     resizeTo(x?: number, y?: number): void {
-
+      const event = new SEnvEvent();
+      event.initEvent("resize", true, true);
+      this.dispatchEvent(event);
     }
 
     scroll(...args): void {

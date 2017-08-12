@@ -1,4 +1,18 @@
-import { Struct, createStructFactory, Box, getValuesByType, getValueById, updateStructProperty, updateStruct, weakMemo, traverseObject } from "aerial-common2";
+import { 
+  Box, 
+  Struct, 
+  weakMemo, 
+  updateStruct, 
+  getValueById, 
+  traverseObject,
+  getValuesByType, 
+  createStructFactory, 
+  updateStructProperty, 
+} from "aerial-common2";
+
+import {
+  SEnvNodeTypes
+} from "../environment";
 
 export const SYNTHETIC_BROWSER_STORE = "SYNTHETIC_BROWSER_STORE";
 export const SYNTHETIC_BROWSER = "SYNTHETIC_BROWSER";
@@ -6,10 +20,8 @@ export const SYNTHETIC_DOCUMENT = "SYNTHETIC_DOCUMENT";
 export const SYNTHETIC_TEXT_NODE = "SYNTHETIC_TEXT_NODE";
 export const SYNTHETIC_WINDOW = "SYNTHETIC_WINDOW";
 export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
+export const SYNTHETIC_COMMENT = "SYNTHETIC_COMMENT";
 
-export enum DOMNodeTypes {
-  
-}
 
 const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   left: 0,
@@ -21,16 +33,22 @@ const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
 };
 
 export type SyntheticNode = {
-  nodeType: DOMNodeTypes;
+  nodeType: SEnvNodeTypes;
   nodeName: string;
 } & Struct;
 
 export type SyntheticDocument = {
-  title: string;
+  documentElement: SyntheticNode;
+} & SyntheticNode;
+
+export type SyntheticAttribute = {
+  name: string;
+  value: string;
 } & SyntheticNode;
 
 export type SyntheticHTMLElement = {
-
+  attributes: SyntheticAttribute[];
+  childNodes: SyntheticNode[];
 } & SyntheticNode;
 
 export type SyntheticValueNode = {
@@ -38,7 +56,7 @@ export type SyntheticValueNode = {
 } & SyntheticNode;
 
 export type SyntheticComment = {
-
+  
 } & SyntheticValueNode;
 
 export type SyntheticTextNode = {
@@ -90,7 +108,23 @@ export const addNewSyntheticBrowser = (root: any) => {
   };
 }
 
-export const isSyntheticDOMNode = (value) => value && value.nodeType != null;
+export const createSyntheticDocument = createStructFactory<SyntheticDocument>(SYNTHETIC_DOCUMENT, {
+  nodeName: "#document",
+  nodeType: SEnvNodeTypes.DOCUMENT
+});
+export const createSyntheticElement  = createStructFactory<SyntheticHTMLElement>(SYNTHETIC_ELEMENT, {
+  nodeType: SEnvNodeTypes.ELEMENT
+});
+export const createSyntheticTextNode = createStructFactory<SyntheticTextNode>(SYNTHETIC_TEXT_NODE, {
+  nodeName: "#text",
+  nodeType: SEnvNodeTypes.TEXT
+});
+export const createSyntheticComment  = createStructFactory<SyntheticComment>(SYNTHETIC_COMMENT, {
+  nodeName: "#comment",
+  nodeType: SEnvNodeTypes.COMMENT
+});
+
+export const isSyntheticDOMNode = (value) => value && value.constructor === Object && value.nodeType != null;
 
 export const getSyntheticBrowserStore = (root: any): SyntheticBrowserStore => getValuesByType(root, SYNTHETIC_BROWSER_STORE)[0];
 

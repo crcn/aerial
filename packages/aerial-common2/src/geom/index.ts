@@ -232,3 +232,11 @@ export const centerTransformZoom = (translate: Translate, box: Box, nz: number, 
     zoom: nz
   };
 };
+
+export const boxesIntersect = (a: Box, b: Box) => !(a.left > b.right || a.right < b.left || a.top > b.bottom || a.bottom < a.top);
+export const pointIntersectsBox = (point: Point, box: Box) => !(point.left < box.left || point.left > box.right || point.top < box.top || point.top > box.bottom);
+export const getSmallestBox = (...boxes: Box[]) => boxes.reduce((a, b) => {
+  const asize = getBoxSize(a);
+  const bsize = getBoxSize(b);
+  return asize.width * asize.height < bsize.width * bsize.height ? a : b;
+}, { left: Infinity, right: Infinity, top: Infinity, bottom: Infinity });

@@ -5,6 +5,7 @@ import { SEnvNodeInterface } from "./node";
 import { SEnvDocumentInterface } from "./document";
 import { SEnvWindowInterface } from "../window";
 import { SEnvParentNodeInterface } from "./parent-node";
+const VOID_ELEMENTS = require("void-elements");
 
 export const parseHTMLDocument = weakMemo((content: string) => {
   const ast = parse5.parse(content, { locationInfo: true });
@@ -34,11 +35,9 @@ export const consumeSaxParser = (parser: parse5.SAXParser, root: SEnvNodeInterfa
       element.setAttribute(attr.name, attr.value);
     }
 
-    if (selfClosing) {
+    if (selfClosing || VOID_ELEMENTS[name.toLowerCase()]) {
       constructNode(element);
-    }
-
-    if (!selfClosing) {
+    } else if (!selfClosing) {
       cpath.push(current = element);
     }
   });

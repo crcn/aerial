@@ -47,7 +47,7 @@ export const generateDefaultId = (...args) => `${ID_SEED}.${String(++_idCount)}`
 
 export const idd = <VInst>(factory: (...args) => VInst, generateId: (...args) => string = generateDefaultId): ((...args) => VInst & IDd) => {
    return (...args) => {
-     return { ...factory(...args) as any, $$id: generateDefaultId(...args) };
+     return { $$id: generateDefaultId(...args), ...factory(...args) as any };
    }
 };
 

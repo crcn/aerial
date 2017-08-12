@@ -1,10 +1,14 @@
 // import { SEnvWindowInterface } from "../environment";
+import { SyntheticDocument } from "../state";
+import { RenderedClientRects } from "../environment";
 import { Request, BaseEvent, generateDefaultId } from "aerial-common2";
 
 export const OPEN_SYNTHETIC_WINDOW               = "OPEN_SYNTHETIC_WINDOW";
 export const NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED = "NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED";
 export const SYNTHETIC_WINDOW_SOURCE_CHANGED     = "SYNTHETIC_WINDOW_SOURCE_CHANGED";
 export const FETCH_REQUEST                       = "FETCH_REQUEST";
+export const SYNTHETIC_WINDOW_RECTS_UPDATED      = "SYNTHETIC_WINDOW_RECTS_UPDATED";
+export const SYNTHETIC_WINDOW_LOADED             = "SYNTHETIC_WINDOW_LOADED";
 
 export type FetchRequest = {
   info: RequestInfo;
@@ -12,7 +16,7 @@ export type FetchRequest = {
 
 export type SyntheticWindowSourceChangedEvent = {
   type: string
-  syntheticWindowId;
+  syntheticWindowId: string;
   window: any;
 } & BaseEvent;
 
@@ -24,6 +28,16 @@ export type OpenSyntheticBrowserWindowRequest = {
 export type NewSyntheticWindowEntryResolvedEvent = {
   location: string;
   syntheticBrowserId?: string;
+} & BaseEvent;
+
+export type SyntheticWindowRectsUpdatedEvent = {
+  rects: RenderedClientRects;
+  syntheticWindowId: string;
+} & BaseEvent;
+
+export type SyntheticWindowLoadedEvent = {
+  document: SyntheticDocument;
+  syntheticWindowId: string;
 } & BaseEvent;
 
 
@@ -50,4 +64,16 @@ export const createNewSyntheticWindowEntryResolvedEvent = (location: string, syn
   location,
   syntheticBrowserId,
   type: NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
+});
+
+export const createSyntheticWindowRectsUpdated = (syntheticWindowId: string, rects: RenderedClientRects): SyntheticWindowRectsUpdatedEvent => ({
+  syntheticWindowId,
+  rects,
+  type: SYNTHETIC_WINDOW_RECTS_UPDATED,
+});
+
+export const createSyntheticWindowLoadedEvent = (syntheticWindowId: string, document: SyntheticDocument): SyntheticWindowLoadedEvent => ({
+  syntheticWindowId,
+  document,
+  type: SYNTHETIC_WINDOW_LOADED,
 });

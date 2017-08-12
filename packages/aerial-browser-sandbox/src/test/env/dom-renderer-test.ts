@@ -26,6 +26,6 @@ describe(__filename + "#", () => {
     await waitForDocumentComplete(window);
     const domRenderer = window.renderer as SyntheticDOMRenderer;
 
-    expect(stripWhitespace(domRenderer.mount.innerHTML)).to.eql("<style></style><span>hello world</span>");
+    expect(stripWhitespace(domRenderer.mount.innerHTML)).to.eql("<style></style><span><body>hello world</body></span>");
   });
 });

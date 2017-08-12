@@ -296,14 +296,20 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
       }
 
       private _evaluate() {
-        const script = new vm.Script(this._scriptSource, {
-          filename: this._filename,
-          displayErrors: true,
-        });
+        try {
+          const script = new vm.Script(this._scriptSource, {
+            filename: this._filename,
+            displayErrors: true,
+          });
 
-        // TODO - need to grab existing VM object
-        script.runInNewContext(vm.createContext(this.ownerDocument.defaultView));
-        
+          // TODO - need to grab existing VM object
+          script.runInNewContext(vm.createContext(this.ownerDocument.defaultView));
+          
+        } catch(e) {
+          this.ownerDocument.defaultView.console.warn(e);
+        }
+
+        // temp for now. Needs to call reject if error is caught
         this._resolveContentLoaded();
       }
     }

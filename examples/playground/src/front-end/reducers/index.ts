@@ -1,11 +1,13 @@
 import { 
+  Box,
+  IDd,
   moved,
   removed,
   resized,
   update,
   Struct,
-  IDd,
   moveBox,
+  zoomBox,
   updateIn, 
   Translate,
   BaseEvent, 
@@ -16,8 +18,11 @@ import {
   updateStruct,
   mapImmutable, 
   keepBoxCenter,
-  getValueByPath, 
+  getValueByPath,
+  getSmallestBox,
   scaleInnerBox,
+  boxesIntersect,
+  pointIntersectsBox,
   keepBoxAspectRatio,
   centerTransformZoom,
   updateStructProperty, 
@@ -45,11 +50,12 @@ import {
 } from "front-end/state";
 
 import {
-  STAGE_TOOL_NODE_OVERLAY_HOVER_OUT,
+  StageToolOverlayMouseMoved,
+  StageToolOverlayClicked,
+  STAGE_TOOL_OVERLAY_MOUSE_CLICKED,
+  STAGE_TOOL_OVERLAY_MOUSE_MOVED,
   StageToolNodeOverlayHoverOut,
   StageToolNodeOverlayHoverOver,
-  STAGE_TOOL_NODE_OVERLAY_HOVER_OVER,
-  STAGE_TOOL_NODE_OVERLAY_CLICKED,
   StageToolNodeOverlayClicked,
   STAGE_TOOL_WINDOW_KEY_DOWN,
   StageWillWindowKeyDown,
@@ -82,17 +88,7 @@ import {
   VisualEditorWheel,
 } from "front-end/actions";
 
-import { syntheticBrowserReducer } from "aerial-browser-sandbox";
-
-// import { 
-//   SyntheticDOMNode2,
-//   SYNTHETIC_BROWSER,
-//   SYTNTHETIC_BROWSER_WINDOW,
-//   syntheticBrowserReducer,
-//   getSyntheticBrowserWindow,
-//   OPEN_SYNTHETIC_WINDOW_REQUESTED,
-//   openSyntheticWindowRequested,
-// } from "aerial-synthetic-browser";
+import { syntheticBrowserReducer, getSyntheticWindow } from "aerial-browser-sandbox";
 
 import {
   createOpenSyntheticWindowRequest
@@ -233,6 +229,19 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       });
     }
 
+    case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
+      const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
+      const workspace = getSyntheticWindowWorkspace(state, windowId);
+      return updateStructProperty(state, workspace, "hoveringIds", [getStageToolMouseNodeTargetUID(state, event as StageToolOverlayMouseMoved)]);
+    }
+
+    case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
+      const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
+      const workspace = getSyntheticWindowWorkspace(state, windowId);
+      console.log(getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked));
+      return handleWindowSelectionFromAction(state, getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked), event as StageToolNodeOverlayClicked);
+    }
+
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       return updateStructProperty(state, workspace, "visualEditorSettings", {
@@ -272,16 +281,6 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     //     return handleWindowSelectionFromAction(state, nodeId, event as StageToolNodeOverlayClicked);
     //   }
     // }
-
-    case STAGE_TOOL_NODE_OVERLAY_HOVER_OVER: {
-      const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOver;
-      return addWorkspaceHovering(state, getSyntheticWindowWorkspace(state, windowId).$$id, nodeId);
-    }
-
-    case STAGE_TOOL_NODE_OVERLAY_HOVER_OUT: {
-      const { windowId, nodeId, sourceEvent } = event as StageToolNodeOverlayHoverOut;
-      return removeWorkspaceHovering(state, getSyntheticWindowWorkspace(state, windowId).$$id, nodeId);
-    }
   }
 
   return state;
@@ -335,4 +334,31 @@ const shortcutServiceReducer = <T extends ShortcutServiceState>(state: Applicati
     }
   }
   return state;
+}
+
+const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: StageToolOverlayMouseMoved|StageToolOverlayClicked) => {
+  const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
+  const window = getSyntheticWindow(state, windowId);
+  const workspace = getSyntheticWindowWorkspace(state, windowId);
+  const zoom = workspace.visualEditorSettings.translate.zoom;
+
+  // TODO - move to reducer
+  const target = sourceEvent.nativeEvent.target as Element;
+  const rect = target.getBoundingClientRect();
+  const mouseX = sourceEvent.pageX - rect.left;
+  const mouseY = sourceEvent.pageY - rect.top;
+
+  const computedBoxs = window.computedBoxes;
+  const intersectingBoxes: Box[] = [];
+  const intersectingBoxMap = new Map<Box, string>();
+  for (const uid in computedBoxs) {
+    const box = computedBoxs[uid];
+    if (pointIntersectsBox({ left: mouseX, top: mouseY }, zoomBox(box, zoom))) {
+      intersectingBoxes.push(box);
+      intersectingBoxMap.set(box, uid);
+    }
+  }
+  const smallestBox = getSmallestBox(...intersectingBoxes);
+  const uid = intersectingBoxMap.get(smallestBox);
+  return uid;
 }
