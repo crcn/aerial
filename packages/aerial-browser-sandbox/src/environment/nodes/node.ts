@@ -38,12 +38,10 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     childNodes: NodeList;
     readonly localName: string | null;
     readonly namespaceURI: string | null;
-    readonly nextSibling: Node | null;
     readonly nodeName: string;
     readonly nodeType: number;
     nodeValue: string | null;
     readonly ownerDocument: SEnvDocumentInterface;
-    readonly previousSibling: Node | null;
     textContent: string | null;
     readonly ATTRIBUTE_NODE: number;
     readonly CDATA_SECTION_NODE: number;
@@ -73,6 +71,14 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       super.$$preconstruct();
       this.uid = generateDefaultId();
       this.childNodes = this.$childNodesArray = new SEnvNodeList();
+    }
+
+    get nextSibling() {
+      return this.parentNode.childNodes[Array.prototype.indexOf.call(this.parentNode.childNodes, this) + 1];
+    }
+
+    get previousSibling() {
+      return this.parentNode.childNodes[Array.prototype.indexOf.call(this.parentNode.childNodes, this) - 1];
     }
 
     get parentNode() {

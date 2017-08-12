@@ -38,6 +38,7 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       return this._insertChild(newChild, index);
     }
 
+
     private _insertChild<T extends Node>(child: T, index: number) {
       if (child.nodeType === SEnvNodeTypes.DOCUMENT_FRAGMENT) {
         while(child.childNodes.length) {
@@ -73,7 +74,6 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       return querySelector(this, selectors);
     }
 
-    querySelectorAll<K extends keyof ElementListTagNameMap>(selectors: K): ElementListTagNameMap[K];
     querySelectorAll(selectors: string): NodeListOf<Element> {
       return null;
     }

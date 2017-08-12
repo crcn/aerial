@@ -23,6 +23,17 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     }
   }
 
+  class SEnvHTMLAllCollection extends _Collection<Element> implements HTMLAllCollection {
+    
+    item(nameOrIndex?: string): HTMLCollection | Element | null {
+      return this.namedItem(nameOrIndex) || this[nameOrIndex];
+    }
+
+    namedItem(name: string): HTMLCollection | Element | null {
+      return this.find((element) => element.getAttribute("name") === name);
+    }
+  }
+
   class SEnvHTMLCollection extends _Collection<Element> implements HTMLCollection {
     private _target: Node & ParentNode;
     $init(target: Node & ParentNode) {
@@ -102,5 +113,6 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     SEnvNamedNodeMap,
     SEnvHTMLCollection,
     SEnvStyleSheetList,
+    SEnvHTMLAllCollection,
   }
 });

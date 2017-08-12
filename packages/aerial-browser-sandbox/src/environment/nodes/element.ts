@@ -40,16 +40,8 @@ export const getSEnvElementClass = weakMemo((context: any) => {
 
     msContentZoomFactor: number;
     readonly msRegionOverflow: string;
-    readonly children: HTMLCollection;
-    readonly firstElementChild: Element | null;
-    readonly lastElementChild: Element | null;
-    readonly childElementCount: number;
     readonly addedNodes: NodeList;
-    readonly attributeName: string | null;
-    readonly attributeNamespace: string | null;
-    readonly nextSibling: Node | null;
     readonly oldValue: string | null;
-    readonly previousSibling: Node | null;
     readonly removedNodes: NodeList;
     readonly nextElementSibling: Element | null;
     readonly previousElementSibling: Element | null;

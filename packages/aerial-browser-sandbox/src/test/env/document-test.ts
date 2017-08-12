@@ -44,7 +44,7 @@ describe(__filename + "#", () => {
         await waitForDocumentComplete(window);
         expect(window.document.body.innerHTML).to.eql(`<span>hello</span>`);
         window.document.write(`<span>b</span>`);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 10));
         expect(window.document.body.innerHTML).to.eql(`<span>b</span>`);
       });
     });

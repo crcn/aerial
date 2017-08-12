@@ -12,7 +12,6 @@ import { parseHTMLDocument, constructNodeTree, whenLoaded, consumeSaxParser } fr
 import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
-
 export interface SEnvDocumentInterface extends SEnvNodeInterface, Document {
   $load(content: string): void;
   $createElementWithoutConstruct(tagName: string): SEnvHTMLElementInterface;
@@ -36,7 +35,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   const { SEnvEvent } = getSEnvEventClasses(context);
   const SEnvDocumentFragment = getSEnvDocumentFragment(context);
   const SENvHTMLElement = getSEnvHTMLElementClass(context);
-  const { SEnvStyleSheetList } = getSEnvHTMLCollectionClasses(context);
+  const { SEnvStyleSheetList, SEnvHTMLAllCollection } = getSEnvHTMLCollectionClasses(context);
 
   const eventMap = {
     MutationEvent:  SEnvMutationEvent
@@ -53,7 +52,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     
     alinkColor: string;
     
-    readonly all: HTMLAllCollection;
     readonly nodeType: number = SEnvNodeTypes.DOCUMENT;
     
     anchors: HTMLCollectionOf<HTMLAnchorElement>;
@@ -103,9 +101,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     msCapsLockWarningOff: boolean;
     msCSSOMElementFloatMetrics: boolean;
 
-    readonly firstElementChild: Element | null;
-    readonly lastElementChild: Element | null;
-    readonly childElementCount: number;
 
     readonly stylesheets: StyleSheetList;
     readonly styleSheets: StyleSheetList;
@@ -115,6 +110,10 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
       this.addEventListener("load", this._onChildLoad.bind(this));
+    }
+
+    get all() {
+      return new SEnvHTMLAllCollection(...Array.from(this.querySelectorAll("*")));
     }
     
     get readyState() {
@@ -562,6 +561,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     createNodeIterator(root: Node, whatToShowe?: number, filter?: NodeFilter, entityReferenceExpansion?: boolean): NodeIterator {
       return null;
     }
+
     createNSResolver(nodeResolver: Node): XPathNSResolver {
       return null;
     }
