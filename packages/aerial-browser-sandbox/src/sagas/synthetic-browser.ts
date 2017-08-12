@@ -23,6 +23,7 @@ import {
   OpenSyntheticBrowserWindowRequest,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
   createSyntheticWindowSourceChangedEvent,
+  createSyntheticWindowResourceLoadedEvent,
   createNewSyntheticWindowEntryResolvedEvent
 } from "../actions";
 
@@ -142,7 +143,9 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     yield fork(function*() {
       while(true) {
         const { value: [info, resolve] } = yield call(fetchQueue.next);
-        resolve((yield yield request(createFetchRequest(info))).payload);
+        const body = (yield yield request(createFetchRequest(info))).payload;
+        yield put(createSyntheticWindowResourceLoadedEvent(syntheticWindowId, String(info)));
+        resolve(body);
       }
     });
 

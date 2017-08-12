@@ -5,14 +5,17 @@ import {
   Resized, 
   Removed,
   REMOVED,
-  RESIZED, 
+  RESIZED,
   BaseEvent, 
   updateStruct, 
   deleteValueById,
   updateStructProperty, 
 } from "aerial-common2";
+import { uniq } from "lodash";
 import { 
   SyntheticWindowLoadedEvent,
+  SYNTHETIC_WINDOW_RESOURCE_LOADED,
+  SyntheticWindowResourceLoadedEvent,
   SYNTHETIC_WINDOW_LOADED,
   SYNTHETIC_WINDOW_RECTS_UPDATED,
   SyntheticWindowRectsUpdatedEvent,
@@ -102,6 +105,15 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
       const { rects, syntheticWindowId } = event as SyntheticWindowRectsUpdatedEvent;
       const window = getSyntheticWindow(root, syntheticWindowId);
       return updateStructProperty(root, window, "computedBoxes", rects);
+    }
+
+    case SYNTHETIC_WINDOW_RESOURCE_LOADED: {
+      const { uri, syntheticWindowId } = event as SyntheticWindowResourceLoadedEvent;
+      const window = getSyntheticWindow(root, syntheticWindowId);
+      return updateStructProperty(root, window, "externalResourceUris", uniq([
+        ...window.externalResourceUris,
+        uri
+      ]));
     }
   }
 

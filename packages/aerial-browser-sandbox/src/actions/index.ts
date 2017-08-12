@@ -4,6 +4,7 @@ import { RenderedClientRects } from "../environment";
 import { Request, BaseEvent, generateDefaultId } from "aerial-common2";
 
 export const OPEN_SYNTHETIC_WINDOW               = "OPEN_SYNTHETIC_WINDOW";
+export const SYNTHETIC_WINDOW_RESOURCE_LOADED    = "SYNTHETIC_WINDOW_RESOURCE_LOADED";
 export const NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED = "NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED";
 export const SYNTHETIC_WINDOW_SOURCE_CHANGED     = "SYNTHETIC_WINDOW_SOURCE_CHANGED";
 export const FETCH_REQUEST                       = "FETCH_REQUEST";
@@ -40,6 +41,11 @@ export type SyntheticWindowLoadedEvent = {
   syntheticWindowId: string;
 } & BaseEvent;
 
+export type SyntheticWindowResourceLoadedEvent = {
+  uri: string;
+  syntheticWindowId: string;
+} & BaseEvent;
+
 
 export const createSyntheticWindowSourceChangedEvent = (syntheticWindowId: string, window: any): SyntheticWindowSourceChangedEvent => ({
   window,
@@ -70,6 +76,13 @@ export const createSyntheticWindowRectsUpdated = (syntheticWindowId: string, rec
   syntheticWindowId,
   rects,
   type: SYNTHETIC_WINDOW_RECTS_UPDATED,
+});
+
+
+export const createSyntheticWindowResourceLoadedEvent = (syntheticWindowId: string, uri: string): SyntheticWindowResourceLoadedEvent => ({
+  uri,
+  syntheticWindowId,
+  type: SYNTHETIC_WINDOW_RESOURCE_LOADED,
 });
 
 export const createSyntheticWindowLoadedEvent = (syntheticWindowId: string, document: SyntheticDocument): SyntheticWindowLoadedEvent => ({

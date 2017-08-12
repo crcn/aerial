@@ -1,8 +1,16 @@
 very simple online playground for visually creating web applications
 
+HI PRIO:
+
+- [ ] CSS inspector
+- [ ] show loaded network files
+
+LOW PRIO:
+
+- [ ] device presets
+
 Immediate TODOS:
 
-- [ ] use DOM renderer
 - [ ] File navigator specific to selected window
 - [ ] proxy remote requests to local server
 - [ ] CSS structs

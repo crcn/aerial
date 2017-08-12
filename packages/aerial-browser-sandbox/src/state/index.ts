@@ -79,6 +79,7 @@ export type SyntheticWindow = {
   computedBoxes: {
     [identifier: string]: Box;
   };
+  externalResourceUris: string[],
   computedStyles: {
     [identifier: string]: CSSStyleDeclaration
   }
@@ -93,7 +94,8 @@ export type SyntheticBrowserStore = {
 } & Struct;
 
 export const createSyntheticWindow = createStructFactory<SyntheticWindow>(SYNTHETIC_WINDOW, {
-  box: DEFAULT_SYNTHETIC_WINDOW_BOX
+  box: DEFAULT_SYNTHETIC_WINDOW_BOX,
+  externalResourceUris: []
 });
 
 export const createSyntheticBrowser = createStructFactory<SyntheticBrowser>(SYNTHETIC_BROWSER, {
