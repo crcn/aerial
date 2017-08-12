@@ -1,9 +1,9 @@
-import { openTestWindow, waitForDocumentComplete } from "./utils";
+import { openTestWindow, waitForDocumentComplete, wrapHTML } from "./utils";
 import { expect } from "chai";
 
 describe(__filename + "#", () => {
   it("can be registered and used", async () => {
-    const window = openTestWindow("content");
+    const window = openTestWindow(wrapHTML(`<span>content</span>`));
     await waitForDocumentComplete(window);
     class TestElement extends window.HTMLElement {
 
@@ -15,7 +15,7 @@ describe(__filename + "#", () => {
 
   describe("calls connectedCallback", () => {
     it("when it's added to the document", async () => {
-      const window = openTestWindow("content");
+      const window = openTestWindow(wrapHTML());
       await waitForDocumentComplete(window);
       let _inserted = false;
       class TestElement extends window.HTMLElement {
@@ -29,7 +29,7 @@ describe(__filename + "#", () => {
       expect(_inserted).to.eql(true);
     });
     it("when it's ancestor is added to the document", async () => {
-      const window = openTestWindow("content");
+      const window = openTestWindow(wrapHTML());
       await waitForDocumentComplete(window);
       let _insertedCount = 0;
       class TestElement extends window.HTMLElement {
@@ -45,7 +45,7 @@ describe(__filename + "#", () => {
       expect(_insertedCount).to.eql(1);
     });
     it("when it's nested in a custom element that's added to the document", async () => {
-      const window = openTestWindow("content");
+      const window = openTestWindow(wrapHTML());
       await waitForDocumentComplete(window);
       let _insertedCount = 0;
       class TestElement extends window.HTMLElement {
@@ -62,7 +62,7 @@ describe(__filename + "#", () => {
       expect(_insertedCount).to.eql(2);
     });
     it("when it's inserted into the document multiple times", async () => {
-      const window = openTestWindow("content");
+      const window = openTestWindow(wrapHTML());
       await waitForDocumentComplete(window);
       let _insertedCount = 0;
       class TestElement extends window.HTMLElement {
@@ -75,7 +75,7 @@ describe(__filename + "#", () => {
       const e = window.document.createElement("x-test");
       window.document.body.appendChild(e);
       window.document.body.appendChild(e);
-      expect(window.document.body.childNodes.length).to.eql(2);
+      expect(window.document.body.childNodes.length).to.eql(1);
     });
   });
 

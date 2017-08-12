@@ -8,9 +8,10 @@ import { getSEnvCommentClass, SEnvCommentInterface } from "./comment";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
-import { parseHTMLDocument, constructNodeTree, loadNodeExpression, whenLoaded } from "./utils";
+import { parseHTMLDocument, constructNodeTree, whenLoaded, consumeSaxParser } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
+
 
 export interface SEnvDocumentInterface extends SEnvNodeInterface, Document {
   $load(content: string): void;
@@ -23,6 +24,8 @@ export interface SEnvDocumentInterface extends SEnvNodeInterface, Document {
   addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, useCapture?: boolean): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
+
+const CONSUME_TIMEOUT = 10;
 
 export const getSEnvDocumentClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
@@ -43,6 +46,10 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     
     readonly activeElement: Element;
     private _readyState: string;
+    private _parser: parse5.SAXParser;
+    private _writeChunks: string[];
+    private _consumingWrites: boolean;
+    private _consumeWritePromise: Promise<any>;
     
     alinkColor: string;
     
@@ -132,12 +139,13 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
 
     async $load(content: string) {
+
+      // TODO - use sax parsing here instead
       this._setReadyState("loading");
 
-      const expression = parseHTMLDocument(content);
-      await Promise.all(expression.childNodes.map(childExpression => {
-        return loadNodeExpression(childExpression, this, this)
-      }));
+      this.write(content);
+
+      await this._consumeWritePromise;
 
       this._setReadyState("interactive");
 
@@ -685,49 +693,48 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
     
     write(...content: string[]): void {
+      if (!this._writeChunks) {
+        this._writeChunks = [];
+      }
+      for (const chunk of content) {
+        this._writeChunks.unshift(...chunk.split(/(?=[<\b])|\b/));
+      }
 
+      if (!this._consumingWrites) {
+        this._consumingWrites = true;
+        this._consumeWritePromise = this._consumeWrites();
+      }
+    }
+
+    private async _consumeWrites() {
+
+      let mountTo: SEnvNodeInterface = this;
+
+      if (this.documentElement) {
+        this.removeChild(this.documentElement);
+        const html = this.createElement("html");
+        html.appendChild(this.createElement("head"));
+        html.appendChild(this.createElement("body"));
+        this.appendChild(html);
+        mountTo = this.body as any as SEnvNodeInterface;
+      }
+
+      this._parser = new parse5.SAXParser({ locationInfo: true });
+      consumeSaxParser(this._parser, mountTo);
+
+      while(this._writeChunks.length && !this.defaultView.closed) {
+        if (this._parser.isPaused()) {
+          await new Promise((resolve) => setTimeout(resolve, CONSUME_TIMEOUT));
+          continue;
+        }
+
+        this._parser.write(this._writeChunks.shift());
+      }
+      this._consumingWrites = false;
     }
     
     writeln(...content: string[]): void {
       
     }
   };
-})
-
-const loadNode = async (document: SEnvDocumentInterface, expression: parse5.AST.Default.Node) => {
-  const node = createNode(document, expression);
-  if (node.nodeType === SEnvNodeTypes.ELEMENT) {
-    await loadChildNodes(node as Element, expression as parse5.AST.Default.Element);
-    node.constructor.call(node);
-  }
-  return node;
-};
-
-const loadChildNodes = async (parentElement: Element, expression: parse5.AST.Default.ParentNode) => {
-  for (const childExpression of expression.childNodes) {
-    parentElement.appendChild(await loadNode(parentElement.ownerDocument as SEnvDocumentInterface, childExpression));
-  }
-};
-
-const createNode = (document: SEnvDocumentInterface, expression: parse5.AST.Default.Node) => {
-  switch(expression.nodeName) {
-    case "#text": {
-      return document.createTextNode((expression as parse5.AST.Default.TextNode).value);
-    }
-    case "#comment": {
-      return document.createComment((expression as parse5.AST.Default.CommentNode).data);
-    }
-    case "#documentType": {
-      return document.createTextNode("");
-    }
-    default: {
-      const elementExpression = expression as parse5.AST.Default.Element;
-      const element = document.$createElementWithoutConstruct(elementExpression.nodeName);
-      for (let i = 0, n = elementExpression.attrs.length; i < n; i++) {
-        const attributeExpression = elementExpression.attrs[i];
-        element.setAttribute(attributeExpression.name, attributeExpression.value);
-      }
-      return element;
-    }
-  }
-};
+});

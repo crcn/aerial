@@ -23,6 +23,8 @@ export const waitForDocumentComplete = (window: Window) => new Promise((resolve)
       resolve();
     }
   }
-})
+});
+
+export const wrapHTML = (content = "") => `<html><head></head><body>${content}</body></html>`;
 
 export * from "../utils";

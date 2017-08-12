@@ -5,7 +5,7 @@ export interface EventTargetInterface extends Event {
   $currentTarget: EventTarget;
 }
 
-export const getSEnvEventClasses = weakMemo((window: Window) => {
+export const getSEnvEventClasses = weakMemo((context: any = {}) => {
   class SEnvEvent implements EventTargetInterface {
 
     $target: any;

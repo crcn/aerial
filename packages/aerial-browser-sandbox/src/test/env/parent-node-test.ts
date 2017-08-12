@@ -1,9 +1,9 @@
-import { openTestWindow, waitForDocumentComplete } from "./utils";
+import { openTestWindow, waitForDocumentComplete, wrapHTML } from "./utils";
 import { expect } from "chai";
 
 describe(__filename + "#", () => {
   it("can append a new child", async () => {
-    const window = openTestWindow();
+    const window = openTestWindow(wrapHTML());
     await waitForDocumentComplete(window);
     const child = window.document.body.appendChild(window.document.createTextNode("a"));
     expect(child.parentElement).to.eql(window.document.body);
@@ -11,7 +11,7 @@ describe(__filename + "#", () => {
   });
 
   it("removes a child from a previous parent when appending", async () => {
-    const window = openTestWindow(`<h1></h1><h2></h2>`);
+    const window = openTestWindow(wrapHTML(`<h1></h1><h2></h2>`));
     await waitForDocumentComplete(window);
     const h1 = window.document.querySelector("h1");
     const child = h1.appendChild(window.document.createTextNode("a"));
@@ -23,7 +23,7 @@ describe(__filename + "#", () => {
   });
 
   it("can insert a child before an existing one", async () => {
-    const window = openTestWindow(``);
+    const window = openTestWindow(wrapHTML());
     await waitForDocumentComplete(window);
     const body = window.document.body;
     const a = body.appendChild(window.document.createTextNode("a"));
@@ -35,7 +35,7 @@ describe(__filename + "#", () => {
   });
 
   it("can insert a document fragment before an existing child", async () => {
-    const window = openTestWindow(``);
+    const window = openTestWindow(wrapHTML());
     await waitForDocumentComplete(window);
     const body = window.document.body;
 

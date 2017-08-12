@@ -1,6 +1,7 @@
-import { getSEnvEventTargetClass } from "../events";
+import { getSEnvEventTargetClass, getSEnvEventClasses } from "../events";
 
 const EventTarget = getSEnvEventTargetClass();
+const { SEnvEvent } = getSEnvEventClasses();
 
 export interface SyntheticWindowRenderer {
   mount: HTMLElement;
@@ -11,13 +12,22 @@ export interface SyntheticWindowRenderer {
 
 export type SyntheticDOMRendererFactory = (window: Window) => SyntheticWindowRenderer;
 
+export interface RenderedClientRects {
+  [identifier: string]: ClientRect
+};
+
 export abstract class BaseSyntheticWindowRenderer extends EventTarget implements SyntheticWindowRenderer {
   abstract readonly mount: HTMLElement;
+  private _rects: RenderedClientRects;
 
   constructor(protected _sourceWindow: Window) {
     super();
     this._onDocumentLoad = this._onDocumentLoad.bind(this) ;
     this._addTargetListeners();
+  }
+
+  get clientRects(): RenderedClientRects {
+    return this._rects;
   }
 
   get sourceWindow(): Window {
@@ -42,5 +52,9 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
 
   protected _onDocumentLoad(event: Event) {
     
+  }
+
+  protected setClientRects(rects: RenderedClientRects) {
+    const event = new SEnvEvent();
   }
 }

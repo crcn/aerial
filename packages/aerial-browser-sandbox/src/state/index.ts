@@ -118,3 +118,7 @@ export const getAllSyntheticDOMNodesAsIdMap = weakMemo((root: any): { [identifie
   }
   return map;
 });
+
+export const updateNodeTreeStruct = (nodeStruct: SyntheticNode, node: Node) => [
+  
+]

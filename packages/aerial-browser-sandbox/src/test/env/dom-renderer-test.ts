@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { 
+  wrapHTML,
   openTestWindow,
   stripWhitespace, 
   waitForDocumentComplete, 
@@ -12,14 +13,14 @@ import {
 
 describe(__filename + "#", () => {
   const createTestSyntheticDOMRendererFactory = async () => {
-    const targetWindow = openTestWindow(``);
+    const targetWindow = openTestWindow(wrapHTML());
     await waitForDocumentComplete(targetWindow);
     return createSyntheticDOMRendererFactory(targetWindow.window.document);
   };
 
   it("can render text to the dom renderer", async () => {
     const createSyntheticDOMRenderer = await createTestSyntheticDOMRendererFactory();
-    const window = openTestWindow(`hello world`, {
+    const window = openTestWindow(wrapHTML(`hello world`), {
       createRenderer: createSyntheticDOMRenderer
     });
     await waitForDocumentComplete(window);

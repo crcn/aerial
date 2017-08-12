@@ -47,7 +47,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly applicationCache: ApplicationCache;
     readonly caches: CacheStorage;
     readonly clientInformation: Navigator;
-    readonly closed: boolean;
+    closed: boolean;
     readonly crypto: Crypto;
     defaultStatus: string;
     readonly devicePixelRatio: number;
@@ -236,7 +236,9 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     blur(): void { }
     cancelAnimationFrame(handle: number): void { }
     captureEvents(): void { }
-    close(): void { }
+    close(): void {
+      this.closed = true;
+    }
 
     confirm(message?: string): boolean {
       return false;

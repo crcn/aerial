@@ -7,6 +7,8 @@ HI PRIO:
 - [ ] flesh out parent-node
 - [ ] change *Interface to Interface
 
+- [ ] same diff / patch algorithms for synthetic browser
+
 LITMUS:
 
 - [ ] run all TODOMVC examples

@@ -1,11 +1,12 @@
-import { weakMemo, ExpressionLocation } from "aerial-common2";
 import { SEnvDocumentInterface } from "./document";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
+import { weakMemo, ExpressionLocation, generateDefaultId } from "aerial-common2";
 
 export interface SEnvNodeInterface extends Node {
+  uid: string;
   source: ExpressionLocation;
   contentLoaded: Promise<any>;
   interactiveLoaded: Promise<any>;
@@ -62,6 +63,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly NOTATION_NODE: number;
     readonly PROCESSING_INSTRUCTION_NODE: number;
     readonly TEXT_NODE: number;
+    uid: string;
 
     connectedToDocument: boolean;
 
@@ -69,6 +71,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     $$preconstruct() {
       super.$$preconstruct();
+      this.uid = generateDefaultId();
       this.childNodes = this.$childNodesArray = new SEnvNodeList();
     }
 

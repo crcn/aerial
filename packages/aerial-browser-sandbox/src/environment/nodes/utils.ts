@@ -11,6 +11,59 @@ export const parseHTMLDocument = weakMemo((content: string) => {
   return ast as parse5.AST.Default.Document;
 });
 
+export const saxParseHTMLDocument = (content: string) => {
+  const parser = new parse5.SAXParser({ locationInfo: true });
+};
+
+export const consumeDocumentSaxParser = (parser: parse5.SAXParser, root: Node) => {
+
+}
+
+export const consumeSaxParser = (parser: parse5.SAXParser, root: SEnvNodeInterface) => {
+
+  let cpath: SEnvNodeInterface[] = [root];
+  let current: SEnvNodeInterface = root;
+  const document = (root.nodeType === SEnvNodeTypes.DOCUMENT ? root : root.ownerDocument) as SEnvDocumentInterface;
+
+  parser.on("startTag", (name, attrs, selfClosing, location) => {
+    const element = addNodeSource(document.$createElementWithoutConstruct(name), location);
+    current.appendChild(element);
+  
+    
+    for (const attr of attrs) {
+      element.setAttribute(attr.name, attr.value);
+    }
+
+    if (selfClosing) {
+      constructNode(element);
+    }
+
+    if (!selfClosing) {
+      cpath.push(current = element);
+    }
+  });
+
+  parser.on("endTag", async (name, location) => {
+    parser.pause();
+    const ended = cpath.pop();
+    current = cpath[cpath.length - 1];
+    constructNode(ended);
+    await ended.contentLoaded;
+    parser.resume();
+  });
+
+  parser.on("text", (text, location) => {
+    const node = addNodeSource(document.createTextNode(text), location);
+    current.appendChild(node);
+  });
+
+  parser.on("comment", (text, location) => {
+    const node = addNodeSource(document.createComment(text), location);
+    current.appendChild(node);
+  });
+  
+};
+
 export const parseHTMLDocumentFragment = weakMemo((content: string) => {
   const ast = parse5.parseFragment(content, { locationInfo: true });
   return ast as parse5.AST.Default.DocumentFragment;
@@ -44,8 +97,8 @@ const getHTMLASTNodeLocation = (expression: parse5.AST.Default.CommentNode|parse
   }
 }
 
-const addNodeSource = (node: SEnvNodeInterface, expression: parse5.AST.Default.Node) => {
-  const start = getHTMLASTNodeLocation(expression);
+const addNodeSource = <T extends SEnvNodeInterface>(node: T, expressionOrLocation) => {
+  const start = expressionOrLocation.__location ? getHTMLASTNodeLocation(expressionOrLocation) : { line: expressionOrLocation.line, column: expressionOrLocation.col };
   node.source = {
     uri: node.ownerDocument && node.ownerDocument.defaultView.location.origin,
     start: start
@@ -96,57 +149,6 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
       }
       for (const childExpression of elementExpression.childNodes) {
         constructNode(mapExpressionToNode(childExpression, document, element));
-      }
-      return element;
-    }
-  }
-};
-
-export const loadNodeExpression = async (expression: parse5.AST.Default.Node, document: SEnvDocumentInterface, parentNode?: SEnvParentNodeInterface) => {
-  switch(expression.nodeName) {
-    case "#document-fragment": {
-      const fragmentExpression = expression as parse5.AST.Default.DocumentFragment;
-      const fragment = document.createDocumentFragment();
-      for (const childExpression of fragmentExpression.childNodes) {
-        await loadNodeExpression(childExpression, document, fragment);
-      }
-      addNodeSource(fragment, expression);
-      if (parentNode) {
-        parentNode.appendChild(fragment);
-      }
-      return fragment;
-    } 
-    case "#text": {
-      const text = addNodeSource(document.createTextNode((expression as parse5.AST.Default.TextNode).value), expression);
-      if (parentNode) {
-        parentNode.appendChild(text);
-      }
-      return text;
-    }
-    case "#comment": {
-      const comment = addNodeSource(document.createComment((expression as parse5.AST.Default.CommentNode).data), expression);
-      if (parentNode) {
-        parentNode.appendChild(comment);
-      }
-      return comment;
-    }
-    case "#documentType": {
-      return null;
-    }
-    default: {
-      const elementExpression = expression as parse5.AST.Default.Element;
-      const element = document.$createElementWithoutConstruct(elementExpression.nodeName);
-      for (const attr of elementExpression.attrs) {
-        element.setAttribute(attr.name, attr.value);
-      }
-      addNodeSource(element, expression);
-      if (parentNode) {
-        parentNode.appendChild(element);
-      }
-
-      await element.contentLoaded;
-      for (const childExpression of elementExpression.childNodes) {
-        constructNode(await loadNodeExpression(childExpression, document, element));
       }
       return element;
     }
