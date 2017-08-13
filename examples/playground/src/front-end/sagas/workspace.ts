@@ -1,9 +1,9 @@
 import { watch } from "aerial-common2";
 import { select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
-import { openSyntheticWindowRequested, STAGE_TOOL_NODE_OVERLAY_CLICKED } from "front-end/actions";
+import { openSyntheticWindowRequested } from "front-end/actions";
 import { createOpenSyntheticWindowRequest } from "aerial-browser-sandbox";
-import { ApplicationState, getSelectedWorkspace, getWorkspaceMainFilePath } from "../state";
+import { ApplicationState, getSelectedWorkspace } from "../state";
 
 export function* mainWorkspaceSaga() {
   yield fork(openDefaultWindow);

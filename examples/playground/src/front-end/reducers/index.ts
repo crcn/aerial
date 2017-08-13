@@ -29,13 +29,13 @@ import {
 } from "aerial-common2";
 
 import { clamp } from "lodash";
+import { fileCacheReducer, getFileCache, getFileCacheItemByUri } from "aerial-sandbox2";
 
 import { 
   addWorkspaceHovering,
   removeWorkspaceHovering,
   ApplicationState,
   getWorkspaceById,
-  getAllFilesByPath,
   ShortcutServiceState,
   getSelectedWorkspace,
   addWorkspaceSelection,
@@ -89,9 +89,10 @@ import {
   VisualEditorWheel,
 } from "front-end/actions";
 
-import { syntheticBrowserReducer, getSyntheticWindow, SyntheticNode } from "aerial-browser-sandbox";
-
-import {
+import { 
+  SyntheticNode,
+  getSyntheticWindow, 
+  syntheticBrowserReducer, 
   createOpenSyntheticWindowRequest
 } from "aerial-browser-sandbox";
 
@@ -106,7 +107,6 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
 
     case TEXT_EDITOR_CHANGED: {
       const { file, value } = event as textEditorChanged;
-      const path = getPathById(state, file.$$id);
       return updateStructProperty(state, file, "content", value);
     }
 
@@ -127,6 +127,7 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
   state = visualEditorReducer(state, event);
   state = windowPaneReducer(state, event);
   state = shortcutServiceReducer(state, event);
+  state.fileCache = fileCacheReducer(state.fileCache, event);
 
   return state;
 };
@@ -242,13 +243,11 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       const targetUID = getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked);
       if (metaKey) {
-        // const filesByUri = getAllFilesByPath(state);
-        // console.log(filesByUri);
-        
         const { source: { uri, start } } = getValueById(state, targetUID) as SyntheticNode;
-        console.log("OPENING", uri, start);
-        // const uriWithoutProtocol = uri.replace(/^\w+:\/\//, "");
-        // return updateStructProperty(state, getSyntheticWindowWorkspace(state, windowId), "selectedFileId", filesByUri[uriWithoutProtocol].$$id);
+        const fileCacheItem = getFileCacheItemByUri(state.fileCache, uri);
+        if (fileCacheItem) {
+          return updateStructProperty(state, workspace, "selectedFileId", fileCacheItem.$$id);
+        }
         return state;
       } else {
         return handleWindowSelectionFromAction(state, targetUID, event as StageToolNodeOverlayClicked);

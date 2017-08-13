@@ -19,13 +19,13 @@ function* handleReadFileRequest() {
     while(true) {
       const req = (yield take((req: ReadUriRequest & NoCacheable) => req.type === READ_URI && !req.noCache)) as ReadUriRequest;
       const fileCacheItem = getFileCacheItemByUri(yield select(), req.uri);
-
       if (fileCacheItem) {
         yield put(createRequestResponse(req.$$id, {
           cached: true,
           content: fileCacheItem.content,
           type: fileCacheItem.contentType
         }));
+        continue;
       }
 
       yield fork(function*() {

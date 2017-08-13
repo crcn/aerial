@@ -1,7 +1,7 @@
 import "./index.scss";
 import * as React from "react";
 import { pure } from "recompose";
-import { Workspace, getSelectedWorkspaceFile } from "front-end/state";
+import { Workspace, getSelectedWorkspaceFile, ApplicationState } from "front-end/state";
 import { Dispatcher, Message, getValueById } from "aerial-common2";
 import { ProjectGutterComponent } from "./project-gutter";
 import { TextEditorComponent, VisualEditorComponent } from "./editors";
@@ -9,15 +9,16 @@ import { VisualGutterComponent } from "./element-gutter";
 
 export type WorkspaceComponentProps = {
   workspace: Workspace,
+  state: ApplicationState,
   dispatch?:  Dispatcher<any>
 };
 
-export const WorkspaceComponentBase = ({ workspace, dispatch }: WorkspaceComponentProps) => {
+export const WorkspaceComponentBase = ({ state, workspace, dispatch }: WorkspaceComponentProps) => {
   const visualSettings = workspace.visualEditorSettings;
   return <div className="workspace-component">
     { visualSettings.showLeftGutter ? <ProjectGutterComponent workspace={workspace} dispatch={dispatch} /> : null }
     <div className="workspace-editors">
-      <TextEditorComponent file={getSelectedWorkspaceFile(workspace)} dispatch={dispatch} />
+      <TextEditorComponent file={getSelectedWorkspaceFile(state, workspace)} dispatch={dispatch} />
       <VisualEditorComponent workspace={workspace} dispatch={dispatch} />
     </div>
     { visualSettings.showRightGutter ? <VisualGutterComponent /> : null }

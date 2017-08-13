@@ -22,6 +22,7 @@ import {
   ImmutableObjectIdentity,
   createImmutableStructFactory,
 } from "aerial-common2";
+import { createFileCache, FileCache, FileCacheItem } from "aerial-sandbox2";
 
 import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortcuts";
 import { toggleLeftGutterPressed, toggleRightGutterPressed, deleteShortcutPressed } from "front-end/actions";
@@ -47,17 +48,6 @@ export const DIRECTORY         = "DIRECTORY";
 export const WORKSPACE         = "WORKSPACE";
 export const APPLICATION_STATE = "APPLICATION_STATE";
 
-/**
- * Structs
- */
-
-export interface File extends Struct, TreeNode<any> {
-  name: string;
-  content?: string;
-}
-
-export type Directory = File;
-
 export type VisualEditorSettings = {
   backgroundColor?: string;
   translate: Translate;
@@ -82,13 +72,6 @@ export type Workspace = {
    */
 
   selectedFileId?: string;
-
-  /**
-   * directory to the source files of this
-   * workspace
-   */
-
-  sourceFiles: Directory;
 
   /**
    */
@@ -119,17 +102,18 @@ export type ApplicationState = {
   selectedWorkspaceId?: string;
   element: HTMLElement;
   apiHost: string;
+  fileCache: FileCache
 } & BaseApplicationState &  ShortcutServiceState & Struct;
 
 /**
  * Utilities
  */
 
-export const getFileExtension = (file: File) => file.name.split(".").pop();
+export const getFileExtension = (file: FileCacheItem) => file.sourceUri.split(".").pop();
 
-export const getWorkspaceMainFile = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.mainFileId);
-export const getSelectedWorkspaceFile = (workspace: Workspace): File => workspace.selectedFileId && getValueById(workspace, workspace.selectedFileId);
-export const getSelectedWorkspacePublicDirectory = (workspace: Workspace): File => getValueById(workspace.sourceFiles, workspace.publicDirectoryId);
+export const getSelectedWorkspaceFile = (state: ApplicationState, workspace: Workspace): FileCacheItem => {
+  return workspace.selectedFileId && getValueById(state.fileCache, workspace.selectedFileId);
+}
 
 export const getSyntheticWindowWorkspace = (root: any, windowId: string): Workspace => {
   const path = getPathById(root, windowId);
@@ -203,51 +187,8 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("backspace", deleteShortcutPressed()),
     createKeyboardShortcut("meta+b", toggleLeftGutterPressed()),
     createKeyboardShortcut("meta+/", toggleRightGutterPressed())
-  ]
-});
-
-export const createFile             = createStructFactory<File>(FILE);
-export const createDirectory        = createStructFactory<Directory>(DIRECTORY, { 
-  childNodes: [] 
-});
-
-export const getAllFilesByPath = weakMemo((state: ApplicationState|Workspace, prefix: string = "") => {
-  let files = {};
-  const getFilesByUrl2 = (dir: Directory, prefix = '') => {
-    for (const doc of dir.childNodes) {
-      const newPrefix = `${prefix}/${doc.name}`;
-      if (doc.$$type === DIRECTORY) {
-        files = {...files, ...getFilesByUrl2(doc, newPrefix)};
-      } else {
-        files[newPrefix] = doc;
-      }
-    }
-    return files;
-  };
-
-  if (state.$$type === APPLICATION_STATE) {
-    for (const workspace of (state as ApplicationState).workspaces) {
-      files = {
-        ...files,
-        ...getFilesByUrl2(workspace.sourceFiles, `${prefix}${workspace.$$id}`)
-      };
-    }
-  } else if (state.$$type === WORKSPACE) {
-    const workspace = state as Workspace;
-    files = getFilesByUrl2(workspace.sourceFiles, `${prefix}${workspace.$$id}`);
-  }
-
-  return files;
-});
-
-export const getWorkspaceMainFilePath = weakMemo((workspace: Workspace) => {
-  const file = getWorkspaceMainFile(workspace);
-  const allPaths = getAllFilesByPath(workspace);
-  for (const path in allPaths) {
-    if (allPaths[path].$$id === file.$$id) {
-      return path;
-    }
-  }
+  ],
+  fileCache: createFileCache()
 });
 
 export * from "./shortcuts";

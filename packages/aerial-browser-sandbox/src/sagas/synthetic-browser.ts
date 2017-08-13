@@ -4,6 +4,10 @@ import { difference } from "lodash";
 import { createQueue } from "mesh";
 
 import { 
+  getFileCache,
+  FileCache,
+  FileCacheItem,
+  getFileCacheItemByUri,
   createReadUriRequest,
   AddDependencyRequest, 
   AddDependencyResponse, 
@@ -108,16 +112,30 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
 function* handleSytheticWindowSession(syntheticWindowId: string) {
   let cwindow: SyntheticWindow;
   let cenv: SEnvWindowInterface;
+  let cachedFiles: FileCacheItem[];
 
-  yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
-    if (!syntheticWindow) {
-      if (cenv) {
-        cenv.close();
+  yield fork(function*() {
+    yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
+      if (!syntheticWindow) {
+        if (cenv) {
+          cenv.close();
+        }
+        return false;
       }
-      return false;
-    }
-    yield spawn(handleSyntheticWindowChange, syntheticWindow);
-    return true;
+      yield spawn(handleSyntheticWindowChange, syntheticWindow);
+      return true;
+    });
+  });
+
+  yield fork(function*() {
+    yield watch((root) => getFileCache(root), function*(fileCache) {
+      const updatedCachedFiles = cwindow.externalResourceUris.map(uri => getFileCacheItemByUri(fileCache, uri));
+      if (cachedFiles && cenv.document.readyState === "complete" && difference(cachedFiles, updatedCachedFiles).length !== 0) {
+        yield spawn(reload);
+      }
+      cachedFiles = updatedCachedFiles;
+      return true;
+    });
   });
 
   function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
@@ -137,7 +155,10 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     if (cwindow && cwindow.location === syntheticWindow.location) {
       return;
     }
+    yield reload(syntheticWindow);
+  }
 
+  function* reload(syntheticWindow: SyntheticWindow = cwindow) {
     const fetchQueue = createQueue();
 
     yield fork(function*() {

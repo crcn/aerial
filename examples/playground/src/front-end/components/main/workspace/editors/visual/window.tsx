@@ -55,6 +55,9 @@ const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>
     componentDidUpdate() {
       const { container, mount } = this.props as WindowMountInnerProps;
       if (container && mount) {
+        if (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
         container.appendChild(mount);
         // TODO - dispatch mounted here
       }

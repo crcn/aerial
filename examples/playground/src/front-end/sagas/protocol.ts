@@ -2,11 +2,10 @@ import { delay } from "redux-saga";
 import { createQueue } from "mesh";
 const blobToBuffer = require("blob-to-buffer");
 import { call, fork, select } from "redux-saga/effects";
-import { ApplicationState, getAllFilesByPath } from "front-end/state";
+import { ApplicationState } from "front-end/state";
 import { URIProtocol, IURIProtocolReadResult, URIProtocolProvider } from "aerial-sandbox";
-import { createURIProtocolSaga } from "aerial-sandbox2";
+import { createURIProtocolSaga, fileCacheSaga } from "aerial-sandbox2";
 
-const getAllFilesWithLocalProtocol = (state: ApplicationState) => getAllFilesByPath(state, "local://");
 
 // copy / pasta code since it's throw away. This will be removed once the synthetic browser
 // uses sagas & reducers. (CC)
@@ -44,6 +43,7 @@ export function* createUrlProxyProtocolSaga() {
   };
 
   return function*() {
+    yield fork(fileCacheSaga);
     yield fork(createURIProtocolSaga({
       name: "http",
       ...adapterBase

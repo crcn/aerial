@@ -11,7 +11,7 @@ export const fileCacheReducer = (root: any = createFileCache(), event: BaseEvent
 
       return updateStructProperty(root, cache, "allFiles", {
         ...cache.allFiles,
-        [uri]: createFileCacheItem({
+        [uri.replace(/\./g, "_")]: createFileCacheItem({
           ...item,
           sourceUri: uri,
           content,

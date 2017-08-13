@@ -1,4 +1,4 @@
-import { File } from "front-end/state";
+import { FileCacheItem } from "aerial-sandbox2";
 import { TreeNode, Box, Action, BaseEvent, Point, WrappedEvent, publicObject } from "aerial-common2";
 
 export const RESIZER_MOVED               = "RESIZER_MOVED";
@@ -121,7 +121,7 @@ export type StageToolOverlayClicked = {
 export type DeleteShortcutPressed = ShortcutEvent;
 
 export type textEditorChanged = {
-  file: File,
+  file: FileCacheItem,
   value: string
 } & BaseEvent;
 
@@ -148,7 +148,7 @@ export const resizerMoved = (workspaceId: string, point: Point): ResizerMoved =>
   type: RESIZER_MOVED,
 });
 
-export const textEditorChanged = (file: File, value: string): textEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
+export const textEditorChanged = (file: FileCacheItem, value: string): textEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
 
 export const stageToolOverlayMouseMoved = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayMouseMoved => ({
   windowId,

@@ -50,5 +50,5 @@ export const getFileCache = (root: any): FileCache => getValuesByType(root, FILE
 
 export const getFileCacheItemByUri = (root: any, uri: string) => {
   const cache = getFileCache(root);
-  return cache.allFiles[uri];
+  return cache.allFiles[uri.replace(/\./g, "_")];
 }

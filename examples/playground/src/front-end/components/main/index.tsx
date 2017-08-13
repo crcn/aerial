@@ -18,7 +18,7 @@ export type MainComponentInnerProps = {
 export const MainComponentBase = ({ state, dispatch }: MainComponentInnerProps) => {
   const workspace = getSelectedWorkspace(state);
   return <div className="main-component">
-    { workspace && <WorkspaceComponent workspace={workspace} dispatch={dispatch} /> }
+    { workspace && <WorkspaceComponent state={state} workspace={workspace} dispatch={dispatch} /> }
   </div>;
 }
 

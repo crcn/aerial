@@ -12,27 +12,28 @@ if (typeof window !== "undefined") {
 }
 
 import * as React from "react";
+import { FileCacheItem } from "aerial-sandbox2";
 import * as CodeMirror from "react-codemirror";
-import { File, getFileExtension } from "front-end/state";
+import { getFileExtension } from "front-end/state";
 import { pure, lifecycle, compose } from "recompose";
 
 export type TextEditorProps = {
-  file: File,
+  file: FileCacheItem,
   options?: any,
   dispatch: Dispatcher<any>
 };
 
 const MODES = {
-  js: "javascript",
-  html: "xml",
-  css: "css",
+  "application/javascript": "javascript",
+  "text/html": "xml",
+  "text/css": "css",
 };
 
 export const TextEditorComponentBase = ({ options, file, dispatch }: TextEditorProps) => {
   return <div className="text-editor-component">
-    <CodeMirror value={(file && file.content) || ""} options={{ 
+    <CodeMirror value={String((file && file.content) || "")} options={{ 
       theme: "dracula",
-      mode: file && MODES[getFileExtension(file)]
+      mode: file && MODES[file.contentType]
     }} onChange={value => dispatch(textEditorChanged(file, value))} />
   </div>
 }
