@@ -1,18 +1,19 @@
-import { weakMemo } from "aerial-common2";
+import { weakMemo, Mutation, diffArray, eachArrayValueMutation } from "aerial-common2";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
-import {getSEnvParentNodeClass } from "./parent-node";
+import { getSEnvParentNodeClass, diffParentNode, patchParentNode, SEnvParentNodeInterface } from "./parent-node";
+import { diffElementChild } from "./element";
 import { getL3EventClasses } from "../level3";
 import { getSEnvEventClasses } from "../events";
+import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvTextClass, SEnvTextInterface } from "./text";
 import { getSEnvCommentClass, SEnvCommentInterface } from "./comment";
-import { getSEnvHTMLCollectionClasses } from "./collections";
 import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, whenLoaded, consumeSaxParser } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
-export interface SEnvDocumentInterface extends SEnvNodeInterface, Document {
+export interface SEnvDocumentInterface extends SEnvParentNodeInterface, Document {
   $load(content: string): void;
   $createElementWithoutConstruct(tagName: string): SEnvHTMLElementInterface;
   createDocumentFragment(): DocumentFragment & SEnvNodeInterface;
@@ -733,3 +734,11 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
   };
 });
+
+export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SEnvDocumentInterface) => {
+  return diffParentNode(oldDocument, newDocument, diffElementChild);
+};
+
+export const patchDocument = (oldDocument: SEnvDocumentInterface, mutations: Mutation<any>[]) => {
+  patchParentNode(oldDocument, mutations);
+};

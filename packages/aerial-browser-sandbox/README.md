@@ -1,8 +1,5 @@
 HI PRIO:
 
-- [ ] ctrl+click to open resource file
-  - [ ] store fetched files in file cache
-  - [ ] trigger reload when a resource changes
 - [ ] css attributes for selected elements
 - [ ] sync text editor changes to file cache
 - [ ] html ast
@@ -47,4 +44,8 @@ function*() {
 
   loadedUris = window.$network.loadedUris;
 }
+```
+
+```javascript
+
 ```

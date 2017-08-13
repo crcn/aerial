@@ -10,6 +10,7 @@ export * from "./dispatchers";
 export * from "./worker";
 export * from "./geom";
 export * from "./array";
+export * from "./mutate";
 export * from "./dom";
 export * from "./messages";
 export * from "./saga";

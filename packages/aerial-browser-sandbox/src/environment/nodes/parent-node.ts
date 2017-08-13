@@ -1,4 +1,15 @@
-import { weakMemo } from "aerial-common2";
+import { 
+  weakMemo, 
+  Mutation, 
+  diffArray, 
+  eachArrayValueMutation, 
+  createInsertChildMutation,
+  createRemoveChildChildMutation,
+  createMoveChildChildMutation,
+  MoveChildMutation,
+  InsertChildMutation,
+  RemoveChildMutation,
+} from "aerial-common2";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getDOMExceptionClasses } from "./exceptions";
@@ -7,6 +18,7 @@ import { SEnvNodeTypes } from "../constants";
 import { querySelector, querySelectorAll } from "./utils";
 
 export interface SEnvParentNodeInterface extends ParentNode, Node {
+  insertChildAt<T extends Node>(child: T, index: number);
 }
 
 export const getSEnvParentNodeClass = weakMemo((context: any) => {
@@ -25,7 +37,7 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
     }
 
     appendChild<T extends Node>(child: T) {
-      return this._insertChild(child, this.childNodes.length);
+      return this.insertChildAt(child, this.childNodes.length);
     }
 
     insertBefore<T extends Node>(newChild: T, refChild: Node | null): T {
@@ -35,14 +47,14 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
         throw new SEnvDOMException(`Failed to execute 'insertBefore' on 'Node': The node before which the new node is to be inserted is not a child of this node.`);
       }
 
-      return this._insertChild(newChild, index);
+      return this.insertChildAt(newChild, index);
     }
 
 
-    private _insertChild<T extends Node>(child: T, index: number) {
+    insertChildAt<T extends Node>(child: T, index: number) {
       if (child.nodeType === SEnvNodeTypes.DOCUMENT_FRAGMENT) {
         while(child.childNodes.length) {
-          this._insertChild(child.lastChild, index);
+          this.insertChildAt(child.lastChild, index);
         }
         return child;
       }
@@ -126,7 +138,7 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
         child.$$removedFromDocument();
       }
     }
-    
+
     $$addedToDocument() {
       super.$$addedToDocument();
       for (const child of Array.prototype.slice.call(this.childNodes)) {
@@ -135,3 +147,65 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
     }
   }
 });
+
+export namespace SEnvParentNodeMutationTypes {
+  export const INSERT_CHILD_NODE_EDIT = "INSERT_CHILD_NODE_EDIT";
+  export const REMOVE_CHILD_NODE_EDIT = "REMOVE_CHILD_NODE_EDIT";
+  export const MOVE_CHILD_NODE_EDIT   = "MOVE_CHILD_NODE_EDIT";
+};
+
+export const createParentNodeInsertChildMutation = (oldNode: SEnvParentNodeInterface, child: Node, index: number) => {
+  return createInsertChildMutation(SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT, oldNode, child.cloneNode(true), index);
+};
+
+export const createParentNodeRemoveChildMutation = (oldNode: SEnvParentNodeInterface, child: Node) => {
+  return createRemoveChildChildMutation(SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT, oldNode, child, Array.from(oldNode.childNodes).indexOf(child));
+};
+
+export const createParentNodeMoveChildMutation = (oldNode: SEnvParentNodeInterface, child: Node, index: number, patchedOldIndex?: number) => {
+  return createMoveChildChildMutation(SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT, oldNode, child, patchedOldIndex || Array.from(oldNode.childNodes).indexOf(child), index);
+};
+
+export const diffParentNode = (oldNode: SEnvParentNodeInterface, newNode: SEnvParentNodeInterface, diffChildNode: (oldChild: Node, newChild: Node) => Mutation<any>[]) => {
+
+  const mutations = [];
+
+  const diff = diffArray(Array.from(oldNode.childNodes), Array.from(newNode.childNodes), (oldNode, newNode) => {
+    if (oldNode.nodeName !== newNode.nodeName || oldNode.namespaceURI !== newNode.namespaceURI) return -1;
+    return 0;
+  });
+  
+  eachArrayValueMutation(diff, {
+    insert({ index, value }) {
+      mutations.push(createParentNodeInsertChildMutation(oldNode, value, index));
+    },
+    delete({ index }) {
+      mutations.push(createParentNodeRemoveChildMutation(oldNode, oldNode.childNodes[index]));
+    },
+    update({ originalOldIndex, patchedOldIndex, newValue, index }) {
+      if (patchedOldIndex !== index) {
+        mutations.push(createParentNodeMoveChildMutation(oldNode, oldNode.childNodes[originalOldIndex] as SEnvNodeInterface, index, patchedOldIndex));
+      }
+      const oldValue = oldNode.childNodes[originalOldIndex];
+      mutations.push(...diffChildNode(oldValue, newValue));
+    }
+  });
+
+  return mutations;
+};
+
+export const patchParentNode = (oldNode: SEnvParentNodeInterface, mutations: Mutation<any>[], createNode = (child: SEnvNodeInterface) => child.cloneNode(true)) => {
+  for (const mutation of mutations) {
+    if (mutation.type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
+      const { child, index } = <InsertChildMutation<any, SEnvNodeInterface>>mutation;
+      (oldNode as any as Element).removeChild(oldNode.childNodes[index] as any);
+    } if (mutation.type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
+      const moveMutation = <MoveChildMutation<any, SEnvNodeInterface>>mutation;
+      this._insertChildAt(oldNode.childNodes[moveMutation.oldIndex] as any, moveMutation.index);
+    } else if (mutation.type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
+      const insertMutation = <InsertChildMutation<SEnvParentNodeInterface, SEnvNodeInterface>>mutation;
+      const newChild = createNode(insertMutation.child);
+      oldNode.insertChildAt(newChild, insertMutation.index);
+    }
+  }
+};

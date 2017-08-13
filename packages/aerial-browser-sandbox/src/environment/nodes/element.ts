@@ -1,7 +1,10 @@
-import { weakMemo } from "aerial-common2";
+import { diffComment } from "./comment";
+import { difference } from "lodash";
+import { diffTextNode } from "./text";
 import { SEnvNodeTypes } from "../constants";
-import { getSEnvParentNodeClass } from "./parent-node";
-import { evaluateHTMLDocumentFragment } from "./utils";
+import { weakMemo, diffArray, eachArrayValueMutation } from "aerial-common2";
+import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface } from "./parent-node";
+import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 
@@ -16,8 +19,9 @@ export const getSEnvAttr = weakMemo((context: any) => {
   }
 });
 
-export interface SEnvElementInterface extends Element {
+export interface SEnvElementInterface extends SEnvParentNodeInterface, Element {
   $$preconstruct();
+  addEventListener(type: string, listener?: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
 }
 
 export const getSEnvElementClass = weakMemo((context: any) => {
@@ -305,5 +309,49 @@ export const getSEnvElementClass = weakMemo((context: any) => {
       return null;
     }
 
+    cloneShallow() {
+      const clone = this.ownerDocument.$createElementWithoutConstruct(this.tagName);
+      for (let i = 0, n = this.attributes.length; i < n; i++) {
+        const attr = this.attributes[i];
+        clone.setAttribute(attr.name, attr.value);
+      }
+      return clone;
+    }
   }
 });
+
+export const diffElementChild = (oldChild: SEnvNodeInterface, newChild: Node) => {
+  switch(oldChild.nodeType) {
+    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as any as SEnvElementInterface, newChild as any as SEnvElementInterface);
+    case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as any as Text, newChild as Text);
+    case SEnvNodeTypes.COMMENT: return diffComment(oldChild as any as Comment, newChild as Comment);
+  }
+  return [];
+};
+
+const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvElementInterface) => {
+  const mutations = [];
+
+  if (oldElement.nodeName !== newElement.nodeName) {
+    throw new Error(`nodeName must match in order to diff`);
+  }
+  
+  const attrDiff = diffArray(Array.from(oldElement.attributes), Array.from(newElement.attributes), (a, b) => a.name === b.name ? 1 : -1);
+  
+  eachArrayValueMutation(attrDiff, {
+    insert: ({ index, value }) => {
+      // this.setAttribute(value.name, value.value, undefined, index);
+    },
+    delete: ({ index }) => {
+      // this.removeAttribute(oldElement.attributes[index].name);
+    },
+    update: ({ originalOldIndex, patchedOldIndex, newValue, index }) => {
+      if(oldElement.attributes[originalOldIndex].value !== newValue.value) {
+        // this.setAttribute(newValue.name, newValue.value, undefined, index);
+      }
+    }
+  });
+
+  mutations.push(...diffParentNode(oldElement, newElement, diffElementChild));
+  return mutations;
+};

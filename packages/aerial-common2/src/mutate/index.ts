@@ -8,6 +8,7 @@ export const SET_PROPERTY_MUTATION = "SET_PROPERTY_MUTATION";
 export const REMOVE_MUTATION       = "REMOVE_MUTATION";
 
 export type Mutation<T> = {
+  type: string;
   target?: T
 } & Struct;
 

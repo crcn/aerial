@@ -3,7 +3,7 @@ import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
-import { weakMemo, ExpressionLocation, generateDefaultId } from "aerial-common2";
+import { weakMemo, ExpressionLocation, generateDefaultId, createSetValueMutation } from "aerial-common2";
 
 export interface SEnvNodeInterface extends Node {
   uid: string;
@@ -103,6 +103,16 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     }
 
     cloneNode(deep?: boolean): Node {
+      const clone = this.cloneShallow();
+      if (deep !== false) {
+        for (let i = 0, n = this.childNodes.length; i < n; i++) {
+          clone.appendChild(this.childNodes[i].cloneNode(true));
+        }
+      }
+      return clone;
+    }
+
+    cloneShallow(): Node {
       this._throwUnsupportedMethod();
       return null;
     }
@@ -186,3 +196,17 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     }
   }
 });
+
+export const UPDATE_VALUE_NODE = "UPDATE_VALUE_NODE";
+
+export const createUpdateValueNodeMutation = (oldNode: Text|Comment, newValue: string) => {
+  return createSetValueMutation(UPDATE_VALUE_NODE, oldNode, newValue);
+}
+
+export const diffValueNode = (oldNode: Text|Comment, newNode: Text|Comment) => {
+  const mutations = [];
+  if(oldNode.nodeValue !== newNode.nodeValue) {
+    mutations.push(createUpdateValueNodeMutation(oldNode, newNode.nodeValue);
+  }
+  return mutations;
+};

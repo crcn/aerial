@@ -213,7 +213,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       });
 
       cenv.document.addEventListener("readystatechange", () => {
-        console.log("READY STATE", cenv.document.readyState, Date.now() - start);
         if (cenv.document.readyState !== "complete") return;
         const documentStruct = mapSEnvDocumentToStruct(cenv.document as SEnvDocumentInterface);
         emit(createSyntheticWindowLoadedEvent(syntheticWindowId, documentStruct));

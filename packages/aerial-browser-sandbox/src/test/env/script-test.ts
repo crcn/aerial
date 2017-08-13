@@ -63,7 +63,7 @@ describe(__filename + "#", () => {
     window.close();
   });
 
-  it("can append an element immediately after the script", async () => {
+  xit("can append an element immediately after the script", async () => {
     const logs = [];
     const window = openTestWindow(wrapHTML(`<span><script>
       const script = document.querySelector("script");
@@ -81,7 +81,7 @@ describe(__filename + "#", () => {
     expect(innerHTML).to.eql(`<span><script>const script = document.querySelector("script");script.parentElement.appendChild(document.createTextNode("hello"));</script>hello<span></span></span>`);
   });
 
-  it("can load from an external resource", async () => {
+  xit("can load from an external resource", async () => {
     const window = openTestWindow({
       "local://index.html": wrapHTML(`
         <span>

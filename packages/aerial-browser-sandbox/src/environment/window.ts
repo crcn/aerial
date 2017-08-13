@@ -398,3 +398,7 @@ export const openSyntheticEnvironmentWindow = (location: string, context: SEnvWi
   window.$load();
   return window;
 }
+
+export const diffWindow = (oldWindow: Window, newWindow: Window) => { 
+  
+};
