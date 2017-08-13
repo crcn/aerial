@@ -3,6 +3,7 @@ import { URIProtocolReadResult } from "../state";
 import { BaseEvent, Request, createStructFactory, generateDefaultId, takeResponse } from "aerial-common2";
 
 export const READ_URI = "READ_URI";
+export const CACHEABLE_READ_URI = "CACHEABLE_READ_URI";
 export const WRITE_URI = "WRITE_URI";
 export const URI_WRITTEN = "URI_WRITTEN";
 export const DELETE_URI = "DELETE_URI";
@@ -39,6 +40,7 @@ const createUriActionFactory = <T extends BaseUriRequest>(type: string) => (uri:
 });
 
 export const createReadUriRequest = createUriActionFactory<ReadUriRequest>(READ_URI);
+export const createReadCacheableUriRequest = createUriActionFactory<ReadUriRequest>(CACHEABLE_READ_URI);
 export const createDeleteUriRequest = createUriActionFactory<DeleteUriRequest>(DELETE_URI);
 export const createUriExistsRequest = createUriActionFactory<UriExistsRequest>(URI_EXISTS);
 export const createWatchUriRequest = createUriActionFactory<WatchUriRequest>(WATCH_URI);

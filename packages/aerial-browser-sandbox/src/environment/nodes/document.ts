@@ -46,8 +46,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     readonly activeElement: Element;
     private _readyState: string;
     private _parser: parse5.SAXParser;
-    private _writeChunks: string[];
-    private _consumingWrites: boolean;
     private _consumeWritePromise: Promise<any>;
     
     alinkColor: string;
@@ -693,16 +691,11 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
     
     write(...content: string[]): void {
-      if (!this._writeChunks) {
-        this._writeChunks = [];
+      if (!this._consumeWritePromise) {
+        this._consumeWritePromise = this._consumeWrites();
       }
       for (const chunk of content) {
-        this._writeChunks.unshift(...chunk.split(/(?=[<\b])|\b/));
-      }
-
-      if (!this._consumingWrites) {
-        this._consumingWrites = true;
-        this._consumeWritePromise = this._consumeWrites();
+        this._parser.write(chunk);
       }
     }
 
@@ -722,15 +715,17 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this._parser = new parse5.SAXParser({ locationInfo: true });
       consumeSaxParser(this._parser, mountTo);
 
-      while(this._writeChunks.length && !this.defaultView.closed) {
-        if (this._parser.isPaused()) {
-          await new Promise((resolve) => setTimeout(resolve, CONSUME_TIMEOUT));
-          continue;
-        }
+      const p = new Promise((resolve) => {
+        this._parser.once("end", () => {
+          resolve();
+        });
+      });
 
-        this._parser.write(this._writeChunks.shift());
-      }
-      this._consumingWrites = false;
+      setImmediate(() => {
+        this._parser.end();
+      });
+
+      await p;
     }
     
     writeln(...content: string[]): void {

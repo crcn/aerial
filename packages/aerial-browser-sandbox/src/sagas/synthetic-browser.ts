@@ -9,6 +9,7 @@ import {
   FileCacheItem,
   getFileCacheItemByUri,
   createReadUriRequest,
+  createReadCacheableUriRequest,
   AddDependencyRequest, 
   AddDependencyResponse, 
   createAddDependencyRequest, 
@@ -76,7 +77,7 @@ export function* syntheticBrowserSaga() {
 function* handleFetchRequests() {
   while(true) {
     yield takeRequest(FETCH_REQUEST, function*({ info }: FetchRequest) {
-      return (yield yield request(createReadUriRequest(String(info)))).payload;
+      return (yield yield request(createReadCacheableUriRequest(String(info)))).payload;
     });
   }
 }
@@ -203,6 +204,8 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       createRenderer: typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
     });
 
+    const start = Date.now();
+
     const chan = eventChannel((emit) => {
 
       cenv.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects }: SyntheticWindowRendererEvent) => {
@@ -210,6 +213,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       });
 
       cenv.document.addEventListener("readystatechange", () => {
+        console.log("READY STATE", cenv.document.readyState, Date.now() - start);
         if (cenv.document.readyState !== "complete") return;
         const documentStruct = mapSEnvDocumentToStruct(cenv.document as SEnvDocumentInterface);
         emit(createSyntheticWindowLoadedEvent(syntheticWindowId, documentStruct));
