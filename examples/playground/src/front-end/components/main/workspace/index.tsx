@@ -18,7 +18,7 @@ export const WorkspaceComponentBase = ({ state, workspace, dispatch }: Workspace
   return <div className="workspace-component">
     { visualSettings.showLeftGutter ? <ProjectGutterComponent workspace={workspace} dispatch={dispatch} /> : null }
     <div className="workspace-editors">
-      <TextEditorComponent file={getSelectedWorkspaceFile(state, workspace)} dispatch={dispatch} />
+      <TextEditorComponent file={getSelectedWorkspaceFile(state, workspace)} cursorPosition={workspace.textCursorPosition} dispatch={dispatch} />
       <VisualEditorComponent workspace={workspace} dispatch={dispatch} />
     </div>
     { visualSettings.showRightGutter ? <VisualGutterComponent /> : null }

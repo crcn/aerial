@@ -18,6 +18,7 @@ import {
   updateStructProperty,
   createImmutableObject,
   createImmutableArray,
+  ExpressionPosition,
   ImmutableArrayIdentity,
   ImmutableObjectIdentity,
   createImmutableStructFactory,
@@ -57,43 +58,12 @@ export type VisualEditorSettings = {
 }
 
 export type Workspace = {
-
-  /**
-   */
-
   selectionIds: string[];
-
-  /**
-   */
-
   hoveringIds: string[];
-  
-  /**
-   */
-
   selectedFileId?: string;
-
-  /**
-   */
-
-  publicDirectoryId: string;
-
-  /**
-   */
-
-  mainFileId: string;
-  
-  /**
-   * The synthetic browser instance.
-   */
-
   browser: SyntheticBrowser;
-
-  /**
-   */
-  
   visualEditorSettings: VisualEditorSettings;
-
+  textCursorPosition: ExpressionPosition;
 } & Struct;
 
 export type ApplicationState = {

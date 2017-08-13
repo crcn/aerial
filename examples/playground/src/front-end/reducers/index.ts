@@ -245,8 +245,12 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       if (metaKey) {
         const { source: { uri, start } } = getValueById(state, targetUID) as SyntheticNode;
         const fileCacheItem = getFileCacheItemByUri(state.fileCache, uri);
+        console.log(uri, start);
         if (fileCacheItem) {
-          return updateStructProperty(state, workspace, "selectedFileId", fileCacheItem.$$id);
+          return updateStruct(state, workspace, {
+            textCursorPosition: start,
+            selectedFileId: fileCacheItem.$$id,
+          });
         }
         return state;
       } else {
