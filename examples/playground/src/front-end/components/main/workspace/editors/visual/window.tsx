@@ -78,7 +78,7 @@ const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
   };
 
   return <div className="visual-canvas-window-component" style={style}>
-    <IsolateComponent inheritCSS>
+    <IsolateComponent>
       <WindowMount mount={window.mount} />
     </IsolateComponent>
   </div>;

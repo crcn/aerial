@@ -167,8 +167,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
 
     set innerHTML(value: string) {
       this.removeAllChildren();
-      const documentFragment = evaluateHTMLDocumentFragment(value, this.ownerDocument);
-      this.appendChild(documentFragment);
+      const documentFragment = evaluateHTMLDocumentFragment(value, this.ownerDocument, this);
     }
     
     getElementsByTagName<K extends keyof ElementListTagNameMap>(name: K): ElementListTagNameMap[K];

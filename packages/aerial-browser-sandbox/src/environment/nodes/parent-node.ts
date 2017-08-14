@@ -70,6 +70,9 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       this.dispatchEvent(event);
 
       const event2 = new SEnvMutationEvent2();
+      if (!child.cloneNode) {
+        console.log("INSERT", child);
+      }
       event2.initMutationEvent(createParentNodeInsertChildMutation(this, child, index));
       this.dispatchEvent(event2);
 

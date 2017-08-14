@@ -13,57 +13,6 @@ export const parseHTMLDocument = weakMemo((content: string) => {
   return ast as parse5.AST.Default.Document;
 });
 
-export const saxParseHTMLDocument = (content: string) => {
-  const parser = new parse5.SAXParser({ locationInfo: true });
-};
-
-export const consumeDocumentSaxParser = (parser: parse5.SAXParser, root: Node) => {
-
-}
-
-export const consumeSaxParser = (parser: parse5.SAXParser, root: SEnvNodeInterface) => {
-
-  let cpath: SEnvNodeInterface[] = [root];
-  let current: SEnvNodeInterface = root;
-  const document = (root.nodeType === SEnvNodeTypes.DOCUMENT ? root : root.ownerDocument) as SEnvDocumentInterface;
-
-  parser.on("startTag", (name, attrs, selfClosing, location) => {
-    const element = addNodeSource(document.$createElementWithoutConstruct(name), location);
-    current.appendChild(element);
-  
-    
-    for (const attr of attrs) {
-      element.setAttribute(attr.name, attr.value);
-    }
-
-    if (selfClosing || VOID_ELEMENTS[name.toLowerCase()]) {
-      constructNode(element);
-    } else if (!selfClosing) {
-      cpath.push(current = element);
-    }
-  });
-
-  parser.on("endTag", async (name, location) => {
-    parser.pause();
-    const ended = cpath.pop();
-    current = cpath[cpath.length - 1];
-    constructNode(ended);
-    await ended.contentLoaded;
-    parser.resume();
-  });
-
-  parser.on("text", (text, location) => {
-    const node = addNodeSource(document.createTextNode(text), location);
-    current.appendChild(node);
-  });
-
-  parser.on("comment", (text, location) => {
-    const node = addNodeSource(document.createComment(text), location);
-    current.appendChild(node);
-  });
-  
-};
-
 export const parseHTMLDocumentFragment = weakMemo((content: string) => {
   const ast = parse5.parseFragment(content, { locationInfo: true });
   return ast as parse5.AST.Default.DocumentFragment;
@@ -85,7 +34,7 @@ export const constructNodeTree = <T extends Node>(parentNode: T) => {
   return constructNode(parentNode);
 }
 
-export const evaluateHTMLDocumentFragment = (source: string, document: SEnvDocumentInterface) => mapExpressionToNode(parseHTMLDocumentFragment(source), document);
+export const evaluateHTMLDocumentFragment = (source: string, document: SEnvDocumentInterface, parentNode: SEnvParentNodeInterface) => mapExpressionToNode(parseHTMLDocumentFragment(source), document, parentNode);
 
 const getHTMLASTNodeLocation = (expression: parse5.AST.Default.CommentNode|parse5.AST.Default.Element|parse5.AST.Default.TextNode|any) => {
   const loc = expression.__location as any;
@@ -106,36 +55,45 @@ const addNodeSource = <T extends SEnvNodeInterface>(node: T, expressionOrLocatio
   return node;
 }
 
-export const mapExpressionToNode = (expression: parse5.AST.Default.Node, document: SEnvDocumentInterface, parentNode?: SEnvParentNodeInterface) => {
+export const mapChildExpressionsToNodes = (promise: Promise<any>, childExpressions: parse5.AST.Default.Node[], document: SEnvDocumentInterface, parentNode: SEnvParentNodeInterface, async: boolean = false) => {
+  for (const childExpression of childExpressions) {
+    if (async) {
+      promise = promise.then(() => mapExpressionToNode(childExpression, document, parentNode as any, async));
+    } else {
+      mapExpressionToNode(childExpression, document, parentNode as any, async);
+    }
+  }
+  return promise;
+}
+
+export const mapExpressionToNode = (expression: parse5.AST.Default.Node, document: SEnvDocumentInterface, parentNode: SEnvParentNodeInterface, async: boolean = false) => {
+  let promise = Promise.resolve();
   switch(expression.nodeName) {
     case "#document-fragment": {
       const fragmentExpression = expression as parse5.AST.Default.DocumentFragment;
       const fragment = document.createDocumentFragment();
-      for (const childExpression of fragmentExpression.childNodes) {
-        mapExpressionToNode(childExpression, document, fragment as any);
-      }
+      promise = mapChildExpressionsToNodes(promise, fragmentExpression.childNodes, document, fragment as any, async);
       addNodeSource(fragment, expression);
-      if (parentNode) {
-        parentNode.appendChild(fragment);
-      }
-      return fragment;
+      parentNode.appendChild(fragment);
+      break;
     } 
     case "#text": {
       const text = addNodeSource(document.createTextNode((expression as parse5.AST.Default.TextNode).value), expression);
-      if (parentNode) {
-        parentNode.appendChild(text);
-      }
-      return text;
+      parentNode.appendChild(text);
+      break;
     }
     case "#comment": {
       const comment = addNodeSource(document.createComment((expression as parse5.AST.Default.CommentNode).data), expression);
-      if (parentNode) {
-        parentNode.appendChild(comment);
-      }
-      return comment;
+      parentNode.appendChild(comment);
+      break;
     }
     case "#documentType": {
-      return null;
+      break;
+    }
+    case "#document": {
+      const documentExpression = expression as parse5.AST.Default.Document;
+      promise = mapChildExpressionsToNodes(promise, documentExpression.childNodes, document, parentNode, async);
+      break;
     }
     default: {
       const elementExpression = expression as parse5.AST.Default.Element;
@@ -144,15 +102,20 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
         element.setAttribute(attr.name, attr.value);
       }
       addNodeSource(element as any as SEnvHTMLElementInterface, expression);
-      if (parentNode) {
-        parentNode.appendChild(element);
+      parentNode.appendChild(element);
+      promise = mapChildExpressionsToNodes(promise, elementExpression.childNodes, document, element, async);
+      if (async) {
+        promise = promise.then(() => {
+          constructNode(element);
+          return element.contentLoaded;
+        });
+      } else {
+        constructNode(element);
       }
-      for (const childExpression of elementExpression.childNodes) {
-        constructNode(mapExpressionToNode(childExpression, document, element as any as SEnvHTMLElementInterface));
-      }
-      return element;
     }
   }
+
+  return promise;
 };
 
 export const whenLoaded = async (node: SEnvNodeInterface) => {

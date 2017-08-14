@@ -10,7 +10,7 @@ import { getSEnvTextClass, SEnvTextInterface } from "./text";
 import { getSEnvCommentClass, SEnvCommentInterface } from "./comment";
 import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
-import { parseHTMLDocument, constructNodeTree, whenLoaded, consumeSaxParser } from "./utils";
+import { parseHTMLDocument, constructNodeTree, whenLoaded, mapExpressionToNode } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
@@ -144,9 +144,8 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       // TODO - use sax parsing here instead
       this._setReadyState("loading");
 
-      this.write(content);
-
-      await this._consumeWritePromise;
+      const expression = parseHTMLDocument(content);
+      await mapExpressionToNode(expression, this, this, true);
 
       this._setReadyState("interactive");
 
@@ -695,12 +694,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
     
     write(...content: string[]): void {
-      if (!this._consumeWritePromise) {
-        this._consumeWritePromise = this._consumeWrites();
-      }
-      for (const chunk of content) {
-        this._parser.write(chunk);
-      }
+      this._throwUnsupportedMethod();
     }
 
     private async _consumeWrites() {

@@ -2,6 +2,7 @@ import * as vm from "vm";
 import { weakMemo } from "aerial-common2";
 import { hasURIProtocol } from "aerial-sandbox2";
 import { getSEnvEventClasses } from "../events";
+import path = require("path");
 import { getSEnvCSSStyleSheetClass } from "../css";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvElementClass, SEnvElementInterface } from "./element";
@@ -315,8 +316,13 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
     }
 }); 
 
+const joinPath = (...parts: string[]) => parts.reduce((a, b) => {
+  return a + (b.charAt(0) === "/" || a.charAt(a.length - 1) === "/" ? b : "/" + b);
+});
+
 const getUri = (href: string, location: Location) => {
-  return hasURIProtocol(href) ? href : href.charAt(0) === "/" ? location.origin + href : location.origin + location.pathname + href;
+  const relativeDir = /.\w+$/.test(location.pathname) ? path.dirname(location.pathname) : location.pathname;
+  return hasURIProtocol(href) ? href : href.charAt(0) === "/" ? joinPath(location.origin, href) : joinPath(location.origin, relativeDir, href);
 };
 
 export const getSEnvHTMLElementClasses = weakMemo((context: any) => {

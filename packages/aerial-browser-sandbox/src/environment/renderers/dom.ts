@@ -5,6 +5,13 @@ import { SEnvMutationEventInterface } from "../events";
 import { BaseSyntheticWindowRenderer } from "./base";
 import { debounce } from "lodash";
 
+const NODE_NAME_MAP = {
+  head: "span",
+  body: "span",
+  link: "span",
+  script: "span",
+};
+
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   readonly mount: HTMLElement;
   private _nodeMap: Map<SEnvNodeInterface, Node>;
@@ -76,7 +83,7 @@ const mapNode = (a: Node, document: Document, map: Map<SEnvNodeInterface, Node> 
     break;
     case SEnvNodeTypes.ELEMENT: 
       const el = a as Element;
-      const bel = document.createElement(el.nodeName);
+      const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || el.nodeName);
       for (let i = 0, n = el.attributes.length; i < n; i++) {
         bel.setAttribute(el.attributes[i].name, el.attributes[i].value);
       }

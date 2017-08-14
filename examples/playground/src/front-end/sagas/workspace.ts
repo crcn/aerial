@@ -13,7 +13,7 @@ function* openDefaultWindow() {
   yield watch((state: ApplicationState) => state.selectedWorkspaceId, function*(selectedWorkspaceId, state) {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
-    yield put(createOpenSyntheticWindowRequest(`http://www.jisiguo.com/about`, workspace.browser.$$id));
+    yield put(createOpenSyntheticWindowRequest(`https://www.w3.org/Style/Examples/011/mypage.html`, workspace.browser.$$id));
     return true;
   });
 }
