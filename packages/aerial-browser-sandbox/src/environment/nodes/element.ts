@@ -2,7 +2,7 @@ import { diffComment } from "./comment";
 import { difference } from "lodash";
 import { diffTextNode } from "./text";
 import { SEnvNodeTypes } from "../constants";
-import { weakMemo, diffArray, eachArrayValueMutation, Mutation } from "aerial-common2";
+import { weakMemo, diffArray, eachArrayValueMutation, Mutation, createPropertyMutation, SetPropertyMutation } from "aerial-common2";
 import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface, patchParentNode } from "./parent-node";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses } from "./collections";
@@ -208,7 +208,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     }
 
     removeAttribute(qualifiedName: string): void { 
-      return null;
+      this.attributes.removeNamedItem(qualifiedName);
     }
 
     removeAttributeNode(oldAttr: Attr): Attr { 
@@ -328,7 +328,14 @@ export const diffElementChild = (oldChild: SEnvNodeInterface, newChild: Node) =>
   return [];
 };
 
-// const createSetElementAttributeMutation = (target: SEnvElementInterface, )
+export namespace SyntheticDOMElementMutationTypes {
+  export const SET_ELEMENT_ATTRIBUTE_EDIT = "setElementAttributeEdit";
+  export const ATTACH_SHADOW_ROOT_EDIT    = "attachShadowRootEdit";
+}
+
+const createSetElementAttributeMutation = (target: SEnvElementInterface, name: string, value: string, oldName?: string, index?: number) => {
+  return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, target, name, value, undefined, oldName, index);
+}
 
 export const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvElementInterface) => {
   const mutations = [];
@@ -341,14 +348,14 @@ export const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvEl
   
   eachArrayValueMutation(attrDiff, {
     insert: ({ index, value }) => {
-      // this.setAttribute(value.name, value.value, undefined, index);
+      mutations.push(createSetElementAttributeMutation(oldElement, value.name, value.value, undefined, index));
     },
     delete: ({ index }) => {
-      // this.removeAttribute(oldElement.attributes[index].name);
+      mutations.push(createSetElementAttributeMutation(oldElement, oldElement.attributes[index].name, undefined));
     },
     update: ({ originalOldIndex, patchedOldIndex, newValue, index }) => {
       if(oldElement.attributes[originalOldIndex].value !== newValue.value) {
-        // this.setAttribute(newValue.name, newValue.value, undefined, index);
+        mutations.push(createSetElementAttributeMutation(oldElement, newValue.name, newValue.value, undefined, index));
       }
     }
   });
@@ -358,6 +365,37 @@ export const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvEl
 };
 
 export const patchElement = (oldElement: SEnvElementInterface, mutation: Mutation<any>) => {
+  if (mutation.$$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
+    
+    const { name, oldName, newValue } = <SetPropertyMutation<any>>mutation;
 
-  patchParentNode(oldElement, mutation);
+    // need to set the current value (property), and the default value (attribute)
+    // TODO - this may need to be separated later on.
+    if (oldElement.constructor.prototype.hasOwnProperty(name)) {
+      oldElement[name] = newValue == null ? "" : newValue;
+    }
+
+    if (newValue == null) {
+      oldElement.removeAttribute(name);
+    } else {
+
+      // An error will be thrown by the DOM if the name is invalid. Need to ignore
+      // native exceptions so that other parts of the app do not break.
+      try {
+        oldElement.setAttribute(name, newValue);
+      } catch(e) {
+        console.warn(e);
+      }
+    }
+
+    if (oldName) {
+      if (oldElement.hasOwnProperty(oldName)) {
+        oldElement[oldName] = undefined;
+      }
+
+      oldElement.removeAttribute(oldName);
+    }
+  } else {
+    patchParentNode(oldElement, mutation);
+  }
 };

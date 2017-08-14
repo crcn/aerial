@@ -237,36 +237,7 @@ export class DOMElementEditor<T extends SyntheticDOMElement|HTMLElement> extends
 
   applySingleMutation(mutation: Mutation<any>) {
     super.applySingleMutation(mutation);
-    if (mutation.type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
-      const { name, oldName, newValue } = <PropertyMutation<any>>mutation;
-
-      // need to set the current value (property), and the default value (attribute)
-      // TODO - this may need to be separated later on.
-      if (this.target.constructor.prototype.hasOwnProperty(name)) {
-        this.target[name] = newValue == null ? "" : newValue;
-      }
-
-      if (newValue == null) {
-        this.target.removeAttribute(name);
-      } else {
-
-        // An error will be thrown by the DOM if the name is invalid. Need to ignore
-        // native exceptions so that other parts of the app do not break.
-        try {
-          this.target.setAttribute(name, newValue);
-        } catch(e) {
-          console.warn(e);
-        }
-      }
-
-      if (oldName) {
-        if (this.target.hasOwnProperty(oldName)) {
-          this.target[oldName] = undefined;
-        }
-
-        this.target.removeAttribute(oldName);
-      }
-    }
+    
   }
 }
 

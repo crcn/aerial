@@ -19,7 +19,7 @@ describe(__filename + "#", () => {
       [`<!--a-->`, `<!--b-->`, `<!--c-->`],
       [`<h1></h1>`, `<h2></h2>`, `<h3></h3>`],
       [`<div a="b"></div>`, `<div a="c"></div>`],
-      [`<div a="b" c="d" e="f"></div>`, `<div e="f" c="d" a="b"></div>`],
+      [`<div a="b" c="d"></div>`, `<div c="d"></div>`],
     ];
 
     cases.forEach((variants) => {
