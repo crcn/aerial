@@ -214,7 +214,7 @@ export const diffParentNode = (oldNode: SEnvParentNodeInterface, newNode: SEnvPa
 };
 
 const insertChildNodeAt = (parent: Node, child: Node, index: number) => {
-  if (index > parent.childNodes.length || parent.childNodes.length === 0) {
+  if (index >= parent.childNodes.length || parent.childNodes.length === 0) {
     parent.appendChild(child);
   } else {
     const before = parent.childNodes[index];

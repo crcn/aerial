@@ -207,7 +207,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       createRenderer: !cenv && typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
     });
 
-
     if (cenv) {
       yield call(waitForDocumentComplete, nenv);
       patchWindow(cenv, diffWindow(cenv, nenv));
