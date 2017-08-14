@@ -1,10 +1,10 @@
 HI PRIO:
 
 - [ ] css attributes for selected elements
-- [ ] sync text editor changes to file cache
-- [ ] html ast
-- [ ] change urls to point to proxy
-- [ ] flesh out parent-node
+  - [ ] ability to change text on screen
+- [ ] diff & patch css objects
+- [ ] sync css changes across screens
+- [ ] web worker
 
 DEMO:
 
