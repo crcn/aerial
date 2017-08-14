@@ -5,6 +5,7 @@ import { SEnvNodeInterface } from "./node";
 import { SEnvDocumentInterface } from "./document";
 import { SEnvWindowInterface } from "../window";
 import { SEnvParentNodeInterface } from "./parent-node";
+import { SEnvHTMLElementInterface } from "./html-elements";
 const VOID_ELEMENTS = require("void-elements");
 
 export const parseHTMLDocument = weakMemo((content: string) => {
@@ -111,7 +112,7 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
       const fragmentExpression = expression as parse5.AST.Default.DocumentFragment;
       const fragment = document.createDocumentFragment();
       for (const childExpression of fragmentExpression.childNodes) {
-        mapExpressionToNode(childExpression, document, fragment);
+        mapExpressionToNode(childExpression, document, fragment as any);
       }
       addNodeSource(fragment, expression);
       if (parentNode) {
@@ -142,12 +143,12 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
       for (const attr of elementExpression.attrs) {
         element.setAttribute(attr.name, attr.value);
       }
-      addNodeSource(element, expression);
+      addNodeSource(element as any as SEnvHTMLElementInterface, expression);
       if (parentNode) {
         parentNode.appendChild(element);
       }
       for (const childExpression of elementExpression.childNodes) {
-        constructNode(mapExpressionToNode(childExpression, document, element));
+        constructNode(mapExpressionToNode(childExpression, document, element as any as SEnvHTMLElementInterface));
       }
       return element;
     }

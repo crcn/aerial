@@ -17,7 +17,7 @@ import { getL3EventClasses } from "../level3";
 import { SEnvNodeTypes } from "../constants";
 import { querySelector, querySelectorAll } from "./utils";
 
-export interface SEnvParentNodeInterface extends ParentNode, Node {
+export interface SEnvParentNodeInterface extends SEnvNodeInterface, ParentNode, Node {
   insertChildAt<T extends Node>(child: T, index: number);
 }
 
@@ -194,18 +194,16 @@ export const diffParentNode = (oldNode: SEnvParentNodeInterface, newNode: SEnvPa
   return mutations;
 };
 
-export const patchParentNode = (oldNode: SEnvParentNodeInterface, mutations: Mutation<any>[], createNode = (child: SEnvNodeInterface) => child.cloneNode(true)) => {
-  for (const mutation of mutations) {
-    if (mutation.type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
-      const { child, index } = <InsertChildMutation<any, SEnvNodeInterface>>mutation;
-      (oldNode as any as Element).removeChild(oldNode.childNodes[index] as any);
-    } if (mutation.type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
-      const moveMutation = <MoveChildMutation<any, SEnvNodeInterface>>mutation;
-      this._insertChildAt(oldNode.childNodes[moveMutation.oldIndex] as any, moveMutation.index);
-    } else if (mutation.type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
-      const insertMutation = <InsertChildMutation<SEnvParentNodeInterface, SEnvNodeInterface>>mutation;
-      const newChild = createNode(insertMutation.child);
-      oldNode.insertChildAt(newChild, insertMutation.index);
-    }
+export const patchParentNode = (oldNode: SEnvParentNodeInterface, mutation: Mutation<any>, createNode = (child: SEnvNodeInterface) => child.cloneNode(true)) => {
+  if (mutation.$$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
+    const { child, index } = <InsertChildMutation<any, SEnvNodeInterface>>mutation;
+    (oldNode as any as Element).removeChild(oldNode.childNodes[index] as any);
+  } if (mutation.$$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
+    const moveMutation = <MoveChildMutation<any, SEnvNodeInterface>>mutation;
+    this._insertChildAt(oldNode.childNodes[moveMutation.oldIndex] as any, moveMutation.index);
+  } else if (mutation.$$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
+    const insertMutation = <InsertChildMutation<SEnvParentNodeInterface, SEnvNodeInterface>>mutation;
+    const newChild = createNode(insertMutation.child);
+    oldNode.insertChildAt(newChild, insertMutation.index);
   }
 };

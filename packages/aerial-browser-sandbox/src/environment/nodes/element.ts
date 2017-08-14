@@ -2,8 +2,8 @@ import { diffComment } from "./comment";
 import { difference } from "lodash";
 import { diffTextNode } from "./text";
 import { SEnvNodeTypes } from "../constants";
-import { weakMemo, diffArray, eachArrayValueMutation } from "aerial-common2";
-import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface } from "./parent-node";
+import { weakMemo, diffArray, eachArrayValueMutation, Mutation } from "aerial-common2";
+import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface, patchParentNode } from "./parent-node";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
@@ -50,7 +50,6 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     readonly nextElementSibling: Element | null;
     readonly previousElementSibling: Element | null;
     readonly type: string;
-    remove() {}
     onpointercancel: (this: GlobalEventHandlers, ev: PointerEvent) => any;
     onpointerdown: (this: GlobalEventHandlers, ev: PointerEvent) => any;
     onpointerenter: (this: GlobalEventHandlers, ev: PointerEvent) => any;
@@ -329,7 +328,9 @@ export const diffElementChild = (oldChild: SEnvNodeInterface, newChild: Node) =>
   return [];
 };
 
-const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvElementInterface) => {
+// const createSetElementAttributeMutation = (target: SEnvElementInterface, )
+
+export const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvElementInterface) => {
   const mutations = [];
 
   if (oldElement.nodeName !== newElement.nodeName) {
@@ -354,4 +355,9 @@ const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvElementIn
 
   mutations.push(...diffParentNode(oldElement, newElement, diffElementChild));
   return mutations;
+};
+
+export const patchElement = (oldElement: SEnvElementInterface, mutation: Mutation<any>) => {
+
+  patchParentNode(oldElement, mutation);
 };

@@ -22,22 +22,33 @@ describe(__filename + "#", () => {
   });
 
 
-  xit("can clone deep", async () => {
+  it("can clone with a text child", async () => {
     const window = openTestWindow(wrapHTML(`<span a="b" c="d">a</span>`));
     await waitForDocumentComplete(window);
     const span = window.document.querySelector("span");
     const span2 = span.cloneNode(true);
     expect(span2).not.to.eql(span);
     expect(span2.attributes.length).to.eql(2);
+    expect(span2.childNodes.length).to.eql(1);
   });
 
-
-  xit("can clone shallow", async () => {
-    const window = openTestWindow(wrapHTML(`<span a="b" c="d"></span>`));
+  it("can clone with a comment child", async () => {
+    const window = openTestWindow(wrapHTML(`<span a="b" c="d"><!--a--></span>`));
     await waitForDocumentComplete(window);
     const span = window.document.querySelector("span");
     const span2 = span.cloneNode(true);
     expect(span2).not.to.eql(span);
     expect(span2.attributes.length).to.eql(2);
+    expect(span2.childNodes.length).to.eql(1);
+  });
+
+  it("can clone shallow", async () => {
+    const window = openTestWindow(wrapHTML(`<span a="b" c="d">b</span>`));
+    await waitForDocumentComplete(window);
+    const span = window.document.querySelector("span");
+    const span2 = span.cloneNode(false);
+    expect(span2).not.to.eql(span);
+    expect(span2.attributes.length).to.eql(2);
+    expect(span2.childNodes.length).to.eql(0);
   });
 });

@@ -12,11 +12,18 @@ export const getSEnvCommentClass = weakMemo((window: Window) => {
     data: string;
     readonly length: number;
     readonly nodeType: number =  SEnvNodeTypes.COMMENT;
-    constructor(readonly text: string) {
+    constructor(public nodeValue: string) {
       super();
+      this.data = nodeValue;
     }
-    remove() {
-      
+
+    get text() {
+      return this.nodeValue;
+    }
+
+    cloneShallow() {
+      const clone = this.ownerDocument.createComment(this.nodeValue);
+      return clone;
     }
     appendData(arg: string): void { }
     deleteData(offset: number, count: number): void { }

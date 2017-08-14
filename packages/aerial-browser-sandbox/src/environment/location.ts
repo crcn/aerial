@@ -16,9 +16,9 @@ export const getSEnvLocationClass = weakMemo((context: any) => {
     public search: string = "";
     public host: string = "";
 
-    constructor(urlStr: string) {
+    constructor(private _urlStr: string) {
       // super();
-      const parts = Url.parse(urlStr);
+      const parts = Url.parse(_urlStr);
       for (const key in parts) {
         this[key] = parts[key] || "";
       }
@@ -35,6 +35,10 @@ export const getSEnvLocationClass = weakMemo((context: any) => {
 
     replace(uri: string) {
 
+    }
+
+    toString() {
+      return this._urlStr;
     }
   }
 });

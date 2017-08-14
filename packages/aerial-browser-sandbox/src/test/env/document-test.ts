@@ -1,8 +1,13 @@
+import { once } from "lodash";
 import { expect } from "chai";
 import { timeout } from "../utils";
-import { once } from "lodash";
 import { openTestWindow, waitForDocumentComplete, wrapHTML } from "./utils";
-import { getSEnvWindowClass, openSyntheticEnvironmentWindow, diffDocument } from "../../environment";
+import { 
+  diffDocument,
+  patchDocument,
+  getSEnvWindowClass, 
+  openSyntheticEnvironmentWindow, 
+} from "../../environment";
 
 describe(__filename + "#", () => {
   describe("event handlers#", () => {
@@ -47,30 +52,6 @@ describe(__filename + "#", () => {
         await new Promise(resolve => setTimeout(resolve, 10));
         expect(window.document.body.innerHTML).to.eql(`<span>b</span>`);
       });
-    });
-
-    xdescribe("clone ", () => {
-
-    });
-  });
-
-  describe("diffing#", () => {
-    xit("can diff a simple text element", async () => {
-      const window = openTestWindow(wrapHTML(`a`));
-      await waitForDocumentComplete(window);
-      const window2 = openTestWindow(wrapHTML(`b`));
-      await waitForDocumentComplete(window2);
-      const mutations = diffDocument(window.document, window2.document);
-      console.log(mutations);
-    });
-
-    xit("can diff a child replacement", async () => {
-      const window = openTestWindow(wrapHTML(`<h1></h1>`));
-      await waitForDocumentComplete(window);
-      const window2 = openTestWindow(wrapHTML(`<h2></h2>`));
-      await waitForDocumentComplete(window2);
-      const mutations = diffDocument(window.document, window2.document);
-      console.log(mutations);
     });
   });
 });

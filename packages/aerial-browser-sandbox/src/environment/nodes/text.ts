@@ -21,6 +21,10 @@ export const getSEnvTextClass = weakMemo((context: any) => {
     set textContent(value: string) {
       this.nodeValue = value;
     }
+
+    cloneShallow() {
+      return this.ownerDocument.createTextNode(this.nodeValue);
+    }
     
     data: string;
     readonly length: number;
@@ -29,7 +33,7 @@ export const getSEnvTextClass = weakMemo((context: any) => {
     splitText(offset: number): Text {
       return null;
     }
-    remove() { }
+
     appendData(arg: string): void { }
     deleteData(offset: number, count: number): void { }
     insertData(offset: number, arg: string): void { }

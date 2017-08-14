@@ -17,7 +17,7 @@
   "devDependencies": {
     "@types/inflection": "^1.5.28",
     "@types/mocha": "^2.2.41",
-    "@types/node": "^7.0.31",
+    "@types/node": "^8.0.20",
     "@types/reflect-metadata": "0.0.5",
     "@types/reselect": "^2.2.0",
     "chai": "^4.0.2",

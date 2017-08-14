@@ -1,9 +1,18 @@
+import { SEnvNodeTypes } from "../constants";
+import { SEnvWindowInterface } from "../window";
 import { SEnvDocumentInterface } from "./document";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
-import { weakMemo, ExpressionLocation, generateDefaultId, createSetValueMutation } from "aerial-common2";
+import { 
+  weakMemo, 
+  Mutation, 
+  SetValueMutation,
+  generateDefaultId, 
+  ExpressionLocation, 
+  createSetValueMutation, 
+} from "aerial-common2";
 
 export interface SEnvNodeInterface extends Node {
   uid: string;
@@ -122,9 +131,14 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     }
 
     contains(child: Node): boolean {
-      return false;
+      return Array.prototype.indexOf.call(this.childNodes, child) !== -1;
     }
     
+    remove() {
+      if (this.parentNode) {
+        this.parentNode.removeChild(this);
+      }
+    }
 
     hasAttributes(): boolean {
       return this.attributes.length > 0;
@@ -181,10 +195,16 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     $$addedToDocument() {
       this.connectedToDocument = true;
       this.connectedCallback();
+      this._defaultView.childObjects.set(this.uid, this);
+    }
+
+    private get _defaultView() {
+      return this.nodeType === SEnvNodeTypes.DOCUMENT ? (this as any as SEnvDocumentInterface).defaultView : this.ownerDocument.defaultView as SEnvWindowInterface;;
     }
 
     $$removedFromDocument() {
       this.connectedToDocument = false;
+      this._defaultView.childObjects.delete(this.uid);
     }
 
     dispatchEvent(event: Event): boolean {
@@ -206,7 +226,13 @@ export const createUpdateValueNodeMutation = (oldNode: Text|Comment, newValue: s
 export const diffValueNode = (oldNode: Text|Comment, newNode: Text|Comment) => {
   const mutations = [];
   if(oldNode.nodeValue !== newNode.nodeValue) {
-    mutations.push(createUpdateValueNodeMutation(oldNode, newNode.nodeValue);
+    mutations.push(createUpdateValueNodeMutation(oldNode, newNode.nodeValue));
   }
   return mutations;
+};
+
+export const patchValueNode = (oldNode: Text|Comment, mutation: Mutation<any>) => {
+  if (mutation.$$type === UPDATE_VALUE_NODE) {
+    oldNode.nodeValue = (mutation as SetValueMutation<any>).newValue;
+  }
 };

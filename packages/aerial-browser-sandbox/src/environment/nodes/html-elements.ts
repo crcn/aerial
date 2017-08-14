@@ -6,7 +6,7 @@ import { getSEnvCSSStyleSheetClass } from "../css";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvElementClass, SEnvElementInterface } from "./element";
 
-export interface SEnvHTMLElementInterface extends HTMLElement, SEnvNodeInterface {
+export interface SEnvHTMLElementInterface extends HTMLElement, SEnvElementInterface {
   $$preconstruct();
   addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;

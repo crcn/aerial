@@ -1,5 +1,6 @@
 import { weakMemo, Mutation, diffArray, eachArrayValueMutation } from "aerial-common2";
-import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
+import { SEnvWindowInterface } from "../window";
+import { getSEnvNodeClass, SEnvNodeInterface, patchValueNode } from "./node";
 import { getSEnvParentNodeClass, diffParentNode, patchParentNode, SEnvParentNodeInterface } from "./parent-node";
 import { diffElementChild } from "./element";
 import { getL3EventClasses } from "../level3";
@@ -14,6 +15,7 @@ import { getSEnvDocumentFragment } from "./fragment";
 import parse5 = require("parse5");
 
 export interface SEnvDocumentInterface extends SEnvParentNodeInterface, Document {
+  defaultView: SEnvWindowInterface;
   $load(content: string): void;
   $createElementWithoutConstruct(tagName: string): SEnvHTMLElementInterface;
   createDocumentFragment(): DocumentFragment & SEnvNodeInterface;
@@ -104,7 +106,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     readonly stylesheets: StyleSheetList;
     readonly styleSheets: StyleSheetList;
 
-    constructor(readonly defaultView: Window) {
+    constructor(readonly defaultView: SEnvWindowInterface) {
       super();
       this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
@@ -739,6 +741,6 @@ export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SE
   return diffParentNode(oldDocument, newDocument, diffElementChild);
 };
 
-export const patchDocument = (oldDocument: SEnvDocumentInterface, mutations: Mutation<any>[]) => {
-  patchParentNode(oldDocument, mutations);
+export const patchDocument = (oldDocument: SEnvDocumentInterface, mutation: Mutation<any>) => {
+  patchParentNode(oldDocument, mutation);
 };

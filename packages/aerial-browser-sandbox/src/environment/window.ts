@@ -1,14 +1,29 @@
-import { Dispatcher, weakMemo } from "aerial-common2";
+import { Dispatcher, weakMemo, Mutation, generateDefaultId } from "aerial-common2";
 import { getSEnvLocationClass } from "./location";
 import { getSEnvEventTargetClass, getSEnvEventClasses } from "./events";
 import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
-import { getSEnvHTMLElementClasses, getSEnvDocumentClass, getSEnvElementClass, getSEnvHTMLElementClass, SEnvDocumentInterface } from "./nodes";
+import { 
+  getSEnvHTMLElementClasses, 
+  getSEnvDocumentClass, 
+  getSEnvElementClass, 
+  getSEnvHTMLElementClass, 
+  SEnvDocumentInterface, 
+  patchDocument, 
+  patchParentNode, 
+  patchValueNode, 
+  diffDocument, 
+  diffComment, 
+  patchElement
+} from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 import nwmatcher = require("nwmatcher");
+import { SEnvNodeTypes } from "./constants";
 
 type OpenTarget = "_self" | "_blank";
 
 export interface SEnvWindowInterface extends Window {
+  document: SEnvDocumentInterface;
+  childObjects: Map<string, any>;
   renderer:  SyntheticWindowRenderer;
   selector: any
 };
@@ -40,6 +55,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
     readonly location: Location;
     private _selector: any;
+    readonly childObjects: Map<string, any>;
 
     readonly sessionStorage: Storage;
     readonly localStorage: Storage;
@@ -48,6 +64,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly applicationCache: ApplicationCache;
     readonly caches: CacheStorage;
     readonly clientInformation: Navigator;
+    readonly uid: string;
     closed: boolean;
     readonly crypto: Crypto;
     defaultStatus: string;
@@ -209,7 +226,9 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     
     constructor(readonly $$id: string, origin: string, readonly $$dispatch: Dispatcher<any>) {
       super();
-      
+
+      this.uid = generateDefaultId();
+      this.childObjects = new Map();
       this.location = new SEnvLocation(origin);
       this.document = new SEnvDocument(this);
       this.window   = this;
@@ -219,7 +238,6 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       for (const tagName in TAG_NAME_MAP) {
         customElements.define(tagName, TAG_NAME_MAP[tagName]);
       }
-
     }
 
     get selector(): any {
@@ -385,7 +403,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     async $load() {
-      const response = await this.fetch(this.location.origin);
+      const response = await this.fetch(this.location.toString());
       const content  = await response.text();
       this.document.$load(content);
     }
@@ -399,6 +417,26 @@ export const openSyntheticEnvironmentWindow = (location: string, context: SEnvWi
   return window;
 }
 
-export const diffWindow = (oldWindow: Window, newWindow: Window) => { 
-  
+export const diffWindow = (oldWindow: SEnvWindowInterface, newWindow: SEnvWindowInterface) => { 
+  return diffDocument(oldWindow.document, newWindow.document);
 };
+
+export const patchWindow = (oldWindow: SEnvWindowInterface, mutations: Mutation<any>[]) => {
+  const { childObjects } = oldWindow;
+  for (const mutation of mutations) {
+    const target = childObjects.get(mutation.target.uid);
+    if (target.nodeType != null) {
+      switch(target.nodeType) {
+        case SEnvNodeTypes.TEXT:
+        case SEnvNodeTypes.COMMENT: {
+          patchValueNode(target, mutation);
+          break;
+        }
+        case SEnvNodeTypes.ELEMENT: {
+          patchElement(target, mutation);
+          break;      
+        }
+      }
+    }
+  }
+}
