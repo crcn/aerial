@@ -697,37 +697,8 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this._throwUnsupportedMethod();
     }
 
-    private async _consumeWrites() {
-
-      let mountTo: SEnvNodeInterface = this;
-
-      if (this.documentElement) {
-        this.removeChild(this.documentElement);
-        const html = this.createElement("html");
-        html.appendChild(this.createElement("head"));
-        html.appendChild(this.createElement("body"));
-        this.appendChild(html);
-        mountTo = this.body as any as SEnvNodeInterface;
-      }
-
-      this._parser = new parse5.SAXParser({ locationInfo: true });
-      consumeSaxParser(this._parser, mountTo);
-
-      const p = new Promise((resolve) => {
-        this._parser.once("end", () => {
-          resolve();
-        });
-      });
-
-      setImmediate(() => {
-        this._parser.end();
-      });
-
-      await p;
-    }
-    
     writeln(...content: string[]): void {
-      
+      this._throwUnsupportedMethod();
     }
   };
 });

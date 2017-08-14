@@ -30,8 +30,8 @@ const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   top: 0,
 
   // small screen size
-  right: 800,
-  bottom: 600
+  right: 1366,
+  bottom: 768
 };
 
 export type SyntheticBaseNode = {

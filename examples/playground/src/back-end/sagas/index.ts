@@ -30,8 +30,14 @@ function* frontEndService() {
 
   expressServer.use("/proxy/:uri", (req, res) => {
     const { uri } = req.params;
-    request(decodeURIComponent(uri), (err, response, body) => {
-      res.set(response.headers);
+    request({
+      method: req.method,
+      uri: decodeURIComponent(uri),
+      gzip: true
+    }, (err, response, body) => {
+      res.set({
+        "content-type": response.headers["content-type"]
+      });
       res.send(body);
     });
   });
