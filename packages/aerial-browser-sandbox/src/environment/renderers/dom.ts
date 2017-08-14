@@ -3,6 +3,7 @@ import { SEnvNodeInterface } from "../nodes";
 import { SEnvWindowInterface, patchWindow, patchNode } from "../window";
 import { SEnvMutationEventInterface } from "../events";
 import { BaseSyntheticWindowRenderer } from "./base";
+import { debounce } from "lodash";
 
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   readonly mount: HTMLElement;
@@ -10,6 +11,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   constructor(sourceWindow: SEnvWindowInterface, readonly targetDocument: Document) {
     super(sourceWindow);
     this.mount = targetDocument.createElement("div");
+    this._deferRecalc = debounce(this._deferRecalc.bind(this), 1);
   }
 
   protected _onDocumentLoad(event: Event) {
@@ -31,6 +33,11 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     const sourceNode = this._sourceWindow.childObjects.get(mutation.target.uid);
     const targetNode = this._nodeMap.get(sourceNode);
     patchNode(targetNode, mutation);
+    this._deferRecalc();
+  }
+
+  private _deferRecalc() {
+    this._resetClientRects();
   }
 
   protected _onWindowResize(event: Event) {

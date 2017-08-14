@@ -82,7 +82,7 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
   }
 
   protected _onWindowMutation(event: SEnvMutationEventInterface) {
-    
+
   }
 
   protected setPaintedInfo(rects: RenderedClientRects, computedStyles?: any /* TODO */) {
