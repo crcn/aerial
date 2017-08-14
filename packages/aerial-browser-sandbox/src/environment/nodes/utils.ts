@@ -100,7 +100,7 @@ const getHTMLASTNodeLocation = (expression: parse5.AST.Default.CommentNode|parse
 const addNodeSource = <T extends SEnvNodeInterface>(node: T, expressionOrLocation) => {
   const start = expressionOrLocation.__location ? getHTMLASTNodeLocation(expressionOrLocation) : { line: expressionOrLocation.line, column: expressionOrLocation.col };
   node.source = {
-    uri: node.ownerDocument && node.ownerDocument.defaultView.location.origin,
+    uri: node.ownerDocument && node.ownerDocument.defaultView.location.toString(),
     start: start
   };
   return node;

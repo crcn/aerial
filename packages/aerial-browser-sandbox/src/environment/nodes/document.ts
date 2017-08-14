@@ -111,6 +111,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
       this.addEventListener("load", this._onChildLoad.bind(this));
+      defaultView.childObjects.set(this.uid, this);
     }
 
     get all() {
@@ -744,3 +745,15 @@ export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SE
 export const patchDocument = (oldDocument: SEnvDocumentInterface, mutation: Mutation<any>) => {
   patchParentNode(oldDocument, mutation);
 };
+
+
+export const waitForDocumentComplete = (window: Window) => new Promise((resolve) => {
+  if (window.document.readyState === "complete") {
+    return resolve();
+  }
+  window.document.addEventListener("readystatechange", () => {
+    if (window.document.readyState === "complete") {
+      resolve();
+    }
+  });
+});

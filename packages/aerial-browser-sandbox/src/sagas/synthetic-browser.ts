@@ -56,6 +56,8 @@ import {
 } from "../state";
 
 import {
+  diffWindow,
+  patchWindow,
   SEnvNodeTypes,
   SEnvNodeInterface,
   SEnvCommentInterface,
@@ -64,6 +66,7 @@ import {
   SEnvWindowInterface,
   SyntheticDOMRenderer,
   SEnvDocumentInterface,
+  waitForDocumentComplete,
   SyntheticWindowRendererEvent,
   openSyntheticEnvironmentWindow,
   createSyntheticDOMRendererFactory,
@@ -175,7 +178,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       cenv.close();
     }
 
-    cenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
+    const nenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
       console: {
         warn(...args) {
           console.warn('VM ', ...args);
@@ -201,9 +204,20 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
           }]);
         });
       },
-      createRenderer: typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
+      createRenderer: !cenv && typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
     });
 
+
+    if (cenv) {
+      yield call(waitForDocumentComplete, nenv);
+      patchWindow(cenv, diffWindow(cenv, nenv));
+    } else {
+      cenv = nenv;
+      yield fork(watchNewWindow, syntheticWindow);
+    }
+  }
+
+  function* watchNewWindow(syntheticWindow: SyntheticWindow) {
     const start = Date.now();
 
     const chan = eventChannel((emit) => {

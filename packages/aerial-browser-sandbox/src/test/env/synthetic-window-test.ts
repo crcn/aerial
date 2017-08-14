@@ -20,6 +20,7 @@ describe(__filename + "#", () => {
       [`<h1></h1>`, `<h2></h2>`, `<h3></h3>`],
       [`<div a="b"></div>`, `<div a="c"></div>`],
       [`<div a="b" c="d"></div>`, `<div c="d"></div>`],
+      [`<h2></h2><h1></h1>`, `<h1></h1><h2></h2>`],
     ];
 
     cases.forEach((variants) => {

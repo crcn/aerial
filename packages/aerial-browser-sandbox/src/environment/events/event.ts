@@ -1,8 +1,12 @@
-import { weakMemo } from "aerial-common2";
+import { weakMemo, Mutation } from "aerial-common2";
 
 export interface EventTargetInterface extends Event {
   $target: EventTarget;
   $currentTarget: EventTarget;
+}
+
+export interface SEnvMutationEventInterface extends Event {
+  readonly mutation: Mutation<any>;
 }
 
 export const getSEnvEventClasses = weakMemo((context: any = {}) => {
@@ -63,7 +67,17 @@ export const getSEnvEventClasses = weakMemo((context: any = {}) => {
     readonly CAPTURING_PHASE: number;
   }
 
-  return {
-    SEnvEvent
+  class SEnvMutationEvent extends SEnvEvent {
+    static readonly MUTATION = "MUTATION";
+    public mutation: Mutation<any>;
+    initMutationEvent(mutation: Mutation<any>) {
+      this.mutation = mutation;
+      super.initEvent(SEnvMutationEvent.MUTATION, true, true);
+    }
   }
+
+  return {
+    SEnvEvent,
+    SEnvMutationEvent
+  };
 });

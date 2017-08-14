@@ -1,12 +1,13 @@
 import { SEnvNodeTypes } from "../constants";
 import { SEnvNodeInterface } from "../nodes";
+import { SEnvWindowInterface, patchWindow, patchNode } from "../window";
+import { SEnvMutationEventInterface } from "../events";
 import { BaseSyntheticWindowRenderer } from "./base";
-
 
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   readonly mount: HTMLElement;
   private _nodeMap: Map<SEnvNodeInterface, Node>;
-  constructor(sourceWindow: Window, readonly targetDocument: Document) {
+  constructor(sourceWindow: SEnvWindowInterface, readonly targetDocument: Document) {
     super(sourceWindow);
     this.mount = targetDocument.createElement("div");
   }
@@ -19,12 +20,17 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     
     const html = this.sourceWindow.document.body.innerHTML;
 
-
     this.mount.innerHTML = `<style>${css}</style><span></span>`;
     this._nodeMap = mapNode(this.sourceWindow.document.body, this.targetDocument);
     this.mount.querySelector("span").appendChild(this._nodeMap.get(this.sourceWindow.document.body as any as SEnvNodeInterface));
 
     this._resetClientRects();
+  }
+
+  protected _onWindowMutation({ mutation }: SEnvMutationEventInterface) {
+    const sourceNode = this._sourceWindow.childObjects.get(mutation.target.uid);
+    const targetNode = this._nodeMap.get(sourceNode);
+    patchNode(targetNode, mutation);
   }
 
   protected _onWindowResize(event: Event) {
@@ -73,7 +79,7 @@ const mapNode = (a: Node, document: Document, map: Map<SEnvNodeInterface, Node> 
       b = bel;
     break;
     case SEnvNodeTypes.COMMENT: 
-      b = document.createTextNode((a as Comment).nodeValue);
+      b = document.createComment((a as Comment).nodeValue);
     break;
   }
 

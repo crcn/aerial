@@ -1,7 +1,8 @@
-import { getSEnvEventTargetClass, getSEnvEventClasses } from "../events";
+import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "../events";
+import { SEnvWindowInterface } from "../window";
 
 const EventTarget = getSEnvEventTargetClass();
-const { SEnvEvent } = getSEnvEventClasses();
+const { SEnvEvent, SEnvMutationEvent } = getSEnvEventClasses();
 
 export interface SyntheticWindowRenderer extends EventTarget {
   mount: HTMLElement;
@@ -29,11 +30,12 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
   abstract readonly mount: HTMLElement;
   private _rects: RenderedClientRects;
 
-  constructor(protected _sourceWindow: Window) {
+  constructor(protected _sourceWindow: SEnvWindowInterface) {
     super();
     this._onDocumentLoad = this._onDocumentLoad.bind(this);
     this._onDocumentLoad2 = this._onDocumentLoad2.bind(this);
     this._onWindowResize = this._onWindowResize.bind(this);
+    this._onWindowMutation = this._onWindowMutation.bind(this);
     this._addTargetListeners();
   }
 
@@ -69,11 +71,18 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
 
 
   protected _onDocumentLoad(event: Event) {
-    
+
+    // document load is when the page is visible to the user, so only listen for 
+    // mutations after stuff is loaded in (They'll be fired as the document is loaded in) (CC)
+    this._sourceWindow.addEventListener(SEnvMutationEvent.MUTATION, this._onWindowMutation);
   }
 
   protected _onWindowResize(event: Event) {
 
+  }
+
+  protected _onWindowMutation(event: SEnvMutationEventInterface) {
+    
   }
 
   protected setPaintedInfo(rects: RenderedClientRects, computedStyles?: any /* TODO */) {

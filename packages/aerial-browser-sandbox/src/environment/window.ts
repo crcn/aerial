@@ -1,6 +1,6 @@
 import { Dispatcher, weakMemo, Mutation, generateDefaultId } from "aerial-common2";
 import { getSEnvLocationClass } from "./location";
-import { getSEnvEventTargetClass, getSEnvEventClasses } from "./events";
+import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "./events";
 import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
 import { 
   getSEnvHTMLElementClasses, 
@@ -46,7 +46,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
   const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(context);
   const SEnvElement     = getSEnvElementClass(context);
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
-  const { SEnvEvent } = getSEnvEventClasses(context);
+  const { SEnvEvent, SEnvMutationEvent } = getSEnvEventClasses(context);
 
   // register default HTML tag names
   const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
@@ -238,6 +238,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       for (const tagName in TAG_NAME_MAP) {
         customElements.define(tagName, TAG_NAME_MAP[tagName]);
       }
+
+      this.document.addEventListener(SEnvMutationEvent.MUTATION, this._onDocumentMutation.bind(this));
     }
 
     get selector(): any {
@@ -407,6 +409,12 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       const content  = await response.text();
       this.document.$load(content);
     }
+
+    private _onDocumentMutation(event: SEnvMutationEventInterface) {
+      const eventClone = new SEnvMutationEvent();
+      eventClone.initMutationEvent(event.mutation);
+      this.dispatchEvent(eventClone);
+    }
   }
 });
 
@@ -426,17 +434,21 @@ export const patchWindow = (oldWindow: SEnvWindowInterface, mutations: Mutation<
   for (const mutation of mutations) {
     const target = childObjects.get(mutation.target.uid);
     if (target.nodeType != null) {
-      switch(target.nodeType) {
-        case SEnvNodeTypes.TEXT:
-        case SEnvNodeTypes.COMMENT: {
-          patchValueNode(target, mutation);
-          break;
-        }
-        case SEnvNodeTypes.ELEMENT: {
-          patchElement(target, mutation);
-          break;      
-        }
-      }
+      patchNode(target, mutation);
+    }
+  }
+}
+
+export const patchNode = (node: Node, mutation: Mutation<any>) => {
+  switch(node.nodeType) {
+    case SEnvNodeTypes.TEXT:
+    case SEnvNodeTypes.COMMENT: {
+      patchValueNode(node as any, mutation);
+      break;
+    }
+    case SEnvNodeTypes.ELEMENT: {
+      patchElement(node as Element, mutation);
+      break;      
     }
   }
 }

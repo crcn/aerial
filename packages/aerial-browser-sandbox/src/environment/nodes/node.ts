@@ -1,4 +1,6 @@
 import { SEnvNodeTypes } from "../constants";
+import { constructNode } from "./utils";
+import { getSEnvEventClasses } from "../events";
 import { SEnvWindowInterface } from "../window";
 import { SEnvDocumentInterface } from "./document";
 import { getDOMExceptionClasses } from "./exceptions";
@@ -12,6 +14,7 @@ import {
   generateDefaultId, 
   ExpressionLocation, 
   createSetValueMutation, 
+  createPropertyMutation,
 } from "aerial-common2";
 
 export interface SEnvNodeInterface extends Node {
@@ -41,6 +44,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     public contentLoaded: Promise<any>;
     public interactiveLoaded: Promise<any>;
     public source: any;
+    readonly constructNode: boolean;
 
     readonly attributes: NamedNodeMap;
     readonly baseURI: string | null;
@@ -117,6 +121,9 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
         for (let i = 0, n = this.childNodes.length; i < n; i++) {
           clone.appendChild(this.childNodes[i].cloneNode(true));
         }
+      }
+      if (this.constructNode) {
+        constructNode(clone);
       }
       return clone;
     }
@@ -213,6 +220,29 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
         this.parentNode.dispatchEvent(event);
       }
       return true;
+    }
+  }
+});
+
+export const getSEnvValueNode = weakMemo((context) => {
+  const SEnvNode = getSEnvNodeClass(context);
+  const { SEnvMutationEvent } = getSEnvEventClasses(context);
+  
+
+  return class SenvValueNode extends SEnvNode {
+    constructor(private _nodeValue: string)  {
+      super();
+    }
+
+    get nodeValue() {
+      return this._nodeValue;
+    }
+
+    set nodeValue(value: string) {
+      this._nodeValue = value;
+      const e = new SEnvMutationEvent();
+      e.initMutationEvent(createPropertyMutation(UPDATE_VALUE_NODE, this, "nodeValue", value, undefined));
+      this.dispatchEvent(e);
     }
   }
 });

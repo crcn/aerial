@@ -4,6 +4,7 @@ import { diffTextNode } from "./text";
 import { SEnvNodeTypes } from "../constants";
 import { weakMemo, diffArray, eachArrayValueMutation, Mutation, createPropertyMutation, SetPropertyMutation } from "aerial-common2";
 import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface, patchParentNode } from "./parent-node";
+import { getSEnvEventClasses } from "../events";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
@@ -29,6 +30,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
   const SEnvParentNode = getSEnvParentNodeClass(context);
   const { SEnvNamedNodeMap } = getSEnvHTMLCollectionClasses(context);
+  const { SEnvMutationEvent } = getSEnvEventClasses(context);
 
   return class SEnvElement extends SEnvParentNode implements SEnvElementInterface {
 
@@ -38,6 +40,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     readonly clientLeft: number;
     readonly clientTop: number;
     readonly clientWidth: number;
+    readonly constructClone: boolean = true;
     attributes: NamedNodeMap;
     nodeType: number = SEnvNodeTypes.ELEMENT;
     id: string;
@@ -105,7 +108,13 @@ export const getSEnvElementClass = weakMemo((context: any) => {
           return typeof target[key] === "function" ? target[key].bind(target) : target[key];
         },
         set: (target, key: string, value: string, receiver)  => {
-          target.setNamedItem(new SEnvAttr(key, value, this));
+          const oldItem = target.getNamedItem(value);
+          if (value == null) {
+            target.removeNamedItem(key);
+          } else {
+            target.setNamedItem(new SEnvAttr(key, value, this));
+          }
+          this.attributeChangedCallback(key, oldItem && oldItem.value, value);
           return true;
         }
       });
@@ -208,7 +217,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     }
 
     removeAttribute(qualifiedName: string): void { 
-      this.attributes.removeNamedItem(qualifiedName);
+      this.attributes[qualifiedName] = undefined;
     }
 
     removeAttributeNode(oldAttr: Attr): Attr { 
@@ -227,12 +236,8 @@ export const getSEnvElementClass = weakMemo((context: any) => {
       return null;
     }
 
-    setAttribute(name: string, value: string): void { 
-      if (this.hasAttribute(name)) {
-        this.attributes[name] = value;
-      } else {
-        this.attributes.setNamedItem(new SEnvAttr(name, value, this));
-      }
+    setAttribute(name: string, value: string): void {
+      this.attributes[name] = value;
     }
 
     setAttributeNode(newAttr: Attr): Attr { 
@@ -308,6 +313,14 @@ export const getSEnvElementClass = weakMemo((context: any) => {
       return null;
     }
 
+
+    protected attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+      const e = new SEnvMutationEvent();
+      e.initMutationEvent(createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, this, name, newValue, oldValue));
+      this.dispatchEvent(e);
+    }
+
+
     cloneShallow() {
       const clone = this.ownerDocument.$createElementWithoutConstruct(this.tagName);
       for (let i = 0, n = this.attributes.length; i < n; i++) {
@@ -364,7 +377,7 @@ export const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvEl
   return mutations;
 };
 
-export const patchElement = (oldElement: SEnvElementInterface, mutation: Mutation<any>) => {
+export const patchElement = (oldElement: Element, mutation: Mutation<any>) => {
   if (mutation.$$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
     
     const { name, oldName, newValue } = <SetPropertyMutation<any>>mutation;
