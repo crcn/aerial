@@ -26,6 +26,9 @@ export const getSEnvEventTargetClass = weakMemo((context?: any) => {
     }
 
     addEventListener(type: string, listener?: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+      if (!this._eventListeners) {
+        console.log("NO EXIT");
+      }
       if (!this._eventListeners[type]) {
         this._eventListeners[type] = listener;
       } else if (!Array.isArray(this._eventListeners[type])) {
@@ -40,6 +43,9 @@ export const getSEnvEventTargetClass = weakMemo((context?: any) => {
       eva.$currentTarget = this;
       if (!eva.$target) {
         eva.$target = this;
+      }
+      if (!event.type) {
+        console.log("NO DISPATCH", event);
       }
       const listeners = this._eventListeners[event.type];
       if (!listeners) return false;
@@ -56,15 +62,15 @@ export const getSEnvEventTargetClass = weakMemo((context?: any) => {
     }
 
     removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
-      const listeners = this._eventListeners[event.type];
+      const listeners = this._eventListeners[type];
       if (!listeners) return;
       if (listeners === listener) {
-        this._eventListeners[event.type] = undefined;
+        this._eventListeners[type] = undefined;
       } else if (Array.isArray(listeners)) {
         const index = listeners.indexOf(listener);
         (listeners as EventListenerOrEventListenerObject[]).splice(index, 1);
         if (listeners.length === 1) {
-          this._eventListeners[event.type] = listeners[0];
+          this._eventListeners[type] = listeners[0];
         }
       }
     }

@@ -246,6 +246,10 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
   };
 });
 
+const _scriptCache = {};
+
+const compileScript = (source) => _scriptCache[source] || (_scriptCache[source] = new Function("__context", `with(__context) {${source}}`));
+
 export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
   return class SEnvHTMLScriptElement extends SEnvHTMLElement implements HTMLScriptElement { async: boolean;
@@ -298,13 +302,11 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
 
       private _evaluate() {
         try {
-          const script = new vm.Script(this._scriptSource, {
-            filename: this._filename,
-            displayErrors: true,
-          });
+          const run = compileScript(this._scriptSource);
 
+          run(this.ownerDocument.defaultView);
           // TODO - need to grab existing VM object
-          script.runInNewContext(vm.createContext(this.ownerDocument.defaultView));
+          // script.runInNewContext(vm.createContext({ __context: this.ownerDocument.defaultView }));
           
         } catch(e) {
           this.ownerDocument.defaultView.console.warn(e);
@@ -322,7 +324,7 @@ const joinPath = (...parts: string[]) => parts.reduce((a, b) => {
 
 const getUri = (href: string, location: Location) => {
   const relativeDir = /.\w+$/.test(location.pathname) ? path.dirname(location.pathname) : location.pathname;
-  return hasURIProtocol(href) ? href : href.charAt(0) === "/" ? joinPath(location.origin, href) : joinPath(location.origin, relativeDir, href);
+  return hasURIProtocol(href) ? href : /^\/\//.test(href) ? location.protocol + href : href.charAt(0) === "/" ? joinPath(location.origin, href) : joinPath(location.origin, relativeDir, href);
 };
 
 export const getSEnvHTMLElementClasses = weakMemo((context: any) => {
