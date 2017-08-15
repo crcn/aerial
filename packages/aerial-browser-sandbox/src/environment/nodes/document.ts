@@ -342,9 +342,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     scripts: HTMLCollectionOf<HTMLScriptElement>;
     readonly scrollingElement: Element | null;
     
-    
-    title: string;
-    
     readonly URL: string;
     
     readonly URLUnencoded: string;
@@ -382,10 +379,16 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       return null;
     }
 
+    get title() {
+      const titleEl = this.querySelector("title");
+      return titleEl && titleEl.textContent;
+    }
+
     createStruct():  SyntheticDocument {
+      const titleEl = this.querySelector("title")
       return {
         ...(super.createStruct() as any),
-        documentElement: this.documentElement && this.documentElement.struct
+        title: this.title
       }
     }
 

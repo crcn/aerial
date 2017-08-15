@@ -1,4 +1,4 @@
-import { fork, take, put, call, spawn, actionChannel } from "redux-saga/effects";
+import { fork, take, put, call, spawn, actionChannel, select } from "redux-saga/effects";
 import { eventChannel } from "redux-saga";
 import { difference, debounce } from "lodash";
 import { createQueue } from "mesh";
@@ -149,13 +149,22 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     });
   });
 
+  function* getFetchedCacheFiles() {
+    const state = yield select();
+    return cwindow.externalResourceUris.map(uri => getFileCacheItemByUri(state, uri));
+  }
+
+  function* updateFetchedCacheFiles() {
+    cachedFiles = yield getFetchedCacheFiles();
+  }
+
   yield fork(function*() {
     yield watch((root) => getFileCache(root), function*(fileCache) {
-      const updatedCachedFiles = cwindow.externalResourceUris.map(uri => getFileCacheItemByUri(fileCache, uri));
+      const updatedCachedFiles = yield getFetchedCacheFiles();
       if (cachedFiles && cenv.document.readyState === "complete" && difference(cachedFiles, updatedCachedFiles).length !== 0) {
         yield spawn(reload);
       }
-      cachedFiles = updatedCachedFiles;
+      yield updateFetchedCacheFiles();
       return true;
     });
   });
@@ -166,6 +175,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       const body = (yield yield request(createFetchRequest(info))).payload;
       yield put(createSyntheticWindowResourceLoadedEvent(syntheticWindowId, String(info)));
       resolve(body);
+      yield updateFetchedCacheFiles();
     }
   });
 
