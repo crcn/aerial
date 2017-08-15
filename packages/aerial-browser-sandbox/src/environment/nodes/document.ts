@@ -12,7 +12,7 @@ import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elemen
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, whenLoaded, mapExpressionToNode } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
-import { SyntheticDocument, SYNTHETIC_DOCUMENT, SyntheticNode, SyntheticParentNode } from "../../state";
+import { SyntheticDocument, SYNTHETIC_DOCUMENT, SyntheticNode, SyntheticParentNode, BasicDocument } from "../../state";
 import parse5 = require("parse5");
 
 export interface SEnvDocumentInterface extends SEnvParentNodeInterface, Document {
@@ -113,7 +113,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     constructor(readonly defaultView: SEnvWindowInterface) {
       super();
-      const d: SyntheticParentNode = this;
       this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
       this.addEventListener("load", this._onChildLoad.bind(this));
@@ -719,7 +718,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   };
 });
 
-export const diffDocument = (oldDocument: SyntheticDocument, newDocument: SyntheticDocument) => {
+export const diffDocument = (oldDocument: BasicDocument, newDocument: BasicDocument) => {
   return diffParentNode(oldDocument, newDocument, diffElementChild);
 };
 

@@ -10,6 +10,7 @@ import { applicationReducer } from "./reducers";
 import { createApplicationState, ApplicationState } from "./state";
 import { mainSaga } from "./sagas";
 import { Provider } from "react-redux";
+import { createWorkerMiddleware } from "./middleware";
 import { 
   hook,
   fork,
@@ -25,7 +26,12 @@ const mainReducer = reduceReducers(
 );
 
 export const initApplication = (initialState: ApplicationState) => {
-  const store = initBaseApplication2(initialState, mainReducer, mainSaga);
+  const store = initBaseApplication2(
+    initialState, 
+    mainReducer, 
+    mainSaga,
+    createWorkerMiddleware()
+  );
   ReactDOM.render(<Provider store={store}>
     <MainComponent dispatch={action => store.dispatch(action)} />
   </Provider>, initialState.element);

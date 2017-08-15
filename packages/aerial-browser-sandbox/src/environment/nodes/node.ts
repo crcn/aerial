@@ -16,7 +16,7 @@ import {
   createSetValueMutation, 
   createPropertyMutation,
 } from "aerial-common2";
-import { SyntheticNode, SyntheticValueNode } from "../../state";
+import { SyntheticNode, SyntheticValueNode, BasicValueNode, BasicNode } from "../../state";
 
 export interface SEnvNodeInterface extends Node {
   uid: string;
@@ -57,7 +57,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     readonly attributes: NamedNodeMap;
     readonly baseURI: string | null;
-    childNodes: NodeList;
+    childNodes: SEnvNodeListInterface;
     readonly localName: string | null;
     readonly namespaceURI: string | null;
     readonly nodeName: string;
@@ -305,11 +305,11 @@ export const getSEnvValueNode = weakMemo((context) => {
 
 export const UPDATE_VALUE_NODE = "UPDATE_VALUE_NODE";
 
-export const createUpdateValueNodeMutation = (oldNode: SyntheticValueNode, newValue: string) => {
+export const createUpdateValueNodeMutation = (oldNode: BasicValueNode, newValue: string) => {
   return createSetValueMutation(UPDATE_VALUE_NODE, oldNode, newValue);
 };
 
-export const diffValueNode = (oldNode: SyntheticValueNode, newNode: SyntheticValueNode) => {
+export const diffValueNode = (oldNode: BasicValueNode, newNode: BasicValueNode) => {
   const mutations = [];
   if(oldNode.nodeValue !== newNode.nodeValue) {
     mutations.push(createUpdateValueNodeMutation(oldNode, newNode.nodeValue));
@@ -317,7 +317,7 @@ export const diffValueNode = (oldNode: SyntheticValueNode, newNode: SyntheticVal
   return mutations;
 };
 
-export const patchValueNode = (oldNode: Text|Comment, mutation: Mutation<any>) => {
+export const patchValueNode = (oldNode: BasicValueNode, mutation: Mutation<any>) => {
   if (mutation.$$type === UPDATE_VALUE_NODE) {
     oldNode.nodeValue = (mutation as SetValueMutation<any>).newValue;
   }

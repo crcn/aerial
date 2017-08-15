@@ -24,7 +24,7 @@ describe(__filename + "#", () => {
     ];
 
     cases.forEach((variants) => {
-      it(`can diff & patch ${variants.join("->")}`, async () => {
+      it(`can diff & patch ${variants.join(" -> ")}`, async () => {
         let mainWindow;
         for (const variant of variants) {
           const newWindow = openTestWindow(wrapHTML(variant));

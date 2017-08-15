@@ -8,7 +8,7 @@ import { getSEnvEventClasses } from "../events";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
-import { SyntheticHTMLElement, SYNTHETIC_ELEMENT, SyntheticAttribute, SyntheticNode, SyntheticTextNode, SyntheticComment } from "../../state";
+import { SyntheticHTMLElement, SYNTHETIC_ELEMENT, SyntheticAttribute, SyntheticNode, SyntheticTextNode, SyntheticComment, BasicNode, BasicElement, BasicAttribute, BasicValueNode, BasicComment, BasicTextNode } from "../../state";
 
 export const getSEnvAttr = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
@@ -348,11 +348,11 @@ export const getSEnvElementClass = weakMemo((context: any) => {
   }
 });
 
-export const diffElementChild = (oldChild: SyntheticNode, newChild: SyntheticNode) => {
+export const diffElementChild = (oldChild: BasicNode, newChild: BasicNode) => {
   switch(oldChild.nodeType) {
-    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as any as SyntheticHTMLElement, newChild as any as SyntheticHTMLElement);
-    case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as any as SyntheticTextNode, newChild as SyntheticTextNode);
-    case SEnvNodeTypes.COMMENT: return diffComment(oldChild as any as SyntheticComment, newChild as SyntheticComment);
+    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as BasicElement, newChild as BasicElement);
+    case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as BasicTextNode, newChild as BasicTextNode);
+    case SEnvNodeTypes.COMMENT: return diffComment(oldChild as SyntheticComment, newChild as BasicTextNode);
   }
   return [];
 };
@@ -362,11 +362,11 @@ export namespace SyntheticDOMElementMutationTypes {
   export const ATTACH_SHADOW_ROOT_EDIT    = "attachShadowRootEdit";
 }
 
-const createSetElementAttributeMutation = (target: SyntheticHTMLElement, name: string, value: string, oldName?: string, index?: number) => {
+const createSetElementAttributeMutation = (target: BasicElement, name: string, value: string, oldName?: string, index?: number) => {
   return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, target, name, value, undefined, oldName, index);
 }
 
-export const diffElement = (oldElement: SyntheticHTMLElement, newElement: SyntheticHTMLElement) => {
+export const diffElement = (oldElement: BasicElement, newElement: BasicElement) => {
   const mutations = [];
 
   if (oldElement.nodeName !== newElement.nodeName) {

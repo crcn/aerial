@@ -3,6 +3,7 @@ import { weakMemo } from "aerial-common2";
 import { hasURIProtocol } from "aerial-sandbox2";
 import { getSEnvEventClasses } from "../events";
 import path = require("path");
+import { SEnvNodeListInterface } from "./collections";
 import { getSEnvCSSStyleSheetClass } from "../css";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvElementClass, SEnvElementInterface } from "./element";
@@ -10,6 +11,7 @@ import { getUri } from "../utils";
 
 export interface SEnvHTMLElementInterface extends HTMLElement, SEnvElementInterface {
   $$preconstruct();
+  childNodes: SEnvNodeListInterface;
   addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }

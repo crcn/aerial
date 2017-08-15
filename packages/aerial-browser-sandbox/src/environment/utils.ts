@@ -10,6 +10,7 @@ export const getUri = (href: string, locationStr: string) => {
   const location = Url.parse(locationStr);
   const origin = location.protocol + "//" + location.host;
 
-  const relativeDir = /.\w+$/.test(location.pathname) ? path.dirname(location.pathname) : location.pathname;
+
+  const relativeDir = location.pathname && /.\w+$/.test(location.pathname) ? path.dirname(location.pathname) : location.pathname;
   return hasURIProtocol(href) ? href : /^\/\//.test(href) ? location.protocol + href : href.charAt(0) === "/" ? joinPath(origin, href) : joinPath(origin, relativeDir, href);
 };

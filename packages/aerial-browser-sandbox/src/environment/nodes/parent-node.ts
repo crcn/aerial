@@ -17,7 +17,7 @@ import { getL3EventClasses } from "../level3";
 import { getSEnvEventClasses } from "../events";
 import { SEnvNodeTypes } from "../constants";
 import { querySelector, querySelectorAll } from "./utils";
-import { SyntheticNode, SyntheticParentNode } from "../../state";
+import { SyntheticNode, SyntheticParentNode, BasicParentNode, BasicNode } from "../../state";
 
 export interface SEnvParentNodeInterface extends SEnvNodeInterface, ParentNode, Node {
   readonly struct: SyntheticNode;
@@ -115,11 +115,11 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
     }
     
     replaceChild<T extends Node>(newChild: Node, oldChild: T): T {
-      const index = this.childNodes.indexOf(oldChild);
+      const index = this.childNodesArray.indexOf(oldChild);
       if (index === -1) {
         throw new SEnvDOMException("The node to be replaced is not a child of this node.");
       }
-      this.childNodes.splice(index, 1, newChild);
+      this.childNodesArray.splice(index, 1, newChild);
       return oldChild;
     }
 
@@ -180,30 +180,28 @@ export namespace SEnvParentNodeMutationTypes {
   export const MOVE_CHILD_NODE_EDIT   = "MOVE_CHILD_NODE_EDIT";
 };
 
-export const createParentNodeInsertChildMutation = (oldNode: SyntheticParentNode, child: SyntheticNode, index: number) => {
-  return createInsertChildMutation(SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT, oldNode, child, index);
+export const cloneNode = (node: BasicNode, deep?: boolean) => {
+  if (node.constructor === Object) return JSON.parse(JSON.stringify(node));
+  return (node as Node).cloneNode(deep);
+}
+
+export const createParentNodeInsertChildMutation = (oldNode: BasicParentNode, child: BasicNode, index: number) => {
+  return createInsertChildMutation(SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT, oldNode, cloneNode(child, true), index);
 };
 
-export const createParentNodeRemoveChildMutation = (oldNode: SyntheticParentNode, child: SyntheticNode, index?: number) => {
+export const createParentNodeRemoveChildMutation = (oldNode: BasicParentNode, child: BasicNode, index?: number) => {
   return createRemoveChildChildMutation(SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT, oldNode, child, index != null ? index : Array.from(oldNode.childNodes).indexOf(child));
 };
 
-export const createParentNodeMoveChildMutation = (oldNode: SyntheticParentNode, child: SyntheticNode, index: number, patchedOldIndex?: number) => {
+export const createParentNodeMoveChildMutation = (oldNode: BasicParentNode, child: BasicNode, index: number, patchedOldIndex?: number) => {
   return createMoveChildChildMutation(SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT, oldNode, child, patchedOldIndex || Array.from(oldNode.childNodes).indexOf(child), index);
 };
 
-export const diffParentNode = (oldNode: SyntheticParentNode, newNode: SyntheticParentNode, diffChildNode: (oldChild: SyntheticNode, newChild: SyntheticNode) => Mutation<any>[]) => {
+export const diffParentNode = (oldNode: BasicParentNode, newNode: BasicNode, diffChildNode: (oldChild: BasicNode, newChild: BasicNode) => Mutation<any>[]) => {
 
   const mutations = [];
 
   const diff = diffArray(Array.from(oldNode.childNodes), Array.from(newNode.childNodes), (oldNode, newNode) => {
-
-    // immutable structs
-    if (oldNode.constructor === Object) {
-      return oldNode.$$id === newNode.$$id ? 0 : -1;
-    }
-    
-    if (oldNode.$$id === newNode.$$id) return 0;
     if (oldNode.nodeName !== newNode.nodeName || oldNode.namespaceURI !== newNode.namespaceURI) return -1;
     return 1;
   });
@@ -246,6 +244,6 @@ export const patchParentNode = (oldNode: ParentNode & Node, mutation: Mutation<a
   } else if (mutation.$$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
     const insertMutation = <InsertChildMutation<SEnvParentNodeInterface, SEnvNodeInterface>>mutation;
     const newChild = createNode(insertMutation.child);
-    insertChildNodeAt(oldNode, newChild, insertMutation.index);
+    insertChildNodeAt(oldNode, cloneNode(newChild, true), insertMutation.index);
   }
 };

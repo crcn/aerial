@@ -37,45 +37,77 @@ export const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   bottom: 768
 };
 
-export type SyntheticBaseNode = {
-  source: ExpressionLocation;
+/**
+ * Basic nodes contain information that all DOM-like structures share
+ */
+
+export type BasicNode = {
   nodeType: SEnvNodeTypes;
   nodeName: string;
   namespaceURI?: string;
-} & Struct;
+  childNodes?: ArrayLike<BasicNode>;
+};
+
+export type BasicParentNode = {
+  childNodes: ArrayLike<BasicNode>;
+} & BasicNode;
+
+export type BasicDocument = {
+  title: string;
+} & BasicParentNode;
+
+export type BasicAttribute = {
+  name: string;
+  value: string; 
+}
+
+export type BasicElement = {
+  title: string;
+  attributes: ArrayLike<BasicAttribute>;
+} & BasicParentNode;
+
+export type BasicValueNode = {
+  nodeValue
+} & Node;
+
+export type BasicTextNode = BasicValueNode;
+export type BasicComment = BasicValueNode;
+
+/**
+ * Synthetic nodes contain information about the synthetic DOM environment
+ */
+
+export type SyntheticBaseNode = {
+  source: ExpressionLocation;
+} & BasicNode & Struct;
 
 export type SyntheticNode = {
-  source: ExpressionLocation;
 } & SyntheticBaseNode;
 
 export type SyntheticParentNode = {
-  childNodes: SyntheticNode[]
-} & SyntheticNode;
+  childNodes: SyntheticNode[];
+} & BasicParentNode & SyntheticNode;
 
 export type SyntheticDocument = {
-  title: string;
-} & SyntheticParentNode;
+} & SyntheticParentNode & BasicDocument;
 
 export type SyntheticAttribute = {
-  name: string;
-  value: string;
-} & SyntheticNode;
+} & BasicAttribute & SyntheticNode;
 
 export type SyntheticHTMLElement = {
   attributes: SyntheticAttribute[];
-} & SyntheticParentNode;
+} & BasicElement & SyntheticParentNode;
 
 export type SyntheticValueNode = {
-  nodeValue: string;
-} & SyntheticNode;
+} & BasicValueNode & SyntheticNode;
 
 export type SyntheticComment = {
   
-} & SyntheticValueNode;
+} & BasicComment & SyntheticValueNode;
 
 export type SyntheticTextNode = {
 
-} & SyntheticValueNode;
+} & BasicTextNode & SyntheticValueNode;
 
 
 export type SyntheticWindow = {
