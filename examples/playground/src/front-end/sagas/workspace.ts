@@ -1,7 +1,6 @@
 import { watch } from "aerial-common2";
 import { select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
-import { openSyntheticWindowRequested } from "front-end/actions";
 import { createOpenSyntheticWindowRequest } from "aerial-browser-sandbox";
 import { ApplicationState, getSelectedWorkspace } from "../state";
 

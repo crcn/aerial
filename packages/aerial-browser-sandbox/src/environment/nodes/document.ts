@@ -12,9 +12,11 @@ import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elemen
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, whenLoaded, mapExpressionToNode } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
+import { SyntheticDocument, SYNTHETIC_DOCUMENT } from "../../state";
 import parse5 = require("parse5");
 
 export interface SEnvDocumentInterface extends SEnvParentNodeInterface, Document {
+  readonly struct: SyntheticDocument;
   defaultView: SEnvWindowInterface;
   $load(content: string): void;
   $createElementWithoutConstruct(tagName: string): SEnvHTMLElementInterface;
@@ -48,6 +50,8 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     
     readonly activeElement: Element;
     private _readyState: string;
+    readonly struct: SyntheticDocument;
+    readonly structType: string = SYNTHETIC_DOCUMENT;
     private _parser: parse5.SAXParser;
     private _consumeWritePromise: Promise<any>;
     
@@ -122,8 +126,8 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       return this._readyState;
     }
 
-    get documentElement(): HTMLElement {
-      return this.children[0] as HTMLElement;
+    get documentElement(): SEnvHTMLElementInterface {
+      return this.children[0] as SEnvHTMLElementInterface;
     }
 
     get head() {
@@ -376,6 +380,13 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     createAttribute(name: string): Attr {
       return null;
+    }
+
+    createStruct():  SyntheticDocument {
+      return {
+        ...(super.createStruct() as any),
+        documentElement: this.documentElement && this.documentElement.struct
+      }
     }
 
     createAttributeNS(namespaceURI: string | null, qualifiedName: string): Attr {

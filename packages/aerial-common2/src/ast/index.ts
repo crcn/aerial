@@ -15,3 +15,8 @@ export type ExpressionLocation = {
   // end of the xpressions
   end?: ExpressionPosition;
 };
+
+
+export function expressionPositionEquals(a: ExpressionPosition, b: ExpressionPosition) {
+  return (a == null && b == null) || (a && b && (a.line === b.line && a.column === b.column));
+}

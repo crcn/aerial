@@ -19,8 +19,6 @@ export const parseHTMLDocumentFragment = weakMemo((content: string) => {
 });
 
 export const constructNode = <T extends Node>(node: T) => {
-  if (node["$$constructed"]) throw new Error("Cannot call constructor multiple times on a class");
-  node["$$constructed"] = true;
   if (node.nodeType ===  SEnvNodeTypes.ELEMENT) {
     node.constructor.call(node);
   }
@@ -36,7 +34,7 @@ export const constructNodeTree = <T extends Node>(parentNode: T) => {
 
 export const evaluateHTMLDocumentFragment = (source: string, document: SEnvDocumentInterface, parentNode: SEnvParentNodeInterface) => mapExpressionToNode(parseHTMLDocumentFragment(source), document, parentNode);
 
-const getHTMLASTNodeLocation = (expression: parse5.AST.Default.CommentNode|parse5.AST.Default.Element|parse5.AST.Default.TextNode|any) => {
+export const getHTMLASTNodeLocation = (expression: parse5.AST.Default.CommentNode|parse5.AST.Default.Element|parse5.AST.Default.TextNode|any) => {
   const loc = expression.__location as any;
   if (!loc) return undefined;
   if ((loc as parse5.MarkupData.ElementLocation).startTag) {
@@ -55,10 +53,19 @@ const addNodeSource = <T extends SEnvNodeInterface>(node: T, expressionOrLocatio
   return node;
 }
 
+let p = Promise.resolve().then(() => {
+  return new Promise((resolve) => {
+    
+  });
+})
+
 export const mapChildExpressionsToNodes = (promise: Promise<any>, childExpressions: parse5.AST.Default.Node[], document: SEnvDocumentInterface, parentNode: SEnvParentNodeInterface, async: boolean = false) => {
   for (const childExpression of childExpressions) {
     if (async) {
-      promise = promise.then(() => mapExpressionToNode(childExpression, document, parentNode as any, async));
+      promise = promise.then(() => {
+        const p = mapExpressionToNode(childExpression, document, parentNode as any, async);
+        return p;
+      });
     } else {
       mapExpressionToNode(childExpression, document, parentNode as any, async);
     }
@@ -78,8 +85,8 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
       break;
     } 
     case "#text": {
-      const text = addNodeSource(document.createTextNode((expression as parse5.AST.Default.TextNode).value), expression);
-      parentNode.appendChild(text);
+      const textNode = addNodeSource(document.createTextNode((expression as parse5.AST.Default.TextNode).value), expression);
+      parentNode.appendChild(textNode);
       break;
     }
     case "#comment": {
@@ -160,3 +167,35 @@ export const filterNodes = (parent: Node, filter: (child: Node) => boolean, ary:
   }
   return ary;
 };
+
+
+export function traverseDOMNodeExpression(target: parse5.AST.Default.Node, each: (expression: parse5.AST.Default.Node) => boolean | void) {
+  if (target.nodeName === "#document" || target.nodeName === "#document-fragment") {
+    
+  }
+  for (const child of target["childNodes"] || []) {
+    if (each(child) === false) return;
+    traverseDOMNodeExpression(child, each);
+  }
+}
+
+export function findDOMNodeExpression(target: parse5.AST.Default.Node, filter: (expression: parse5.AST.Default.Node) => boolean): parse5.AST.Default.Node {
+  let found;
+  traverseDOMNodeExpression(target, (expression) => {
+    if (filter(expression)) {
+      found = expression;
+      return false;
+    }
+  });
+  return found;
+}
+
+export function filterDOMNodeExpressions(target: parse5.AST.Default.Node, filter: (expression: parse5.AST.Default.Node) => boolean): parse5.AST.Default.Node[] {
+  let found = [];
+  traverseDOMNodeExpression(target, (expression) => {
+    if (filter(expression)) {
+      found.push(expression);
+    }
+  });
+  return found;
+}

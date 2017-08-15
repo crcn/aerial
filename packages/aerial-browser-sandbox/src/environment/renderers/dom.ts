@@ -47,10 +47,9 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
       const insertChildMutation = mutation as InsertChildMutation<any, any>;
       const newChildMap = mapNode(insertChildMutation.child, this.targetDocument);
       newChildMap.forEach((value, key) => this._nodeMap.set(key, value));
-
       mutation = createParentNodeInsertChildMutation(targetNode as SEnvParentNodeInterface, newChildMap.get(insertChildMutation.child.uid), insertChildMutation.index);
     } else if (mutation.$$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
-
+      deleteNodeTree((mutation as RemoveChildMutation<any, any>).child, this._nodeMap);
     }
 
     patchNode(targetNode, mutation);
@@ -118,3 +117,10 @@ const mapNode = (a: SEnvNodeInterface, document: Document, map: Map<string, Node
 }
 
 export const createSyntheticDOMRendererFactory = (targetDocument: Document) => (window: SEnvWindowInterface) => new SyntheticDOMRenderer(window, targetDocument);
+
+const deleteNodeTree = (node: SEnvNodeInterface, map: Map<string, Node>) => {
+  map.delete(node.uid);
+  Array.prototype.forEach.call(node, child => {
+    deleteNodeTree(child, map);
+  });
+};

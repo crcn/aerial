@@ -17,18 +17,26 @@ export interface RenderedClientRects {
   [identifier: string]: ClientRect
 };
 
+
+export interface RenderedComputedStyleDeclarations {
+  [identifier: string]: CSSStyleDeclaration
+};
+
 export class SyntheticWindowRendererEvent extends SEnvEvent {
   static readonly PAINTED = "PAINTED";
   rects: RenderedClientRects;
-  initRendererEvent(type: string, rects: RenderedClientRects) {
+  styles: RenderedComputedStyleDeclarations;
+  initRendererEvent(type: string, rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations) {
     super.initEvent(type, true, true);
     this.rects = rects;
+    this.styles = styles;
   }
 }
 
 export abstract class BaseSyntheticWindowRenderer extends EventTarget implements SyntheticWindowRenderer {
   abstract readonly mount: HTMLElement;
   private _rects: RenderedClientRects;
+  private _styles: RenderedComputedStyleDeclarations;
 
   constructor(protected _sourceWindow: SEnvWindowInterface) {
     super();
@@ -85,10 +93,11 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
 
   }
 
-  protected setPaintedInfo(rects: RenderedClientRects, computedStyles?: any /* TODO */) {
+  protected setPaintedInfo(rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations) {
     this._rects = rects;
+    this._styles = styles;
     const event = new SyntheticWindowRendererEvent();
-    event.initRendererEvent(SyntheticWindowRendererEvent.PAINTED, rects);
+    event.initRendererEvent(SyntheticWindowRendererEvent.PAINTED, rects, styles);
     this.dispatchEvent(event);
   }
 }

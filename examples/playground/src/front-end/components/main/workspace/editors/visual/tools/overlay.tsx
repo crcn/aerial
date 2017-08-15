@@ -8,7 +8,8 @@ import { SyntheticNode, getAllSyntheticDOMNodesAsIdMap, SyntheticWindow } from "
 import { getValueById, Dispatcher, Box, wrapEventToDispatch, weakMemo } from "aerial-common2";
 import { 
   stageToolOverlayMouseClicked,
-  stageToolOverlayMouseMoved 
+  stageToolOverlayMouseMoved,
+  stageToolOverlayMouseDoubleClicked,
 } from "front-end/actions";
 
 export type VisualToolsComponentProps = {
@@ -76,6 +77,7 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom }: Windo
       style={{ width: "100%", height: "100%", position: "absolute" } as any} 
       onMouseMove={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))} 
       onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, window.$$id))} 
+      onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$$id))} 
       onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))}
       />
   </div>

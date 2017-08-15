@@ -2,8 +2,11 @@ very simple online playground for visually creating web applications
 
 HI PRIO:
 
+- [ ] edit text on screen
+- [ ] HTML writer
 - [ ] CSS inspector
 - [ ] show loaded network files
+- [ ] ability to delete selected elements
 
 LOW PRIO:
 

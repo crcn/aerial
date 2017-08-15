@@ -3,8 +3,11 @@ import {
   Struct, 
   weakMemo, 
   updateStruct, 
+  getPathById,
   getValueById, 
+  getValueByPath,
   traverseObject,
+  findParentObject,
   getValuesByType, 
   ExpressionLocation,
   ExpressionPosition,
@@ -14,7 +17,7 @@ import {
 
 import {
   SEnvNodeTypes
-} from "../environment";
+} from "../environment/constants";
 
 export const SYNTHETIC_BROWSER_STORE = "SYNTHETIC_BROWSER_STORE";
 export const SYNTHETIC_BROWSER = "SYNTHETIC_BROWSER";
@@ -44,10 +47,13 @@ export type SyntheticNode = {
   source: ExpressionLocation;
 } & SyntheticBaseNode;
 
+export type SyntheticParentNode = {
+  childNodes: SyntheticNode
+} & SyntheticNode;
+
 export type SyntheticDocument = {
   title: string;
-  documentElement: SyntheticNode;
-} & SyntheticBaseNode;
+} & SyntheticParentNode;
 
 export type SyntheticAttribute = {
   name: string;
@@ -56,8 +62,7 @@ export type SyntheticAttribute = {
 
 export type SyntheticHTMLElement = {
   attributes: SyntheticAttribute[];
-  childNodes: SyntheticNode[];
-} & SyntheticNode;
+} & SyntheticParentNode;
 
 export type SyntheticValueNode = {
   nodeValue: string;
@@ -143,6 +148,20 @@ export const getSyntheticBrowsers = weakMemo((root: any): SyntheticBrowser[] => 
 export const getSyntheticBrowser = (root: any, id: string): SyntheticBrowser => getValueById(root, id);
 export const getSyntheticWindow = (root: any, id: string): SyntheticWindow => getValueById(root, id);
 
+export const getSyntheticNodeById = (root: any, id: string): SyntheticNode => getValueById(root, id);
+
+export const getSyntheticNodeTextContent = weakMemo((node: SyntheticNode): string => {
+  let text = "";
+  traverseObject(node, (child) => {
+    if (isSyntheticDOMNode(child) && (child as SyntheticNode).nodeType === SEnvNodeTypes.TEXT) {
+      text += (child as SyntheticTextNode).nodeValue;
+    }
+  });
+  return text;
+});
+
+export const getSyntheticNodeWindow = weakMemo((root: any, nodeId: string): SyntheticWindow => findParentObject(root, nodeId, parent => parent.$$type === SYNTHETIC_WINDOW));
+
 export const findSyntheticDOMNodes = weakMemo((root: any, filter: (node: SyntheticNode) => boolean): SyntheticNode[] => {
   const found: SyntheticNode[] = [];
   traverseObject(root, (item: any) => {
@@ -162,7 +181,3 @@ export const getAllSyntheticDOMNodesAsIdMap = weakMemo((root: any): { [identifie
   }
   return map;
 });
-
-export const updateNodeTreeStruct = (nodeStruct: SyntheticNode, node: Node) => [
-  
-]

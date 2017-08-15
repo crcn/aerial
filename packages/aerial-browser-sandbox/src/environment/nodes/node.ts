@@ -4,7 +4,7 @@ import { getSEnvEventClasses } from "../events";
 import { SEnvWindowInterface } from "../window";
 import { SEnvDocumentInterface } from "./document";
 import { getDOMExceptionClasses } from "./exceptions";
-import { getSEnvEventTargetClass } from "../events";
+import { getSEnvEventTargetClass, SEnvMutationEventInterface } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { 
@@ -16,9 +16,11 @@ import {
   createSetValueMutation, 
   createPropertyMutation,
 } from "aerial-common2";
+import { SyntheticNode, SyntheticValueNode } from "../../state";
 
 export interface SEnvNodeInterface extends Node {
   uid: string;
+  structType: string;
   source: ExpressionLocation;
   contentLoaded: Promise<any>;
   interactiveLoaded: Promise<any>;
@@ -36,6 +38,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
   const SEnvNamedNodeMap = getSEnvNamedNodeMapClass(context);
   const { SEnvNodeList } =  getSEnvHTMLCollectionClasses(context);
   const { SEnvDOMException } =  getDOMExceptionClasses(context);
+  const { SEnvMutationEvent } =  getSEnvEventClasses(context);
 
   return class SEnvNode extends SEnvEventTarget implements SEnvNodeInterface {
 
@@ -44,7 +47,10 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     public contentLoaded: Promise<any>;
     public interactiveLoaded: Promise<any>;
     public source: any;
+    private _struct: SyntheticNode;
+    private _constructed: boolean;
     readonly constructNode: boolean;
+    readonly structType: string;
 
     readonly attributes: NamedNodeMap;
     readonly baseURI: string | null;
@@ -80,6 +86,17 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     protected $childNodesArray: Node[];
 
+    constructor() {
+      super();
+
+      // called specifically for elements
+      if (this._constructed) {
+        throw new Error(`Cannot call constructor twice.`);
+      }
+      this._constructed = true;
+      this.addEventListener(SEnvMutationEvent.MUTATION, this._onMutation.bind(this));
+    }
+
     $$preconstruct() {
       super.$$preconstruct();
       this.uid = generateDefaultId();
@@ -93,6 +110,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     get previousSibling() {
       return this.parentNode.childNodes[Array.prototype.indexOf.call(this.parentNode.childNodes, this) - 1];
     }
+
 
     get parentNode() {
       return this.$$parentNode;
@@ -110,6 +128,27 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       return this.childNodes[this.childNodes.length - 1];
     }
 
+    get struct(): SyntheticNode {
+      if (!this._struct) {
+        this.updateStruct();
+      }
+      return this._struct;
+    }
+
+    protected updateStruct() {
+      this._struct = this.createStruct();
+    }
+
+    protected createStruct(): SyntheticNode {
+      return {
+        nodeType: this.nodeType,
+        nodeName: this.nodeName,
+        source: this.source,
+        $$type: this.structType,
+        $$id: this.uid
+      };
+    }
+
     appendChild<T extends Node>(newChild: T): T {
       this._throwUnsupportedMethod();
       return null;
@@ -117,6 +156,9 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     cloneNode(deep?: boolean): Node {
       const clone = this.cloneShallow();
+      clone.source = this.source;
+      clone.uid    = this.uid;
+
       if (deep !== false) {
         for (let i = 0, n = this.childNodes.length; i < n; i++) {
           clone.appendChild(this.childNodes[i].cloneNode(true));
@@ -128,7 +170,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       return clone;
     }
 
-    cloneShallow(): Node {
+    cloneShallow(): SEnvNodeInterface {
       this._throwUnsupportedMethod();
       return null;
     }
@@ -190,6 +232,10 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     }
 
+    protected _onMutation(event: SEnvMutationEventInterface) {
+      this._struct = null;
+    }
+
     replaceChild<T extends Node>(newChild: Node, oldChild: T): T {
       this._throwUnsupportedMethod();
       return null;
@@ -206,7 +252,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     }
 
     private get _defaultView() {
-      return this.nodeType === SEnvNodeTypes.DOCUMENT ? (this as any as SEnvDocumentInterface).defaultView : this.ownerDocument.defaultView as SEnvWindowInterface;;
+      return this.nodeType === SEnvNodeTypes.DOCUMENT ? (this as any as SEnvDocumentInterface).defaultView : this.ownerDocument.defaultView as SEnvWindowInterface;
     }
 
     $$removedFromDocument() {
@@ -236,6 +282,13 @@ export const getSEnvValueNode = weakMemo((context) => {
 
     get nodeValue() {
       return this._nodeValue;
+    }
+
+    createStruct(): SyntheticValueNode {
+      return {
+        ...(super.createStruct() as any),
+        nodeValue: this._nodeValue
+      }
     }
 
     set nodeValue(value: string) {

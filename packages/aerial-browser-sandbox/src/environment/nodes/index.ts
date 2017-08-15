@@ -7,3 +7,4 @@ export * from "./exceptions";
 export * from "./text";
 export * from "./comment";
 export * from "./node";
+export * from "./utils";

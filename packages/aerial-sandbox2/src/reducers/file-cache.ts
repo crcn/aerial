@@ -19,6 +19,7 @@ export const fileCacheReducer = (root: any = createFileCache(), event: BaseEvent
         })
       })
     }
+
     case URI_WRITTEN: {
       const { uri, content, contentType } = event as UriWrittenEvent;
       const item = getFileCacheItemByUri(root, uri);

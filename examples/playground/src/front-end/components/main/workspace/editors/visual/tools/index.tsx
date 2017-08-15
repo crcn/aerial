@@ -5,6 +5,7 @@ import React =  require("react");
 import { pure } from "recompose";
 import { Workspace } from "front-end/state";
 import { Dispatcher } from "aerial-common2";
+import { EditTextToolComponent } from "./edit-text";
 import { GridStageToolComponent } from "./grid";
 import { WindowsStageToolComponent } from "./windows";
 import { NodeOverlaysToolComponent } from "./overlay";
@@ -20,6 +21,7 @@ export const ToolsLayerComponent = pure((({ workspace, dispatch }: ToolsComponen
   <SelectionStageToolComponent workspace={workspace} dispatch={dispatch} />
   <NodeOverlaysToolComponent workspace={workspace} dispatch={dispatch} />
   <WindowsStageToolComponent workspace={workspace} dispatch={dispatch} />
+  <EditTextToolComponent workspace={workspace} dispatch={dispatch} />
 </div>) as any);
 
 export * from "./selection";

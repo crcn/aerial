@@ -1,11 +1,13 @@
 import { 
   Moved, 
   MOVED, 
+  Mutation,
   moveBox,
   Resized, 
   Removed,
   REMOVED,
   RESIZED,
+  getValueById,
   BaseEvent, 
   updateStruct, 
   deleteValueById,
@@ -14,6 +16,7 @@ import {
 import { uniq } from "lodash";
 import { 
   SyntheticWindowLoadedEvent,
+  SyntheticWindowPatchedEvent,
   SYNTHETIC_WINDOW_RESOURCE_LOADED,
   SyntheticWindowResourceLoadedEvent,
   SYNTHETIC_WINDOW_LOADED,
@@ -26,6 +29,8 @@ import { 
   NewSyntheticWindowEntryResolvedEvent,
 } from "../actions";
 import { 
+  SyntheticNode,
+  SyntheticWindow,
   SYNTHETIC_WINDOW,
   getSyntheticWindow,
   createSyntheticBrowser, 
@@ -58,6 +63,7 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
         })
       ]);
     }
+
     case SYNTHETIC_WINDOW_SOURCE_CHANGED: {
       const { window, syntheticWindowId } = event as SyntheticWindowSourceChangedEvent;
       const syntheticWindow = getSyntheticWindow(root, syntheticWindowId);
@@ -102,9 +108,12 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
     }
 
     case SYNTHETIC_WINDOW_RECTS_UPDATED: {
-      const { rects, syntheticWindowId } = event as SyntheticWindowRectsUpdatedEvent;
+      const { rects, styles, syntheticWindowId } = event as SyntheticWindowRectsUpdatedEvent;
       const window = getSyntheticWindow(root, syntheticWindowId);
-      return updateStructProperty(root, window, "computedBoxes", rects);
+      return updateStruct(root, window, {
+        computedBoxes: rects,
+        computedStyles: styles
+      });
     }
 
     case SYNTHETIC_WINDOW_RESOURCE_LOADED: {
@@ -118,4 +127,13 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
   }
 
   return root;
+}
+
+const patchSyntheticWindow = (window: SyntheticWindow, mutations: Mutation<any>[]) => {
+  for (const mutation of mutations) {
+    console.log(mutation.target);
+    const target = getValueById(window, mutation.target.uid);
+    console.log(target);
+  }
+  return window;
 }

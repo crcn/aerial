@@ -7,7 +7,6 @@ import { ToolsLayerComponent } from "./tools";
 import { CanvasComponent } from "./canvas";
 import { IsolateComponent } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
-import { SyntheticBrowser2, SyntheticDOMRenderer } from "aerial-synthetic-browser";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
 import { visualEditorWheel } from "front-end/actions";
 

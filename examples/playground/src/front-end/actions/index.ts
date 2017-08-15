@@ -21,6 +21,9 @@ export const STAGE_TOOL_WINDOW_BACKGROUND_CLICKED = "STAGE_TOOL_WINDOW_BACKGROUN
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_MOVED = "STAGE_TOOL_OVERLAY_MOUSE_MOVED";
 export const STAGE_TOOL_OVERLAY_MOUSE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_CLICKED";
+export const STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED";
+export const STAGE_TOOL_EDIT_TEXT_CHANGED = "STAGE_TOOL_EDIT_TEXT_CHANGED";
+export const STAGE_TOOL_EDIT_TEXT_BLUR = "STAGE_TOOL_EDIT_TEXT_BLUR";
 
 /**
  * Types
@@ -105,6 +108,14 @@ export type StageToolNodeOverlayHoverOver = {
   nodeId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
+export type StageToolEditTextChanged = {
+  nodeId: string;
+} & WrappedEvent<React.ChangeEvent<any>>;
+
+export type StageToolEditTextBlur = {
+  nodeId: string;
+} & WrappedEvent<React.FocusEvent<any>>;
+
 export type StageToolNodeOverlayHoverOut = {
   windowId: string;
   nodeId: string;
@@ -162,6 +173,12 @@ export const stageToolOverlayMouseClicked = (windowId: string, sourceEvent: Reac
   sourceEvent
 });
 
+export const stageToolOverlayMouseDoubleClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayClicked => ({
+  windowId,
+  type: STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED,
+  sourceEvent
+});
+
 export const resizerPathMoved = (workspaceId: string, anchor: Point, box: Box, sourceEvent: React.MouseEvent<any>): ResizerPathMoved => ({
   type: RESIZER_PATH_MOUSE_MOVED,
   workspaceId,
@@ -180,6 +197,18 @@ export const promptedNewWindowUrl = (workspaceId: string, location: string): Pro
   location,
   workspaceId,
   type: PROMPTED_NEW_WINDOW_URL
+});
+
+export const stageToolEditTextChanged = (nodeId: string, sourceEvent: React.ChangeEvent<any>): StageToolEditTextChanged => ({
+  type: STAGE_TOOL_EDIT_TEXT_CHANGED,
+  nodeId,
+  sourceEvent
+});
+
+export const stageToolEditTextBlur = (nodeId: string, sourceEvent: React.FocusEvent<any>): StageToolEditTextBlur => ({
+  nodeId,
+  type: STAGE_TOOL_EDIT_TEXT_BLUR,
+  sourceEvent
 });
 
 export const keyboardShortcutAdded = (keyCombo: string, action: Action): KeyboardShortcutAdded => ({
@@ -212,5 +241,3 @@ export const visualEditorWheel = (workspaceId: string, canvasWidth: number, canv
   deltaY,
   type: VISUAL_EDITOR_WHEEL,
 })
-
-export * from "aerial-synthetic-browser/src/functional/actions";

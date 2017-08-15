@@ -1,6 +1,6 @@
 import { fork, take, put, call, spawn, actionChannel } from "redux-saga/effects";
 import { eventChannel } from "redux-saga";
-import { difference } from "lodash";
+import { difference, debounce } from "lodash";
 import { createQueue } from "mesh";
 
 import { 
@@ -17,15 +17,29 @@ import {
   sandboxEnvironmentSaga
 } from "aerial-sandbox2";
 
+import {
+  htmlContentEditorSaga
+} from "./html-content-editor";
+
+import {
+  fileEditorSaga
+} from "./file-editor";
+
 import { 
   FetchRequest,
   FETCH_REQUEST,
   createFetchRequest,
   OPEN_SYNTHETIC_WINDOW,
+  createApplyFileMutationsRequest,
+  SYNTHETIC_WINDOW_PERSIST_CHANGES,
+  SyntheticWindowPersistChangesRequest,
+  SyntheticNodeTextContentChanged,
+  SyntheticWindowSourceChangedEvent,
   createSyntheticWindowLoadedEvent,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
   createSyntheticWindowRectsUpdated,
   OpenSyntheticBrowserWindowRequest,
+  SYNTHETIC_NODE_TEXT_CONTENT_CHANGED,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
   createSyntheticWindowSourceChangedEvent,
   createSyntheticWindowResourceLoadedEvent,
@@ -63,6 +77,7 @@ import {
   SEnvCommentInterface,
   SEnvTextInterface,
   SEnvElementInterface,
+  getSEnvEventClasses,
   SEnvWindowInterface,
   SyntheticDOMRenderer,
   SEnvDocumentInterface,
@@ -75,6 +90,8 @@ import {
 export function* syntheticBrowserSaga() {
   yield fork(handleBrowserChanges);
   yield fork(handleFetchRequests);
+  yield fork(htmlContentEditorSaga);
+  yield fork(fileEditorSaga);
 }
 
 function* handleFetchRequests() {
@@ -117,6 +134,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   let cwindow: SyntheticWindow;
   let cenv: SEnvWindowInterface;
   let cachedFiles: FileCacheItem[];
+  const fetchQueue = createQueue();
 
   yield fork(function*() {
     yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
@@ -142,6 +160,15 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     });
   });
 
+  yield fork(function*() {
+    while(true) {
+      const { value: [info, resolve] } = yield call(fetchQueue.next);
+      const body = (yield yield request(createFetchRequest(info))).payload;
+      yield put(createSyntheticWindowResourceLoadedEvent(syntheticWindowId, String(info)));
+      resolve(body);
+    }
+  });
+
   function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
     yield fork(handleSizeChange, syntheticWindow),
     yield fork(handleLocationChange, syntheticWindow)
@@ -162,23 +189,8 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     yield reload(syntheticWindow);
   }
 
-  function* reload(syntheticWindow: SyntheticWindow = cwindow) {
-    const fetchQueue = createQueue();
-
-    yield fork(function*() {
-      while(true) {
-        const { value: [info, resolve] } = yield call(fetchQueue.next);
-        const body = (yield yield request(createFetchRequest(info))).payload;
-        yield put(createSyntheticWindowResourceLoadedEvent(syntheticWindowId, String(info)));
-        resolve(body);
-      }
-    });
-
-    if (cenv) {
-      cenv.close();
-    }
-
-    const nenv = openSyntheticEnvironmentWindow(syntheticWindow.location, {
+  function openTargetSyntheticWindow(syntheticWindow: SyntheticWindow) {
+    return openSyntheticEnvironmentWindow(syntheticWindow.location, {
       console: {
         warn(...args) {
           console.warn('VM ', ...args);
@@ -206,29 +218,59 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       },
       createRenderer: !cenv && typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
     });
+  }
+
+  async function getCurrentSyntheticWindowDiffs(syntheticWindow: SyntheticWindow = cwindow, reverse?: boolean) {
+    const nenv = openTargetSyntheticWindow(syntheticWindow);
+    await waitForDocumentComplete(nenv);
+    return diffWindow(reverse ? nenv : cenv, reverse ? cenv : nenv);
+  }
+
+  let _reloading: boolean;
+  let _shouldReloadAgain: boolean;
+
+  function* reload(syntheticWindow: SyntheticWindow = cwindow) {
+    if (_reloading) {
+      _shouldReloadAgain = true;
+      return;
+    }
 
     if (cenv) {
-      yield call(waitForDocumentComplete, nenv);
-      patchWindow(cenv, diffWindow(cenv, nenv));
+      _reloading = true;
+      const diffs = yield call(getCurrentSyntheticWindowDiffs, syntheticWindow);
+      _reloading = false;
+      patchWindow(cenv, diffs);
+      if (_shouldReloadAgain) {
+        _shouldReloadAgain = false;
+        yield reload(syntheticWindow);
+      }
     } else {
-      cenv = nenv;
+      cenv = openTargetSyntheticWindow(syntheticWindow);
       yield fork(watchNewWindow, syntheticWindow);
     }
   }
 
   function* watchNewWindow(syntheticWindow: SyntheticWindow) {
-    const start = Date.now();
-
+    const { SEnvMutationEvent } = getSEnvEventClasses(cenv);
     const chan = eventChannel((emit) => {
 
-      cenv.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects }: SyntheticWindowRendererEvent) => {
-        emit(createSyntheticWindowRectsUpdated(syntheticWindowId, rects));
+      cenv.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects, styles }: SyntheticWindowRendererEvent) => {
+        emit(createSyntheticWindowRectsUpdated(syntheticWindowId, rects, styles));
+      });
+      
+      const emitStructChange = debounce(() => {
+        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct));
+      }, 0);
+
+      cenv.addEventListener(SEnvMutationEvent.MUTATION, () => {
+        if (cenv.document.readyState !== "complete") return;
+        // multiple mutations may be fired, so batch everything in one go
+        emitStructChange();
       });
 
       cenv.document.addEventListener("readystatechange", () => {
         if (cenv.document.readyState !== "complete") return;
-        const documentStruct = mapSEnvDocumentToStruct(cenv.document as SEnvDocumentInterface);
-        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, documentStruct));
+        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct));
       });
 
       return () => {
@@ -244,41 +286,23 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
     yield put(createSyntheticWindowSourceChangedEvent(syntheticWindow.$$id, cenv));
   }
-}
 
-const mapSEnvDocumentToStruct = (document: SEnvDocumentInterface): SyntheticDocument => {
-  const titleEl = document.querySelector("title");
-  return createSyntheticDocument({
-    title: titleEl ? titleEl.textContent : null,
-    documentElement: mapSEnvNodeToStruct(document.documentElement as any as SEnvNodeInterface)
+  yield fork(function*() {
+    while(true) {
+      const { syntheticNodeId, textContent } = (yield take((action) => action.type === SYNTHETIC_NODE_TEXT_CONTENT_CHANGED && (action as SyntheticNodeTextContentChanged).syntheticWindowId === syntheticWindowId)) as SyntheticNodeTextContentChanged;
+      const syntheticNode = cenv.childObjects.get(syntheticNodeId);
+      syntheticNode.textContent = textContent;
+    }
+  }); 
+
+  yield fork(function*() {
+    while(true) {
+      (yield take(action => action.type === SYNTHETIC_WINDOW_PERSIST_CHANGES && (action as SyntheticWindowPersistChangesRequest).syntheticWindowId === syntheticWindowId));
+      const diffs = yield call(getCurrentSyntheticWindowDiffs, cwindow, true);
+      yield put(createApplyFileMutationsRequest(diffs));
+    }
   });
-};
-
-const mapSEnvNodeToStruct = (node: SEnvNodeInterface): SyntheticNode => {
-  switch(node.nodeType) {
-    case SEnvNodeTypes.ELEMENT: return createSyntheticElement({
-      $$id: node.uid,
-      source: node.source,
-      nodeName: node.nodeName,
-      attributes: Array.prototype.map.call((node as any as SEnvElementInterface).attributes, mapSEnvAttribute),
-      childNodes: Array.prototype.map.call((node as any as SEnvElementInterface).childNodes, mapSEnvNodeToStruct)
-    });
-
-    case SEnvNodeTypes.TEXT: return createSyntheticTextNode({
-      $$id: node.uid,
-      source: node.source,
-      nodeValue: (node as any as SEnvTextInterface).nodeValue,
-    });
-
-    case SEnvNodeTypes.COMMENT: return createSyntheticComment({
-      $$id: node.uid,
-      source: node.source,
-      nodeValue: (node as any as SEnvCommentInterface).nodeValue,
-    });
-  }
-
-  return null;
-};
+}
 
 const mapSEnvAttribute = ({name, value}: Attr) => ({
   name,

@@ -52,7 +52,7 @@ export const TextEditorComponent = compose<TextEditorInnerProps, TextEditorProps
       if (codeMirror && cursorPosition !== (this.props as any).cursorPosition) {
         setImmediate(() => {
           codeMirror.focus();
-          codeMirror.codeMirror.setCursor({ line: cursorPosition.line - 1, ch: cursorPosition.column - 1 })
+          codeMirror.codeMirror.setCursor({ line: cursorPosition.line - 1, ch: cursorPosition.column - 1 });
         })
       }
     }

@@ -32,19 +32,21 @@ import { clamp } from "lodash";
 import { fileCacheReducer, getFileCache, getFileCacheItemByUri } from "aerial-sandbox2";
 
 import { 
-  addWorkspaceHovering,
-  removeWorkspaceHovering,
   ApplicationState,
   getWorkspaceById,
+  addWorkspaceHovering,
   ShortcutServiceState,
   getSelectedWorkspace,
   addWorkspaceSelection,
-  removeWorkspaceSelection,
+  setWorkspaceSelection,
   createApplicationState,
   clearWorkspaceSelection,
+  removeWorkspaceHovering,
+  removeWorkspaceSelection,
   toggleWorkspaceSelection,
   getSelectedWorkspaceFile,
   getWorkspaceSelectionBox,
+  getSyntheticNodeWorkspace,
   getBoxedWorkspaceSelection,
   getSyntheticWindowWorkspace,
 } from "front-end/state";
@@ -52,6 +54,9 @@ import {
 import {
   StageToolOverlayMouseMoved,
   StageToolOverlayClicked,
+  StageToolEditTextChanged,
+  STAGE_TOOL_EDIT_TEXT_CHANGED,
+  STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED,
   STAGE_TOOL_OVERLAY_MOUSE_CLICKED,
   STAGE_TOOL_OVERLAY_MOUSE_MOVED,
   StageToolNodeOverlayHoverOut,
@@ -258,6 +263,20 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       }
     }
 
+    case STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED: {
+      const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
+      const workspace = getSyntheticWindowWorkspace(state, windowId);
+      const targetUID = getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked);
+
+      state = updateStruct(state, workspace, {
+        secondarySelection: true
+      });
+
+      state = setWorkspaceSelection(state, workspace.$$id, targetUID);
+
+      return state;
+    }
+
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       return updateStructProperty(state, workspace, "visualEditorSettings", {
@@ -265,6 +284,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         showRightGutter: !workspace.visualEditorSettings.showRightGutter
       });
     }
+
 
     case DELETE_SHORCUT_PRESSED: {
       const { sourceEvent } = event as DeleteShortcutPressed;

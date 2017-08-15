@@ -4,10 +4,8 @@ import { LogLevel } from "aerial-common2";
 import { createSyntheticBrowser } from "aerial-browser-sandbox";
 
 import { 
-  createFile,
   initApplication, 
   createWorkspace, 
-  createDirectory,
   createApplicationState, 
 } from "./index";
 

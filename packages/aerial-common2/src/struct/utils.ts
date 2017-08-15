@@ -88,6 +88,22 @@ export const getValueById = (root: any, id: string) => {
 /**
  */
 
+export const findParentObject = weakMemo((root: any, childId: string, test: (value) => boolean) => {
+  let path = [...getPathById(root, childId)];
+  let trash;
+  while(path.length) {
+    const parent = getValueByPath(root, path);
+    if (test(parent)) {
+      return parent;
+    }
+    path = path.slice(0, path.length - 1);
+  }
+  return null;
+});
+
+/**
+ */
+
 export const updateStructProperty = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct, key: K, value: any) => updateIn(root, [...getPathById(root, struct.$$id), key], value);
 
 /**

@@ -8,6 +8,7 @@ import { getSEnvEventClasses } from "../events";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
+import { SyntheticHTMLElement, SYNTHETIC_ELEMENT, SyntheticAttribute } from "../../state";
 
 export const getSEnvAttr = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
@@ -16,6 +17,13 @@ export const getSEnvAttr = weakMemo((context: any) => {
     readonly specified: boolean;
     constructor(readonly name: string, public value: string, readonly ownerElement: Element) {
       super();
+    }
+    createStruct(): SyntheticAttribute {
+      return {
+        ...(super.createStruct() as any),
+        name: this.name,
+        value: this.value
+      };
     }
   }
 });
@@ -41,6 +49,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     readonly clientTop: number;
     readonly clientWidth: number;
     readonly constructClone: boolean = true;
+    readonly structType: string = SYNTHETIC_ELEMENT;
     attributes: NamedNodeMap;
     nodeType: number = SEnvNodeTypes.ELEMENT;
     id: string;
@@ -168,6 +177,13 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     set innerHTML(value: string) {
       this.removeAllChildren();
       const documentFragment = evaluateHTMLDocumentFragment(value, this.ownerDocument, this);
+    }
+
+    createStruct(): SyntheticHTMLElement {
+      return {
+        ...(super.createStruct() as any),
+        attributes: Array.prototype.map.call(this.attributes, attr => attr.struct)
+      };
     }
     
     getElementsByTagName<K extends keyof ElementListTagNameMap>(name: K): ElementListTagNameMap[K];

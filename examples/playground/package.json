@@ -61,7 +61,6 @@
     "aerial-common2": "0.0.x",
     "aerial-sandbox": "0.0.x",
     "aerial-sandbox2": "^0.0.5",
-    "aerial-synthetic-browser": "0.0.x",
     "ansi_up": "^2.0.2",
     "antd": "^2.12.3",
     "blob-to-buffer": "^1.2.6",

@@ -12,6 +12,7 @@ import {
   updateStruct,
   ImmutableArray, 
   getValueByPath,
+  findParentObject,
   ImmutableObject,
   createStructFactory,
   BaseApplicationState,
@@ -29,7 +30,8 @@ import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortc
 import { toggleLeftGutterPressed, toggleRightGutterPressed, deleteShortcutPressed } from "front-end/actions";
 
 import {
-  SyntheticBrowser
+  SyntheticBrowser,
+  getSyntheticNodeById,
 } from "aerial-browser-sandbox";
 
 import {
@@ -64,6 +66,7 @@ export type Workspace = {
   browser: SyntheticBrowser;
   visualEditorSettings: VisualEditorSettings;
   textCursorPosition: ExpressionPosition;
+  secondarySelection?: boolean;
 } & Struct;
 
 export type ApplicationState = {
@@ -112,7 +115,11 @@ export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...sele
 };
 
 export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
-  return setWorkspaceSelection(root, workspaceId);
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateStruct(root, workspace, {
+    selectionIds: [],
+    secondarySelection: false
+  });
 };
 
 export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
@@ -130,6 +137,8 @@ export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hover
   return updateStructProperty(root, workspace, "hoveringIds", difference(workspace.hoveringIds, hoveringIds));
 };
 
+export const getSyntheticNodeWorkspace = weakMemo((root: any, nodeId: string): Workspace => findParentObject(root, nodeId, parent => parent.$$type === WORKSPACE));
+
 export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))) as any);
 export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => boxed.box)));
 
@@ -145,10 +154,11 @@ export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, 
   visualEditorSettings: {
     translate: { left: 0, top: 0, zoom: 1 },
     showLeftGutter: true,
-    showRightGutter: true
+    showRightGutter: true,
   },
   selectionIds: [],
-  hoveringIds: []
+  hoveringIds: [],
+  secondarySelection: false
 });
 
 export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {
