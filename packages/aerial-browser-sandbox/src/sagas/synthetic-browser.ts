@@ -337,7 +337,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
   yield fork(function* handleRemoveNode() {
     while(true) {
-      const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType)));
+      const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
       const target = cenv.childObjects.get(itemId) as Node;
       const parent = target.parentNode;
       const removeMutation = createParentNodeRemoveChildMutation(parent, target);
@@ -350,7 +350,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
   yield fork(function* handleMoveNode() {
     while(true) {
-      const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType)));
+      const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
       const target = cenv.childObjects.get(itemId) as HTMLElement;
       
       // console.log(calculateUntransformedBoundingRect(target));
@@ -361,16 +361,16 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
       // TODO - get best CSS style
       target.style.position = "fixed";
-      target.style.left = String(point.left) + "px";
-      target.style.top  = String(point.top) + "px";
+      target.style.left = String(point.left - cwindow.box.left) + "px";
+      target.style.top  = String(point.top - cwindow.box.top) + "px";
     }
   });
 
   yield fork(function* handleMoveNodeStopped() {
     while(true) {
-      const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType)));
+      const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
       const target = cenv.childObjects.get(itemId) as HTMLElement;
-      
+
       // TODO - prompt where to persist style
       const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
       yield yield request(createApplyFileMutationsRequest(mutation));
