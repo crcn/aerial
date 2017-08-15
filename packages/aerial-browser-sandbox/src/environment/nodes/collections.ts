@@ -1,5 +1,12 @@
 import { weakMemo } from "aerial-common2";
 import { SEnvNodeTypes } from "../constants";
+import { SEnvNodeInterface } from "./node";
+import { SyntheticNode } from "../../state";
+
+export interface SEnvNodeListInterface extends Array<SEnvNodeInterface>, NodeList {
+  length: number;
+  [index: number]: SEnvNodeInterface;
+}
 
 export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
 
@@ -67,7 +74,7 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     }
   }
 
-  class SEnvNodeList extends _Collection<Node> implements NodeList {
+  class SEnvNodeList extends _Collection<SEnvNodeInterface> implements SEnvNodeListInterface {
     item(index: number) {
       return this[index];
     }

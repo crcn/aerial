@@ -1,5 +1,6 @@
-import { Dispatcher, weakMemo, Mutation, generateDefaultId } from "aerial-common2";
+import { SyntheticWindow, createSyntheticWindow } from "../state";
 import { getSEnvLocationClass } from "./location";
+import { Dispatcher, weakMemo, Mutation, generateDefaultId } from "aerial-common2";
 import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "./events";
 import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
 import { 
@@ -22,6 +23,7 @@ import { SEnvNodeTypes } from "./constants";
 type OpenTarget = "_self" | "_blank";
 
 export interface SEnvWindowInterface extends Window {
+  struct: SyntheticWindow;
   document: SEnvDocumentInterface;
   childObjects: Map<string, any>;
   renderer:  SyntheticWindowRenderer;
@@ -212,11 +214,13 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly toolbar: BarProp;
     readonly renderer: SyntheticWindowRenderer;
     readonly top: Window;
+    readonly mount: HTMLElement;
     readonly window: Window;
     URL: typeof URL;
     URLSearchParams: typeof URLSearchParams;
     Blob: typeof Blob;
     readonly customElements: CustomElementRegistry;
+    private _struct: SyntheticWindow;
 
     // classes
     readonly EventTarget: typeof EventTarget = SEnvEventTarget;
@@ -240,6 +244,16 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       }
 
       this.document.addEventListener(SEnvMutationEvent.MUTATION, this._onDocumentMutation.bind(this));
+    }
+
+    get struct() {
+      if (!this._struct) {
+        this._struct = createSyntheticWindow({
+          location: this.location.toString(),
+          document: this.document.struct
+        });
+      }
+      return this._struct;
     }
 
     get selector(): any {

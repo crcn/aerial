@@ -1,5 +1,5 @@
 import { fork, take, put, call, spawn, actionChannel, select } from "redux-saga/effects";
-import { eventChannel } from "redux-saga";
+import { eventChannel, delay } from "redux-saga";
 import { difference, debounce } from "lodash";
 import { createQueue } from "mesh";
 
@@ -47,9 +47,12 @@ import {
 } from "../actions";
 
 import { 
+  diffArray,
+  eachArrayValueMutation,
   watch,
   request,
   takeRequest, 
+  Mutation,
 } from "aerial-common2";
 
 import {
@@ -58,6 +61,7 @@ import {
   createSyntheticElement,
   createSyntheticTextNode,
   SyntheticNode,
+  SyntheticParentNode,
   SyntheticHTMLElement,
   SyntheticTextNode,
   SyntheticComment,
@@ -71,6 +75,7 @@ import {
 
 import {
   diffWindow,
+  diffDocument,
   patchWindow,
   SEnvNodeTypes,
   SEnvNodeInterface,
@@ -309,9 +314,23 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     while(true) {
       (yield take(action => action.type === SYNTHETIC_WINDOW_PERSIST_CHANGES && (action as SyntheticWindowPersistChangesRequest).syntheticWindowId === syntheticWindowId));
       const diffs = yield call(getCurrentSyntheticWindowDiffs, cwindow, true);
-      yield put(createApplyFileMutationsRequest(diffs));
+      console.log(diffs);
+      yield yield request(createApplyFileMutationsRequest(diffs));
     }
   });
+
+  // watch for changes in the struct
+  // yield fork(function*() {
+
+  //   yield watch((root) => getSyntheticWindow(root, syntheticWindowId), (window: SyntheticWindow) => {
+  //     if (cenv.document.readyState !== "complete") {
+  //       return true;
+  //     }
+  //     const diffs = diffDocument(cenv.document as any as SyntheticDocument, window.document);
+  //     patchWindow(cenv, diffs);
+  //     return true;
+  //   });
+  // });
 }
 
 const mapSEnvAttribute = ({name, value}: Attr) => ({

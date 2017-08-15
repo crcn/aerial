@@ -5,19 +5,20 @@ import { getSEnvParentNodeClass, diffParentNode, patchParentNode, SEnvParentNode
 import { diffElementChild } from "./element";
 import { getL3EventClasses } from "../level3";
 import { getSEnvEventClasses } from "../events";
-import { getSEnvHTMLCollectionClasses } from "./collections";
+import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getSEnvTextClass, SEnvTextInterface } from "./text";
 import { getSEnvCommentClass, SEnvCommentInterface } from "./comment";
 import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, whenLoaded, mapExpressionToNode } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
-import { SyntheticDocument, SYNTHETIC_DOCUMENT } from "../../state";
+import { SyntheticDocument, SYNTHETIC_DOCUMENT, SyntheticNode, SyntheticParentNode } from "../../state";
 import parse5 = require("parse5");
 
 export interface SEnvDocumentInterface extends SEnvParentNodeInterface, Document {
   readonly struct: SyntheticDocument;
   defaultView: SEnvWindowInterface;
+  childNodes: SEnvNodeListInterface;
   $load(content: string): void;
   $createElementWithoutConstruct(tagName: string): SEnvHTMLElementInterface;
   createDocumentFragment(): DocumentFragment & SEnvNodeInterface;
@@ -112,6 +113,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     constructor(readonly defaultView: SEnvWindowInterface) {
       super();
+      const d: SyntheticParentNode = this;
       this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
       this.addEventListener("load", this._onChildLoad.bind(this));
@@ -717,7 +719,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   };
 });
 
-export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SEnvDocumentInterface) => {
+export const diffDocument = (oldDocument: SyntheticDocument, newDocument: SyntheticDocument) => {
   return diffParentNode(oldDocument, newDocument, diffElementChild);
 };
 

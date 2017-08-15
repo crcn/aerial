@@ -1,7 +1,8 @@
 import "./edit-text.scss";
 import * as React from "react";
+import {findDOMNode} from "react-dom";
 import { Workspace } from "front-end/state";
-import { compose, pure, lifecycle } from "recompose";
+import { compose, pure, lifecycle, withState } from "recompose";
 import { Dispatcher, getBoxSize ,wrapEventToDispatch } from "aerial-common2";
 import { stageToolEditTextChanged, stageToolEditTextBlur } from "front-end/actions";
 import { 
@@ -14,12 +15,17 @@ import {
   getSyntheticNodeTextContent,
 } from "aerial-browser-sandbox";
 
-export type EditTextToolInnerProps = {
+export type EditTextToolOuterProps = {
   workspace: Workspace;
   dispatch: Dispatcher<any>;
 }
 
-export const EditTextToolComponentBase = ({ workspace, dispatch }: EditTextToolInnerProps) => {
+export type EditTextToolInnerProps = {
+  textarea: HTMLTextAreaElement;
+  setTextarea: (v: any) => any;
+} & EditTextToolOuterProps;
+
+export const EditTextToolComponentBase = ({ workspace, dispatch, setTextarea }: EditTextToolInnerProps) => {
   if (!workspace.secondarySelection) return null;
   const zoom = workspace.visualEditorSettings.translate.zoom;
   const selectedNode: SyntheticNode = workspace.selectionIds.map(id => getSyntheticNodeById(workspace, id)).shift();
@@ -38,7 +44,8 @@ export const EditTextToolComponentBase = ({ workspace, dispatch }: EditTextToolI
     left: nodeWindow.box.left + box.left,
     top: nodeWindow.box.top + box.top,
     width: width,
-    height: height
+    height: height,
+    zIndex: 99999999
   };
 
   const textStyle = {
@@ -55,6 +62,7 @@ export const EditTextToolComponentBase = ({ workspace, dispatch }: EditTextToolI
 
   return <div style={style as any}>
     <textarea 
+     ref={setTextarea}
     style={{ width: "100%", height: "100%", padding: 0, ...textStyle }} 
     defaultValue={getSyntheticNodeTextContent(selectedNode)}
     onChange={wrapEventToDispatch(dispatch, stageToolEditTextChanged.bind(this, selectedNode.$$id))}
@@ -63,8 +71,16 @@ export const EditTextToolComponentBase = ({ workspace, dispatch }: EditTextToolI
   </div>;
 }
 
-const enhanceEditTextToolComponent = compose<EditTextToolInnerProps, EditTextToolInnerProps>(
-  pure
+const enhanceEditTextToolComponent = compose<EditTextToolInnerProps, EditTextToolOuterProps>(
+  pure,
+  withState("textarea", "setTextarea", null),
+  lifecycle<EditTextToolInnerProps, any>({
+    componentWillUpdate({ textarea }) {
+      if (textarea && this.props.textarea !== textarea) {
+        textarea.select();
+      }
+    }
+  })
 );
 
 export const EditTextToolComponent = enhanceEditTextToolComponent(EditTextToolComponentBase);

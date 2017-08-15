@@ -38,6 +38,7 @@ import {
   SyntheticBrowser,
   getSyntheticNodeById,
   getSyntheticWindow,
+  getSyntheticNodeWindow,
 } from "aerial-browser-sandbox";
 
 import {
@@ -145,8 +146,14 @@ export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hover
 
 export const getSyntheticNodeWorkspace = weakMemo((root: any, nodeId: string): Workspace => findParentObject(root, nodeId, parent => parent.$$type === WORKSPACE));
 
-export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => filterBoxed(workspace.selectionIds.map(id => getValueById(workspace, id))) as any);
-export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => boxed.box)));
+export const getFrontEndBox = weakMemo((root: any, item: Partial<Struct & Boxed>) => {
+  if (item.box) return item.box;
+  const window = getSyntheticNodeWindow(root, item.$$id);
+  return window && window.computedBoxes[item.$$id];
+});
+
+export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => workspace.selectionIds.map(id => getValueById(workspace, id)).filter(item => getFrontEndBox(workspace, item)));
+export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => getFrontEndBox(workspace, boxed))));
 
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => getValueById(state, id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);

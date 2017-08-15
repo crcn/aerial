@@ -1,7 +1,7 @@
 import { weakMemo } from "aerial-common2";
 import { SEnvNodeTypes } from "../constants";
 import { getSEnvNodeClass, SEnvNodeInterface, diffValueNode, getSEnvValueNode } from "./node";
-import { SYNTHETIC_COMMENT } from "../../state";
+import { SYNTHETIC_COMMENT, SyntheticComment } from "../../state";
 
 export interface SEnvCommentInterface extends SEnvNodeInterface, Comment {
 
@@ -36,6 +36,6 @@ export const getSEnvCommentClass = weakMemo((context) => {
   }
 });
 
-export const diffComment = (oldComment: Comment, newComment: Comment) => {
+export const diffComment = (oldComment: SyntheticComment, newComment: SyntheticComment) => {
   return diffValueNode(oldComment, newComment);
 };

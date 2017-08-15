@@ -57,6 +57,8 @@ import {
   StageToolOverlayClicked,
   StageToolEditTextChanged,
   STAGE_TOOL_EDIT_TEXT_CHANGED,
+  SELECTOR_DOUBLE_CLICKED,
+  SelectorDoubleClicked,
   STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED,
   STAGE_TOOL_OVERLAY_MOUSE_CLICKED,
   STAGE_TOOL_OVERLAY_MOUSE_MOVED,
@@ -260,7 +262,8 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         }
         return state;
       } else {
-        return handleWindowSelectionFromAction(state, targetUID, event as StageToolNodeOverlayClicked);
+        state = handleWindowSelectionFromAction(state, targetUID, event as StageToolNodeOverlayClicked);
+        return state;
       }
     }
 
@@ -278,6 +281,16 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
+    case SELECTOR_DOUBLE_CLICKED: {
+      const { sourceEvent, itemId } = event as SelectorDoubleClicked;
+      const workspace = getSyntheticNodeWorkspace(state, itemId);
+      state = updateStruct(state, workspace, {
+        secondarySelection: true
+      });
+
+      state = setWorkspaceSelection(state, workspace.$$id, itemId);
+    }
+
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       return updateStructProperty(state, workspace, "visualEditorSettings", {
@@ -285,7 +298,6 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         showRightGutter: !workspace.visualEditorSettings.showRightGutter
       });
     }
-
 
     case DELETE_SHORCUT_PRESSED: {
       const { sourceEvent } = event as DeleteShortcutPressed;

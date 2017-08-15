@@ -114,9 +114,12 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
 
     case REMOVED: {
       const { itemId, itemType } = event as Removed;
-      if (itemType === SYNTHETIC_WINDOW) {
+      const value = getValueById(root, itemId);
+      if (itemType === SYNTHETIC_WINDOW || value.nodeType != null) {
         return deleteValueById(root, itemId);
       }
+
+      break;
     }
 
     case SYNTHETIC_WINDOW_LOADED: {

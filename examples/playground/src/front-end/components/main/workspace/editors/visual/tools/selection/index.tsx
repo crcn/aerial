@@ -2,8 +2,9 @@ import "./index.scss";
 import * as React from "react";
 import { compose, pure } from "recompose";
 import { ResizerComponent } from "./resizer";
-import { Dispatcher, mergeBoxes, Boxed } from "aerial-common2";
-import { Workspace, getBoxedWorkspaceSelection } from "front-end/state";
+import { Dispatcher, mergeBoxes, Boxed, wrapEventToDispatch } from "aerial-common2";
+import { Workspace, getBoxedWorkspaceSelection, getFrontEndBox } from "front-end/state";
+import { selectorDoubleClicked } from "front-end/actions";
 
 export type SelectionOuterProps = {
   workspace: Workspace;
@@ -15,7 +16,7 @@ export type SelectionInnerProps = {
 
 const SelectionBoundsComponent = ({ workspace }: { workspace: Workspace }) => {
   const selection = getBoxedWorkspaceSelection(workspace);
-  const entireBounds = mergeBoxes(...selection.map(value => value.box));
+  const entireBounds = mergeBoxes(...selection.map(value => getFrontEndBox(workspace, value)));
   const style = {};
   const borderWidth = 1 / workspace.visualEditorSettings.translate.zoom;
   const boundsStyle = {
@@ -31,9 +32,9 @@ const SelectionBoundsComponent = ({ workspace }: { workspace: Workspace }) => {
 
 export const SelectionStageToolComponentBase = ({ workspace, dispatch }: SelectionInnerProps) => {
   const selection = getBoxedWorkspaceSelection(workspace);
-  if (!selection.length) return null;
+  if (!selection.length || workspace.secondarySelection) return null;
 
-  return <div className="m-stage-selection-tool">
+  return <div className="m-stage-selection-tool" onDoubleClick={selection.length === 1 ? wrapEventToDispatch(dispatch, selectorDoubleClicked.bind(this, selection[0].$$id)) : null }>
     <SelectionBoundsComponent workspace={workspace} />
     <ResizerComponent workspace={workspace} dispatch={dispatch} />
   </div>;

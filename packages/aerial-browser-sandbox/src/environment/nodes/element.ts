@@ -6,9 +6,9 @@ import { weakMemo, diffArray, eachArrayValueMutation, Mutation, createPropertyMu
 import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface, patchParentNode } from "./parent-node";
 import { getSEnvEventClasses } from "../events";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
-import { getSEnvHTMLCollectionClasses } from "./collections";
+import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
-import { SyntheticHTMLElement, SYNTHETIC_ELEMENT, SyntheticAttribute } from "../../state";
+import { SyntheticHTMLElement, SYNTHETIC_ELEMENT, SyntheticAttribute, SyntheticNode, SyntheticTextNode, SyntheticComment } from "../../state";
 
 export const getSEnvAttr = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
@@ -30,6 +30,7 @@ export const getSEnvAttr = weakMemo((context: any) => {
 
 export interface SEnvElementInterface extends SEnvParentNodeInterface, Element {
   $$preconstruct();
+  childNodes: SEnvNodeListInterface;
   addEventListener(type: string, listener?: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
 }
 
@@ -347,11 +348,11 @@ export const getSEnvElementClass = weakMemo((context: any) => {
   }
 });
 
-export const diffElementChild = (oldChild: SEnvNodeInterface, newChild: Node) => {
+export const diffElementChild = (oldChild: SyntheticNode, newChild: SyntheticNode) => {
   switch(oldChild.nodeType) {
-    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as any as SEnvElementInterface, newChild as any as SEnvElementInterface);
-    case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as any as Text, newChild as Text);
-    case SEnvNodeTypes.COMMENT: return diffComment(oldChild as any as Comment, newChild as Comment);
+    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as any as SyntheticHTMLElement, newChild as any as SyntheticHTMLElement);
+    case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as any as SyntheticTextNode, newChild as SyntheticTextNode);
+    case SEnvNodeTypes.COMMENT: return diffComment(oldChild as any as SyntheticComment, newChild as SyntheticComment);
   }
   return [];
 };
@@ -361,11 +362,11 @@ export namespace SyntheticDOMElementMutationTypes {
   export const ATTACH_SHADOW_ROOT_EDIT    = "attachShadowRootEdit";
 }
 
-const createSetElementAttributeMutation = (target: SEnvElementInterface, name: string, value: string, oldName?: string, index?: number) => {
+const createSetElementAttributeMutation = (target: SyntheticHTMLElement, name: string, value: string, oldName?: string, index?: number) => {
   return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, target, name, value, undefined, oldName, index);
 }
 
-export const diffElement = (oldElement: SEnvElementInterface, newElement: SEnvElementInterface) => {
+export const diffElement = (oldElement: SyntheticHTMLElement, newElement: SyntheticHTMLElement) => {
   const mutations = [];
 
   if (oldElement.nodeName !== newElement.nodeName) {

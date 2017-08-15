@@ -6,7 +6,7 @@ import { SEnvDocumentInterface } from "./document";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getSEnvEventTargetClass, SEnvMutationEventInterface } from "../events";
 import { getSEnvNamedNodeMapClass } from "./named-node-map";
-import { getSEnvHTMLCollectionClasses } from "./collections";
+import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { 
   weakMemo, 
   Mutation, 
@@ -44,6 +44,8 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     public $$parentNode: Node;
     public $$parentElement: HTMLElement;
+    public $$type: string;
+    public $$id: string;
     public contentLoaded: Promise<any>;
     public interactiveLoaded: Promise<any>;
     public source: any;
@@ -81,10 +83,10 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly PROCESSING_INSTRUCTION_NODE: number;
     readonly TEXT_NODE: number;
     uid: string;
+    childNodesArray: Node[];
 
     connectedToDocument: boolean;
 
-    protected $childNodesArray: Node[];
 
     constructor() {
       super();
@@ -100,7 +102,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     $$preconstruct() {
       super.$$preconstruct();
       this.uid = generateDefaultId();
-      this.childNodes = this.$childNodesArray = new SEnvNodeList();
+      this.childNodes = this.childNodesArray = new SEnvNodeList();
     }
 
     get nextSibling() {
@@ -302,11 +304,11 @@ export const getSEnvValueNode = weakMemo((context) => {
 
 export const UPDATE_VALUE_NODE = "UPDATE_VALUE_NODE";
 
-export const createUpdateValueNodeMutation = (oldNode: Text|Comment, newValue: string) => {
+export const createUpdateValueNodeMutation = (oldNode: SyntheticValueNode, newValue: string) => {
   return createSetValueMutation(UPDATE_VALUE_NODE, oldNode, newValue);
-}
+};
 
-export const diffValueNode = (oldNode: Text|Comment, newNode: Text|Comment) => {
+export const diffValueNode = (oldNode: SyntheticValueNode, newNode: SyntheticValueNode) => {
   const mutations = [];
   if(oldNode.nodeValue !== newNode.nodeValue) {
     mutations.push(createUpdateValueNodeMutation(oldNode, newNode.nodeValue));

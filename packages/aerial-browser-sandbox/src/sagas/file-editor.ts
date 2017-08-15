@@ -1,4 +1,4 @@
-import { Mutation, editString, StringMutation, request } from "aerial-common2";
+import { Mutation, editString, StringMutation, request, createRequestResponse } from "aerial-common2";
 import { SEnvNodeInterface } from "../environment";
 import { fork, take, select, put } from "redux-saga/effects";
 import { APPLY_FILE_MUTATIONS, ApplyFileMutationsRequest, createMutateSourceContentRequest } from "../actions";
@@ -7,7 +7,8 @@ import { getFileCacheItemByUri, createUriCacheBustedEvent } from "aerial-sandbo
 export function* fileEditorSaga() {
   yield fork(function* handleFileEditRequest() {
     while(true) {
-      const { mutations } = (yield take(action => action.type === APPLY_FILE_MUTATIONS)) as ApplyFileMutationsRequest;
+      const req = (yield take(action => action.type === APPLY_FILE_MUTATIONS)) as ApplyFileMutationsRequest;
+      const { mutations } = req;
       const state = yield select();
       const mutationsByUri: {
         [identifier: string]: Mutation<any>[]
@@ -36,6 +37,8 @@ export function* fileEditorSaga() {
         const newContent = editString(String(fileCacheItem.content), stringMutations);
         yield put(createUriCacheBustedEvent(uri, newContent, fileCacheItem.contentType));
       }
+
+      yield put(createRequestResponse(req.$$id, true));
     }
   }); 
 }

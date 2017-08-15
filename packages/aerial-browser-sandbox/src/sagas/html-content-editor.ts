@@ -1,7 +1,7 @@
 import parse5 = require("parse5");
 import { } from "aerial-sandbox";
 import { fork, take } from "redux-saga/effects";
-import { UPDATE_VALUE_NODE, findDOMNodeExpression, getHTMLASTNodeLocation } from "../environment";
+import { UPDATE_VALUE_NODE, SEnvParentNodeMutationTypes, findDOMNodeExpression, getHTMLASTNodeLocation } from "../environment";
 import { 
   Mutation, 
   weakMemo,
@@ -23,6 +23,15 @@ export function* htmlContentEditorSaga(contentType: string = "text/html") {
         const targetNode = findMutationTargetExpression(mutation, parseHTML(content)) as any;
 
         return createStringMutation(targetNode.__location.startOffset, targetNode.__location.startOffset + targetNode.value.trim().length, mutation.newValue);
+      });
+    }
+  });
+  yield fork(function* handleRemoveNode() {
+    while(true) {
+      yield takeRequest(testMutateContentRequest(contentType, SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT), ({ mutation, content }: MutateSourceContentRequest<SetValueMutation<any>>) => {  
+        const targetNode = findMutationTargetExpression(mutation, parseHTML(content)) as any;
+
+        return createStringMutation(targetNode.__location.startOffset, targetNode.__location.endOffset, "");
       });
     }
   });

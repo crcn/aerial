@@ -41,6 +41,7 @@ export type SyntheticBaseNode = {
   source: ExpressionLocation;
   nodeType: SEnvNodeTypes;
   nodeName: string;
+  namespaceURI?: string;
 } & Struct;
 
 export type SyntheticNode = {
@@ -48,7 +49,7 @@ export type SyntheticNode = {
 } & SyntheticBaseNode;
 
 export type SyntheticParentNode = {
-  childNodes: SyntheticNode
+  childNodes: SyntheticNode[]
 } & SyntheticNode;
 
 export type SyntheticDocument = {
@@ -75,6 +76,7 @@ export type SyntheticComment = {
 export type SyntheticTextNode = {
 
 } & SyntheticValueNode;
+
 
 export type SyntheticWindow = {
   mount: HTMLElement;

@@ -22,6 +22,7 @@ export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_MOVED = "STAGE_TOOL_OVERLAY_MOUSE_MOVED";
 export const STAGE_TOOL_OVERLAY_MOUSE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_CLICKED";
 export const STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED";
+export const SELECTOR_DOUBLE_CLICKED = "SELECTOR_DOUBLE_CLICKED";
 export const STAGE_TOOL_EDIT_TEXT_CHANGED = "STAGE_TOOL_EDIT_TEXT_CHANGED";
 export const STAGE_TOOL_EDIT_TEXT_BLUR = "STAGE_TOOL_EDIT_TEXT_BLUR";
 
@@ -129,6 +130,10 @@ export type StageToolOverlayClicked = {
   windowId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
+export type SelectorDoubleClicked = {
+  itemId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
+
 export type DeleteShortcutPressed = ShortcutEvent;
 
 export type textEditorChanged = {
@@ -176,6 +181,12 @@ export const stageToolOverlayMouseClicked = (windowId: string, sourceEvent: Reac
 export const stageToolOverlayMouseDoubleClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayClicked => ({
   windowId,
   type: STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED,
+  sourceEvent
+});
+
+export const selectorDoubleClicked = (itemId: string, sourceEvent: React.MouseEvent<any>): SelectorDoubleClicked => ({
+  itemId,
+  type: SELECTOR_DOUBLE_CLICKED,
   sourceEvent
 });
 
