@@ -1,7 +1,13 @@
-import { watch } from "aerial-common2";
+import { watch, getValueById, removed, Struct } from "aerial-common2";
 import { take, select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
-import { STAGE_TOOL_OVERLAY_MOUSE_CLICKED, StageToolOverlayClicked } from "../actions";
+import { 
+  DeleteShortcutPressed, 
+  DELETE_SHORCUT_PRESSED, 
+  StageToolOverlayClicked, 
+  workspaceSelectionDeleted,
+  STAGE_TOOL_OVERLAY_MOUSE_CLICKED, 
+} from "../actions";
 import { 
   getUri,
   SEnvNodeTypes, 
@@ -22,6 +28,7 @@ import {
 export function* mainWorkspaceSaga() {
   yield fork(openDefaultWindow);
   yield fork(handleAltClickElement);
+  yield fork(handleDeleteKeyPressed);
 }
 
 function* openDefaultWindow() {
@@ -58,4 +65,18 @@ function* handleAltClickElement() {
 function* openNewWindow(href: string, origin: SyntheticWindow, workspace: Workspace) {
   const uri = getUri(href, origin.location);
   yield put(createOpenSyntheticWindowRequest(uri, workspace.browser.$$id));
+}
+
+function* handleDeleteKeyPressed() {
+  while(true) {
+    const action = (yield take(DELETE_SHORCUT_PRESSED)) as DeleteShortcutPressed;
+    const state = yield select();
+    const { sourceEvent } = event as DeleteShortcutPressed;
+    const workspace = getSelectedWorkspace(state);
+    const selected  = workspace.selectionIds.map(id => getValueById(state, id)) as Struct[];
+    for (const item of selected) {
+      yield put(removed(item.$$id, item.$$type));
+    }
+    yield put(workspaceSelectionDeleted(workspace.$$id));
+  }
 }

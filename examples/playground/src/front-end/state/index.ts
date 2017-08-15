@@ -147,6 +147,7 @@ export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hover
 export const getSyntheticNodeWorkspace = weakMemo((root: any, nodeId: string): Workspace => findParentObject(root, nodeId, parent => parent.$$type === WORKSPACE));
 
 export const getFrontEndBox = weakMemo((root: any, item: Partial<Struct & Boxed>) => {
+  if (!item) return null;
   if (item.box) return item.box;
   const window = getSyntheticNodeWindow(root, item.$$id);
   return window && window.computedBoxes[item.$$id];

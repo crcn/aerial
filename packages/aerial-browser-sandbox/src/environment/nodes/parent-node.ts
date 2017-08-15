@@ -10,7 +10,7 @@ import {
   InsertChildMutation,
   RemoveChildMutation,
 } from "aerial-common2";
-import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
+import { getSEnvNodeClass, SEnvNodeInterface, diffNode, patchNode } from "./node";
 import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getL3EventClasses } from "../level3";
@@ -185,12 +185,12 @@ export const cloneNode = (node: BasicNode, deep?: boolean) => {
   return (node as Node).cloneNode(deep);
 }
 
-export const createParentNodeInsertChildMutation = (oldNode: BasicParentNode, child: BasicNode, index: number) => {
-  return createInsertChildMutation(SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT, oldNode, cloneNode(child, true), index);
+export const createParentNodeInsertChildMutation = (parent: BasicParentNode, child: BasicNode, index: number) => {
+  return createInsertChildMutation(SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT, parent, cloneNode(child, true), index);
 };
 
-export const createParentNodeRemoveChildMutation = (oldNode: BasicParentNode, child: BasicNode, index?: number) => {
-  return createRemoveChildChildMutation(SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT, oldNode, child, index != null ? index : Array.from(oldNode.childNodes).indexOf(child));
+export const createParentNodeRemoveChildMutation = (parent: BasicParentNode, child: BasicNode, index?: number) => {
+  return createRemoveChildChildMutation(SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT, parent, child, index != null ? index : Array.from(parent.childNodes).indexOf(child));
 };
 
 export const createParentNodeMoveChildMutation = (oldNode: BasicParentNode, child: BasicNode, index: number, patchedOldIndex?: number) => {
@@ -199,7 +199,7 @@ export const createParentNodeMoveChildMutation = (oldNode: BasicParentNode, chil
 
 export const diffParentNode = (oldNode: BasicParentNode, newNode: BasicNode, diffChildNode: (oldChild: BasicNode, newChild: BasicNode) => Mutation<any>[]) => {
 
-  const mutations = [];
+  const mutations = [...diffNode(oldNode, newNode)];
 
   const diff = diffArray(Array.from(oldNode.childNodes), Array.from(newNode.childNodes), (oldNode, newNode) => {
     if (oldNode.nodeName !== newNode.nodeName || oldNode.namespaceURI !== newNode.namespaceURI) return -1;
@@ -245,5 +245,7 @@ export const patchParentNode = (oldNode: ParentNode & Node, mutation: Mutation<a
     const insertMutation = <InsertChildMutation<SEnvParentNodeInterface, SEnvNodeInterface>>mutation;
     const newChild = createNode(insertMutation.child);
     insertChildNodeAt(oldNode, cloneNode(newChild, true), insertMutation.index);
+  } else {
+    patchNode(oldNode, mutation);
   }
 };

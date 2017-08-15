@@ -109,6 +109,9 @@ export type SyntheticTextNode = {
 
 } & BasicTextNode & SyntheticValueNode;
 
+export const isSyntheticNodeType = (value: string) => {
+  return [SYNTHETIC_DOCUMENT, SYNTHETIC_TEXT_NODE, SYNTHETIC_COMMENT, SYNTHETIC_ELEMENT].indexOf(value) !== -1;
+}
 
 export type SyntheticWindow = {
   mount: HTMLElement;

@@ -59,6 +59,8 @@ import {
   STAGE_TOOL_EDIT_TEXT_CHANGED,
   SELECTOR_DOUBLE_CLICKED,
   SelectorDoubleClicked,
+  WorkspaceSelectionDeleted,
+  WORKSPACE_DELETION_SELECTED,
   STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED,
   STAGE_TOOL_OVERLAY_MOUSE_CLICKED,
   STAGE_TOOL_OVERLAY_MOUSE_MOVED,
@@ -299,14 +301,9 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       });
     }
 
-    case DELETE_SHORCUT_PRESSED: {
-      const { sourceEvent } = event as DeleteShortcutPressed;
-      const workspace = getSelectedWorkspace(state);
-      const selected  = workspace.selectionIds.map(id => getValueById(state, id)) as Struct[];
-      for (const item of selected) {
-        state = applicationReducer(state, removed(item.$$id, item.$$type));
-      }
-      return clearWorkspaceSelection(state, workspace.$$id);
+    case WORKSPACE_DELETION_SELECTED: {
+      const { workspaceId } = event as WorkspaceSelectionDeleted;
+      return clearWorkspaceSelection(state, workspaceId);
     }
 
     case STAGE_TOOL_WINDOW_TITLE_CLICKED: {

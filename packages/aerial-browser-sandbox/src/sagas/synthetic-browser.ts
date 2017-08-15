@@ -50,6 +50,8 @@ import {
   diffArray,
   eachArrayValueMutation,
   watch,
+  REMOVED,
+  Removed,
   request,
   takeRequest, 
   Mutation,
@@ -64,6 +66,7 @@ import {
   SyntheticParentNode,
   SyntheticHTMLElement,
   SyntheticTextNode,
+  isSyntheticNodeType,
   SyntheticComment,
   SyntheticDocument,
   SyntheticWindow,
@@ -90,6 +93,7 @@ import {
   SyntheticWindowRendererEvent,
   openSyntheticEnvironmentWindow,
   createSyntheticDOMRendererFactory,
+  createParentNodeRemoveChildMutation,
 } from "../environment";
 
 export function* syntheticBrowserSaga() {
@@ -310,26 +314,28 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     }
   }); 
 
+  // TODO: deprecated. changes must be explicit in the editor instead of doing diff / patch work
+  // since we may end up editing the wrong node otherwise (CC).
   yield fork(function*() {
     while(true) {
       (yield take(action => action.type === SYNTHETIC_WINDOW_PERSIST_CHANGES && (action as SyntheticWindowPersistChangesRequest).syntheticWindowId === syntheticWindowId));
       const diffs = yield call(getCurrentSyntheticWindowDiffs, cwindow, true);
-      console.log(diffs);
       yield yield request(createApplyFileMutationsRequest(diffs));
     }
   });
 
-  // yield fork(function*() {
+  yield fork(function*() {
+    while(true) {
+      const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType)));
+      const target = cenv.childObjects.get(itemId) as Node;
+      const parent = target.parentNode;
+      const removeMutation = createParentNodeRemoveChildMutation(parent, target);
 
-  //   yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(window: SyntheticWindow) {
-  //     if (cenv.document.readyState !== "complete") {
-  //       return true;
-  //     }
-  //     const diffs = diffDocument(cenv.document.struct, window.document);
-  //     yield yield request(createApplyFileMutationsRequest(diffs));
-  //     return true;
-  //   });
-  // });
+      // remove immediately so that it's reflected in the canvas
+      parent.removeChild(target);
+      yield yield request(createApplyFileMutationsRequest([removeMutation]));
+    }
+  })
 }
 
 const mapSEnvAttribute = ({name, value}: Attr) => ({

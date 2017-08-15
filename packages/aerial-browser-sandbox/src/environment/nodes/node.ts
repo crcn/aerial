@@ -12,9 +12,11 @@ import {
   Mutation, 
   SetValueMutation,
   generateDefaultId, 
+  SetPropertyMutation,
   ExpressionLocation, 
   createSetValueMutation, 
   createPropertyMutation,
+  expressionLocationEquals,
 } from "aerial-common2";
 import { SyntheticNode, SyntheticValueNode, BasicValueNode, BasicNode } from "../../state";
 
@@ -27,6 +29,7 @@ export interface SEnvNodeInterface extends Node {
   interactiveLoaded: Promise<any>;
   connectedToDocument: boolean;
   $$parentNode: Node;
+  setSource(source: ExpressionLocation): any;
   $$parentElement: HTMLElement;
   $$addedToDocument();
   $$removedFromDocument();
@@ -136,6 +139,11 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
         this.updateStruct();
       }
       return this._struct;
+    }
+
+    setSource(source: ExpressionLocation) {
+      this.source = source;
+      this.dispatchMutatonEvent(createSyntheticSourceChangeMutation(this, source));
     }
 
     protected updateStruct() {
@@ -270,6 +278,12 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       }
       return true;
     }
+
+    dispatchMutatonEvent(mutation: Mutation<any>) {
+      const e = new SEnvMutationEvent();
+      e.initMutationEvent(mutation);
+      this.dispatchEvent(e);
+    }
   }
 });
 
@@ -296,12 +310,27 @@ export const getSEnvValueNode = weakMemo((context) => {
 
     set nodeValue(value: string) {
       this._nodeValue = value;
-      const e = new SEnvMutationEvent();
-      e.initMutationEvent(createPropertyMutation(UPDATE_VALUE_NODE, this, "nodeValue", value, undefined));
-      this.dispatchEvent(e);
+      this.dispatchMutatonEvent(createPropertyMutation(UPDATE_VALUE_NODE, this, "nodeValue", value, undefined));
     }
   }
 });
+
+export const SET_SYNTHETIC_SOURCE_CHANGE = "SET_SYNTHETIC_SOURCE_CHANGE";
+export const createSyntheticSourceChangeMutation = (target: any, value: ExpressionLocation) => createPropertyMutation(SET_SYNTHETIC_SOURCE_CHANGE, target, "source", value);
+
+export const diffNode = (oldNode: Partial<SyntheticNode>, newNode: Partial<SyntheticNode>) => {
+  const mutations = [];
+  if (!expressionLocationEquals(oldNode.source, newNode.source)) {
+    mutations.push(createSyntheticSourceChangeMutation(oldNode, newNode.source));
+  }
+  return mutations;
+};
+
+export const patchNode = (oldNode: Partial<SEnvNodeInterface>, mutation: Mutation<any>) => {
+  if (mutation.$$type === SET_SYNTHETIC_SOURCE_CHANGE && oldNode.setSource) {
+    oldNode.setSource(JSON.parse(JSON.stringify((mutation as SetPropertyMutation<any>).newValue)) as ExpressionLocation);
+  }
+};
 
 export const UPDATE_VALUE_NODE = "UPDATE_VALUE_NODE";
 
@@ -314,11 +343,13 @@ export const diffValueNode = (oldNode: BasicValueNode, newNode: BasicValueNode) 
   if(oldNode.nodeValue !== newNode.nodeValue) {
     mutations.push(createUpdateValueNodeMutation(oldNode, newNode.nodeValue));
   }
-  return mutations;
+  return [...mutations, ...diffNode(oldNode, newNode)];
 };
 
 export const patchValueNode = (oldNode: BasicValueNode, mutation: Mutation<any>) => {
   if (mutation.$$type === UPDATE_VALUE_NODE) {
     oldNode.nodeValue = (mutation as SetValueMutation<any>).newValue;
+  } else {
+    patchNode(oldNode, mutation);
   }
 };

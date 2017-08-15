@@ -20,6 +20,7 @@ export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
 export const STAGE_TOOL_WINDOW_BACKGROUND_CLICKED = "STAGE_TOOL_WINDOW_BACKGROUND_CLICKED";
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_MOVED = "STAGE_TOOL_OVERLAY_MOUSE_MOVED";
+export const WORKSPACE_DELETION_SELECTED = "WORKSPACE_DELETION_SELECTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_CLICKED";
 export const STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED";
 export const SELECTOR_DOUBLE_CLICKED = "SELECTOR_DOUBLE_CLICKED";
@@ -134,6 +135,10 @@ export type SelectorDoubleClicked = {
   itemId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
+export type WorkspaceSelectionDeleted = {
+  workspaceId: string;
+} & BaseEvent;
+
 export type DeleteShortcutPressed = ShortcutEvent;
 
 export type textEditorChanged = {
@@ -202,6 +207,11 @@ export const windowPaneRowClicked = (windowId: string, sourceEvent: React.MouseE
   windowId,
   sourceEvent,
   type: WINDOW_PANE_ROW_CLICKED
+});
+
+export const workspaceSelectionDeleted = (workspaceId: string): WorkspaceSelectionDeleted => ({
+  workspaceId,
+  type: WORKSPACE_DELETION_SELECTED
 });
 
 export const promptedNewWindowUrl = (workspaceId: string, location: string): PromptedNewWindowUrl => ({

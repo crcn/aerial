@@ -25,6 +25,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
 
   protected _onDocumentLoad(event: Event) {
     super._onDocumentLoad(event);
+    console.log("DOC LOAD");
     const css = Array.prototype.map.call(this.sourceWindow.document.stylesheets, (ss: CSSStyleSheet) => (
       ss.cssText
     )).join("\n");
@@ -32,7 +33,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     const html = this.sourceWindow.document.body.innerHTML;
 
     this.mount.innerHTML = `<style>${css}</style><span></span>`;
-    this._nodeMap = mapNode(this.sourceWindow.document.body as any as SEnvElementInterface, this.targetDocument);
+    this._nodeMap = mapNode(this.sourceWindow.document.documentElement as any as SEnvElementInterface, this.targetDocument);
     this.mount.querySelector("span").appendChild(this._nodeMap.get((this.sourceWindow.document.body as any as SEnvNodeInterface).uid));
 
     this._resetClientRects();
