@@ -1,4 +1,5 @@
 import { 
+  Box,
   Moved, 
   MOVED, 
   Mutation,
@@ -32,6 +33,7 @@ import {
   SyntheticNode,
   SyntheticWindow,
   SYNTHETIC_WINDOW,
+  DEFAULT_SYNTHETIC_WINDOW_BOX,
   getSyntheticWindow,
   createSyntheticBrowser, 
   createSyntheticBrowserStore, 
@@ -42,6 +44,20 @@ import {
   getSyntheticBrowser, 
   createSyntheticWindow 
 } from "../state";
+
+const WINDOW_PADDING = 50;
+
+const getBestWindowBox = (browser: SyntheticBrowser, box: Box) => {
+  if (!browser.windows.length) return box;
+  const rightMostWindow = browser.windows.length > 1 ? browser.windows.reduce((a, b) => {
+    return a.box.right > b.box.right ? a : b;
+  }) : browser.windows[0];
+
+  return moveBox(box, {
+    left: rightMostWindow.box.right + WINDOW_PADDING,
+    top: rightMostWindow.box.top
+  });
+};
 
 
 export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(), event: BaseEvent) => {
@@ -56,10 +72,12 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
       } else {
         syntheticBrowser = getSyntheticBrowser(root, syntheticBrowserId);
       }
+      
       return updateStructProperty(root, syntheticBrowser, "windows", [
         ...syntheticBrowser.windows,
         createSyntheticWindow({
-          location: uri
+          location: uri,
+          box: getBestWindowBox(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
         })
       ]);
     }

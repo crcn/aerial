@@ -58,5 +58,4 @@ function* handleAltClickElement() {
 function* openNewWindow(href: string, origin: SyntheticWindow, workspace: Workspace) {
   const uri = getUri(href, origin.location);
   yield put(createOpenSyntheticWindowRequest(uri, workspace.browser.$$id));
-  console.log(uri);
 }

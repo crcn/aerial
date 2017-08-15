@@ -156,7 +156,7 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
-const MIN_ZOOM = 0.2;
+const MIN_ZOOM = 0.02;
 const MAX_ZOOM = 6400 / 100;
 
 

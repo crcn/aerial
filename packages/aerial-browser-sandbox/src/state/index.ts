@@ -28,7 +28,7 @@ export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
 export const SYNTHETIC_COMMENT = "SYNTHETIC_COMMENT";
 
 
-const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
+export const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   left: 0,
   top: 0,
 
