@@ -89,14 +89,15 @@ export function updateIn(target: any, path: string[], value: any) {
 };
 
 export const flattenObject = weakMemo((target: any) => {
-  const keys = new Map();
   const flattened = {};
-  traverseObject(target, (value, key, object) => {
-    const prefix = keys.get(object) || "";
-    const path   = prefix ? `${prefix}.${key}` : key;
-    flattened[path] = value;
-    keys.set(value, path);
-  });
+  if (Array.isArray(target) || (target && (target.constructor === Object || target.constructor === ImmutableObject))) {
+    each(target, (value, key) => {
+      flattened[key] = value;
+      each(flattenObject(value), (obj, path) => {
+        flattened[`${key}.${path}`] = obj;
+      }); 
+    });
+  };
   return flattened;
 });
 

@@ -56,6 +56,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   protected _onWindowMutation({ mutation }: SEnvMutationEventInterface) {
+    console.log("APPLY DOM MUTATIONS", mutation);
     const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.uid), this._sourceWindow.document), this.mount.lastElementChild);
 
     if (mutation.$$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
@@ -111,6 +112,9 @@ const mapNode = (a: SEnvNodeInterface, document: Document) => {
       const el = a as SEnvElementInterface;
       const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || el.nodeName) as HTMLElement;
       bel.dataset.sourceUID = a.uid;
+      if (el.nodeName.toLowerCase() === "script") {
+        bel.style.display = "none";
+      }
       for (let i = 0, n = el.attributes.length; i < n; i++) {
         bel.setAttribute(el.attributes[i].name, el.attributes[i].value);
       }

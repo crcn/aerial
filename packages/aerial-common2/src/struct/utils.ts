@@ -13,6 +13,8 @@ import {
   weakMemo
 } from "../memo";
 
+import { each } from "lodash";
+
 import {
   omit
 } from "lodash";
@@ -54,7 +56,9 @@ export const idd = <VInst>(factory: (...args) => VInst, generateId: (...args) =>
 /**
  */
 
-export const getPathById = weakMemo((root: any, id: string) => getPath(root, (value: IDd) => value && value.$$id === id));
+const pathIdFilter = weakMemo(id => (value: IDd) => value && value.$$id === id);
+
+export const getPathById = weakMemo((root: any, id: string) => getPath(root, pathIdFilter(id)));
 
 /**
  */
