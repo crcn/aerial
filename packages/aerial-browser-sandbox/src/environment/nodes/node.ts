@@ -20,6 +20,7 @@ import { SyntheticNode, SyntheticValueNode } from "../../state";
 
 export interface SEnvNodeInterface extends Node {
   uid: string;
+  $$id: string;
   structType: string;
   source: ExpressionLocation;
   contentLoaded: Promise<any>;
@@ -101,7 +102,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     $$preconstruct() {
       super.$$preconstruct();
-      this.uid = generateDefaultId();
+      this.uid = this.$$id = generateDefaultId();
       this.childNodes = this.childNodesArray = new SEnvNodeList();
     }
 
@@ -159,7 +160,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     cloneNode(deep?: boolean): Node {
       const clone = this.cloneShallow();
       clone.source = this.source;
-      clone.uid    = this.uid;
+      clone.uid    = clone.$$id = this.uid;
 
       if (deep !== false) {
         for (let i = 0, n = this.childNodes.length; i < n; i++) {

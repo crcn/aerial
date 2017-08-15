@@ -310,27 +310,26 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     }
   }); 
 
-  yield fork(function*() {
-    while(true) {
-      (yield take(action => action.type === SYNTHETIC_WINDOW_PERSIST_CHANGES && (action as SyntheticWindowPersistChangesRequest).syntheticWindowId === syntheticWindowId));
-      const diffs = yield call(getCurrentSyntheticWindowDiffs, cwindow, true);
-      console.log(diffs);
-      yield yield request(createApplyFileMutationsRequest(diffs));
-    }
-  });
-
-  // watch for changes in the struct
   // yield fork(function*() {
-
-  //   yield watch((root) => getSyntheticWindow(root, syntheticWindowId), (window: SyntheticWindow) => {
-  //     if (cenv.document.readyState !== "complete") {
-  //       return true;
-  //     }
-  //     const diffs = diffDocument(cenv.document as any as SyntheticDocument, window.document);
-  //     patchWindow(cenv, diffs);
-  //     return true;
-  //   });
+  //   while(true) {
+  //     (yield take(action => action.type === SYNTHETIC_WINDOW_PERSIST_CHANGES && (action as SyntheticWindowPersistChangesRequest).syntheticWindowId === syntheticWindowId));
+  //     const diffs = yield call(getCurrentSyntheticWindowDiffs, cwindow, true);
+  //     console.log(diffs);
+      // yield yield request(createApplyFileMutationsRequest(diffs));
+  //   }
   // });
+
+  yield fork(function*() {
+
+    yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(window: SyntheticWindow) {
+      if (cenv.document.readyState !== "complete") {
+        return true;
+      }
+      const diffs = diffDocument(cenv.document.struct, window.document);
+      yield yield request(createApplyFileMutationsRequest(diffs));
+      return true;
+    });
+  });
 }
 
 const mapSEnvAttribute = ({name, value}: Attr) => ({

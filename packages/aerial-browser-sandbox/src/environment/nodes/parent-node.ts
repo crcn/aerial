@@ -197,8 +197,15 @@ export const diffParentNode = (oldNode: SyntheticParentNode, newNode: SyntheticP
   const mutations = [];
 
   const diff = diffArray(Array.from(oldNode.childNodes), Array.from(newNode.childNodes), (oldNode, newNode) => {
+
+    // immutable structs
+    if (oldNode.constructor === Object) {
+      return oldNode.$$id === newNode.$$id ? 0 : -1;
+    }
+    
+    if (oldNode.$$id === newNode.$$id) return 0;
     if (oldNode.nodeName !== newNode.nodeName || oldNode.namespaceURI !== newNode.namespaceURI) return -1;
-    return 0;
+    return 1;
   });
   
   eachArrayValueMutation(diff, {
