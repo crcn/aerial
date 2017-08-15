@@ -6,6 +6,7 @@ import path = require("path");
 import { getSEnvCSSStyleSheetClass } from "../css";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvElementClass, SEnvElementInterface } from "./element";
+import { getUri } from "../utils";
 
 export interface SEnvHTMLElementInterface extends HTMLElement, SEnvElementInterface {
   $$preconstruct();
@@ -225,7 +226,7 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
     private async _loadStylesheet() {
       const { href } = this;
       const window = this.ownerDocument.defaultView;
-      const uri = getUri(href, window.location);
+      const uri = getUri(href, String(window.location));
       const response = await window.fetch(uri);
       const text = await response.text();
       this._parseStylesheet(text);
@@ -240,7 +241,7 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
       const location = this.ownerDocument.defaultView.location;
       sheet.cssText = text.replace(/url\(.*?\)/g, (url) => {
         const url2 = url.replace(/(^url\(["']?)/g, "").replace(/(['"]?\)$)/, "");
-        return `url(${getUri(url2, location)})`;
+        return `url(${getUri(url2, String(location))})`;
       });
     }
   };
@@ -285,7 +286,7 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
             this._rejectContentLoaded = reject;
           });
 
-          const response = await window.fetch(getUri(src, window.location));
+          const response = await window.fetch(getUri(src, String(window.location)));
           const text = await response.text();
 
           this._scriptSource = text;
@@ -318,14 +319,6 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
     }
 }); 
 
-const joinPath = (...parts: string[]) => parts.reduce((a, b) => {
-  return a + (b.charAt(0) === "/" || a.charAt(a.length - 1) === "/" ? b : "/" + b);
-});
-
-const getUri = (href: string, location: Location) => {
-  const relativeDir = /.\w+$/.test(location.pathname) ? path.dirname(location.pathname) : location.pathname;
-  return hasURIProtocol(href) ? href : /^\/\//.test(href) ? location.protocol + href : href.charAt(0) === "/" ? joinPath(location.origin, href) : joinPath(location.origin, relativeDir, href);
-};
 
 export const getSEnvHTMLElementClasses = weakMemo((context: any) => {
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);

@@ -1,37 +1,43 @@
 import {
+  Box,
   Struct,
   Boxed,
   Action,
+  zoomBox,
   TreeNode,
   weakMemo,
   Translate,
+  mergeBoxes,
   getPathById,
   filterBoxed,
   getValueById,
-  mergeBoxes,
   updateStruct,
+  getSmallestBox,
   ImmutableArray, 
   getValueByPath,
-  findParentObject,
   ImmutableObject,
+  findParentObject,
+  ExpressionPosition,
+  pointIntersectsBox,
   createStructFactory,
   BaseApplicationState,
   updateStructProperty,
-  createImmutableObject,
   createImmutableArray,
-  ExpressionPosition,
+  createImmutableObject,
   ImmutableArrayIdentity,
   ImmutableObjectIdentity,
   createImmutableStructFactory,
 } from "aerial-common2";
 import { createFileCache, FileCache, FileCacheItem } from "aerial-sandbox2";
 
+import { StageToolOverlayMouseMoved, StageToolOverlayClicked } from "../actions";
 import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortcuts";
 import { toggleLeftGutterPressed, toggleRightGutterPressed, deleteShortcutPressed } from "front-end/actions";
 
 import {
   SyntheticBrowser,
   getSyntheticNodeById,
+  getSyntheticWindow,
 } from "aerial-browser-sandbox";
 
 import {
@@ -172,3 +178,31 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
 });
 
 export * from "./shortcuts";
+
+
+export const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: StageToolOverlayMouseMoved|StageToolOverlayClicked) => {
+  const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
+  const window = getSyntheticWindow(state, windowId);
+  const workspace = getSyntheticWindowWorkspace(state, windowId);
+  const zoom = workspace.visualEditorSettings.translate.zoom;
+
+  // TODO - move to reducer
+  const target = sourceEvent.nativeEvent.target as Element;
+  const rect = target.getBoundingClientRect();
+  const mouseX = sourceEvent.pageX - rect.left;
+  const mouseY = sourceEvent.pageY - rect.top;
+
+  const computedBoxs = window.computedBoxes;
+  const intersectingBoxes: Box[] = [];
+  const intersectingBoxMap = new Map<Box, string>();
+  for (const uid in computedBoxs) {
+    const box = computedBoxs[uid];
+    if (pointIntersectsBox({ left: mouseX, top: mouseY }, zoomBox(box, zoom))) {
+      intersectingBoxes.push(box);
+      intersectingBoxMap.set(box, uid);
+    }
+  }
+  const smallestBox = getSmallestBox(...intersectingBoxes);
+  const uid = intersectingBoxMap.get(smallestBox);
+  return uid;
+}

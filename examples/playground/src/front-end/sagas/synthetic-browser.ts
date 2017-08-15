@@ -14,7 +14,6 @@ function* handleTextEditChanges() {
     const state = yield select();
     const window = getSyntheticNodeWindow(state, nodeId);
     const text = String(sourceEvent.target.value || "").trim();
-    console.log(JSON.stringify(text));
     const workspace = getSyntheticNodeWorkspace(state, nodeId);
     yield put(createSyntheticNodeTextContentChanged(window.$$id, nodeId, text));
   }

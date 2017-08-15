@@ -1,7 +1,7 @@
 import "./edit-text.scss";
 import * as React from "react";
 import { Workspace } from "front-end/state";
-import { compose, pure } from "recompose";
+import { compose, pure, lifecycle } from "recompose";
 import { Dispatcher, getBoxSize ,wrapEventToDispatch } from "aerial-common2";
 import { stageToolEditTextChanged, stageToolEditTextBlur } from "front-end/actions";
 import { 

@@ -2,6 +2,7 @@ very simple online playground for visually creating web applications
 
 HI PRIO:
 
+- [ ] fit new window in new location
 - [ ] delete elements
 - [ ] D&D elements around the page
 - [ ] CSS inspector
@@ -14,7 +15,6 @@ LOW PRIO:
 
 Immediate TODOS:
 
-- [ ] File navigator specific to selected window
 - [ ] proxy remote requests to local server
 - [ ] CSS structs
 - [ ] Welcome - enter URL to start

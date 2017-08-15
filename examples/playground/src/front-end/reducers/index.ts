@@ -49,6 +49,7 @@ import {
   getSyntheticNodeWorkspace,
   getBoxedWorkspaceSelection,
   getSyntheticWindowWorkspace,
+  getStageToolMouseNodeTargetUID,
 } from "front-end/state";
 
 import {
@@ -245,12 +246,12 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
+      const altKey = sourceEvent.altKey;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       const targetUID = getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked);
       if (metaKey) {
         const { source: { uri, start } } = getValueById(state, targetUID) as SyntheticNode;
         const fileCacheItem = getFileCacheItemByUri(state.fileCache, uri);
-        console.log(uri, start);
         if (fileCacheItem) {
           return updateStruct(state, workspace, {
             textCursorPosition: start,
@@ -362,31 +363,4 @@ const shortcutServiceReducer = <T extends ShortcutServiceState>(state: Applicati
     }
   }
   return state;
-}
-
-const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: StageToolOverlayMouseMoved|StageToolOverlayClicked) => {
-  const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
-  const window = getSyntheticWindow(state, windowId);
-  const workspace = getSyntheticWindowWorkspace(state, windowId);
-  const zoom = workspace.visualEditorSettings.translate.zoom;
-
-  // TODO - move to reducer
-  const target = sourceEvent.nativeEvent.target as Element;
-  const rect = target.getBoundingClientRect();
-  const mouseX = sourceEvent.pageX - rect.left;
-  const mouseY = sourceEvent.pageY - rect.top;
-
-  const computedBoxs = window.computedBoxes;
-  const intersectingBoxes: Box[] = [];
-  const intersectingBoxMap = new Map<Box, string>();
-  for (const uid in computedBoxs) {
-    const box = computedBoxs[uid];
-    if (pointIntersectsBox({ left: mouseX, top: mouseY }, zoomBox(box, zoom))) {
-      intersectingBoxes.push(box);
-      intersectingBoxMap.set(box, uid);
-    }
-  }
-  const smallestBox = getSmallestBox(...intersectingBoxes);
-  const uid = intersectingBoxMap.get(smallestBox);
-  return uid;
 }
