@@ -4,6 +4,7 @@ import { Dispatcher, weakMemo, Mutation, generateDefaultId } from "aerial-common
 import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "./events";
 import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
 import { 
+  SEnvElementInterface,
   getSEnvHTMLElementClasses, 
   getSEnvDocumentClass, 
   getSEnvElementClass, 
@@ -295,8 +296,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     focus(): void {
 
     }
-    getComputedStyle(elt: Element, pseudoElt?: string): CSSStyleDeclaration {
-      return null;
+    getComputedStyle(elt: SEnvElementInterface, pseudoElt?: string): CSSStyleDeclaration {
+      return this.renderer.getComputedStyle(elt);
     }
 
     getMatchedCSSRules(elt: Element, pseudoElt?: string): CSSRuleList {

@@ -37,7 +37,7 @@ class ElementClassList extends ArrayCollection<string> {
 
 // http://www.w3schools.com/jsref/dom_obj_event.asp
 // TODO - proxy dataset
-export class SyntheticHTMLElement extends VisibleSyntheticDOMElement<SyntheticCSSStyle> {
+export class SyntheticElement extends VisibleSyntheticDOMElement<SyntheticCSSStyle> {
 
   private _style: SyntheticCSSStyle;
   private _styleProxy: SyntheticCSSStyle;

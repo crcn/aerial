@@ -93,7 +93,7 @@ export const createMutateSourceContentRequest = (content: string, contentType: s
   type: EDIT_SOURCE_CONTENT,
 });
 
-export const createApplyFileMutationsRequest = (mutations: Mutation<any>[]): ApplyFileMutationsRequest => ({
+export const createApplyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutationsRequest => ({
   mutations,
   $$id: generateDefaultId(),
   type: APPLY_FILE_MUTATIONS,

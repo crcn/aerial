@@ -2,7 +2,7 @@ import "./resizer.scss";
 import React =  require("react");
 import { pure, compose, withHandlers } from "recompose";
 import { Workspace, getBoxedWorkspaceSelection, getWorkspaceSelectionBox } from "front-end/state";
-import { resizerMoved } from "front-end/actions";
+import { resizerMoved, resizerStoppedMoving } from "front-end/actions";
 import { startDOMDrag, Dispatcher, mergeBoxes, moveBox } from "aerial-common2";
 import { PathComponent } from "./path";
 
@@ -78,6 +78,8 @@ const enhanceResizerComponent = compose<ResizerComponentInnerProps, ResizerCompo
           left: box.left + delta.x / translate.zoom,
           top: box.top + delta.y / translate.zoom,
         }));
+      }, () => {
+        dispatch(resizerStoppedMoving(workspace.$$id, null));
       });
     }
   })

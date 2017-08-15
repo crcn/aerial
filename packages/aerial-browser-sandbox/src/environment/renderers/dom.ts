@@ -25,7 +25,6 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
 
   protected _onDocumentLoad(event: Event) {
     super._onDocumentLoad(event);
-    console.log("DOC LOAD");
     const css = Array.prototype.map.call(this.sourceWindow.document.stylesheets, (ss: CSSStyleSheet) => (
       ss.cssText
     )).join("\n");

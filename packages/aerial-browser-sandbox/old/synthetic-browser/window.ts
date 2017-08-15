@@ -8,7 +8,7 @@ import nwmatcher = require("nwmatcher");
 import { Blob, FakeBlob } from "./blob";
 import { SyntheticHistory } from "./history";
 import { SyntheticDocument } from "./document";
-import { SyntheticHTMLElement } from "./html";
+import { SyntheticElement } from "./html";
 import { SyntheticLocalStorage } from "./local-storage";
 import { SyntheticWindowTimers } from "./timers";
 import { bindDOMNodeEventMethods } from "./utils";
@@ -64,7 +64,7 @@ export class SyntheticDOMImplementation {
 
   createHTMLDocument(title?: string) {
     const document = new SyntheticDocument(HTML_XMLNS, this);
-    document.registerElementNS(HTML_XMLNS, "default", SyntheticHTMLElement);
+    document.registerElementNS(HTML_XMLNS, "default", SyntheticElement);
     const documentElement = document.createElement("html");
 
     // head
@@ -157,7 +157,7 @@ export class SyntheticWindow extends Observable implements SyntheticWindowInterf
     
     // in case proto gets set - don't want the original to get fudged
     // but doesn't work -- element instanceof HTMLElement 
-    this.HTMLElement = SyntheticHTMLElement;
+    this.HTMLElement = SyntheticElement;
     this.Element     = SyntheticDOMElement;
 
     const xhrServer = this._server = new XHRServer(this);
@@ -222,7 +222,7 @@ export class SyntheticWindow extends Observable implements SyntheticWindowInterf
     return null;
   }
 
-  getComputedStyle(element: SyntheticHTMLElement) {
+  getComputedStyle(element: SyntheticElement) {
     const style = new SyntheticCSSStyle();
     if (element.nodeType !== DOMNodeType.ELEMENT) return style;
     const copy = (from: SyntheticCSSStyle) => {

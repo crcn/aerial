@@ -56,7 +56,8 @@ export const EditTextToolComponentBase = ({ workspace, dispatch, setTextarea }: 
     letterSpacing: computedStyle.letterSpacing,
     textAlign: computedStyle.textAlign,
     padding: computedStyle.padding,
-    background: "white"
+    background: "white",
+    border: "none",
     // webkitTextFillColor: `transparent`
   };
 

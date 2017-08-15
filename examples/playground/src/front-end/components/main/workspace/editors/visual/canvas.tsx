@@ -10,7 +10,6 @@ import {
   SyntheticBrowser,
   SyntheticWindow, 
   SyntheticTextNode,
-  SyntheticHTMLElement,
 } from "aerial-browser-sandbox";
 import { IsolateComponent } from "front-end/components/isolated";
 

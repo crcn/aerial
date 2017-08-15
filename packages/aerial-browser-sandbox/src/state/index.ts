@@ -1,7 +1,9 @@
 import { 
   Box, 
+  Boxed,
   Struct, 
   weakMemo, 
+  shiftBox,
   updateStruct, 
   getPathById,
   getValueById, 
@@ -94,7 +96,7 @@ export type SyntheticDocument = {
 export type SyntheticAttribute = {
 } & BasicAttribute & SyntheticNode;
 
-export type SyntheticHTMLElement = {
+export type SyntheticElement = {
   attributes: SyntheticAttribute[];
 } & BasicElement & SyntheticParentNode;
 
@@ -160,11 +162,19 @@ export const addNewSyntheticBrowser = (root: any) => {
   };
 }
 
+export const getSyntheticBrowserBox = weakMemo((root: any, item: Partial<Struct & Boxed>) => {
+  if (!item) return null;
+  if (item.box) return item.box;
+  const window = getSyntheticNodeWindow(root, item.$$id);
+  return window && shiftBox(window.computedBoxes[item.$$id], window.box);
+});
+
+
 export const createSyntheticDocument = createStructFactory<SyntheticDocument>(SYNTHETIC_DOCUMENT, {
   nodeName: "#document",
   nodeType: SEnvNodeTypes.DOCUMENT
 });
-export const createSyntheticElement  = createStructFactory<SyntheticHTMLElement>(SYNTHETIC_ELEMENT, {
+export const createSyntheticElement  = createStructFactory<SyntheticElement>(SYNTHETIC_ELEMENT, {
   nodeType: SEnvNodeTypes.ELEMENT
 });
 export const createSyntheticTextNode = createStructFactory<SyntheticTextNode>(SYNTHETIC_TEXT_NODE, {
@@ -218,3 +228,11 @@ export const getAllSyntheticDOMNodesAsIdMap = weakMemo((root: any): { [identifie
   }
   return map;
 });
+
+export const isSyntheticBrowserItemMovable = (root: any, item: Struct) => {
+  if (item.$$type === SYNTHETIC_WINDOW) return true;
+  if (isSyntheticNodeType(item.$$type) && (item as SyntheticNode).nodeType === SEnvNodeTypes.ELEMENT) {
+    const element = item as SyntheticElement;
+  }
+  return false;
+}

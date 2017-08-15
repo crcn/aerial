@@ -1,5 +1,5 @@
 import { IPoint } from "aerial-common";
-import { SyntheticHTMLElement } from "../element";
+import { SyntheticElement } from "../element";
 
 /**
  * Localizes a fixed point according to the relative element. In other words, convert the fixed point into one
@@ -8,7 +8,7 @@ import { SyntheticHTMLElement } from "../element";
  * TODO - need to consider right / bottom constraints
  */
 
-export const localizeFixedPosition = (point: IPoint, element: SyntheticHTMLElement) => {
+export const localizeFixedPosition = (point: IPoint, element: SyntheticElement) => {
 
   // get the initial position (0, 0) of the element -- this is according to the position style - absolute, relative, or fixed
   const initialPosition = getInitialFixedPosition(element);
@@ -24,7 +24,7 @@ export const localizeFixedPosition = (point: IPoint, element: SyntheticHTMLEleme
   return localizedPosition;
 }
 
-export const convertComputedStylePositionToPixels = (element: SyntheticHTMLElement) => {
+export const convertComputedStylePositionToPixels = (element: SyntheticElement) => {
 
   // for now do nothing
   const computedStyle = element.getComputedStyle();
@@ -37,9 +37,9 @@ export const convertComputedStylePositionToPixels = (element: SyntheticHTMLEleme
   }
 }
 
-const getInitialFixedPosition = (element: SyntheticHTMLElement): IPoint => {
+const getInitialFixedPosition = (element: SyntheticElement): IPoint => {
 
-  const parentElement = element.parentElement as SyntheticHTMLElement;
+  const parentElement = element.parentElement as SyntheticElement;
   const parentRect   = parentElement.getBoundingClientRect();
   const targetRect   = element.getBoundingClientRect();
   const targetStyle  = element.getComputedStyle();
@@ -59,7 +59,7 @@ const getInitialFixedPosition = (element: SyntheticHTMLElement): IPoint => {
   }
 }
 
-const convertMeasurementToPixels = (measurement: string, element: SyntheticHTMLElement) => {
+const convertMeasurementToPixels = (measurement: string, element: SyntheticElement) => {
   const [match, length, unit] = measurement.match(/([-\d\.]+)(\w+)?/);
   return Number(length);
 }

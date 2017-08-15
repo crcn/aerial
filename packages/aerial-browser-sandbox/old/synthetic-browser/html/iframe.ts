@@ -1,8 +1,8 @@
 import { SyntheticWindow } from "../window";
-import { SyntheticHTMLElement } from "./element";
+import { SyntheticElement } from "./element";
 
 
-export class SyntheticHTMLIframeElement extends SyntheticHTMLElement  {
+export class SyntheticHTMLIframeElement extends SyntheticElement  {
   private _contentWindow: SyntheticWindow;
   createdCallback() {
     super.createdCallback();

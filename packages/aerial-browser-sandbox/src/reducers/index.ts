@@ -33,6 +33,7 @@ import {
   SyntheticNode,
   SyntheticWindow,
   SYNTHETIC_WINDOW,
+  isSyntheticNodeType,
   DEFAULT_SYNTHETIC_WINDOW_BOX,
   getSyntheticWindow,
   createSyntheticBrowser, 
@@ -110,6 +111,7 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
         }
         break;
       }
+      break;
     }
 
     case REMOVED: {

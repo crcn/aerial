@@ -1,5 +1,6 @@
 import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "../events";
 import { SEnvWindowInterface } from "../window";
+import { SEnvElementInterface } from "../nodes/element";
 
 const EventTarget = getSEnvEventTargetClass();
 const { SEnvEvent, SEnvMutationEvent } = getSEnvEventClasses();
@@ -7,8 +8,8 @@ const { SEnvEvent, SEnvMutationEvent } = getSEnvEventClasses();
 export interface SyntheticWindowRenderer extends EventTarget {
   mount: HTMLElement;
   sourceWindow: Window;
-  getBoundingClientRect(element: HTMLElement): ClientRect;
-  getComputedStyle(element: HTMLElement, pseudoElement?: HTMLElement): CSSStyleDeclaration;
+  getBoundingClientRect(element: SEnvElementInterface): ClientRect;
+  getComputedStyle(element: SEnvElementInterface, pseudoElement?: SEnvElementInterface): CSSStyleDeclaration;
 }
 
 export type SyntheticDOMRendererFactory = (window: Window) => SyntheticWindowRenderer;
@@ -55,12 +56,12 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
     return this._sourceWindow;
   }
 
-  getBoundingClientRect(element: HTMLElement): ClientRect {
-    return null;
+  getBoundingClientRect(element: SEnvElementInterface): ClientRect {
+    return this._rects && this._rects[element.uid];
   }
 
-  getComputedStyle(element: HTMLElement, pseudoElement?: HTMLElement): CSSStyleDeclaration {
-    return null;
+  getComputedStyle(element: SEnvElementInterface, pseudoElement?: SEnvElementInterface): CSSStyleDeclaration {
+    return this._styles && this._styles[element.uid];
   }
 
   protected _removeTargetListeners() {

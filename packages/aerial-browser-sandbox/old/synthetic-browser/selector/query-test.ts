@@ -3,7 +3,7 @@ import { expect } from "chai";
 //   evaluateMarkup,
 //   SyntheticWindow,
 //   SyntheticDocument,
-//   SyntheticHTMLElement,
+//   SyntheticElement,
 // } from "@tandem/synthetic-browser";
 import parse5 = require("parse5");
 
@@ -67,8 +67,8 @@ describe(__filename + "#", () => {
     xit(`selector ${selector} for ${a} equals ${b}`, () => {
       // const { document } = new SyntheticWindow();
       
-      // document.registerElement("div", SyntheticHTMLElement);
-      // document.registerElement("span", SyntheticHTMLElement);
+      // document.registerElement("div", SyntheticElement);
+      // document.registerElement("span", SyntheticElement);
       // document.removeAllChildren();
       // document.appendChild(evaluateMarkup(parse5.parseFragment(a, { locationInfo: true }) as any, document));
       // const nodes = document.querySelectorAll(selector);

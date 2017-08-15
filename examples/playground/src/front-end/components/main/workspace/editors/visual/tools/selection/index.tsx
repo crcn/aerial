@@ -3,7 +3,7 @@ import * as React from "react";
 import { compose, pure } from "recompose";
 import { ResizerComponent } from "./resizer";
 import { Dispatcher, mergeBoxes, Boxed, wrapEventToDispatch } from "aerial-common2";
-import { Workspace, getBoxedWorkspaceSelection, getFrontEndBox } from "front-end/state";
+import { Workspace, getBoxedWorkspaceSelection, getSyntheticBrowserBox } from "front-end/state";
 import { selectorDoubleClicked } from "front-end/actions";
 
 export type SelectionOuterProps = {
@@ -16,7 +16,7 @@ export type SelectionInnerProps = {
 
 const SelectionBoundsComponent = ({ workspace }: { workspace: Workspace }) => {
   const selection = getBoxedWorkspaceSelection(workspace);
-  const entireBounds = mergeBoxes(...selection.map(value => getFrontEndBox(workspace, value)));
+  const entireBounds = mergeBoxes(...selection.map(value => getSyntheticBrowserBox(workspace, value)));
   const style = {};
   const borderWidth = 1 / workspace.visualEditorSettings.translate.zoom;
   const boundsStyle = {

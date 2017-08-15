@@ -1,7 +1,7 @@
 // import Canvas = require("canvas-prebuilt");
-import { SyntheticHTMLElement } from "./element";
+import { SyntheticElement } from "./element";
 
-export class SyntheticHTMLCanvasElement extends SyntheticHTMLElement {
+export class SyntheticHTMLCanvasElement extends SyntheticElement {
   private _canvas: any; // HTMLCanvasElement
 
   createdCallback() {

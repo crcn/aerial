@@ -5,7 +5,7 @@ import {
   HTML_MIME_TYPE,
 } from "aerial-common";
 
-import { SyntheticHTMLElement } from "./element";
+import { SyntheticElement } from "./element";
 import { SyntheticCSSStyleSheet } from "../css";
 
 import path =  require("path");
@@ -13,10 +13,10 @@ import path =  require("path");
 const _cache = {};
 
 // TODO - implement imports
-export class SyntheticHTMLLinkElement extends SyntheticHTMLElement {
+export class SyntheticHTMLLinkElement extends SyntheticElement {
 
   public stylesheet: SyntheticCSSStyleSheet;
-  public import: SyntheticHTMLElement;
+  public import: SyntheticElement;
 
   private _addedToDocument: boolean;
 

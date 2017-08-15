@@ -1,8 +1,9 @@
 import {
   Box,
-  Struct,
   Boxed,
   Action,
+  Struct,
+  shiftBox,
   zoomBox,
   TreeNode,
   weakMemo,
@@ -39,6 +40,7 @@ import {
   getSyntheticNodeById,
   getSyntheticWindow,
   getSyntheticNodeWindow,
+  getSyntheticBrowserBox,
 } from "aerial-browser-sandbox";
 
 import {
@@ -146,15 +148,8 @@ export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hover
 
 export const getSyntheticNodeWorkspace = weakMemo((root: any, nodeId: string): Workspace => findParentObject(root, nodeId, parent => parent.$$type === WORKSPACE));
 
-export const getFrontEndBox = weakMemo((root: any, item: Partial<Struct & Boxed>) => {
-  if (!item) return null;
-  if (item.box) return item.box;
-  const window = getSyntheticNodeWindow(root, item.$$id);
-  return window && window.computedBoxes[item.$$id];
-});
-
-export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => workspace.selectionIds.map(id => getValueById(workspace, id)).filter(item => getFrontEndBox(workspace, item)));
-export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => getFrontEndBox(workspace, boxed))));
+export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => workspace.selectionIds.map(id => getValueById(workspace, id)).filter(item => getSyntheticBrowserBox(workspace, item)));
+export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => getSyntheticBrowserBox(workspace, boxed))));
 
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => getValueById(state, id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
@@ -185,9 +180,6 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
   fileCache: createFileCache()
 });
 
-export * from "./shortcuts";
-
-
 export const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: StageToolOverlayMouseMoved|StageToolOverlayClicked) => {
   const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
   const window = getSyntheticWindow(state, windowId);
@@ -200,11 +192,11 @@ export const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: S
   const mouseX = sourceEvent.pageX - rect.left;
   const mouseY = sourceEvent.pageY - rect.top;
 
-  const computedBoxs = window.computedBoxes;
+  const computedBoxes = window.computedBoxes;
   const intersectingBoxes: Box[] = [];
   const intersectingBoxMap = new Map<Box, string>();
-  for (const uid in computedBoxs) {
-    const box = computedBoxs[uid];
+  for (const uid in computedBoxes) {
+    const box = computedBoxes[uid];
     if (pointIntersectsBox({ left: mouseX, top: mouseY }, zoomBox(box, zoom))) {
       intersectingBoxes.push(box);
       intersectingBoxMap.set(box, uid);
@@ -214,3 +206,6 @@ export const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: S
   const uid = intersectingBoxMap.get(smallestBox);
   return uid;
 }
+
+export * from "./shortcuts";
+export * from "aerial-browser-sandbox/src/state";

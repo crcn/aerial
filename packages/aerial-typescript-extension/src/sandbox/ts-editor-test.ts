@@ -7,7 +7,7 @@
 // import { createTestSandboxProviders, ISandboxTestProviderOptions } from "aerial-sandbox/test";
 // import { Sandbox, FileCacheProvider, URIProtocolProvider, FileEditorProvider } from "aerial-sandbox";
 
-// import { SyntheticBrowser, SyntheticHTMLElement, evaluateMarkup } from "aerial-synthetic-browser";
+// import { SyntheticBrowser, SyntheticElement, evaluateMarkup } from "aerial-synthetic-browser";
 
 // // TODO - move most of this in util functions - possibly in @tandem/editor/test/utils
 // // TODO - re-use VM instead of creating a new one each time - should be much faster
@@ -64,7 +64,7 @@
 //     });
 
 //     const getElement = () => {
-//       return  browser.document.documentElement.firstChild as SyntheticHTMLElement;
+//       return  browser.document.documentElement.firstChild as SyntheticElement;
 //     }
 
 //     return {

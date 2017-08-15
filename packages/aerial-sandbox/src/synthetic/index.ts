@@ -95,7 +95,7 @@ export interface ISyntheticObject extends IWalkable {
    *
    * May be transpiled to:
    *
-   * const element = document.createElement("div"); // SyntheticHTMLElement
+   * const element = document.createElement("div"); // SyntheticElement
    * element.$source = { kind: 'functionCall' uri: './script.js', start: { line: 2, column: 1 }};
    */
 

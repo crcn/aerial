@@ -29,8 +29,10 @@ export function* fileEditorSaga() {
         const mutations = mutationsByUri[uri];
         const fileCacheItem = getFileCacheItemByUri(state, uri);
         for (const mutation of mutations) {
+          const stringMutation = (yield yield request(createMutateSourceContentRequest(fileCacheItem.content.toString(), fileCacheItem.contentType, mutation))).payload;
+
           stringMutations.push(
-            (yield yield request(createMutateSourceContentRequest(fileCacheItem.content.toString(), fileCacheItem.contentType, mutation))).payload
+            ...(Array.isArray(stringMutation) ? stringMutation : [stringMutation])
           );
         }
 

@@ -1,9 +1,9 @@
 import path =  require("path");
 import { JS_MIME_TYPE } from "aerial-common";
-import { SyntheticHTMLElement } from "./element";
+import { SyntheticElement } from "./element";
 import { compileGlobalSandboxScript, runGlobalSandboxScript } from "aerial-sandbox";
 
-export class SyntheticHTMLScriptElement extends SyntheticHTMLElement {
+export class SyntheticHTMLScriptElement extends SyntheticElement {
   private _executed: boolean;
 
   get src() {

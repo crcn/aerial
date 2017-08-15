@@ -1,9 +1,10 @@
 import { Box, Point } from "../geom";
 import { BaseEvent } from "../bus";
 
-export const RESIZED = "resized";
-export const MOVED   = "moved";
-export const REMOVED = "removed";
+export const RESIZED = "RESIZED";
+export const MOVED   = "MOVED";
+export const STOPPED_MOVING   = "STOPPED_MOVING";
+export const REMOVED = "REMOVED";
 
 export type Resized = {
   itemId: string;
@@ -34,6 +35,13 @@ export const moved = (itemId: string, itemType: string, point: Point): Moved => 
   itemType,
   point,
   type: MOVED
+});
+
+export const stoppedMoving = (itemId: string, itemType: string): Moved => ({
+  itemId,
+  itemType,
+  point: null,
+  type: STOPPED_MOVING
 });
 
 export const removed = (itemId: string, itemType: string): Removed => ({

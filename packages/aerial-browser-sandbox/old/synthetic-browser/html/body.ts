@@ -1,5 +1,5 @@
 import { BoundingRect } from "aerial-common";
-import { SyntheticHTMLElement } from "./element";
+import { SyntheticElement } from "./element";
 
 export class SyntheticTextRange {
   getBoundingClientRect() {
@@ -7,7 +7,7 @@ export class SyntheticTextRange {
   }
 }
 
-export class SyntheticHTMLBodyElement extends SyntheticHTMLElement {
+export class SyntheticHTMLBodyElement extends SyntheticElement {
   createTextRange() {
     return new SyntheticTextRange();
   }

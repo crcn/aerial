@@ -32,6 +32,7 @@ import { clamp } from "lodash";
 import { fileCacheReducer, getFileCache, getFileCacheItemByUri } from "aerial-sandbox2";
 
 import { 
+  getSyntheticBrowserBox,
   ApplicationState,
   getWorkspaceById,
   addWorkspaceHovering,
@@ -211,19 +212,9 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       }
 
       for (const item of getBoxedWorkspaceSelection(workspace)) {
-        const scaledBox = scaleInnerBox(item.box, bounds, newBounds);
-        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, newBounds)));
-      }
-      return state;
-    }
-    
-    case RESIZER_MOVED: {
-      const { point, workspaceId, point: newPoint } = event as ResizerMoved;
-      const workspace = getWorkspaceById(state, workspaceId);
-      const translate = workspace.visualEditorSettings.translate;
-      const bounds = getWorkspaceSelectionBox(workspace);
-      for (const item of getBoxedWorkspaceSelection(workspace)) {
-        state = applicationReducer(state, moved(item.$$id, item.$$type, scaleInnerBox(item.box, bounds, moveBox(bounds, newPoint))));
+        const box = getSyntheticBrowserBox(workspace, item);
+        const scaledBox = scaleInnerBox(box, bounds, newBounds);
+        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBox(box, bounds, newBounds)));
       }
       return state;
     }

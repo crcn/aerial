@@ -1,7 +1,7 @@
 import { camelCase, values, uniq } from "lodash";
 import { SyntheticCSSObject } from "./base";
 // import { SyntheticDOMElement, DOMNodeType } from "../../dom/markup";
-// import { SyntheticHTMLElement } from "../../dom/html";
+// import { SyntheticElement } from "../../dom/html";
 import { diffArray, ArrayMutation } from "aerial-common";
 import { SyntheticCSSFontFace } from "./font-face";
 import { SyntheticCSSMediaRule } from "./media-rule";
@@ -37,12 +37,12 @@ export function diffStyleSheetRules(oldRules: syntheticCSSRuleType[], newRules: 
 //   }
 // }
 
-// export function eachInheritedMatchingStyleRule(element: SyntheticDOMElement, each: (element: SyntheticDOMElement, rule: SyntheticCSSElementStyleRule|SyntheticHTMLElement) => any, filter?: (rule: SyntheticCSSElementStyleRule) => boolean) {
+// export function eachInheritedMatchingStyleRule(element: SyntheticDOMElement, each: (element: SyntheticDOMElement, rule: SyntheticCSSElementStyleRule|SyntheticElement) => any, filter?: (rule: SyntheticCSSElementStyleRule) => boolean) {
 //   if (!filter) filter = () => true;
 
 //   const visited = {};
 
-//   const run = (current: SyntheticHTMLElement) => {
+//   const run = (current: SyntheticElement) => {
 //     if (current.nodeType !== DOMNodeType.ELEMENT) return;
 //     if (current.style) {
 //       each(current, current);
@@ -53,7 +53,7 @@ export function diffStyleSheetRules(oldRules: syntheticCSSRuleType[], newRules: 
 //     }, (rule) => !visited[rule.uid]);
 //   }
 
-//   run(element as SyntheticHTMLElement);
+//   run(element as SyntheticElement);
 //   element.ancestors.forEach(run);
 // }
 

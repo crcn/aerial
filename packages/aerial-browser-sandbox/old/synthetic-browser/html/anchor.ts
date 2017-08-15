@@ -1,9 +1,9 @@
 import Url =  require("url");
 import { bindable, PropertyWatcher } from "aerial-common";
-import { SyntheticHTMLElement } from "./element";
+import { SyntheticElement } from "./element";
 // import { SyntheticLocation } from "../../location";
 
-export class SyntheticHTMLAnchorElement extends SyntheticHTMLElement {
+export class SyntheticHTMLAnchorElement extends SyntheticElement {
 
   private _location: any;
 

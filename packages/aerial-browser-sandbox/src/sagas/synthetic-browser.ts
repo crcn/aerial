@@ -7,14 +7,14 @@ import {
   getFileCache,
   FileCache,
   FileCacheItem,
-  getFileCacheItemByUri,
   createReadUriRequest,
-  createReadCacheableUriRequest,
   AddDependencyRequest, 
   AddDependencyResponse, 
+  getFileCacheItemByUri,
+  sandboxEnvironmentSaga,
   createAddDependencyRequest, 
+  createReadCacheableUriRequest,
   createEvaluateDependencyRequest,
-  sandboxEnvironmentSaga
 } from "aerial-sandbox2";
 
 import {
@@ -47,14 +47,19 @@ import {
 } from "../actions";
 
 import { 
-  diffArray,
-  eachArrayValueMutation,
   watch,
   REMOVED,
   Removed,
+  STOPPED_MOVING,
   request,
-  takeRequest, 
+  shiftBox,
+  moveBox,
   Mutation,
+  diffArray,
+  takeRequest, 
+  Moved,
+  MOVED,
+  eachArrayValueMutation,
 } from "aerial-common2";
 
 import {
@@ -64,7 +69,7 @@ import {
   createSyntheticTextNode,
   SyntheticNode,
   SyntheticParentNode,
-  SyntheticHTMLElement,
+  SyntheticElement,
   SyntheticTextNode,
   isSyntheticNodeType,
   SyntheticComment,
@@ -92,7 +97,9 @@ import {
   waitForDocumentComplete,
   SyntheticWindowRendererEvent,
   openSyntheticEnvironmentWindow,
+  createSetElementAttributeMutation,
   createSyntheticDOMRendererFactory,
+  calculateUntransformedBoundingRect,
   createParentNodeRemoveChildMutation,
 } from "../environment";
 
@@ -320,11 +327,11 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     while(true) {
       (yield take(action => action.type === SYNTHETIC_WINDOW_PERSIST_CHANGES && (action as SyntheticWindowPersistChangesRequest).syntheticWindowId === syntheticWindowId));
       const diffs = yield call(getCurrentSyntheticWindowDiffs, cwindow, true);
-      yield yield request(createApplyFileMutationsRequest(diffs));
+      yield yield request(createApplyFileMutationsRequest(...diffs));
     }
   });
 
-  yield fork(function*() {
+  yield fork(function* handleRemoveNode() {
     while(true) {
       const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType)));
       const target = cenv.childObjects.get(itemId) as Node;
@@ -333,9 +340,40 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
       // remove immediately so that it's reflected in the canvas
       parent.removeChild(target);
-      yield yield request(createApplyFileMutationsRequest([removeMutation]));
+      yield yield request(createApplyFileMutationsRequest(removeMutation));
     }
-  })
+  });
+
+  yield fork(function* handleMoveNode() {
+    while(true) {
+      const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType)));
+      const target = cenv.childObjects.get(itemId) as HTMLElement;
+      
+      // console.log(calculateUntransformedBoundingRect(target));
+      // console.log("ITEM", itemType, target.getBoundingClientRect());
+      const originalRect = target.getBoundingClientRect();
+      // const box = moveBox(originalRect, point);
+
+
+      // TODO - get best CSS style
+      target.style.position = "fixed";
+      target.style.left = String(point.left) + "px";
+      target.style.top  = String(point.top) + "px";
+    }
+  });
+
+
+  yield fork(function* handleMoveNodeStopped() {
+    while(true) {
+      const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType)));
+      const target = cenv.childObjects.get(itemId) as HTMLElement;
+      
+      // TODO - prompt where to persist style
+      const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
+      yield yield request(createApplyFileMutationsRequest(mutation));
+    }
+  });
+
 }
 
 const mapSEnvAttribute = ({name, value}: Attr) => ({

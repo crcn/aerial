@@ -8,7 +8,7 @@ import { getSEnvEventClasses } from "../events";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
-import { SyntheticHTMLElement, SYNTHETIC_ELEMENT, SyntheticAttribute, SyntheticNode, SyntheticTextNode, SyntheticComment, BasicNode, BasicElement, BasicAttribute, BasicValueNode, BasicComment, BasicTextNode } from "../../state";
+import { SyntheticElement, SYNTHETIC_ELEMENT, SyntheticAttribute, SyntheticNode, SyntheticTextNode, SyntheticComment, BasicNode, BasicElement, BasicAttribute, BasicValueNode, BasicComment, BasicTextNode } from "../../state";
 
 export const getSEnvAttr = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
@@ -147,7 +147,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     }
     
     getBoundingClientRect(): ClientRect { 
-      return null;
+      return this.ownerDocument.defaultView.renderer.getBoundingClientRect(this);
     }
     
     getClientRects(): ClientRectList { 
@@ -180,7 +180,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
       const documentFragment = evaluateHTMLDocumentFragment(value, this.ownerDocument, this);
     }
 
-    createStruct(): SyntheticHTMLElement {
+    createStruct(): SyntheticElement {
       return {
         ...(super.createStruct() as any),
         attributes: Array.prototype.map.call(this.attributes, attr => attr.struct)
@@ -362,7 +362,7 @@ export namespace SyntheticDOMElementMutationTypes {
   export const ATTACH_SHADOW_ROOT_EDIT    = "attachShadowRootEdit";
 }
 
-const createSetElementAttributeMutation = (target: BasicElement, name: string, value: string, oldName?: string, index?: number) => {
+export const createSetElementAttributeMutation = (target: BasicElement, name: string, value: string, oldName?: string, index?: number) => {
   return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, target, name, value, undefined, oldName, index);
 }
 

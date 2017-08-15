@@ -2,6 +2,8 @@ very simple online playground for visually creating web applications
 
 HI PRIO:
 
+- [ ] convert units
+- [ ] prompt for selector to save to
 - [ ] delete elements
 - [ ] D&D elements around the page
 - [ ] CSS inspector

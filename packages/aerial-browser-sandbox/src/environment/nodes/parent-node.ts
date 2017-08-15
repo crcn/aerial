@@ -10,7 +10,7 @@ import {
   InsertChildMutation,
   RemoveChildMutation,
 } from "aerial-common2";
-import { getSEnvNodeClass, SEnvNodeInterface, diffNode, patchNode } from "./node";
+import { getSEnvNodeClass, SEnvNodeInterface, diffBaseNode, patchBaseNode } from "./node";
 import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getL3EventClasses } from "../level3";
@@ -199,7 +199,7 @@ export const createParentNodeMoveChildMutation = (oldNode: BasicParentNode, chil
 
 export const diffParentNode = (oldNode: BasicParentNode, newNode: BasicNode, diffChildNode: (oldChild: BasicNode, newChild: BasicNode) => Mutation<any>[]) => {
 
-  const mutations = [...diffNode(oldNode, newNode)];
+  const mutations = [...diffBaseNode(oldNode, newNode)];
 
   const diff = diffArray(Array.from(oldNode.childNodes), Array.from(newNode.childNodes), (oldNode, newNode) => {
     if (oldNode.nodeName !== newNode.nodeName || oldNode.namespaceURI !== newNode.namespaceURI) return -1;
@@ -246,6 +246,6 @@ export const patchParentNode = (oldNode: ParentNode & Node, mutation: Mutation<a
     const newChild = createNode(insertMutation.child);
     insertChildNodeAt(oldNode, cloneNode(newChild, true), insertMutation.index);
   } else {
-    patchNode(oldNode, mutation);
+    patchBaseNode(oldNode, mutation);
   }
 };

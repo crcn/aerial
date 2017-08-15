@@ -4,7 +4,7 @@ import { hasURIProtocol } from "aerial-sandbox2";
 import { getSEnvEventClasses } from "../events";
 import path = require("path");
 import { SEnvNodeListInterface } from "./collections";
-import { getSEnvCSSStyleSheetClass } from "../css";
+import { getSEnvCSSStyleSheetClass, getSEnvCSSStyleDeclarationClass } from "../css";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvElementClass, SEnvElementInterface } from "./element";
 import { getUri } from "../utils";
@@ -19,6 +19,7 @@ export interface SEnvHTMLElementInterface extends HTMLElement, SEnvElementInterf
 export const getSEnvHTMLElementClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
   const SEnvElement = getSEnvElementClass(context);
+  const SEnvCSSStyleDeclaration = getSEnvCSSStyleDeclarationClass(context);
   
   return class SEnvHTMLElement extends SEnvElement implements SEnvHTMLElementInterface {
 
@@ -107,13 +108,23 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
     onwaiting: (this: HTMLElement, ev: Event) => any;
     outerText: string;
     spellcheck: boolean;
-    readonly style: CSSStyleDeclaration;
+    private _style: CSSStyleDeclaration;
+    private _styleProxy: CSSStyleDeclaration;
     tabIndex: number;
     title: string;
 
     protected _linkChild(child: SEnvNodeInterface) {
       super._linkChild(child);
       child.$$parentElement = this;
+    }
+
+    get style(): CSSStyleDeclaration {
+      return this._styleProxy || this._resetStyleProxy();
+    }
+
+    set style(value: CSSStyleDeclaration) {
+      Object.assign(this._style, value);
+      this.onStyleChange();
     }
 
     blur(): void {
@@ -138,6 +149,37 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
 
     remove(): void {
       
+    }
+
+    private _resetStyleProxy() {
+
+      if (!this._style) {
+        this._style = new SEnvCSSStyleDeclaration();
+      }
+
+      // Proxy the style here so that any changes get synchronized back
+      // to the attribute
+      // element.
+      return this._styleProxy = new Proxy(this._style, {
+        get: (target, propertyName, receiver) => {
+          return target[propertyName];
+        },
+        set: (target, propertyName, value, receiver) => {
+
+          // normalize the value if it's a pixel unit. Numbers are invalid for CSS declarations.
+          if (typeof value === "number") {
+            value = Math.round(value) + "px";
+          }
+
+          target.setProperty(propertyName.toString(), value);
+          this.onStyleChange();
+          return true;
+        }
+      });
+    }
+
+    protected onStyleChange() {
+      this.setAttribute("style", this.style.cssText.replace(/[\n\t\s]+/g, " ").trim());
     }
   }
 });

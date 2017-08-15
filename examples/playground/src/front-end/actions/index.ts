@@ -2,6 +2,7 @@ import { FileCacheItem } from "aerial-sandbox2";
 import { TreeNode, Box, Action, BaseEvent, Point, WrappedEvent, publicObject } from "aerial-common2";
 
 export const RESIZER_MOVED               = "RESIZER_MOVED";
+export const RESIZER_STOPPED_MOVING               = "RESIZER_STOPPED_MOVING";
 export const WINDOW_PANE_ROW_CLICKED     = "WINDOW_PANE_ROW_CLICKED";
 export const PROMPTED_NEW_WINDOW_URL     = "PROMPTED_NEW_WINDOW_URL";
 export const KEYBOARD_SHORTCUT_ADDED     = "KEYBOARD_SHORTCUT_ADDED";
@@ -167,6 +168,12 @@ export const resizerMoved = (workspaceId: string, point: Point): ResizerMoved =>
   workspaceId,
   point,
   type: RESIZER_MOVED,
+});
+
+export const resizerStoppedMoving = (workspaceId: string, point: Point): ResizerMoved => ({
+  workspaceId,
+  point,
+  type: RESIZER_STOPPED_MOVING,
 });
 
 export const textEditorChanged = (file: FileCacheItem, value: string): textEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
