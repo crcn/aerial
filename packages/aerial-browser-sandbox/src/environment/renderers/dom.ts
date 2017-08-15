@@ -9,14 +9,32 @@ import { InsertChildMutation, RemoveChildMutation, MoveChildMutation } from "aer
 
 const NODE_NAME_MAP = {
   head: "span",
+  html: "span",
   body: "span",
   link: "span",
   script: "span",
 };
 
+const getNodePath = (node: Node, root: Node) => {
+  const path = [];
+  let current = node;
+  while(current !== root) {
+    path.unshift(Array.prototype.indexOf.call(current.parentNode.childNodes, current));
+    current = current.parentNode;
+  }
+  return path;
+}
+
+const getNodeByPath = (path: string[], root: Node) => {
+  let current = root;
+  for (const part of path) {
+    current = current.childNodes[part];
+  }
+  return current;
+}
+
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   readonly mount: HTMLElement;
-  private _nodeMap: Map<string, Node>;
   constructor(sourceWindow: SEnvWindowInterface, readonly targetDocument: Document) {
     super(sourceWindow);
     this.mount = targetDocument.createElement("div");
@@ -32,24 +50,20 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     const html = this.sourceWindow.document.body.innerHTML;
 
     this.mount.innerHTML = `<style>${css}</style><span></span>`;
-    this._nodeMap = mapNode(this.sourceWindow.document.documentElement as any as SEnvElementInterface, this.targetDocument);
-    this.mount.querySelector("span").appendChild(this._nodeMap.get((this.sourceWindow.document.body as any as SEnvNodeInterface).uid));
+    this.mount.lastElementChild.appendChild(mapNode(this.sourceWindow.document.documentElement as any as SEnvElementInterface, this.targetDocument));
 
     this._resetClientRects();
   }
 
   protected _onWindowMutation({ mutation }: SEnvMutationEventInterface) {
-    const sourceNode = this._sourceWindow.childObjects.get(mutation.target.uid);
-    const targetNode = this._nodeMap.get(sourceNode.uid);
+    const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.uid), this._sourceWindow.document), this.mount.lastElementChild);
 
     if (mutation.$$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
     } else if (mutation.$$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
       const insertChildMutation = mutation as InsertChildMutation<any, any>;
-      const newChildMap = mapNode(insertChildMutation.child, this.targetDocument);
-      newChildMap.forEach((value, key) => this._nodeMap.set(key, value));
-      mutation = createParentNodeInsertChildMutation(targetNode as SEnvParentNodeInterface, newChildMap.get(insertChildMutation.child.uid), insertChildMutation.index);
+      mapNode(insertChildMutation.child, this.targetDocument);
+      mutation = createParentNodeInsertChildMutation(targetNode as SEnvParentNodeInterface, mapNode(insertChildMutation.child, this.targetDocument), insertChildMutation.index);
     } else if (mutation.$$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
-      deleteNodeTree((mutation as RemoveChildMutation<any, any>).child, this._nodeMap);
     }
 
     patchNode(targetNode, mutation);
@@ -70,11 +84,10 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
 
     const boundingClientRects = {};
     const computedStyles = {};
-    this._nodeMap.forEach((b, uid) => {
-      if (b.nodeType === SEnvNodeTypes.ELEMENT) {
-        boundingClientRects[uid] = (b as Element).getBoundingClientRect();
-        computedStyles[uid] = targetWindow.getComputedStyle(b as Element);
-      }
+    Array.prototype.forEach.call(this.mount.lastElementChild.querySelectorAll("*"), (element) => {
+      const sourceUID = element.dataset.sourceUID;
+      boundingClientRects[sourceUID] = element.getBoundingClientRect();
+      computedStyles[sourceUID] = targetWindow.getComputedStyle(element);
     });
 
     this.setPaintedInfo(boundingClientRects, computedStyles);
@@ -88,7 +101,7 @@ const eachMatchingElement = (a: SEnvNodeInterface, b: Node, each: (a: SEnvNodeIn
   });
 };
 
-const mapNode = (a: SEnvNodeInterface, document: Document, map: Map<string, Node> = new Map<string, Node>()) => {
+const mapNode = (a: SEnvNodeInterface, document: Document) => {
   let b: Node;
   switch(a.nodeType) {
     case SEnvNodeTypes.TEXT: 
@@ -96,12 +109,13 @@ const mapNode = (a: SEnvNodeInterface, document: Document, map: Map<string, Node
     break;
     case SEnvNodeTypes.ELEMENT: 
       const el = a as SEnvElementInterface;
-      const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || el.nodeName);
+      const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || el.nodeName) as HTMLElement;
+      bel.dataset.sourceUID = a.uid;
       for (let i = 0, n = el.attributes.length; i < n; i++) {
         bel.setAttribute(el.attributes[i].name, el.attributes[i].value);
       }
       for (const child of Array.from(el.childNodes)) {
-        bel.appendChild(mapNode(child as SEnvNodeInterface, document, map).get((child as SEnvNodeInterface).uid));
+        bel.appendChild(mapNode(child as SEnvNodeInterface, document));
       }
       b = bel;
     break;
@@ -109,11 +123,8 @@ const mapNode = (a: SEnvNodeInterface, document: Document, map: Map<string, Node
       b = document.createComment((a as SEnvCommentInterface).nodeValue);
     break;
   }
-
-
-  map.set(a.uid, b);
-
-  return map;
+  
+  return b;
 }
 
 export const createSyntheticDOMRendererFactory = (targetDocument: Document) => (window: SEnvWindowInterface) => new SyntheticDOMRenderer(window, targetDocument);

@@ -11,7 +11,7 @@ export const FETCH_REQUEST                       = "FETCH_REQUEST";
 export const SYNTHETIC_WINDOW_RECTS_UPDATED      = "SYNTHETIC_WINDOW_RECTS_UPDATED";
 export const SYNTHETIC_WINDOW_LOADED             = "SYNTHETIC_WINDOW_LOADED";
 export const SYNTHETIC_NODE_TEXT_CONTENT_CHANGED = "SYNTHETIC_NODE_TEXT_CONTENT_CHANGED";
-export const SYNTHETIC_WINDOW_PERSIST_CHANGES    = "SYNTHETIC_WINDOW_PERSIST_CHANGES";
+export const NODE_VALUE_STOPPED_EDITING          = "NODE_VALUE_STOPPED_EDITING";
 export const EDIT_SOURCE_CONTENT                 = "EDIT_SOURCE_CONTENT";
 export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
 
@@ -46,9 +46,10 @@ export type SyntheticWindowLoadedEvent = {
   syntheticWindowId: string;
 } & BaseEvent;
 
-export type SyntheticWindowPersistChangesRequest = {
+export type SyntheticNodeValueStoppedEditing = {
   syntheticWindowId: string;
-} & Request;
+  nodeId: string;
+} & BaseEvent;
 
 export type SyntheticWindowResourceLoadedEvent = {
   uri: string;
@@ -101,10 +102,10 @@ export const createApplyFileMutationsRequest = (...mutations: Mutation<any>[]): 
 
 export const testMutateContentRequest = (contentType: string, mutationType?: string) => ((action: MutateSourceContentRequest<any>) => action.type === EDIT_SOURCE_CONTENT && action.contentType === contentType && (!mutationType || action.mutation.$$type === mutationType));
 
-export const createSyntheticWindowPersistChangesRequest = (syntheticWindowId: string): SyntheticWindowPersistChangesRequest => ({
+export const createSyntheticNodeValueStoppedEditing = (syntheticWindowId: string, nodeId: string): SyntheticNodeValueStoppedEditing => ({
+  nodeId,
   syntheticWindowId,
-  $$id: generateDefaultId(),
-  type: SYNTHETIC_WINDOW_PERSIST_CHANGES
+  type: NODE_VALUE_STOPPED_EDITING
 });
 
 export const createSyntheticNodeTextContentChanged = (syntheticWindowId: string, syntheticNodeId: string, textContent: string): SyntheticNodeTextContentChanged => ({

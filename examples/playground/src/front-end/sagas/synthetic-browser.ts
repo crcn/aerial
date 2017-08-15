@@ -1,7 +1,7 @@
 import { take, fork, select, put } from "redux-saga/effects";
 import { getValueById } from "aerial-common2";
 import { getSyntheticNodeWorkspace, getSelectedWorkspace } from "front-end/state";
-import { createSyntheticNodeTextContentChanged, getSyntheticNodeWindow, createSyntheticWindowPersistChangesRequest } from "aerial-browser-sandbox";
+import { createSyntheticNodeTextContentChanged, getSyntheticNodeWindow, createSyntheticNodeValueStoppedEditing } from "aerial-browser-sandbox";
 import { STAGE_TOOL_EDIT_TEXT_CHANGED, DELETE_SHORCUT_PRESSED, STAGE_TOOL_EDIT_TEXT_BLUR, StageToolEditTextChanged, StageToolEditTextBlur } from "front-end/actions";
 
 export function* frontEndSyntheticBrowserSaga() {
@@ -25,6 +25,6 @@ function* handleTextEditBlur() {
     const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_BLUR)) as StageToolEditTextBlur;
     const state = yield select();
     const window = getSyntheticNodeWindow(state, nodeId);
-    yield put(createSyntheticWindowPersistChangesRequest(window.$$id));
+    yield put(createSyntheticNodeValueStoppedEditing(window.$$id, nodeId));
   }
 }

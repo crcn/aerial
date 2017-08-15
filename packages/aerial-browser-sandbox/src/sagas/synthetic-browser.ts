@@ -31,8 +31,8 @@ import {
   createFetchRequest,
   OPEN_SYNTHETIC_WINDOW,
   createApplyFileMutationsRequest,
-  SYNTHETIC_WINDOW_PERSIST_CHANGES,
-  SyntheticWindowPersistChangesRequest,
+  NODE_VALUE_STOPPED_EDITING,
+  SyntheticNodeValueStoppedEditing,
   SyntheticNodeTextContentChanged,
   SyntheticWindowSourceChangedEvent,
   createSyntheticWindowLoadedEvent,
@@ -74,6 +74,7 @@ import {
   isSyntheticNodeType,
   SyntheticComment,
   SyntheticDocument,
+  BasicValueNode,
   SyntheticWindow,
   SyntheticBrowser,
   getSyntheticWindow,
@@ -87,19 +88,21 @@ import {
   patchWindow,
   SEnvNodeTypes,
   SEnvNodeInterface,
-  SEnvCommentInterface,
   SEnvTextInterface,
-  SEnvElementInterface,
   getSEnvEventClasses,
   SEnvWindowInterface,
+  SEnvElementInterface,
+  SEnvCommentInterface,
   SyntheticDOMRenderer,
   SEnvDocumentInterface,
   waitForDocumentComplete,
   SyntheticWindowRendererEvent,
+  createUpdateValueNodeMutation,
   openSyntheticEnvironmentWindow,
   createSetElementAttributeMutation,
   createSyntheticDOMRendererFactory,
   calculateUntransformedBoundingRect,
+  createSetElementTextContentMutation,
   createParentNodeRemoveChildMutation,
 } from "../environment";
 
@@ -325,9 +328,10 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   // since we may end up editing the wrong node otherwise (CC).
   yield fork(function*() {
     while(true) {
-      (yield take(action => action.type === SYNTHETIC_WINDOW_PERSIST_CHANGES && (action as SyntheticWindowPersistChangesRequest).syntheticWindowId === syntheticWindowId));
-      const diffs = yield call(getCurrentSyntheticWindowDiffs, cwindow, true);
-      yield yield request(createApplyFileMutationsRequest(...diffs));
+      const { nodeId } = (yield take(action => action.type === NODE_VALUE_STOPPED_EDITING && (action as SyntheticNodeValueStoppedEditing).syntheticWindowId === syntheticWindowId)) as SyntheticNodeValueStoppedEditing;
+      const node = cenv.childObjects.get(nodeId) as HTMLElement;
+      const mutation = createSetElementTextContentMutation(node, node.textContent);
+      yield yield request(createApplyFileMutationsRequest(mutation));
     }
   });
 
@@ -362,7 +366,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     }
   });
 
-
   yield fork(function* handleMoveNodeStopped() {
     while(true) {
       const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType)));
@@ -373,7 +376,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       yield yield request(createApplyFileMutationsRequest(mutation));
     }
   });
-
 }
 
 const mapSEnvAttribute = ({name, value}: Attr) => ({

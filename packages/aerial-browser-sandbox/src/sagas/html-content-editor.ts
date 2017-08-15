@@ -33,8 +33,17 @@ export function* htmlContentEditorSaga(contentType: string = "text/html") {
     while(true) {
       yield takeRequest(testMutateContentRequest(contentType, SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT), ({ mutation, content }: MutateSourceContentRequest<RemoveChildMutation<any, any>>) => {  
         const targetNode = findMutationTargetExpression(mutation.child, parseHTML(content)) as any;
-        
         return createStringMutation(targetNode.__location.startOffset, targetNode.__location.endOffset, "");
+      });
+    }
+  });
+
+  yield fork(function* handleSetTextContent() {
+    while(true) {
+      yield takeRequest(testMutateContentRequest(contentType, SyntheticDOMElementMutationTypes.SET_TEXT_CONTENT), ({ mutation, content }: MutateSourceContentRequest<SetPropertyMutation<any>>) => {  
+        const targetNode = findMutationTargetExpression(mutation.target, parseHTML(content)) as parse5.AST.Default.Element;
+
+        return createStringMutation(targetNode.__location.startTag.endOffset, targetNode.__location.endTag.startOffset, mutation.newValue);
       });
     }
   });

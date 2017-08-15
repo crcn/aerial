@@ -138,7 +138,7 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
   state = visualEditorReducer(state, event);
   state = windowPaneReducer(state, event);
   state = shortcutServiceReducer(state, event);
-  state.fileCache = fileCacheReducer(state.fileCache, event);
+  state = fileCacheReducer(state, event);
 
   return state;
 };

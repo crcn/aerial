@@ -360,6 +360,11 @@ export const diffElementChild = (oldChild: BasicNode, newChild: BasicNode) => {
 export namespace SyntheticDOMElementMutationTypes {
   export const SET_ELEMENT_ATTRIBUTE_EDIT = "setElementAttributeEdit";
   export const ATTACH_SHADOW_ROOT_EDIT    = "attachShadowRootEdit";
+  export const SET_TEXT_CONTENT    = "setTextContent";
+}
+
+export const createSetElementTextContentMutation = (target: BasicElement, value: string) => {
+  return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_TEXT_CONTENT, target, "textContent", value);
 }
 
 export const createSetElementAttributeMutation = (target: BasicElement, name: string, value: string, oldName?: string, index?: number) => {
