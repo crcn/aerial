@@ -2,8 +2,8 @@ very simple online playground for visually creating web applications
 
 HI PRIO:
 
-- [ ] HTML writer
-- [ ] move elements around the page
+- [ ] delete elements
+- [ ] D&D elements around the page
 - [ ] CSS inspector
 - [ ] show loaded network files
 - [ ] ability to delete selected elements

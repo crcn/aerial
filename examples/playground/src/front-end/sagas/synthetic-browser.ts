@@ -13,7 +13,8 @@ function* handleTextEditChanges() {
     const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_CHANGED)) as StageToolEditTextChanged;
     const state = yield select();
     const window = getSyntheticNodeWindow(state, nodeId);
-    const text = sourceEvent.target.value;
+    const text = String(sourceEvent.target.value || "").trim();
+    console.log(JSON.stringify(text));
     const workspace = getSyntheticNodeWorkspace(state, nodeId);
     yield put(createSyntheticNodeTextContentChanged(window.$$id, nodeId, text));
   }

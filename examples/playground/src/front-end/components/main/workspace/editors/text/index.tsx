@@ -37,7 +37,7 @@ const MODES = {
 
 export const TextEditorComponentBase = ({ options, file, dispatch, setCodeMirror }: TextEditorInnerProps) => {
   return <div className="text-editor-component">
-    <CodeMirror ref={setCodeMirror} value={String((file && file.content) || "")} options={{ 
+    <CodeMirror ref={setCodeMirror} options={{ 
       theme: "dracula",
       mode: file && MODES[file.contentType]
     }} onChange={value => dispatch(textEditorChanged(file, value))} />
@@ -48,12 +48,19 @@ export const TextEditorComponent = compose<TextEditorInnerProps, TextEditorProps
   pure,
   withState("codeMirror", "setCodeMirror", null),
   lifecycle({
-    componentWillUpdate({ codeMirror, cursorPosition }: TextEditorInnerProps) {
-      if (codeMirror && cursorPosition !== (this.props as any).cursorPosition) {
-        setImmediate(() => {
-          codeMirror.focus();
-          codeMirror.codeMirror.setCursor({ line: cursorPosition.line - 1, ch: cursorPosition.column - 1 });
-        })
+    componentWillUpdate({ codeMirror, cursorPosition, file }: TextEditorInnerProps) {
+      if (codeMirror) {
+        if (cursorPosition !== (this.props as any).cursorPosition) {
+          setImmediate(() => {
+            codeMirror.focus();
+            codeMirror.codeMirror.setCursor({ line: cursorPosition.line - 1, ch: cursorPosition.column - 1 });
+          });
+        }
+        if (file !== this.props.file && codeMirror.codeMirror.getValue() !== String(file.content)) {
+          const scrollInfo = codeMirror.codeMirror.getScrollInfo();
+          codeMirror.codeMirror.setValue(String(file.content));
+          codeMirror.codeMirror.scrollTo(scrollInfo.left, scrollInfo.top);
+        }
       }
     }
   })

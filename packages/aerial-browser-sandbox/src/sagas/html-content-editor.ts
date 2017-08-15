@@ -21,7 +21,8 @@ export function* htmlContentEditorSaga(contentType: string = "text/html") {
     while(true) {
       yield takeRequest(testMutateContentRequest(contentType, UPDATE_VALUE_NODE), ({ mutation, content }: MutateSourceContentRequest<SetValueMutation<any>>) => {  
         const targetNode = findMutationTargetExpression(mutation, parseHTML(content)) as any;
-        return createStringMutation(targetNode.__location.startOffset, targetNode.__location.endOffset, mutation.newValue);
+
+        return createStringMutation(targetNode.__location.startOffset, targetNode.__location.startOffset + targetNode.value.trim().length, mutation.newValue);
       });
     }
   });
