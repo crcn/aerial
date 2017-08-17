@@ -16,7 +16,7 @@ describe(__filename + "#", () => {
       const createShape = idd(identity as (({a: number}) => {a: number}));
       const s1 = createShape({ a: 1 });
       const s2 = createShape({ a: 1 });
-      expect(s1.$$id).to.eql("1");
+      expect(s1.$$id).not.to.eql(undefined);
       expect(s1.a).to.eql(1);
     });
 
