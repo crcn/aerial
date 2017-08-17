@@ -41,6 +41,7 @@ import {
   getSyntheticWindow,
   getSyntheticNodeWindow,
   getSyntheticBrowserBox,
+  SyntheticBrowserRootState,
 } from "aerial-browser-sandbox";
 
 import {
@@ -85,7 +86,7 @@ export type ApplicationState = {
   element: HTMLElement;
   apiHost: string;
   fileCache: FileCache
-} & BaseApplicationState &  ShortcutServiceState & Struct;
+} & BaseApplicationState &  ShortcutServiceState & SyntheticBrowserRootState & Struct;
 
 /**
  * Utilities

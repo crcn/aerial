@@ -25,7 +25,6 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
   return class SEnvHTMLElement extends SEnvElement implements SEnvHTMLElementInterface {
 
     accessKey: string;
-    readonly children: HTMLCollection;
     contentEditable: string;
     private _dataset: DOMStringMap;
     dir: string;
@@ -299,16 +298,21 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
       this._resolveLoaded();
     }
     private async _loadStylesheet() {
-      const { href } = this;
-      const window = this.ownerDocument.defaultView;
-      const uri = getUri(href, String(window.location));
-      const response = await window.fetch(uri);
-      const text = await response.text();
-      this._parseStylesheet(text);
-      const event = new SEnvEvent();
-      event.initEvent("load", true, true);
-      this._resolveLoaded();
-      this.dispatchEvent(event);
+      try {
+        const { href } = this;
+        const window = this.ownerDocument.defaultView;
+        const uri = getUri(href, String(window.location));
+        const response = await window.fetch(uri);
+        const text = await response.text();
+
+        this._parseStylesheet(text);
+        const event = new SEnvEvent();
+        event.initEvent("load", true, true);
+        this._resolveLoaded();
+        this.dispatchEvent(event);
+      } catch(e) {
+        this._rejectLoaded(e);
+      }
     }
 
     private _parseStylesheet(text: string) {

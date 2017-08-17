@@ -5,17 +5,17 @@ import { fork, call, select } from "redux-saga/effects";
 import { createTestProtocolAdapter } from "./utils";
 import { createStore, applyMiddleware } from "redux";
 import { default as createSagaMiddleware, delay } from "redux-saga";
-import { getSyntheticBrowserStore, createSyntheticBrowserStore } from "../state";
+import { getSyntheticBrowserRootState, createSyntheticBrowserRootState } from "../state";
 import { syntheticBrowserReducer } from "../reducers";
 import { syntheticBrowserSaga } from "../sagas";
 import { getSEnvWindowClass, openSyntheticEnvironmentWindow } from "../environment";
 import { createOpenSyntheticWindowRequest } from "../actions";
 // import { 
-//   getSyntheticBrowserStore,
+//   getSyntheticBrowserRootState,
 //   createOpenSyntheticWindowRequest, 
 //   syntheticBrowserSaga,
 //   syntheticBrowserReducer,
-//   createSyntheticBrowserStore
+//   createSyntheticBrowserRootState
 // } from "../index";
 
 describe(__filename + "#", () => {
@@ -24,7 +24,7 @@ describe(__filename + "#", () => {
 
     const createMainState = () => ({
       dependencyGraph: createDependencyGraph(),
-      syntheticBrowserStore: createSyntheticBrowserStore()
+      SyntheticBrowserRootState: createSyntheticBrowserRootState()
     });
 
     const mainReducer = (state = createMainState(), event) => {
@@ -52,7 +52,7 @@ describe(__filename + "#", () => {
   it("can open a new synthetic browser window environment", (next) => {
     const { getState, dispatch } = createTestStore({}, function*() {
       yield request(createOpenSyntheticWindowRequest("http://google.com"));
-      const { browsers } = getSyntheticBrowserStore(yield select());
+      const { browsers } = getSyntheticBrowserRootState(yield select());
       expect(browsers.length).to.eql(1);
       expect(browsers[0].windows.length).to.eql(1);
       expect(browsers[0].windows[0].location).to.eql("http://google.com");

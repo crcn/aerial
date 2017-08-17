@@ -28,10 +28,11 @@ export interface SEnvNodeInterface extends Node {
   contentLoaded: Promise<any>;
   interactiveLoaded: Promise<any>;
   connectedToDocument: boolean;
+  $setOwnerDocument(document: SEnvDocumentInterface);
   $$parentNode: Node;
   setSource(source: ExpressionLocation): any;
   $$parentElement: HTMLElement;
-  $$addedToDocument();
+  $$addedToDocument(deep?: boolean);
   $$removedFromDocument();
   $$preconstruct();
 };
@@ -66,7 +67,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly nodeName: string;
     readonly nodeType: number;
     nodeValue: string | null;
-    readonly ownerDocument: SEnvDocumentInterface;
+    private _ownerDocument: SEnvDocumentInterface;
     textContent: string | null;
     readonly ATTRIBUTE_NODE: number;
     readonly CDATA_SECTION_NODE: number;
@@ -91,7 +92,6 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     connectedToDocument: boolean;
 
-
     constructor() {
       super();
 
@@ -107,6 +107,10 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       super.$$preconstruct();
       this.uid = this.$$id = generateDefaultId();
       this.childNodes = this.childNodesArray = new SEnvNodeList();
+    }
+    
+    get ownerDocument() {
+      return this._ownerDocument;
     }
 
     get nextSibling() {
@@ -256,19 +260,37 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       throw new SEnvDOMException("This node type does not support this method.");
     }
 
-    $$addedToDocument() {
+    $$addedToDocument(deep?: boolean) {
       this.connectedToDocument = true;
       this.connectedCallback();
-      this._defaultView.childObjects.set(this.uid, this);
+      this._getDefaultView().childObjects.set(this.uid, this);
+      if (deep !== false) {
+        for (const child of this.childNodes) {
+          child.$$addedToDocument();
+        }
+      }
     }
 
-    private get _defaultView() {
+    private _getDefaultView() {
       return this.nodeType === SEnvNodeTypes.DOCUMENT ? (this as any as SEnvDocumentInterface).defaultView : this.ownerDocument.defaultView as SEnvWindowInterface;
+    }
+
+    $setOwnerDocument(document: SEnvDocumentInterface) {
+      if (this.ownerDocument === document) {
+        return;
+      }
+      this._ownerDocument = document;
+      this.$$addedToDocument(false);
+      if (this.childNodes) {
+        for (const child of this.childNodes) {
+          (child as SEnvNodeInterface).$setOwnerDocument(document);
+        }
+      }
     }
 
     $$removedFromDocument() {
       this.connectedToDocument = false;
-      this._defaultView.childObjects.delete(this.uid);
+      this._getDefaultView().childObjects.delete(this.uid);
     }
 
     dispatchEvent(event: Event): boolean {

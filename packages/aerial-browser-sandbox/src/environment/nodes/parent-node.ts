@@ -15,6 +15,7 @@ import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface, SEnvHTMLAllCollec
 import { getDOMExceptionClasses } from "./exceptions";
 import { getL3EventClasses } from "../level3";
 import { getSEnvEventClasses } from "../events";
+import { SEnvDocumentInterface } from "./document";
 import { SEnvNodeTypes } from "../constants";
 import { querySelector, querySelectorAll } from "./utils";
 import { SyntheticNode, SyntheticParentNode, BasicParentNode, BasicNode } from "../../state";
@@ -154,19 +155,13 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
         child.$$parentNode.removeChild(child);
       }
       child.$$parentNode = this;
+      child.$setOwnerDocument(this.nodeType === SEnvNodeTypes.DOCUMENT ? this as any as SEnvDocumentInterface : this.ownerDocument);
     }
 
     protected _unlinkChild(child: SEnvNodeInterface) {
       child.$$parentNode = null;
       if (child.connectedToDocument) {
         child.$$removedFromDocument();
-      }
-    }
-
-    $$addedToDocument() {
-      super.$$addedToDocument();
-      for (const child of Array.prototype.slice.call(this.childNodes)) {
-        child.$$addedToDocument();
       }
     }
   }

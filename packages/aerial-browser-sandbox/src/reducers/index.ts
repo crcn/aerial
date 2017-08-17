@@ -37,11 +37,11 @@ import {
   DEFAULT_SYNTHETIC_WINDOW_BOX,
   getSyntheticWindow,
   createSyntheticBrowser, 
-  createSyntheticBrowserStore, 
-  SyntheticBrowserStore, 
+  createSyntheticBrowserRootState, 
+  SyntheticBrowserRootState, 
   SyntheticBrowser, 
   addNewSyntheticBrowser, 
-  getSyntheticBrowserStore, 
+  getSyntheticBrowserRootState, 
   getSyntheticBrowser, 
   createSyntheticWindow 
 } from "../state";
@@ -61,7 +61,7 @@ const getBestWindowBox = (browser: SyntheticBrowser, box: Box) => {
 };
 
 
-export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(), event: BaseEvent) => {
+export const syntheticBrowserReducer = (root: any = createSyntheticBrowserRootState(), event: BaseEvent) => {
   switch(event.type) {
     case OPEN_SYNTHETIC_WINDOW: {
       const { uri, syntheticBrowserId } = event as OpenSyntheticBrowserWindowRequest;

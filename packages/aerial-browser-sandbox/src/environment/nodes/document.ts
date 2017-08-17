@@ -142,7 +142,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
 
     protected _linkChild(child: SEnvNodeInterface) {
       super._linkChild(child);
-      child.$$addedToDocument();
+      child.$$addedToDocument(true);
     }
 
     async $load(content: string) {
@@ -160,7 +160,12 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this.dispatchEvent(domContentLoadedEvent);
 
       // wait for images, stylesheets, and other external resources
-      await whenLoaded(this);
+      try {
+        await whenLoaded(this);
+      } catch(e) {
+        // catch anyways since we want to fire a load completion
+        this.defaultView.console.error(e);
+      }
 
       const loadEvent = new SEnvEvent();
       loadEvent.initEvent("load", true, true);
@@ -501,7 +506,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
 
     private _linkNode<T extends Node>(node: T): T {
-      node["" + "ownerDocument"] = this;
+      node["" + "_ownerDocument"] = this;
       return node;
     }
     createElementNS(namespaceURI: "http://www.w3.org/1999/xhtml", qualifiedName: string): HTMLElement;

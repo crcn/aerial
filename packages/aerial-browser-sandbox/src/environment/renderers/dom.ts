@@ -2,7 +2,7 @@ import { debounce } from "lodash";
 import { SEnvNodeTypes } from "../constants";
 import { SEnvNodeInterface } from "../nodes";
 import { SEnvWindowInterface, patchWindow, patchNode } from "../window";
-import { SEnvParentNodeMutationTypes, createParentNodeInsertChildMutation, SEnvParentNodeInterface, SEnvCommentInterface, SEnvElementInterface, SEnvTextInterface } from "../nodes";
+import { SEnvParentNodeMutationTypes, createParentNodeInsertChildMutation, SEnvParentNodeInterface, SEnvCommentInterface, SEnvElementInterface, SEnvTextInterface, createParentNodeRemoveChildMutation } from "../nodes";
 import { SEnvMutationEventInterface } from "../events";
 import { BaseSyntheticWindowRenderer } from "./base";
 import { InsertChildMutation, RemoveChildMutation, MoveChildMutation } from "aerial-common2";
@@ -63,6 +63,8 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
       const insertChildMutation = mutation as InsertChildMutation<any, any>;
       mutation = createParentNodeInsertChildMutation(targetNode as SEnvParentNodeInterface, mapNode(insertChildMutation.child.cloneNode(true), this.targetDocument), insertChildMutation.index);
     } else if (mutation.$$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
+      const removeChildMutation = mutation as RemoveChildMutation<any, any>;
+      mutation = createParentNodeRemoveChildMutation(targetNode, null, removeChildMutation.index);
     }
 
     patchNode(targetNode, mutation);
@@ -108,13 +110,17 @@ const mapNode = (a: SEnvNodeInterface, document: Document) => {
     break;
     case SEnvNodeTypes.ELEMENT: 
       const el = a as SEnvElementInterface;
-      const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || el.nodeName) as HTMLElement;
+      const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || encodeURIComponent(el.nodeName)) as HTMLElement;
       bel.dataset.sourceUID = a.uid;
       if (el.nodeName.toLowerCase() === "script") {
         bel.style.display = "none";
       }
       for (let i = 0, n = el.attributes.length; i < n; i++) {
-        bel.setAttribute(el.attributes[i].name, el.attributes[i].value);
+        try {
+          bel.setAttribute(el.attributes[i].name, el.attributes[i].value);
+        } catch(e) {
+          // ignore invalid attributes
+        }
       }
       for (const child of Array.from(el.childNodes)) {
         bel.appendChild(mapNode(child as SEnvNodeInterface, document));

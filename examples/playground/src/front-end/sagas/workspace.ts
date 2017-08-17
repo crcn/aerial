@@ -50,8 +50,7 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    yield put(createOpenSyntheticWindowRequest(`https://www.w3.org/Style/Examples/011/mypage.html`, workspace.browser.$$id));
-    // yield put(createOpenSyntheticWindowRequest(`https://webflow.com/`, workspace.browser.$$id));
+    yield put(createOpenSyntheticWindowRequest(`http://localhost:8082/`, workspace.browser.$$id));
     return true;
   });
 }

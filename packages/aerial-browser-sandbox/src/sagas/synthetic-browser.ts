@@ -249,26 +249,32 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     });
   }
 
-  async function getCurrentSyntheticWindowDiffs(syntheticWindow: SyntheticWindow = cwindow, reverse?: boolean) {
+  async function getCurrentSyntheticWindowDiffs(syntheticWindow: SyntheticWindow = cwindow) {
     const nenv = openTargetSyntheticWindow(syntheticWindow);
     await waitForDocumentComplete(nenv);
-    return diffWindow(reverse ? nenv : cenv, reverse ? cenv : nenv);
+    return diffWindow(cenv, nenv);
   }
 
   let _reloading: boolean;
   let _shouldReloadAgain: boolean;
 
   function* reload(syntheticWindow: SyntheticWindow = cwindow) {
+
     if (_reloading) {
       _shouldReloadAgain = true;
       return;
     }
 
     if (cenv) {
-      _reloading = true;
-      const diffs = yield call(getCurrentSyntheticWindowDiffs, syntheticWindow);
+      try {
+        _reloading = true;
+        const diffs = yield call(getCurrentSyntheticWindowDiffs, syntheticWindow);
+        patchWindow(cenv, diffs);
+
+      } catch(e) {
+        console.warn(e);
+      }
       _reloading = false;
-      patchWindow(cenv, diffs);
       if (_shouldReloadAgain) {
         _shouldReloadAgain = false;
         yield reload(syntheticWindow);

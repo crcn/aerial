@@ -6,6 +6,10 @@ HI PRIO:
 - [ ] move style to class shortcut
 - [ ] CSS inspector
 
+MVP:
+
+- [ ] absolute position elements
+
 LOW PRIO:
 
 - [ ] device presets

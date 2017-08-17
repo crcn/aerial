@@ -28,13 +28,18 @@ function* frontEndService() {
     express.static(path.dirname(frontEnd.entryPath))
   );
 
-  expressServer.use("/proxy/:uri", (req, res) => {
+  expressServer.use("/proxy/:uri", (req, res, next) => {
     const { uri } = req.params;
     request({
       method: req.method,
       uri: decodeURIComponent(uri),
       gzip: true
     }, (err, response, body) => {
+
+      if (err) {
+        return next(err);
+      }
+
       res.set({
         "content-type": response.headers["content-type"]
       });

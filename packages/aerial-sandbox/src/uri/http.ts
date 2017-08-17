@@ -30,7 +30,6 @@ export class HTTPURIProtocol extends URIProtocol {
         if (err) return reject(err);
 
         if (/^30/.test(String(response.statusCode))) {
-          console.log(response.headers.location);
         }
 
         this._storeResponseInfo(uri, response);
