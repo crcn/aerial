@@ -401,11 +401,13 @@ export const diffElement = (oldElement: BasicElement, newElement: BasicElement) 
 export const patchElement = (oldElement: Element, mutation: Mutation<any>) => {
   if (mutation.$$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
     
+
     const { name, oldName, newValue } = <SetPropertyMutation<any>>mutation;
 
     // need to set the current value (property), and the default value (attribute)
     // TODO - this may need to be separated later on.
     if (oldElement.constructor.prototype.hasOwnProperty(name)) {
+
       oldElement[name] = newValue == null ? "" : newValue;
     }
 
@@ -416,6 +418,7 @@ export const patchElement = (oldElement: Element, mutation: Mutation<any>) => {
       // An error will be thrown by the DOM if the name is invalid. Need to ignore
       // native exceptions so that other parts of the app do not break.
       try {
+
         oldElement.setAttribute(name, newValue);
       } catch(e) {
         console.warn(e);

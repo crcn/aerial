@@ -1,14 +1,24 @@
-import { weakMemo } from "aerial-common2";
 import { SEnvNodeTypes } from "../constants";
 import { SEnvNodeInterface } from "./node";
 import { SyntheticNode } from "../../state";
+import { SEnvParentNodeMutationTypes } from "./parent-node";
+import { getSEnvEventClasses, SEnvMutationEventInterface } from "../events";
+import { weakMemo, RemoveChildMutation, InsertChildMutation, diffArray, eachArrayValueMutation } from "aerial-common2";
 
 export interface SEnvNodeListInterface extends Array<SEnvNodeInterface>, NodeList {
   length: number;
   [index: number]: SEnvNodeInterface;
 }
 
+export interface SEnvHTMLAllCollectionInterface extends Array<Element>, HTMLCollection {
+  length: number;
+  [index: number]: Element;
+  update(): SEnvHTMLAllCollectionInterface;
+}
+
 export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
+  
+  const { SEnvMutationEvent } = getSEnvEventClasses(context);
 
   interface Collection<T> extends Array<T> { } 
 
@@ -30,6 +40,10 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     }
   }
 
+  class SEnvDOMStringMap implements DOMStringMap {
+    [name: string]: string | undefined;
+  }
+
   class SEnvHTMLAllCollection extends _Collection<Element> implements HTMLAllCollection {
     
     item(nameOrIndex?: string): HTMLCollection | Element | null {
@@ -43,10 +57,35 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
 
   class SEnvHTMLCollection extends _Collection<Element> implements HTMLCollection {
     private _target: Node & ParentNode;
+    private _stale: boolean;
     $init(target: Node & ParentNode) {
       this._target = target;
-      target.addEventListener("DOMNodeInserted", this._onChildAdded);
-      target.addEventListener("DOMNodeRemoved", this._onChildRemoved);
+      this._stale = true;
+      target.addEventListener(SEnvMutationEvent.MUTATION, this._onChildMutation);
+      return this;
+    }
+    update() {
+      if (this._stale) {
+        this._stale = false;
+        const diff = diffArray(
+          this, 
+          Array.prototype.filter.call(this._target.childNodes, a => a.nodeType === SEnvNodeTypes.ELEMENT),
+          (a, b) => a === b ? 0 : -1
+        );
+        
+        eachArrayValueMutation(diff, {
+          insert: ({ value, index }) => {
+            this.splice(index, 0, value);
+          },
+          delete: ({ index }) => {
+            this.splice(index, 1);
+          },
+          update() {
+
+          }
+        });
+      }
+      
       return this;
     }
     namedItem(name: string) {
@@ -55,22 +94,11 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     item(index: number) {
       return this[index];
     }
-    private _onChildAdded = (event: MutationEvent) => {
+    private _onChildMutation = (event: SEnvMutationEventInterface) => {
       if (event.target !== this._target) {
         return;
       }
-      if (event.relatedNode.nodeType === SEnvNodeTypes.ELEMENT) {
-        this.push(event.relatedNode as Element);
-      }
-    }
-    private _onChildRemoved = (event: MutationEvent) => {
-      if (event.target !== this._target) {
-        return;
-      }
-      const index = this.indexOf(event.relatedNode as Element);
-      if (index !== -1) {
-        this.splice(index, 1);
-      }
+      this._stale = true;
     }
   }
 
@@ -118,6 +146,7 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
   return {
     SEnvNodeList,
     SEnvNamedNodeMap,
+    SEnvDOMStringMap,
     SEnvHTMLCollection,
     SEnvStyleSheetList,
     SEnvHTMLAllCollection,

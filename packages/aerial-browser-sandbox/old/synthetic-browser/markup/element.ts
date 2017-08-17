@@ -2,11 +2,11 @@ import { bindable } from "aerial-common";
 import { difference } from "lodash";
 import { DOMNodeType } from "./node-types";
 import { SyntheticDocument } from "../document";
+import { CallbackBus, IBus } from "mesh7";
 import { IMarkupNodeVisitor } from "./visitor";
 import { selectorMatchesElement } from "../selector";
 import { syntheticElementClassType } from "./types";
 import { SyntheticDocumentFragment } from "./document-fragment";
-import { CallbackBus, IBus } from "mesh7";
 import { SyntheticDOMNode, SyntheticDOMNodeSerializer } from "./node";
 import { DOMEventListenerFunction } from "../events";
 import { 

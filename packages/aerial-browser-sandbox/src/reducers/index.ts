@@ -154,9 +154,7 @@ export const syntheticBrowserReducer = (root: any = createSyntheticBrowserStore(
 
 const patchSyntheticWindow = (window: SyntheticWindow, mutations: Mutation<any>[]) => {
   for (const mutation of mutations) {
-    console.log(mutation.target);
     const target = getValueById(window, mutation.target.uid);
-    console.log(target);
   }
   return window;
 }

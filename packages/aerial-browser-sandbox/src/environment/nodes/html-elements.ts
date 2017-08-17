@@ -3,7 +3,7 @@ import { weakMemo } from "aerial-common2";
 import { hasURIProtocol } from "aerial-sandbox2";
 import { getSEnvEventClasses } from "../events";
 import path = require("path");
-import { SEnvNodeListInterface } from "./collections";
+import { SEnvNodeListInterface, getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvCSSStyleSheetClass, getSEnvCSSStyleDeclarationClass } from "../css";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { getSEnvElementClass, SEnvElementInterface } from "./element";
@@ -20,13 +20,14 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
   const SEnvNode = getSEnvNodeClass(context);
   const SEnvElement = getSEnvElementClass(context);
   const SEnvCSSStyleDeclaration = getSEnvCSSStyleDeclarationClass(context);
+  const { SEnvDOMStringMap } = getSEnvHTMLCollectionClasses(context);
   
   return class SEnvHTMLElement extends SEnvElement implements SEnvHTMLElementInterface {
 
     accessKey: string;
     readonly children: HTMLCollection;
     contentEditable: string;
-    readonly dataset: DOMStringMap;
+    private _dataset: DOMStringMap;
     dir: string;
     draggable: boolean;
     hidden: boolean;
@@ -116,10 +117,36 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
     protected _linkChild(child: SEnvNodeInterface) {
       super._linkChild(child);
       child.$$parentElement = this;
+      
     }
 
     get style(): CSSStyleDeclaration {
       return this._styleProxy || this._resetStyleProxy();
+    }
+
+    get dataset(): DOMStringMap {
+      return this._dataset || (this._dataset = new Proxy(new SEnvDOMStringMap(), {
+        get(target, key) {
+          return target[key];
+        },
+        set: (target, key: string, value: string, handler) => {
+          const attrName = key.toLowerCase();
+          if (!this.hasAttribute(key)) {
+
+          }
+          target[key] = value;
+          return true;
+        }
+      }))
+    }
+
+    protected attributeChangedCallback(propertyName: string, oldValue: string, newValue: string) {
+      super.attributeChangedCallback(propertyName, oldValue, newValue);
+      if (propertyName === "style" && newValue !== this._getStyleString()) {
+        this.style.cssText = newValue;
+      } else if (propertyName.substr(0, 5) === "data-") {
+        this.dataset[propertyName.substr(5).toLowerCase()] = newValue;
+      } 
     }
 
     set style(value: CSSStyleDeclaration) {
@@ -179,7 +206,11 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
     }
 
     protected onStyleChange() {
-      this.setAttribute("style", this.style.cssText.replace(/[\n\t\s]+/g, " ").trim());
+      this.setAttribute("style", this._getStyleString());
+    }
+
+    private _getStyleString() {
+      return this.style.cssText.replace(/[\n\t\s]+/g, " ").trim();
     }
   }
 });

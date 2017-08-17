@@ -56,14 +56,12 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   protected _onWindowMutation({ mutation }: SEnvMutationEventInterface) {
-    console.log("APPLY DOM MUTATIONS", mutation);
     const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.uid), this._sourceWindow.document), this.mount.lastElementChild);
 
     if (mutation.$$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
     } else if (mutation.$$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
       const insertChildMutation = mutation as InsertChildMutation<any, any>;
-      mapNode(insertChildMutation.child, this.targetDocument);
-      mutation = createParentNodeInsertChildMutation(targetNode as SEnvParentNodeInterface, mapNode(insertChildMutation.child, this.targetDocument), insertChildMutation.index);
+      mutation = createParentNodeInsertChildMutation(targetNode as SEnvParentNodeInterface, mapNode(insertChildMutation.child.cloneNode(true), this.targetDocument), insertChildMutation.index);
     } else if (mutation.$$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
     }
 
@@ -132,10 +130,3 @@ const mapNode = (a: SEnvNodeInterface, document: Document) => {
 }
 
 export const createSyntheticDOMRendererFactory = (targetDocument: Document) => (window: SEnvWindowInterface) => new SyntheticDOMRenderer(window, targetDocument);
-
-const deleteNodeTree = (node: SEnvNodeInterface, map: Map<string, Node>) => {
-  map.delete(node.uid);
-  Array.prototype.forEach.call(node, child => {
-    deleteNodeTree(child, map);
-  });
-};

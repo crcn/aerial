@@ -85,6 +85,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     embeds: HTMLCollectionOf<HTMLEmbedElement>;
     
     fgColor: string;
+    readonly nodeName: string = "#document";
     
     forms: HTMLCollectionOf<HTMLFormElement>;
     readonly fullscreenElement: Element | null;

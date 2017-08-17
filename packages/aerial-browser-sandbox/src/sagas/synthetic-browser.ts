@@ -267,7 +267,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     if (cenv) {
       _reloading = true;
       const diffs = yield call(getCurrentSyntheticWindowDiffs, syntheticWindow);
-      console.log(diffs);
       _reloading = false;
       patchWindow(cenv, diffs);
       if (_shouldReloadAgain) {

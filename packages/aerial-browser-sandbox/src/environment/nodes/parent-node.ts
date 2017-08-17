@@ -11,7 +11,7 @@ import {
   RemoveChildMutation,
 } from "aerial-common2";
 import { getSEnvNodeClass, SEnvNodeInterface, diffBaseNode, patchBaseNode } from "./node";
-import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
+import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface, SEnvHTMLAllCollectionInterface } from "./collections";
 import { getDOMExceptionClasses } from "./exceptions";
 import { getL3EventClasses } from "../level3";
 import { getSEnvEventClasses } from "../events";
@@ -33,11 +33,15 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
   const { SEnvMutationEvent: SEnvMutationEvent2 } = getSEnvEventClasses(context);
 
   return class SEnvParentNode extends SEnvNode implements ParentNode {
-    children: HTMLCollection;
+    private _children: SEnvHTMLAllCollectionInterface;
 
     $$preconstruct() {
       super.$$preconstruct();
-      this.children = new SEnvHTMLCollection().$init(this);
+      this._children = new SEnvHTMLCollection().$init(this);
+    }
+
+    get children() {
+      return this._children.update();
     }
 
     appendChild<T extends Node>(child: T) {
@@ -73,12 +77,9 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       if (this.connectedToDocument) {
         (child as any as SEnvNodeInterface).$$addedToDocument();
       }
-      const event = new  SEnvMutationEvent();
-      event.initMutationEvent("DOMNodeInserted", true, true, child, null, null, null, -1);
-      this.dispatchEvent(event);
 
       const event2 = new SEnvMutationEvent2();
-      event2.initMutationEvent(createParentNodeInsertChildMutation(this, child, index));
+      event2.initMutationEvent(createParentNodeInsertChildMutation(this, child, index, false));
       this.dispatchEvent(event2);
 
       return child;
@@ -93,14 +94,9 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       // needs to come after so that 
       this.childNodesArray.splice(index, 1);
 
-      const event = new SEnvMutationEvent();
-      event.initMutationEvent("DOMNodeRemoved", true, true, child, null, null, null, -1);
-      this.dispatchEvent(event);
-
       const event2 = new SEnvMutationEvent2();
       event2.initMutationEvent(createParentNodeRemoveChildMutation(this, child, index));
       this.dispatchEvent(event2);
-
 
       return child;
     }
@@ -111,7 +107,9 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
     }
 
     querySelectorAll(selectors: string): NodeListOf<Element> {
-      return null;
+
+      // TODO - not actually an array here
+      return querySelectorAll(this, selectors) as any as NodeListOf<Element>;
     }
     
     replaceChild<T extends Node>(newChild: Node, oldChild: T): T {
@@ -185,8 +183,8 @@ export const cloneNode = (node: BasicNode, deep?: boolean) => {
   return (node as Node).cloneNode(deep);
 }
 
-export const createParentNodeInsertChildMutation = (parent: BasicParentNode, child: BasicNode, index: number) => {
-  return createInsertChildMutation(SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT, parent, cloneNode(child, true), index);
+export const createParentNodeInsertChildMutation = (parent: BasicParentNode, child: BasicNode, index: number, cloneChild: boolean = true) => {
+  return createInsertChildMutation(SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT, parent, cloneChild ? cloneNode(child, true) : child, index);
 };
 
 export const createParentNodeRemoveChildMutation = (parent: BasicParentNode, child: BasicNode, index?: number) => {
