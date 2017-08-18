@@ -2,7 +2,7 @@ import "./windows.scss";
 import * as React from "react";
 import { compose, pure } from "recompose";
 import { Workspace } from "front-end/state";
-import { SyntheticWindow } from "aerial-browser-sandbox";
+import { SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, getBoxSize, Translate, wrapEventToDispatch } from "aerial-common2";
 import { stageToolWindowTitleClicked, stageToolWindowKeyDown, stageToolWindowBackgroundClicked } from "front-end/actions";
 
@@ -50,10 +50,11 @@ const WindowItemComponent = pure(WindowItemComponentBase as any) as typeof Windo
 
 export type WindowsStageToolComponentInnerProps = {
   workspace: Workspace;
+  browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
-export const WindowsStageToolComponentBase = ({ workspace, dispatch }: WindowsStageToolComponentInnerProps) => {
+export const WindowsStageToolComponentBase = ({ workspace, browser, dispatch }: WindowsStageToolComponentInnerProps) => {
   const { translate, backgroundColor } = workspace.visualEditorSettings;
   
   const backgroundStyle = {
@@ -64,7 +65,7 @@ export const WindowsStageToolComponentBase = ({ workspace, dispatch }: WindowsSt
   return <div className="m-windows-stage-tool">
     <div style={backgroundStyle} className="m-windows-stage-tool-background" onClick={wrapEventToDispatch(dispatch, stageToolWindowBackgroundClicked)} /> 
     {
-      workspace.browser.windows.map((window) => <WindowItemComponent key={window.$$id} window={window} dispatch={dispatch} translate={translate} />)
+      browser.windows.map((window) => <WindowItemComponent key={window.$$id} window={window} dispatch={dispatch} translate={translate} />)
     }
   </div>;
 }

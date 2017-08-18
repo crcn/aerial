@@ -9,13 +9,14 @@ import { IsolateComponent } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
 import { visualEditorWheel } from "front-end/actions";
+import { SyntheticBrowser } from "aerial-browser-sandbox";
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
 
-
 export type VisualEditorOuterComponentProps = {
   workspace: Workspace;
+  browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
@@ -50,6 +51,7 @@ const enhanceVisualEditorComponent = compose<VisualEditorOuterComponentProps, Vi
 export const VisualEditorComponentBase = ({ 
   setCanvasOuter,
   workspace, 
+  browser,
   dispatch, 
   onWheel,
   onDrop,
@@ -98,8 +100,8 @@ export const VisualEditorComponentBase = ({
           className="visual-editor-inner"
           style={outerStyle}>
           <div style={innerStyle} className="visual-editor-inner">
-            <CanvasComponent browser={workspace.browser} dispatch={dispatch} />
-            <ToolsLayerComponent workspace={workspace} dispatch={dispatch} />
+            <CanvasComponent browser={browser} dispatch={dispatch} />
+            <ToolsLayerComponent workspace={workspace} dispatch={dispatch} browser={browser} />
           </div>
         </div>
       </span>

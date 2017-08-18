@@ -1,34 +1,37 @@
-import { BaseEvent, updateStruct, updateStructProperty, getValueById } from "aerial-common2";
-import { FileCache, createFileCache, createFileCacheItem, getFileCache, getFileCacheItemByUri } from "../state";
 import { UriCacheBustedEvent, URI_CACHE_BUSTED, UriWrittenEvent, URI_WRITTEN } from "../actions";
+import { BaseEvent, updateStruct, updateStructProperty, getValueById, dsInsert, dsUpdate, dsUpdateOne } from "aerial-common2";
+import { FileCacheRootState, FileCacheItem, createFileCacheRootState, createFileCacheItem, getFileCacheItemByUri } from "../state";
 
-export const fileCacheReducer = (root: any = createFileCache(), event: BaseEvent) => {
+export const fileCacheReducer = <TRootState extends FileCacheRootState>(root: TRootState = createFileCacheRootState() as TRootState, event: BaseEvent): TRootState => {
   switch(event.type) {
     case URI_CACHE_BUSTED: {
       const { uri, content, contentType } = event as UriCacheBustedEvent;
-      const item = getFileCacheItemByUri(root, uri) || {};
-      const cache = getFileCache(root);
+      const item = getFileCacheItemByUri(root, uri);
+      const newProperties = {
+        sourceUri: uri,
+        content,
+        contentType
+      };
 
-      return updateStructProperty(root, cache, "allFiles", {
-        ...cache.allFiles,
-        [uri.replace(/\./g, "_")]: createFileCacheItem({
-          ...item,
-          sourceUri: uri,
-          content,
-          contentType
-        })
-      })
+      return {
+        ...(root as any),
+        fileCacheStore: item ? dsUpdateOne(root.fileCacheStore, { $$id: item.$$id }, newProperties) : dsInsert(root.fileCacheStore, createFileCacheItem
+        (newProperties))
+      };
     }
 
     case URI_WRITTEN: {
       const { uri, content, contentType } = event as UriWrittenEvent;
       const item = getFileCacheItemByUri(root, uri);
       if (!item) return root;
-      return updateStruct(root, item, {
-        sourceUri: uri,
-        content, 
-        contentType: contentType || item.contentType
-      });
+      return {
+        ...(root as any),
+        fileCacheStore: dsUpdateOne(root.fileCacheStore, { $$id: item.$$id }, {
+          sourceUri: uri,
+          content, 
+          contentType: contentType || item.contentType
+        })
+      };
     }
   }
   return root;

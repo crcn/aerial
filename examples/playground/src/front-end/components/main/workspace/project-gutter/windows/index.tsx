@@ -3,6 +3,7 @@ import * as React from "react";
 import { Workspace } from "front-end/state";
 import { PaneComponent } from "front-end/components/pane";
 import { SyntheticWindow } from "aerial-browser-sandbox";
+import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { pure, compose, withHandlers } from "recompose";
 import { promptedNewWindowUrl, windowPaneRowClicked } from "front-end/actions";
 import { Dispatcher, BaseEvent, wrapEventToDispatch } from "aerial-common2";
@@ -28,8 +29,8 @@ const enhanceControls = compose(
 const WindowsPaneComponentControls = enhanceControls(WindowsPaneComponentControlsBase as any) as any;
 
 
-export const WindowsPaneComponent = pure((({ workspace, dispatch }: { workspace: Workspace, dispatch: Dispatcher<any> }) => workspace.browser && <PaneComponent title="Windows" className="m-windows-pane" controls={<WindowsPaneComponentControls workspace={workspace} dispatch={dispatch} />}>
+export const WindowsPaneComponent = pure((({ workspace, browser, dispatch }: { workspace: Workspace, browser: SyntheticBrowser, dispatch: Dispatcher<any> }) => <PaneComponent title="Windows" className="m-windows-pane" controls={<WindowsPaneComponentControls workspace={workspace} dispatch={dispatch} />}>
   {
-    workspace.browser.windows.map((window) => <WindowRow key={window.$$id} window={window} dispatch={dispatch} />)
+    browser.windows.map((window) => <WindowRow key={window.$$id} window={window} dispatch={dispatch} />)
   }
 </PaneComponent>) as any);

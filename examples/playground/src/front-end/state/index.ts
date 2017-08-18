@@ -15,12 +15,15 @@ import {
   updateStruct,
   getSmallestBox,
   ImmutableArray, 
+  StructReference,
   getValueByPath,
   ImmutableObject,
   findParentObject,
+  getStructReference,
   ExpressionPosition,
   pointIntersectsBox,
   createStructFactory,
+  getReferenceString,
   BaseApplicationState,
   updateStructProperty,
   createImmutableArray,
@@ -29,7 +32,7 @@ import {
   ImmutableObjectIdentity,
   createImmutableStructFactory,
 } from "aerial-common2";
-import { createFileCache, FileCache, FileCacheItem } from "aerial-sandbox2";
+import { createFileCacheStore, FileCacheRootState, FileCacheItem, getFileCacheItemById } from "aerial-sandbox2";
 
 import { StageToolOverlayMouseMoved, StageToolOverlayClicked } from "../actions";
 import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortcuts";
@@ -37,16 +40,21 @@ import { toggleLeftGutterPressed, toggleRightGutterPressed, deleteShortcutPresse
 
 import {
   SyntheticBrowser,
-  getSyntheticNodeById,
+  SYNTHETIC_ELEMENT,
   getSyntheticWindow,
+  getSyntheticNodeById,
   getSyntheticNodeWindow,
   getSyntheticBrowserBox,
+  getSyntheticWindowBrowser,
   SyntheticBrowserRootState,
+  createSyntheticBrowserStore,
+  getSyntheticBrowserStoreItemByReference,
 } from "aerial-browser-sandbox";
 
 import {
   uniq,
   difference,
+  differenceWith
 } from "lodash";
 
 import { Kernel } from "aerial-common";
@@ -70,10 +78,10 @@ export type VisualEditorSettings = {
 }
 
 export type Workspace = {
-  selectionIds: string[];
-  hoveringIds: string[];
+  selectionRefs: StructReference[]; // $$type:$$id;
+  browserId: string;
+  hoveringRefs: StructReference[];
   selectedFileId?: string;
-  browser: SyntheticBrowser;
   visualEditorSettings: VisualEditorSettings;
   textCursorPosition: ExpressionPosition;
   secondarySelection?: boolean;
@@ -85,8 +93,7 @@ export type ApplicationState = {
   selectedWorkspaceId?: string;
   element: HTMLElement;
   apiHost: string;
-  fileCache: FileCache
-} & BaseApplicationState &  ShortcutServiceState & SyntheticBrowserRootState & Struct;
+} & BaseApplicationState &  ShortcutServiceState & SyntheticBrowserRootState & FileCacheRootState & Struct;
 
 /**
  * Utilities
@@ -95,62 +102,81 @@ export type ApplicationState = {
 export const getFileExtension = (file: FileCacheItem) => file.sourceUri.split(".").pop();
 
 export const getSelectedWorkspaceFile = (state: ApplicationState, workspace: Workspace): FileCacheItem => {
-  return workspace.selectedFileId && getValueById(state.fileCache, workspace.selectedFileId);
+  return workspace.selectedFileId && getFileCacheItemById(state, workspace.selectedFileId);
 }
 
-export const getSyntheticWindowWorkspace = (root: any, windowId: string): Workspace => {
-  const path = getPathById(root, windowId);
-  let current = root;
-  for (const segment of path) {
-    current = current[segment];
-    if (current.$$type === WORKSPACE) {
-      return current as any as Workspace;
-    }
-  }
-}
+export const getSyntheticWindowWorkspace = (root: ApplicationState, windowId: string): Workspace => getSyntheticBrowserWorkspace(root, getSyntheticWindowBrowser(root, windowId).$$id);
 
-export const addWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+export const getSyntheticBrowserWorkspace = weakMemo((root: ApplicationState, browserId: string) => {
+  return root.workspaces.find(workspace => workspace.browserId === browserId);
+});
+
+export const addWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return setWorkspaceSelection(root, workspaceId, ...workspace.selectionIds, ...selectionIds);
+  return setWorkspaceSelection(root, workspaceId, ...workspace.selectionRefs, ...selection);
 };
 
-export const removeWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+export const removeWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return setWorkspaceSelection(root, workspaceId, ...workspace.selectionIds.filter((id) => selectionIds.indexOf(id) === -1));
+  return setWorkspaceSelection(root, workspaceId, ...workspace.selectionRefs.filter((type, id) => !selection.find((type2, id2) => id === id2)));
 }
 
-export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+const diffStructReferences = (a: StructReference[], b: StructReference[]) => {
+  return differenceWith(a, b, (a, b) => a[1] === b[1]);
+}
+
+export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return setWorkspaceSelection(root, workspaceId, ...difference(selectionIds, workspace.selectionIds));
+  return setWorkspaceSelection(root, workspaceId, ...diffStructReferences(selection, workspace.selectionRefs));
 };
 
 export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
   const workspace = getWorkspaceById(root, workspaceId);
   return updateStruct(root, workspace, {
-    selectionIds: [],
+    selectionRefs: [],
     secondarySelection: false
   });
 };
 
-export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: string[]) => {
+export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "selectionIds", uniq([...selectionIds]));
+  return updateStructProperty(root, workspace, "selectionRefs", uniq([...selectionIds]));
 };
 
-export const addWorkspaceHovering = (root: any, workspaceId: string, ...hoveringIds: string[]) => {
+// export const updateWorkspace = (root: ApplicationState, workspaceId: string, newProperties: Partial<Workspace>) => {
+
+  
+//   const workspace = getWorkspaceById(root, workspaceId);
+//   return updateStructProperty(root, workspace, "selectionIds", uniq([...selectionIds]));
+// };
+
+export const addWorkspaceHovering = (root: any, workspaceId: string, ...hovering: Struct[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "hoveringIds", uniq([...hoveringIds]));
+  return updateStructProperty(root, workspace, "hoveringRefs", uniq([...hovering.map(getReferenceString)]));
 };
 
-export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hoveringIds: string[]) => {
+export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hovering: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "hoveringIds", difference(workspace.hoveringIds, hoveringIds));
+  return updateStructProperty(root, workspace, "hoveringRefs", diffStructReferences(workspace.hoveringRefs, hovering));
 };
 
-export const getSyntheticNodeWorkspace = weakMemo((root: any, nodeId: string): Workspace => findParentObject(root, nodeId, parent => parent.$$type === WORKSPACE));
+export const addWorkspace = (root: ApplicationState, workspace: Workspace) => {
+  return {
+    ...root,
+    workspaces: [...root.workspaces, workspace]
+  };
+}
 
-export const getBoxedWorkspaceSelection = weakMemo((workspace: Workspace): Array<Boxed & Struct> => workspace.selectionIds.map(id => getValueById(workspace, id)).filter(item => getSyntheticBrowserBox(workspace, item)));
-export const getWorkspaceSelectionBox = weakMemo((workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(workspace).map(boxed => getSyntheticBrowserBox(workspace, boxed))));
+const getFrontEndItemByReference = (root: ApplicationState|SyntheticBrowser, ref: StructReference) => {
+  return getSyntheticBrowserStoreItemByReference(root, ref);
+};
+
+export const getSyntheticNodeWorkspace = weakMemo((root: ApplicationState, nodeId: string): Workspace => {
+  return getSyntheticWindowWorkspace(root, getSyntheticNodeWindow(root, nodeId).$$id);
+});
+
+export const getBoxedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Boxed & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserBox(state, item)));
+export const getWorkspaceSelectionBox = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserBox(state, boxed))));
 
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => getValueById(state, id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
@@ -166,8 +192,8 @@ export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, 
     showLeftGutter: true,
     showRightGutter: true,
   },
-  selectionIds: [],
-  hoveringIds: [],
+  selectionRefs: [],
+  hoveringRefs: [],
   secondarySelection: false
 });
 
@@ -178,10 +204,16 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+b", toggleLeftGutterPressed()),
     createKeyboardShortcut("meta+/", toggleRightGutterPressed())
   ],
-  fileCache: createFileCache()
+  fileCacheStore: createFileCacheStore(),
+  browserStore: createSyntheticBrowserStore()
 });
 
-export const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: StageToolOverlayMouseMoved|StageToolOverlayClicked) => {
+export const selectWorkspace = (state: ApplicationState, selectedWorkspaceId: string) => ({
+  ...state,
+  selectedWorkspaceId,
+})
+
+export const getStageToolMouseNodeTargetReference = (state: ApplicationState, event: StageToolOverlayMouseMoved|StageToolOverlayClicked) => {
   const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
   const window = getSyntheticWindow(state, windowId);
   const workspace = getSyntheticWindowWorkspace(state, windowId);
@@ -204,8 +236,7 @@ export const getStageToolMouseNodeTargetUID = (state: ApplicationState, event: S
     }
   }
   const smallestBox = getSmallestBox(...intersectingBoxes);
-  const uid = intersectingBoxMap.get(smallestBox);
-  return uid;
+  return [SYNTHETIC_ELEMENT, intersectingBoxMap.get(smallestBox)] as [string, string];
 }
 
 export * from "./shortcuts";

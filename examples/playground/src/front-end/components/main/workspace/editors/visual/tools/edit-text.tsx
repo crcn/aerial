@@ -8,6 +8,7 @@ import { stageToolEditTextChanged, stageToolEditTextBlur } from "front-end/acti
 import { 
   SyntheticNode, 
   SyntheticWindow,
+  SyntheticBrowser,
   isSyntheticDOMNode,
   getSyntheticNodeById, 
   getSyntheticNodeWindow,
@@ -17,6 +18,7 @@ import {
 
 export type EditTextToolOuterProps = {
   workspace: Workspace;
+  browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 }
 
@@ -25,12 +27,12 @@ export type EditTextToolInnerProps = {
   setTextarea: (v: any) => any;
 } & EditTextToolOuterProps;
 
-export const EditTextToolComponentBase = ({ workspace, dispatch, setTextarea }: EditTextToolInnerProps) => {
+export const EditTextToolComponentBase = ({ workspace, browser, dispatch, setTextarea }: EditTextToolInnerProps) => {
   if (!workspace.secondarySelection) return null;
   const zoom = workspace.visualEditorSettings.translate.zoom;
-  const selectedNode: SyntheticNode = workspace.selectionIds.map(id => getSyntheticNodeById(workspace, id)).shift();
+  const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
   if (!isSyntheticDOMNode(selectedNode)) return null;
-  const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(workspace, selectedNode.$$id);
+  const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(browser, selectedNode.$$id);
   const box = nodeWindow.computedBoxes[selectedNode.$$id];
   const computedStyle = (nodeWindow.computedStyles[selectedNode.$$id] || {}) as CSSStyleDeclaration;
   if (!box) return null;

@@ -8,7 +8,7 @@ import { createCommonJSSaga } from "aerial-commonjs-extension2";
 
 import { 
   fileCacheSaga,
-  createFileCache,
+  createFileCacheStore,
   fileCacheReducer,
   sandboxEnvironmentSaga,
   createAddDependencyRequest,
@@ -34,7 +34,7 @@ describe(__filename + "#", () => {
     }
   };
 
-  const mainReducer = (state = { sandbox: createSandbox(), dependencyGraph: createDependencyGraph(), fileCache: createFileCache() }, event) => {
+  const mainReducer = (state = { sandbox: createSandbox(), dependencyGraph: createDependencyGraph(), fileCacheStore: createFileCacheStore() }, event) => {
     state = dependencyGraphReducer(state, event);
     state = sandboxReducer(state, event);
     state = fileCacheReducer(state, event);

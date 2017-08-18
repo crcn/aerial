@@ -34,7 +34,7 @@ import {
   getWorkspaceSelectionBox,
   getBoxedWorkspaceSelection,
   getSyntheticWindowWorkspace,
-  getStageToolMouseNodeTargetUID,
+  getStageToolMouseNodeTargetReference,
 } from "../state";
 
 export function* mainWorkspaceSaga() {
@@ -50,7 +50,7 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    yield put(createOpenSyntheticWindowRequest(`http://localhost:8082/`, workspace.browser.$$id));
+    yield put(createOpenSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
     return true;
   });
 }
@@ -59,8 +59,8 @@ function* handleAltClickElement() {
   while(true) {
     const event: StageToolOverlayClicked = yield take((action: StageToolOverlayClicked) => action.type === STAGE_TOOL_OVERLAY_MOUSE_CLICKED && action.sourceEvent.altKey);
     const state = yield select();
-    const targetUID = getStageToolMouseNodeTargetUID(state, event);
-    const node = getSyntheticNodeById(state, targetUID);
+    const targetRef = getStageToolMouseNodeTargetReference(state, event);
+    const node = getSyntheticNodeById(state, targetRef[1]);
     if (node.nodeType === SEnvNodeTypes.ELEMENT) {
       const element = node as SyntheticElement;
       if (element.nodeName === "A") {
@@ -77,7 +77,7 @@ function* handleAltClickElement() {
 
 function* openNewWindow(href: string, origin: SyntheticWindow, workspace: Workspace) {
   const uri = getUri(href, origin.location);
-  yield put(createOpenSyntheticWindowRequest(uri, workspace.browser.$$id));
+  yield put(createOpenSyntheticWindowRequest(uri, workspace.browserId));
 }
 
 function* handleDeleteKeyPressed() {
@@ -86,7 +86,7 @@ function* handleDeleteKeyPressed() {
     const state = yield select();
     const { sourceEvent } = event as DeleteShortcutPressed;
     const workspace = getSelectedWorkspace(state);
-    const selected  = workspace.selectionIds.map(id => getValueById(state, id)) as Struct[];
+    const selected  = workspace.selectionRefs.map(([type, id]) => getValueById(state, id)) as Struct[];
     for (const item of selected) {
       yield put(removed(item.$$id, item.$$type));
     }
@@ -97,13 +97,13 @@ function* handleDeleteKeyPressed() {
 function* handleSelectionMoved() {
   while(true) {
     const { point, workspaceId, point: newPoint } = (yield take(RESIZER_MOVED)) as ResizerMoved;
-    const state = yield select();
+    const state = (yield select()) as ApplicationState;
     const workspace = getWorkspaceById(state, workspaceId);
     const translate = workspace.visualEditorSettings.translate;
 
-    const bounds = getWorkspaceSelectionBox(workspace);
-    for (const item of getBoxedWorkspaceSelection(workspace)) {
-      const box = getSyntheticBrowserBox(workspace, item);
+    const bounds = getWorkspaceSelectionBox(state, workspace);
+    for (const item of getBoxedWorkspaceSelection(state, workspace)) {
+      const box = getSyntheticBrowserBox(state, item);
       yield put(moved(item.$$id, item.$$type, scaleInnerBox(box, bounds, moveBox(bounds, newPoint))));
     }
   }
@@ -112,10 +112,10 @@ function* handleSelectionMoved() {
 function* handleSelectionStoppedMoving() {
   while(true) {
     const { point, workspaceId } = (yield take(RESIZER_STOPPED_MOVING)) as ResizerMoved;
-    const state = yield select();
+    const state = (yield select()) as ApplicationState;
     const workspace = getWorkspaceById(state, workspaceId);
-    for (const item of getBoxedWorkspaceSelection(workspace)) {
-      const box = getSyntheticBrowserBox(workspace, item);
+    for (const item of getBoxedWorkspaceSelection(state, workspace)) {
+      const box = getSyntheticBrowserBox(state, item);
       yield put(stoppedMoving(item.$$id, item.$$type));
     }
   }

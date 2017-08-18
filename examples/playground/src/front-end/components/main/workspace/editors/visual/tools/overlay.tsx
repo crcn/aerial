@@ -4,8 +4,8 @@ import * as React from "react";
 import { Workspace } from "front-end/state";
 import { compose, pure, withHandlers } from "recompose";
 import { mapValues, values } from "lodash";
-import { SyntheticNode, getAllSyntheticDOMNodesAsIdMap, SyntheticWindow } from "aerial-browser-sandbox";
-import { getValueById, Dispatcher, Box, wrapEventToDispatch, weakMemo } from "aerial-common2";
+import { SyntheticNode, getAllSyntheticDOMNodesAsIdMap, SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
+import { getValueById, Dispatcher, Box, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
 import { 
   stageToolOverlayMouseClicked,
   stageToolOverlayMouseMoved,
@@ -14,6 +14,7 @@ import {
 
 export type VisualToolsComponentProps = {
   workspace: Workspace;
+  browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
@@ -85,16 +86,16 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom }: Windo
 
 const WindowOverlayTools = pure(WindowOverlayToolsBase as any) as any as typeof WindowOverlayToolsBase;
 
-const getHoveringSyntheticNodes = weakMemo((hoveringIds: string[], window: SyntheticWindow) => {
+const getHoveringSyntheticNodes = weakMemo((hoveringRefs: StructReference[], window: SyntheticWindow) => {
   const allNodes = getAllSyntheticDOMNodesAsIdMap(window);
-  return hoveringIds.map((id) => allNodes[id]).filter((id) => !!id);
+  return hoveringRefs.map(([type, id]) => allNodes[id]).filter((id) => !!id);
 });
 
-export const NodeOverlaysToolComponentBase = ({ workspace, dispatch }: VisualToolsComponentProps) => {
+export const NodeOverlaysToolComponentBase = ({ workspace, browser, dispatch }: VisualToolsComponentProps) => {
   return <div className="visual-tools-layer-component">
     {
-      workspace.browser.windows.map((window) => {
-        return <WindowOverlayTools key={window.$$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringIds, window)} window={window} dispatch={dispatch} zoom={workspace.visualEditorSettings.translate.zoom} />;
+      browser.windows.map((window) => {
+        return <WindowOverlayTools key={window.$$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={workspace.visualEditorSettings.translate.zoom} />;
       })
     }
   </div>

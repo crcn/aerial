@@ -4,10 +4,9 @@ import { delay } from "redux-saga";
 import { createStore, applyMiddleware, combineReducers } from "redux";
 import { default as createSagaMiddleware } from "redux-saga";
 import { waitUntil, request } from "aerial-common2";
-import { createCommonJSLoaderSaga } from "aerial-commonjs-extension2";
+// import { createCommonJSLoaderSaga } from "aerial-commonjs-extension2";
 
 import { 
-  getFileCache,
   createWriteUriRequest,
   getFileCacheItemByUri,
   createReadUriRequest,

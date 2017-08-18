@@ -155,3 +155,8 @@ export const deleteValueById = (root: any, id: string) => {
   const ownerClone = Array.isArray(owner) ? [...owner.slice(0, Number(key)), ...owner.slice(Number(key) + 1)] : omit(owner, key);
   return updateIn(root, ownerPath, ownerClone);
 };
+
+export type StructReference = [string, string];
+
+export const getReferenceString = ({ $$id, $$type }: Struct) => `${$$type}:${$$id}`;
+export const getStructReference = ({ $$id, $$type }: Struct): [string, string] => [$$type, $$id];

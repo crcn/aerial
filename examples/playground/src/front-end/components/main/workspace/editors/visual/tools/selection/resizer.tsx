@@ -1,5 +1,6 @@
 import "./resizer.scss";
 import React =  require("react");
+import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { pure, compose, withHandlers } from "recompose";
 import { Workspace, getBoxedWorkspaceSelection, getWorkspaceSelectionBox } from "front-end/state";
 import { resizerMoved, resizerStoppedMoving } from "front-end/actions";
@@ -7,6 +8,7 @@ import { startDOMDrag, Dispatcher, mergeBoxes, moveBox } from "aerial-common2";
 import { PathComponent } from "./path";
 
 export type ResizerComponentOuterProps = {
+  browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
   workspace: Workspace;
 }
@@ -19,9 +21,9 @@ const POINT_STROKE_WIDTH = 1;
 const POINT_RADIUS       = 4;
 
 
-export const ResizerComponentBase = ({ workspace, dispatch, onMouseDown }: ResizerComponentInnerProps) => {
+export const ResizerComponentBase = ({ workspace, browser, dispatch, onMouseDown }: ResizerComponentInnerProps) => {
 
-  const box = getWorkspaceSelectionBox(workspace);
+  const box = getWorkspaceSelectionBox(browser, workspace);
   const zoom = workspace.visualEditorSettings.translate.zoom;
 
   // offset stroke
@@ -68,9 +70,9 @@ export const ResizerComponentBase = ({ workspace, dispatch, onMouseDown }: Resiz
 const enhanceResizerComponent = compose<ResizerComponentInnerProps, ResizerComponentOuterProps>(
   pure,
   withHandlers({
-    onMouseDown: ({ dispatch, workspace }: ResizerComponentOuterProps) => (event: React.MouseEvent<any>) => {
+    onMouseDown: ({ dispatch, workspace, browser }: ResizerComponentOuterProps) => (event: React.MouseEvent<any>) => {
       const { translate } = workspace.visualEditorSettings;
-      const box = getWorkspaceSelectionBox(workspace);
+      const box = getWorkspaceSelectionBox(browser, workspace);
       const translateLeft = translate.left;
       const translateTop  = translate.top;
       startDOMDrag(event, (event2, { delta }) => {

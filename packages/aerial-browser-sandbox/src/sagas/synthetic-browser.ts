@@ -4,9 +4,9 @@ import { difference, debounce } from "lodash";
 import { createQueue } from "mesh";
 
 import { 
-  getFileCache,
-  FileCache,
   FileCacheItem,
+  getFileCacheStore,
+  FileCacheRootState,
   createReadUriRequest,
   AddDependencyRequest, 
   AddDependencyResponse, 
@@ -71,6 +71,7 @@ import {
   SyntheticParentNode,
   SyntheticElement,
   SyntheticTextNode,
+  SyntheticBrowserRootState,
   isSyntheticNodeType,
   SyntheticComment,
   SyntheticDocument,
@@ -123,7 +124,7 @@ function* handleFetchRequests() {
 
 function* handleBrowserChanges() {
   let runningSyntheticBrowserIds = [];
-  yield watch((root) => getSyntheticBrowsers(root), function*(browsers: SyntheticBrowser[]) {
+  yield watch((root: SyntheticBrowserRootState) => getSyntheticBrowsers(root), function*(browsers: SyntheticBrowser[]) {
     const syntheticBrowserIds = browsers.map(item => item.$$id);
     yield* difference(syntheticBrowserIds, runningSyntheticBrowserIds).map((id) => (
       spawn(handleSyntheticBrowserSession, id)
@@ -135,7 +136,7 @@ function* handleBrowserChanges() {
 
 function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
   let runningSyntheticWindowIds = [];
-  yield watch((root) => getSyntheticBrowser(root, syntheticBrowserId), function*(syntheticBrowser: SyntheticBrowser) {
+  yield watch((root: SyntheticBrowserRootState) => getSyntheticBrowser(root, syntheticBrowserId), function*(syntheticBrowser: SyntheticBrowser) {
 
     // stop the session if there is no synthetic window
     if (!syntheticBrowser) return false;
@@ -156,7 +157,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   const fetchQueue = createQueue();
 
   yield fork(function*() {
-    yield watch((root) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
+    yield watch((root: SyntheticBrowserRootState) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
       if (!syntheticWindow) {
         if (cenv) {
           cenv.close();
@@ -178,7 +179,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   }
 
   yield fork(function*() {
-    yield watch((root) => getFileCache(root), function*(fileCache) {
+    yield watch((root: FileCacheRootState) => root.fileCacheStore, function*(fileCache) {
       const updatedCachedFiles = yield getFetchedCacheFiles();
       if (cachedFiles && cenv.document.readyState === "complete" && difference(cachedFiles, updatedCachedFiles).length !== 0) {
         yield spawn(reload);

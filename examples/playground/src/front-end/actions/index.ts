@@ -1,5 +1,5 @@
 import { FileCacheItem } from "aerial-sandbox2";
-import { TreeNode, Box, Action, BaseEvent, Point, WrappedEvent, publicObject } from "aerial-common2";
+import { TreeNode, Box, Action, BaseEvent, Point, WrappedEvent, publicObject, Struct } from "aerial-common2";
 
 export const RESIZER_MOVED               = "RESIZER_MOVED";
 export const RESIZER_STOPPED_MOVING               = "RESIZER_STOPPED_MOVING";
@@ -133,7 +133,7 @@ export type StageToolOverlayClicked = {
 } & WrappedEvent<React.MouseEvent<any>>;
 
 export type SelectorDoubleClicked = {
-  itemId: string;
+  item: Struct;
 } & WrappedEvent<React.MouseEvent<any>>;
 
 export type WorkspaceSelectionDeleted = {
@@ -196,8 +196,8 @@ export const stageToolOverlayMouseDoubleClicked = (windowId: string, sourceEvent
   sourceEvent
 });
 
-export const selectorDoubleClicked = (itemId: string, sourceEvent: React.MouseEvent<any>): SelectorDoubleClicked => ({
-  itemId,
+export const selectorDoubleClicked = (item: Struct, sourceEvent: React.MouseEvent<any>): SelectorDoubleClicked => ({
+  item,
   type: SELECTOR_DOUBLE_CLICKED,
   sourceEvent
 });

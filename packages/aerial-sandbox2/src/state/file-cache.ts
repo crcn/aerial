@@ -1,4 +1,4 @@
-import { Struct, createStructFactory, getValuesByType } from "aerial-common2";
+import { weakMemo, Struct, createStructFactory, getValuesByType, createDSQuery, DataStore, dsIndex, createDataStore, dsFind } from "aerial-common2";
 
 export const FILE_CACHE = "FILE_CACHE";
 export const FILE_CACHE_ITEM = "FILE_CACHE_ITEM";
@@ -33,22 +33,22 @@ export type FileCacheItem = {
   updatedAt: Date;
 } & Struct;
 
-export type FileCache = {
-  allFiles: {
-    [identifier: string]: FileCacheItem
-  }
-} & Struct;
+export type FileCacheRootState = {
+  fileCacheStore: DataStore<FileCacheItem>
+};
 
 export const createFileCacheItem = createStructFactory<FileCacheItem>(FILE_CACHE_ITEM);
-export const createFileCache  = createStructFactory<FileCache>(FILE_CACHE, {
-  allFiles: {
-
-  }
+export const createFileCacheStore = (items?: FileCacheItem[]) => dsIndex(dsIndex(createDataStore(items), "$$id", true), "sourceUri", true);
+export const createFileCacheRootState  = (items?: FileCacheItem[]): FileCacheRootState => ({
+  fileCacheStore: createFileCacheStore(items)
 });
 
-export const getFileCache = (root: any): FileCache => getValuesByType(root, FILE_CACHE)[0];
+export const getFileCacheStore = (root: FileCacheRootState) => root.fileCacheStore;
 
-export const getFileCacheItemByUri = (root: any, uri: string) => {
-  const cache = getFileCache(root);
-  return cache.allFiles[uri.replace(/\./g, "_")];
-}
+export const getFileCacheItemByUri = (root: FileCacheRootState, uri: string) => {
+  return dsFind(root.fileCacheStore, createDSQuery("sourceUri", uri));
+};
+
+export const getFileCacheItemById = (root: FileCacheRootState, id: string) => {
+  return dsFind(root.fileCacheStore, createDSQuery("$$id", id));
+};

@@ -5,6 +5,9 @@ HI PRIO:
 - [ ] localized DND for elements
 - [ ] move style to class shortcut
 - [ ] CSS inspector
+- [ ] rename visual to stage, visualSettings to stage
+- [ ] use DataStore instead of traversing entire tree
+- [ ] use struct property from synthetic DOM.
 
 MVP:
 

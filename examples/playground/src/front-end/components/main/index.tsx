@@ -5,6 +5,7 @@ import { WorkspaceComponent } from "./workspace";
 import { connect } from "react-redux";
 import { ImmutableObject, Dispatcher, getValueById } from "aerial-common2";
 import { Workspace, ApplicationState, getSelectedWorkspace } from "front-end/state";
+import { getSyntheticBrowser } from "aerial-browser-sandbox";
 
 export type MainComponentOuterProps = {
   dispatch: Dispatcher<any>
@@ -17,8 +18,9 @@ export type MainComponentInnerProps = {
 
 export const MainComponentBase = ({ state, dispatch }: MainComponentInnerProps) => {
   const workspace = getSelectedWorkspace(state);
+  const browser   = getSyntheticBrowser(state, workspace.browserId);
   return <div className="main-component">
-    { workspace && <WorkspaceComponent state={state} workspace={workspace} dispatch={dispatch} /> }
+    { workspace && <WorkspaceComponent state={state} workspace={workspace} dispatch={dispatch} browser={browser} /> }
   </div>;
 }
 

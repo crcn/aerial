@@ -22,6 +22,8 @@ import {
   getSmallestBox,
   scaleInnerBox,
   boxesIntersect,
+  StructReference,
+  getStructReference,
   pointIntersectsBox,
   keepBoxAspectRatio,
   centerTransformZoom,
@@ -29,7 +31,7 @@ import {
 } from "aerial-common2";
 
 import { clamp } from "lodash";
-import { fileCacheReducer, getFileCache, getFileCacheItemByUri } from "aerial-sandbox2";
+import { fileCacheReducer , getFileCacheItemByUri } from "aerial-sandbox2";
 
 import { 
   getSyntheticBrowserBox,
@@ -50,7 +52,7 @@ import {
   getSyntheticNodeWorkspace,
   getBoxedWorkspaceSelection,
   getSyntheticWindowWorkspace,
-  getStageToolMouseNodeTargetUID,
+  getStageToolMouseNodeTargetReference,
 } from "front-end/state";
 
 import {
@@ -103,8 +105,9 @@ import {
 import { 
   SyntheticNode,
   getSyntheticWindow, 
+  getSyntheticBrowser,
   syntheticBrowserReducer, 
-  createOpenSyntheticWindowRequest
+  createOpenSyntheticWindowRequest,
 } from "aerial-browser-sandbox";
 
 import reduceReducers = require("reduce-reducers");
@@ -198,7 +201,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getWorkspaceById(state, workspaceId);
 
       // TODO - possibly use BoxStruct instead of Box since there are cases where box prop doesn't exist
-      const bounds = getWorkspaceSelectionBox(workspace);
+      const bounds = getWorkspaceSelectionBox(state, workspace);
 
       const keepAspectRatio = sourceEvent.shiftKey;
       const keepCenter      = sourceEvent.altKey;
@@ -211,8 +214,8 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         newBounds = keepBoxAspectRatio(newBounds, bounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
       }
 
-      for (const item of getBoxedWorkspaceSelection(workspace)) {
-        const box = getSyntheticBrowserBox(workspace, item);
+      for (const item of getBoxedWorkspaceSelection(state, workspace)) {
+        const box = getSyntheticBrowserBox(state, item);
         const scaledBox = scaleInnerBox(box, bounds, newBounds);
         state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBox(box, bounds, newBounds)));
       }
@@ -221,7 +224,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case PROMPTED_NEW_WINDOW_URL: {
       const { workspaceId, location } = event as PromptedNewWindowUrl;
-      return applicationReducer(state, createOpenSyntheticWindowRequest(location, getWorkspaceById(state, workspaceId).browser.$$id));
+      return applicationReducer(state, createOpenSyntheticWindowRequest(location, getWorkspaceById(state, workspaceId).browserId));
     }
 
     case TOGGLE_LEFT_GUTTER_PRESSED: {
@@ -235,7 +238,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
       const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return updateStructProperty(state, workspace, "hoveringIds", [getStageToolMouseNodeTargetUID(state, event as StageToolOverlayMouseMoved)]);
+      return updateStructProperty(state, workspace, "hoveringRefs", [getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved)]);
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
@@ -243,10 +246,10 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
       const altKey = sourceEvent.altKey;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      const targetUID = getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked);
+      const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (metaKey) {
-        const { source: { uri, start } } = getValueById(state, targetUID) as SyntheticNode;
-        const fileCacheItem = getFileCacheItemByUri(state.fileCache, uri);
+        const { source: { uri, start } } = getValueById(state, targetRef[1]) as SyntheticNode;
+        const fileCacheItem = getFileCacheItemByUri(state, uri);
         if (fileCacheItem) {
           return updateStruct(state, workspace, {
             textCursorPosition: start,
@@ -255,7 +258,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         }
         return state;
       } else {
-        state = handleWindowSelectionFromAction(state, targetUID, event as StageToolNodeOverlayClicked);
+        state = handleWindowSelectionFromAction(state, targetRef, event as StageToolNodeOverlayClicked);
         return state;
       }
     }
@@ -263,25 +266,25 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      const targetUID = getStageToolMouseNodeTargetUID(state, event as StageToolNodeOverlayClicked);
+      const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
 
       state = updateStruct(state, workspace, {
         secondarySelection: true
       });
 
-      state = setWorkspaceSelection(state, workspace.$$id, targetUID);
+      state = setWorkspaceSelection(state, workspace.$$id, targetRef);
 
       return state;
     }
 
     case SELECTOR_DOUBLE_CLICKED: {
-      const { sourceEvent, itemId } = event as SelectorDoubleClicked;
-      const workspace = getSyntheticNodeWorkspace(state, itemId);
+      const { sourceEvent, item } = event as SelectorDoubleClicked;
+      const workspace = getSyntheticNodeWorkspace(state, item.$$id);
       state = updateStruct(state, workspace, {
         secondarySelection: true
       });
-
-      state = setWorkspaceSelection(state, workspace.$$id, itemId);
+      state = setWorkspaceSelection(state, workspace.$$id, getStructReference(item));
+      return state;
     }
 
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
@@ -298,7 +301,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     }
 
     case STAGE_TOOL_WINDOW_TITLE_CLICKED: {
-      return handleWindowSelectionFromAction(state, (event as WindowPaneRowClicked).windowId, event as WindowPaneRowClicked);
+      return handleWindowSelectionFromAction(state, getStructReference(getSyntheticWindow(state, (event as WindowPaneRowClicked).windowId)), event as WindowPaneRowClicked);
     }
 
     case STAGE_TOOL_WINDOW_KEY_DOWN: {
@@ -339,16 +342,16 @@ const moveItemFromAction = <T extends { sourceEvent: React.KeyboardEvent<any> }>
   return state;
 };
 
-const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, itemId: string, event: T) => {
+const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, ref: StructReference, event: T) => {
   const { windowId, sourceEvent } = event;
   const workspace = getSyntheticWindowWorkspace(state, windowId);
-  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, itemId) : toggleWorkspaceSelection(state, workspace.$$id, itemId);
+  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, ref) : toggleWorkspaceSelection(state, workspace.$$id, ref);
 }
 
 const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
   switch (event.type) {
     case WINDOW_PANE_ROW_CLICKED: {
-      return handleWindowSelectionFromAction(state, (event as WindowPaneRowClicked).windowId, event as WindowPaneRowClicked);
+      return handleWindowSelectionFromAction(state, getStructReference(getSyntheticWindow(state, (event as WindowPaneRowClicked).windowId)), event as WindowPaneRowClicked);
     }
   }
   return state;

@@ -5,21 +5,23 @@ import { Workspace, getSelectedWorkspaceFile, ApplicationState } from "front-end
 import { Dispatcher, Message, getValueById } from "aerial-common2";
 import { ProjectGutterComponent } from "./project-gutter";
 import { TextEditorComponent, VisualEditorComponent } from "./editors";
+import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { VisualGutterComponent } from "./element-gutter";
 
 export type WorkspaceComponentProps = {
-  workspace: Workspace,
-  state: ApplicationState,
+  workspace: Workspace;
+  browser: SyntheticBrowser;
+  state: ApplicationState;
   dispatch?:  Dispatcher<any>
 };
 
-export const WorkspaceComponentBase = ({ state, workspace, dispatch }: WorkspaceComponentProps) => {
+export const WorkspaceComponentBase = ({ state, workspace, browser, dispatch }: WorkspaceComponentProps) => {
   const visualSettings = workspace.visualEditorSettings;
   return <div className="workspace-component">
-    { visualSettings.showLeftGutter ? <ProjectGutterComponent workspace={workspace} dispatch={dispatch} /> : null }
+    { visualSettings.showLeftGutter ? <ProjectGutterComponent workspace={workspace} browser={browser} dispatch={dispatch} /> : null }
     <div className="workspace-editors">
       <TextEditorComponent file={getSelectedWorkspaceFile(state, workspace)} cursorPosition={workspace.textCursorPosition} dispatch={dispatch} />
-      <VisualEditorComponent workspace={workspace} dispatch={dispatch} />
+      <VisualEditorComponent workspace={workspace} dispatch={dispatch} browser={browser} />
     </div>
     { visualSettings.showRightGutter ? <VisualGutterComponent /> : null }
   </div>
