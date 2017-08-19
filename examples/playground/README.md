@@ -2,6 +2,7 @@ very simple online playground for visually creating web applications
 
 HI PRIO:
 
+- [ ] do NOT dispatch DOM mutations on initial load 
 - [ ] localized DND for elements
 - [ ] move style to class shortcut
 - [ ] CSS inspector

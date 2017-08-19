@@ -50,7 +50,8 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    yield put(createOpenSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
+    // yield put(createOpenSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
+    yield put(createOpenSyntheticWindowRequest("https://www.w3.org/Style/Examples/011/mypage.html", workspace.browserId));
     return true;
   });
 }

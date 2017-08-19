@@ -13,6 +13,7 @@ export const getSEnvTextClass = weakMemo((context: any) => {
   return class SEnvText extends SEnvValueNode implements Text {
     readonly nodeType: number =  SEnvNodeTypes.TEXT;
     readonly structType: string = SYNTHETIC_TEXT_NODE;
+    readonly nodeName: string = "#text";
     
     get textContent() {
       return this.nodeValue;

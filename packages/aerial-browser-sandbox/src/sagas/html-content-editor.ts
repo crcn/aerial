@@ -42,8 +42,7 @@ export function* htmlContentEditorSaga(contentType: string = "text/html") {
     while(true) {
       yield takeRequest(testMutateContentRequest(contentType, SyntheticDOMElementMutationTypes.SET_TEXT_CONTENT), ({ mutation, content }: MutateSourceContentRequest<SetPropertyMutation<any>>) => {  
         const targetNode = findMutationTargetExpression(mutation.target, parseHTML(content)) as parse5.AST.Default.Element;
-
-        return createStringMutation(targetNode.__location.startTag.endOffset, targetNode.__location.endTag.startOffset, mutation.newValue);
+        return createStringMutation(targetNode.__location.startTag.endOffset, targetNode.__location.endTag ? targetNode.__location.endTag.startOffset : targetNode.__location.endOffset, mutation.newValue);
       });
     }
   });
@@ -125,8 +124,8 @@ const parseHTML = weakMemo((content) => {
 });
 
 const findMutationTargetExpression = (target: SEnvNodeInterface, root: parse5.AST.Default.Node) => {
-  return findDOMNodeExpression(root, (expression) => {
+  return findDOMNodeExpression(root, (expression: parse5.AST.Default.Node) => {
     const location = getHTMLASTNodeLocation(expression);
-    return /*expression.kind === synthetic.source.kind &&*/ expressionPositionEquals(location, target.source.start)
+    return expression.nodeName === target.nodeName.toLowerCase() && expressionPositionEquals(location, target.source.start)
   });
 };

@@ -298,8 +298,9 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
         emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct));
       }, 0);
 
-      cenv.addEventListener(SEnvMutationEvent.MUTATION, () => {
+      cenv.addEventListener(SEnvMutationEvent.MUTATION, (event) => {
         if (cenv.document.readyState !== "complete") return;
+        console.log("STRUCT CHANGE", event.mutation.$$type);
         // multiple mutations may be fired, so batch everything in one go
         emitStructChange();
       });

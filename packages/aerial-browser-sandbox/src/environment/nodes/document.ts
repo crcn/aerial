@@ -392,7 +392,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
 
     createStruct():  SyntheticDocument {
-      const titleEl = this.querySelector("title")
+      const titleEl = this.querySelector("title");
       return {
         ...(super.createStruct() as any),
         title: this.title

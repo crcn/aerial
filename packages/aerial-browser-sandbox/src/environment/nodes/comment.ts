@@ -13,6 +13,7 @@ export const getSEnvCommentClass = weakMemo((context) => {
     readonly length: number;
     readonly nodeType: number =  SEnvNodeTypes.COMMENT;
     readonly structType: string = SYNTHETIC_COMMENT;
+    readonly nodeName: string = "#comment";
     
     get data() {
       return this.nodeValue;
