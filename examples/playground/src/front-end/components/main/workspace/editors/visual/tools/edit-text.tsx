@@ -12,7 +12,6 @@ import {
   isSyntheticDOMNode,
   getSyntheticNodeById, 
   getSyntheticNodeWindow,
-  getAllSyntheticDOMNodes, 
   getSyntheticNodeTextContent,
 } from "aerial-browser-sandbox";
 

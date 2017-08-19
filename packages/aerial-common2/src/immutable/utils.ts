@@ -88,29 +88,11 @@ export function updateIn(target: any, path: string[], value: any) {
   return newTarget;
 };
 
-export const flattenObject = weakMemo((target: any) => {
-  const flattened = {};
-  if (Array.isArray(target) || (target && (target.constructor === Object || target.constructor === ImmutableObject))) {
-    each(target, (value, key) => {
-      flattened[key] = value;
-      each(flattenObject(value), (obj, path) => {
-        flattened[`${key}.${path}`] = obj;
-      }); 
-    });
-  };
-  return flattened;
-});
 
-export const getPath = weakMemo(<T>(root: any, filter: (a: any) => boolean) => {
-  if (filter(root)) return [];
-  const flattened = flattenObject(root);
-  for (const path in flattened) {
-    const value = flattened[path];
-    if (filter(value)) return path.split(".");
-  }
-});
+export const arraySplice = <T>(target: T[], startIndex: number, deleteCount: number, ...newValues: T[]) => [...target.slice(0, startIndex), ...newValues, ...target.slice(startIndex + deleteCount)];
 
+export const arrayReplaceIndex = <T>(target: T[], index: number, newItem: T) => arraySplice(target, index, 1, newItem);
+export const arrayReplaceItem = <T>(target: T[], oldItem: T, newItem: T) => arrayReplaceIndex(target, target.indexOf(oldItem), newItem);
 
-export const getValueByPath = weakMemo(<T>(root: any, path: string[] | ReadonlyArray<string>) => {
-  return path ? path.length ? flattenObject(root)[path.join(".")] : root : undefined;
-});
+export const arrayRemoveIndex = <T>(target: T[], index: number) => arraySplice(target, index, 1);
+export const arrayRemoveItem = <T>(target: T[], item: T) => arraySplice(target, target.indexOf(item), 1);

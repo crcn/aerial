@@ -286,6 +286,12 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     }
   }
 
+  const getAllNodes = () => {
+    const allNodes = {};
+    cenv.childObjects.forEach((value, key) => allNodes[key] = value.struct);
+    return allNodes;
+  }
+
   function* watchNewWindow(syntheticWindow: SyntheticWindow) {
     const { SEnvMutationEvent } = getSEnvEventClasses(cenv);
     const chan = eventChannel((emit) => {
@@ -295,7 +301,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       });
       
       const emitStructChange = debounce(() => {
-        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct));
+        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct, getAllNodes()));
       }, 0);
 
       cenv.addEventListener(SEnvMutationEvent.MUTATION, (event) => {
@@ -306,7 +312,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
       cenv.document.addEventListener("readystatechange", () => {
         if (cenv.document.readyState !== "complete") return;
-        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct));
+        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct, getAllNodes()));
       });
 
       return () => {
@@ -360,10 +366,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
       const target = cenv.childObjects.get(itemId) as HTMLElement;
       
-      // console.log(calculateUntransformedBoundingRect(target));
-      // console.log("ITEM", itemType, target.getBoundingClientRect());
       const originalRect = target.getBoundingClientRect();
-      // const box = moveBox(originalRect, point);
 
 
       // TODO - get best CSS style

@@ -12,8 +12,6 @@ import {
   moveBox,
   BaseEvent, 
   updateStructProperty, 
-  getValueById, 
-  deleteValueById,
 } from "aerial-common2";
 
 import { 

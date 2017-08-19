@@ -1,4 +1,4 @@
-import { Struct, createStructFactory, getValuesByType, getValueById } from "aerial-common2";
+import { Struct, createStructFactory } from "aerial-common2";
 
 export const SANDBOX_ENVIRONMENT = "SANDBOX_ENVIRONMENT";
 export const SANDBOX = "SANDBOX";
@@ -21,5 +21,5 @@ export const createSandboxEnvironment = createStructFactory<SandboxEnvironment>(
   fresh: false
 });
 
-export const getSandbox = (root: any): Sandbox => getValuesByType(root, SANDBOX)[0];
-export const getSandboxEnvironment = (root: any, sandboxEnvironmentId: string): SandboxEnvironment => getValueById(root, sandboxEnvironmentId);
+export const getSandbox = (root: any): Sandbox => null; //getValuesByType(root, SANDBOX)[0];
+export const getSandboxEnvironment = (root: any, sandboxEnvironmentId: string): SandboxEnvironment => null; //getValueById(root, sandboxEnvironmentId);

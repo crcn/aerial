@@ -5,7 +5,6 @@ import {
   Box, 
   Point, 
   weakMemo,
-  getValueById,
   traverseObject,
   createStructFactory,
 } from "aerial-common2";

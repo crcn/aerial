@@ -1,4 +1,4 @@
-import { watch, getValueById, removed, Struct, moved, stoppedMoving, moveBox, scaleInnerBox } from "aerial-common2";
+import { watch, removed, Struct, moved, stoppedMoving, moveBox, scaleInnerBox } from "aerial-common2";
 import { take, select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
 import { 
@@ -87,9 +87,8 @@ function* handleDeleteKeyPressed() {
     const state = yield select();
     const { sourceEvent } = event as DeleteShortcutPressed;
     const workspace = getSelectedWorkspace(state);
-    const selected  = workspace.selectionRefs.map(([type, id]) => getValueById(state, id)) as Struct[];
-    for (const item of selected) {
-      yield put(removed(item.$$id, item.$$type));
+    for (const [type, id] of workspace.selectionRefs) {
+      yield put(removed(id, type));
     }
     yield put(workspaceSelectionDeleted(workspace.$$id));
   }

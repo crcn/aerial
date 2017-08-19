@@ -9,23 +9,18 @@ import {
   weakMemo,
   Translate,
   mergeBoxes,
-  getPathById,
   filterBoxed,
-  getValueById,
-  updateStruct,
   getSmallestBox,
   ImmutableArray, 
   StructReference,
-  getValueByPath,
+  arrayReplaceIndex,
   ImmutableObject,
-  findParentObject,
   getStructReference,
   ExpressionPosition,
   pointIntersectsBox,
   createStructFactory,
   getReferenceString,
   BaseApplicationState,
-  updateStructProperty,
   createImmutableArray,
   createImmutableObject,
   ImmutableArrayIdentity,
@@ -131,33 +126,27 @@ export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...sele
 };
 
 export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
-  const workspace = getWorkspaceById(root, workspaceId);
-  return updateStruct(root, workspace, {
+  return updateWorkspace(root, workspaceId, {
     selectionRefs: [],
     secondarySelection: false
   });
 };
 
 export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: StructReference[]) => {
-  const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "selectionRefs", uniq([...selectionIds]));
+  return updateWorkspace(root, workspaceId, {
+    selectionRefs: uniq([...selectionIds])
+  });
 };
 
-// export const updateWorkspace = (root: ApplicationState, workspaceId: string, newProperties: Partial<Workspace>) => {
-
-  
-//   const workspace = getWorkspaceById(root, workspaceId);
-//   return updateStructProperty(root, workspace, "selectionIds", uniq([...selectionIds]));
-// };
-
-export const addWorkspaceHovering = (root: any, workspaceId: string, ...hovering: Struct[]) => {
+export const updateWorkspace = (root: ApplicationState, workspaceId: string, newProperties: Partial<Workspace>) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "hoveringRefs", uniq([...hovering.map(getReferenceString)]));
-};
-
-export const removeWorkspaceHovering = (root: any, workspaceId: string, ...hovering: StructReference[]) => {
-  const workspace = getWorkspaceById(root, workspaceId);
-  return updateStructProperty(root, workspace, "hoveringRefs", diffStructReferences(workspace.hoveringRefs, hovering));
+  return {
+    ...root,
+    workspaces: arrayReplaceIndex(root.workspaces, root.workspaces.indexOf(workspace), {
+      ...workspace,
+      ...newProperties
+    })
+  }
 };
 
 export const addWorkspace = (root: ApplicationState, workspace: Workspace) => {
@@ -178,9 +167,8 @@ export const getSyntheticNodeWorkspace = weakMemo((root: ApplicationState, nodeI
 export const getBoxedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Boxed & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserBox(state, item)));
 export const getWorkspaceSelectionBox = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserBox(state, boxed))));
 
-export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => getValueById(state, id);
+export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => state.workspaces.find((workspace) => workspace.$$id === id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
-export const getSelectedWorkspacePath = (state: ApplicationState) => getPathById(state, state.selectedWorkspaceId);
 
 /**
  * Factories

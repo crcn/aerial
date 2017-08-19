@@ -1,10 +1,7 @@
 import { 
   Struct, 
-  getPath,
   weakMemo,
   ErrorShape, 
-  getValueById,
-  getValuesByType, 
   createStructFactory, 
 } from "aerial-common2";
 import {
@@ -148,12 +145,13 @@ export const createDependencyGraph = createStructFactory(DEPENDENCY_GRAPH, {
   allDependencies: {}
 });
 
-export const getDependencyGraph = (root: any): DependencyGraph => getValuesByType(root, DEPENDENCY_GRAPH)[0];
+export const getDependencyGraph = (root: any): DependencyGraph => null; // getValuesByType(root, DEPENDENCY_GRAPH)[0];
 
 
 export const getDependency = (root: any, dependencyIdOrHash: string): Dependency => { 
   const graph = getDependencyGraph(root);
-  return graph.allDependencies[dependencyIdOrHash] || getValueById(root, dependencyIdOrHash);
+  return null;
+  // return graph.allDependencies[dependencyIdOrHash] || getValueById(root, dependencyIdOrHash);
 }
 
 export const getAllDependencies = weakMemo((root: any, hash: string, filter: ((dep: Dependency) => boolean) = (dep) => true) => {

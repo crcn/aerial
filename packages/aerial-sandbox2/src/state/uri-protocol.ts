@@ -1,8 +1,6 @@
 import { 
   Struct, 
   weakMemo,
-  getPathByType,
-  getValueByPath,
   createStructFactory,
 } from "aerial-common2";
 
@@ -35,6 +33,6 @@ export const createURIProtocolState = createStructFactory(URI_PROTOCOL_STATE, {
 });
 
 
-export const getUriProtocolState = weakMemo((root: any) => getValueByPath(root, getPathByType(root, URI_PROTOCOL_STATE))) as (root) => URIProtocolState;
+// export const getUriProtocolState = weakMemo((root: any) => getValueByPath(root, getPathByType(root, URI_PROTOCOL_STATE))) as (root) => URIProtocolState;
 
 export const hasURIProtocol = (uri: string) => /^\w+:\/\//.test(uri);

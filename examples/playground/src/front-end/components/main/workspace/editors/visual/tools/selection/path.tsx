@@ -3,7 +3,7 @@ import * as  React from "react";
 import { compose, pure, withHandlers } from "recompose";
 import { getWorkspaceById, Workspace } from "front-end/state";
 import { resizerPathMoved } from "front-end/actions";
-import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, updateStructProperty, Box } from "aerial-common2";
+import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, Box } from "aerial-common2";
 
 export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
 

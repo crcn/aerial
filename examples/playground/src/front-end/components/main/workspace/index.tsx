@@ -1,12 +1,12 @@
 import "./index.scss";
 import * as React from "react";
 import { pure } from "recompose";
-import { Workspace, getSelectedWorkspaceFile, ApplicationState } from "front-end/state";
-import { Dispatcher, Message, getValueById } from "aerial-common2";
+import { SyntheticBrowser } from "aerial-browser-sandbox";
+import { Dispatcher, Message } from "aerial-common2";
+import { VisualGutterComponent } from "./element-gutter";
 import { ProjectGutterComponent } from "./project-gutter";
 import { TextEditorComponent, VisualEditorComponent } from "./editors";
-import { SyntheticBrowser } from "aerial-browser-sandbox";
-import { VisualGutterComponent } from "./element-gutter";
+import { Workspace, getSelectedWorkspaceFile, ApplicationState } from "front-end/state";
 
 export type WorkspaceComponentProps = {
   workspace: Workspace;

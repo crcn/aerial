@@ -10,16 +10,15 @@ import {
   dsUpdate,
   dsInsert,
   dsUpdateOne,
-  getValueById,
-  updateStruct, 
+  arrayReplaceItem,
   traverseObject,
   createDataStore,
   StructReference,
-  findParentObject,
+  arrayRemoveItem,
+
   ExpressionLocation,
   ExpressionPosition,
   createStructFactory, 
-  updateStructProperty, 
 } from "aerial-common2";
 
 import {
@@ -121,6 +120,9 @@ export const isSyntheticNodeType = (value: string) => {
 }
 
 export type SyntheticWindow = {
+  allNodes: {
+    [identifier: string]: SyntheticNode
+  }
   mount: HTMLElement;
   location: string;
   document: SyntheticDocument;
@@ -147,7 +149,8 @@ export const createSyntheticBrowserStore = (syntheticBrowsers?: SyntheticBrowser
 
 export const createSyntheticWindow = createStructFactory<SyntheticWindow>(SYNTHETIC_WINDOW, {
   box: DEFAULT_SYNTHETIC_WINDOW_BOX,
-  externalResourceUris: []
+  externalResourceUris: [],
+  allNodes: {}
 });
 
 export const createSyntheticBrowser = createStructFactory<SyntheticBrowser>(SYNTHETIC_BROWSER, {
@@ -226,6 +229,35 @@ export const getSyntheticWindow = (root: SyntheticBrowserRootState|SyntheticBrow
   return (root as SyntheticBrowserRootState).browserStore ? eachSyntheticWindow(root as SyntheticBrowserRootState, filter) : (root as SyntheticBrowser).windows.find(filter);
 };
 
+export const updateSyntheticBrowser = <TState extends SyntheticBrowserRootState>(root: TState, browserId: string, properties: Partial<SyntheticBrowser>): TState => {
+  const browser = getSyntheticBrowser(root, browserId);
+  return {
+    ...(root as any),
+    browserStore: dsUpdate(root.browserStore, { $$id: browser.$$id }, {
+      ...browser,
+      ...properties
+    })
+  };
+};
+
+export const updateSyntheticWindow = <TState extends SyntheticBrowserRootState>(root: TState, windowId: string, properties: Partial<SyntheticWindow>): TState => {
+  const browser = getSyntheticWindowBrowser(root, windowId);
+  const window = getSyntheticWindow(browser, windowId);
+  return updateSyntheticBrowser(root, browser.$$id, {
+    windows: arrayReplaceItem(browser.windows, window, {
+      ...window,
+      ...properties
+    })
+  });
+}
+
+export const removeSyntheticWindow = <TState extends SyntheticBrowserRootState>(root: TState, windowId: string): TState => {
+  const browser = getSyntheticWindowBrowser(root, windowId);
+  return updateSyntheticBrowser(root, browser.$$id, {
+    windows: arrayRemoveItem(browser.windows, getSyntheticWindow(browser, windowId))
+  });
+}
+
 export const getSyntheticWindowBrowser = weakMemo((root: SyntheticBrowserRootState, windowId: string): SyntheticBrowser => {
   for (const browser of getSyntheticBrowsers(root)) {
     for (const window of browser.windows) {
@@ -238,8 +270,8 @@ export const getSyntheticWindowBrowser = weakMemo((root: SyntheticBrowserRootSta
 export function getSyntheticNodeById(root: SyntheticBrowserRootState, id: string);
 export function getSyntheticNodeById(root: SyntheticBrowser, id: string);
 export function getSyntheticNodeById (root: any, id: string): SyntheticNode {
-  return getValueById(root, id);
-}
+  return getSyntheticNodeWindow(root, id).allNodes[id];
+};
 
 export const getSyntheticNodeTextContent = weakMemo((node: SyntheticNode): string => {
   let text = "";
@@ -265,42 +297,8 @@ export const getSyntheticNodeWindow = weakMemo((root: SyntheticBrowserRootState|
   return (root as SyntheticBrowserRootState).browserStore ? eachSyntheticWindow(root as SyntheticBrowserRootState, filter) : (root as SyntheticBrowser).windows.find(filter);
 });
 
-
-
 export const syntheticWindowContainsNode = weakMemo((window: SyntheticWindow, nodeId: string): boolean => {
-  return Boolean(getAllSyntheticDOMNodesAsIdMap(window)[nodeId]);
-});
-
-export const findSyntheticDOMNodes = weakMemo((root: SyntheticBrowserRootState|SyntheticWindow, filter: (node: SyntheticNode) => boolean): SyntheticNode[] => {
-  const found: SyntheticNode[] = [];
-
-  const travserceWindow = (window) => {
-    traverseObject(window.document, (item: any) => {
-      if (isSyntheticDOMNode(item) && filter(item)) {
-        found.push(item);
-      }
-    });
-  };
-
-  if ((root as SyntheticBrowserRootState).browserStore) {
-    eachSyntheticWindow(root as SyntheticBrowserRootState, (window) => {
-      travserceWindow(window);
-    });
-  } else {
-    travserceWindow(root as SyntheticWindow);
-  }
-
-  return found;
-});
-
-export const getAllSyntheticDOMNodes = weakMemo((root: SyntheticBrowserRootState|SyntheticWindow) => findSyntheticDOMNodes(root, () => true));
-export const getAllSyntheticDOMNodesAsIdMap = weakMemo((root: SyntheticBrowserRootState|SyntheticWindow): { [identifier: string]: SyntheticNode } => {
-  const allNodes = getAllSyntheticDOMNodes(root);
-  const map = {};
-  for (const node of allNodes) {
-    map[node.$$id] = node;
-  }
-  return map;
+  return Boolean(window.allNodes[nodeId]);
 });
 
 export const isSyntheticBrowserItemMovable = (root: SyntheticBrowserRootState, item: Struct) => {

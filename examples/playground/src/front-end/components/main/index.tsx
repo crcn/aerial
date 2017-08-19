@@ -3,7 +3,7 @@ import * as React from "react";
 import { pure, compose } from "recompose";
 import { WorkspaceComponent } from "./workspace";
 import { connect } from "react-redux";
-import { ImmutableObject, Dispatcher, getValueById } from "aerial-common2";
+import { ImmutableObject, Dispatcher } from "aerial-common2";
 import { Workspace, ApplicationState, getSelectedWorkspace } from "front-end/state";
 import { getSyntheticBrowser } from "aerial-browser-sandbox";
 

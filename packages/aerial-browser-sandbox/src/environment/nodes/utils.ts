@@ -113,7 +113,6 @@ export const mapExpressionToNode = (expression: parse5.AST.Default.Node, documen
       addNodeSource(element as any as SEnvHTMLElementInterface, expression);
       parentNode.appendChild(element);
       promise = mapChildExpressionsToNodes(promise, elementExpression.childNodes, document, element, async);
-      
       if (async) {
         promise = promise.then(() => {
           constructNode(element);

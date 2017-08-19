@@ -1,5 +1,5 @@
 import { fork, take, put, call, select } from "redux-saga/effects";
-import { takeRequest, request, getValuesByType, watch } from "aerial-common2";
+import { takeRequest, request, watch } from "aerial-common2";
 import { hasURIProtocol, getDependencyGraph, DependencyGraph, Dependency, LoadedDependencyContentResult, DependencyStatus, getDependency } from "../state";
 import * as Url from "url";
 import * as md5 from "md5";

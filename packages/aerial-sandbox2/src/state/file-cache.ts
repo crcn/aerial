@@ -1,4 +1,4 @@
-import { weakMemo, Struct, createStructFactory, getValuesByType, createDSQuery, DataStore, dsIndex, createDataStore, dsFind } from "aerial-common2";
+import { weakMemo, Struct, createStructFactory, createDSQuery, DataStore, dsIndex, createDataStore, dsFind, dsUpdateOne } from "aerial-common2";
 
 export const FILE_CACHE = "FILE_CACHE";
 export const FILE_CACHE_ITEM = "FILE_CACHE_ITEM";
@@ -51,4 +51,11 @@ export const getFileCacheItemByUri = (root: FileCacheRootState, uri: string) => 
 
 export const getFileCacheItemById = (root: FileCacheRootState, id: string) => {
   return dsFind(root.fileCacheStore, createDSQuery("$$id", id));
+};
+
+export const updateFileCacheItem = <TState extends FileCacheRootState>(root: TState, fileCacheItemId: string, properties: Partial<FileCacheItem>): TState => {
+  return {
+    ...(root as any),
+    fileCacheStore: dsUpdateOne(root.fileCacheStore, createDSQuery("$$id", fileCacheItemId), properties)
+  };
 };

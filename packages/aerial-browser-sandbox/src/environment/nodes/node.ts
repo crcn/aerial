@@ -297,8 +297,10 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     dispatchEvent(event: Event): boolean {
       super.dispatchEvent(event);
-      if (event.bubbles && this.$$parentNode && this.$$parentNode.constructed) {
-        this.parentNode.dispatchEvent(event);
+
+      // do not bubble if still constructing
+      if (event.bubbles && this.$$parentNode && !(event.type === SEnvMutationEvent.MUTATION && !this.$$parentNode.constructed)) {
+        this.$$parentNode.dispatchEvent(event);
       }
       return true;
     }

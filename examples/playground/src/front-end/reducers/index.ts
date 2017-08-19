@@ -13,12 +13,8 @@ import {
   BaseEvent, 
   boxFromRect,
   mergeBoxes,
-  getPathById, 
-  getValueById,
-  updateStruct,
   mapImmutable, 
   keepBoxCenter,
-  getValueByPath,
   getSmallestBox,
   scaleInnerBox,
   boxesIntersect,
@@ -27,24 +23,22 @@ import {
   pointIntersectsBox,
   keepBoxAspectRatio,
   centerTransformZoom,
-  updateStructProperty, 
 } from "aerial-common2";
 
 import { clamp } from "lodash";
-import { fileCacheReducer , getFileCacheItemByUri } from "aerial-sandbox2";
+import { fileCacheReducer, getFileCacheItemByUri, FileCacheItem, updateFileCacheItem } from "aerial-sandbox2";
 
 import { 
-  getSyntheticBrowserBox,
   ApplicationState,
+  updateWorkspace,
   getWorkspaceById,
-  addWorkspaceHovering,
   ShortcutServiceState,
   getSelectedWorkspace,
   addWorkspaceSelection,
   setWorkspaceSelection,
+  getSyntheticBrowserBox,
   createApplicationState,
   clearWorkspaceSelection,
-  removeWorkspaceHovering,
   removeWorkspaceSelection,
   toggleWorkspaceSelection,
   getSelectedWorkspaceFile,
@@ -108,6 +102,7 @@ import {
   getSyntheticBrowser,
   syntheticBrowserReducer, 
   createOpenSyntheticWindowRequest,
+  getSyntheticNodeById
 } from "aerial-browser-sandbox";
 
 import reduceReducers = require("reduce-reducers");
@@ -116,12 +111,14 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
   switch(event.type) {
     case TREE_NODE_LABEL_CLICKED: {
       const { node } = event as TreeNodeLabelClickedEvent;
-      return updateStructProperty(state, getSelectedWorkspace(state), "selectedFileId", node.$$id);
+      return updateWorkspace(state, state.selectedWorkspaceId, {
+        selectedFileId: node.$$id
+      });
     }
 
     case TEXT_EDITOR_CHANGED: {
       const { file, value } = event as textEditorChanged;
-      return updateStructProperty(state, file, "content", value);
+      return updateFileCacheItem(state, file.$$id, { content: value });
     }
 
     case FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED: {
@@ -190,9 +187,11 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
         };
       }
 
-      return updateStructProperty(state, workspace, "visualEditorSettings", {
-        ...workspace.visualEditorSettings,
-        translate: translate
+      return updateWorkspace(state, workspace.$$id, {
+        visualEditorSettings: {
+          ...workspace.visualEditorSettings,
+          translate
+        }
       });
     }
 
@@ -229,16 +228,20 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case TOGGLE_LEFT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
-      return updateStructProperty(state, workspace, "visualEditorSettings", {
-        ...workspace.visualEditorSettings,
-        showLeftGutter: !workspace.visualEditorSettings.showLeftGutter
+      return updateWorkspace(state, workspace.$$id, {
+        visualEditorSettings: {
+          ...workspace.visualEditorSettings,
+          showLeftGutter: !workspace.visualEditorSettings.showLeftGutter
+        }
       });
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
       const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return updateStructProperty(state, workspace, "hoveringRefs", [getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved)]);
+      return updateWorkspace(state, workspace.$$id, {
+        hoveringRefs: [getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved)]
+      });
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
@@ -248,10 +251,10 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (metaKey) {
-        const { source: { uri, start } } = getValueById(state, targetRef[1]) as SyntheticNode;
+        const { source: { uri, start } } = getSyntheticNodeById(state, targetRef[1]) as SyntheticNode;
         const fileCacheItem = getFileCacheItemByUri(state, uri);
         if (fileCacheItem) {
-          return updateStruct(state, workspace, {
+          return updateWorkspace(state, workspace.$$id, {
             textCursorPosition: start,
             selectedFileId: fileCacheItem.$$id,
           });
@@ -268,7 +271,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
 
-      state = updateStruct(state, workspace, {
+      state = updateWorkspace(state, workspace.$$id, {
         secondarySelection: true
       });
 
@@ -280,7 +283,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case SELECTOR_DOUBLE_CLICKED: {
       const { sourceEvent, item } = event as SelectorDoubleClicked;
       const workspace = getSyntheticNodeWorkspace(state, item.$$id);
-      state = updateStruct(state, workspace, {
+      state = updateWorkspace(state, workspace.$$id, {
         secondarySelection: true
       });
       state = setWorkspaceSelection(state, workspace.$$id, getStructReference(item));
@@ -289,9 +292,11 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
-      return updateStructProperty(state, workspace, "visualEditorSettings", {
-        ...workspace.visualEditorSettings,
-        showRightGutter: !workspace.visualEditorSettings.showRightGutter
+      return updateWorkspace(state, workspace.$$id, {
+        visualEditorSettings: {
+          ...workspace.visualEditorSettings,
+          showRightGutter: !workspace.visualEditorSettings.showRightGutter
+        }
       });
     }
 
@@ -306,7 +311,8 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case STAGE_TOOL_WINDOW_KEY_DOWN: {
       const e = event as StageWillWindowKeyDown;
-      return moveItemFromAction(state, e.windowId, e);
+      // return moveItemFromAction(state, e.windowId, e);
+      return state;
     }
 
     case STAGE_TOOL_WINDOW_BACKGROUND_CLICKED: {
@@ -320,7 +326,7 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
 
 const moveItemFromAction = <T extends { sourceEvent: React.KeyboardEvent<any> }>(state: ApplicationState, itemId: string, event: T) => {
   const { sourceEvent } = event;
-  const item = getValueById(state, itemId);
+  const item = getSyntheticNodeById(state, itemId);
 
   // TODO - prop may not exist here -- need to use getBox instead
   const box = item.box;

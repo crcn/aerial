@@ -1,11 +1,8 @@
 
 import { 
-  getPath,
   updateIn,
   immutable,
   mapImmutable,
-  flattenObject,
-  getValueByPath,
   ImmutableObject,
 } from "../immutable";
 
@@ -58,65 +55,6 @@ export const idd = <VInst>(factory: (...args) => VInst, generateId: (...args) =>
 
 const pathIdFilter = weakMemo(id => (value: IDd) => value && value.$$id === id);
 
-export const getPathById = weakMemo((root: any, id: string) => getPath(root, pathIdFilter(id)));
-
-/**
- */
-
-export const getPathByType = (root: any, type: string) => getPath(root, (value: Typed) => value && value.$$type === type);
-
-/**
- */
-
-export const getValuesByType = weakMemo((root: any, type: string) => {
-  const flattened = flattenObject(root);
-  const valuesByType = [];
-  if (root.$$type === type) {
-    valuesByType.push(root);
-  }
-  for (const k in flattened) {
-    if (flattened[k] && flattened[k].$$type === type) {
-      valuesByType.push(flattened[k]);
-    }
-  }
-  return valuesByType;
-});
-
-/**
- */
-
-export const getValueById = (root: any, id: string) => {
-  return getValueByPath(root, getPathById(root, id));
-}
-
-/**
- */
-
-export const findParentObject = weakMemo((root: any, childId: string, test: (value) => boolean) => {
-  let path = [...getPathById(root, childId)];
-  let trash;
-  while(path.length) {
-    const parent = getValueByPath(root, path);
-    if (test(parent)) {
-      return parent;
-    }
-    path = path.slice(0, path.length - 1);
-  }
-  return null;
-});
-
-/**
- */
-
-export const updateStructProperty = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct, key: K, value: any) => updateIn(root, [...getPathById(root, struct.$$id), key], value);
-
-/**
- */
-
-export const updateStruct = <TStruct extends IDd, K extends keyof TStruct>(root: any, struct: TStruct, value: Partial<TStruct>) => updateIn(root, getPathById(root, struct.$$id), Object.assign({}, struct, value));
-
-
-
 /**
  * @param type 
  */
@@ -144,17 +82,6 @@ export const createStructFactory = <T>(type: string, defaults: Partial<T> = {}) 
   }) as ((props?: Partial<T>) => T)))
 }
 
-/**
- */
-
-export const deleteValueById = (root: any, id: string) => {
-  const path  = getPathById(root, id);
-  const key   = path[path.length - 1];
-  const ownerPath = path.slice(0, path.length - 1);
-  const owner = getValueByPath(root, ownerPath);
-  const ownerClone = Array.isArray(owner) ? [...owner.slice(0, Number(key)), ...owner.slice(Number(key) + 1)] : omit(owner, key);
-  return updateIn(root, ownerPath, ownerClone);
-};
 
 export type StructReference = [string, string];
 

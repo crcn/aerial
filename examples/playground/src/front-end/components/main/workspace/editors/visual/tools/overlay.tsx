@@ -4,8 +4,8 @@ import * as React from "react";
 import { Workspace } from "front-end/state";
 import { compose, pure, withHandlers } from "recompose";
 import { mapValues, values } from "lodash";
-import { SyntheticNode, getAllSyntheticDOMNodesAsIdMap, SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
-import { getValueById, Dispatcher, Box, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
+import { SyntheticNode, SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
+import { Dispatcher, Box, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
 import { 
   stageToolOverlayMouseClicked,
   stageToolOverlayMouseMoved,
@@ -86,8 +86,7 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom }: Windo
 
 const WindowOverlayTools = pure(WindowOverlayToolsBase as any) as any as typeof WindowOverlayToolsBase;
 
-const getHoveringSyntheticNodes = weakMemo((hoveringRefs: StructReference[], window: SyntheticWindow) => {
-  const allNodes = getAllSyntheticDOMNodesAsIdMap(window);
+const getHoveringSyntheticNodes = weakMemo((hoveringRefs: StructReference[], { allNodes }: SyntheticWindow) => {
   return hoveringRefs.map(([type, id]) => allNodes[id]).filter((id) => !!id);
 });
 

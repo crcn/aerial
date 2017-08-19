@@ -8,11 +8,7 @@ import {
   Removed,
   REMOVED,
   RESIZED,
-  getValueById,
   BaseEvent, 
-  updateStruct, 
-  deleteValueById,
-  updateStructProperty, 
 } from "aerial-common2";
 import { uniq } from "lodash";
 import { 
@@ -33,10 +29,13 @@ import {
   SyntheticNode,
   SyntheticWindow,
   SYNTHETIC_WINDOW,
+  removeSyntheticWindow,
   isSyntheticNodeType,
   DEFAULT_SYNTHETIC_WINDOW_BOX,
   getSyntheticWindow,
   createSyntheticBrowser, 
+  updateSyntheticWindow,
+  updateSyntheticBrowser,
   createSyntheticBrowserRootState, 
   SyntheticBrowserRootState, 
   SyntheticBrowser, 
@@ -71,19 +70,20 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
         syntheticBrowser = getSyntheticBrowser(root, syntheticBrowserId);
       }
       
-      return updateStructProperty(root, syntheticBrowser, "windows", [
-        ...syntheticBrowser.windows,
-        createSyntheticWindow({
-          location: uri,
-          box: getBestWindowBox(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
-        })
-      ]);
+      return updateSyntheticBrowser(root, syntheticBrowser.$$id, {
+        windows: [
+          ...syntheticBrowser.windows,
+          createSyntheticWindow({
+            location: uri,
+            box: getBestWindowBox(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
+          })
+        ]
+      });
     }
 
     case SYNTHETIC_WINDOW_SOURCE_CHANGED: {
       const { window, syntheticWindowId } = event as SyntheticWindowSourceChangedEvent;
-      const syntheticWindow = getSyntheticWindow(root, syntheticWindowId);
-      return updateStruct(root, syntheticWindow, {
+      return updateSyntheticWindow(root, syntheticWindowId, {
         mount: window.renderer.mount
       });
     }
@@ -93,7 +93,9 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
       if (itemType === SYNTHETIC_WINDOW) {
         const window = getSyntheticWindow(root, itemId);
         if (window) {
-          return updateStructProperty(root, window, "box", box);
+          return updateSyntheticWindow(root, itemId, {
+            box
+          });
         }
         break;
       }
@@ -104,7 +106,9 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
       if (itemType === SYNTHETIC_WINDOW) {
         const window = getSyntheticWindow(root, itemId);
         if (window) {
-          return updateStructProperty(root, window, "box", moveBox(window.box, point));
+          return updateSyntheticWindow(root, itemId, {
+            box: moveBox(window.box, point)
+          });
         }
         break;
       }
@@ -113,24 +117,21 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
 
     case REMOVED: {
       const { itemId, itemType } = event as Removed;
-      const value = getValueById(root, itemId);
-      if (itemType === SYNTHETIC_WINDOW || value.nodeType != null) {
-        return deleteValueById(root, itemId);
+      if (itemType === SYNTHETIC_WINDOW) {
+        return removeSyntheticWindow(root, itemId);
       }
 
       break;
     }
 
     case SYNTHETIC_WINDOW_LOADED: {
-      const { syntheticWindowId, document } = event as SyntheticWindowLoadedEvent;
-      const window = getSyntheticWindow(root, syntheticWindowId);
-      return updateStructProperty(root, window, "document", document);
+      const { syntheticWindowId, document, allNodes } = event as SyntheticWindowLoadedEvent;
+      return updateSyntheticWindow(root, syntheticWindowId, { document, allNodes });
     }
 
     case SYNTHETIC_WINDOW_RECTS_UPDATED: {
       const { rects, styles, syntheticWindowId } = event as SyntheticWindowRectsUpdatedEvent;
-      const window = getSyntheticWindow(root, syntheticWindowId);
-      return updateStruct(root, window, {
+      return updateSyntheticWindow(root, syntheticWindowId, {
         computedBoxes: rects,
         computedStyles: styles
       });
@@ -139,19 +140,11 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
     case SYNTHETIC_WINDOW_RESOURCE_LOADED: {
       const { uri, syntheticWindowId } = event as SyntheticWindowResourceLoadedEvent;
       const window = getSyntheticWindow(root, syntheticWindowId);
-      return updateStructProperty(root, window, "externalResourceUris", uniq([
-        ...window.externalResourceUris,
-        uri
-      ]));
+      return updateSyntheticWindow(root, syntheticWindowId, {
+        externalResourceUris: uniq(window.externalResourceUris, uri)
+      });
     }
   }
 
   return root;
-}
-
-const patchSyntheticWindow = (window: SyntheticWindow, mutations: Mutation<any>[]) => {
-  for (const mutation of mutations) {
-    const target = getValueById(window, mutation.target.uid);
-  }
-  return window;
 }

@@ -1,5 +1,5 @@
 // import { SEnvWindowInterface } from "../environment";
-import { SyntheticDocument } from "../state";
+import { SyntheticDocument, SyntheticNode } from "../state";
 import { Request, BaseEvent, generateDefaultId, Mutation } from "aerial-common2";
 import { RenderedClientRects, RenderedComputedStyleDeclarations } from "../environment";
 
@@ -42,6 +42,9 @@ export type SyntheticWindowRectsUpdatedEvent = {
 } & BaseEvent;
 
 export type SyntheticWindowLoadedEvent = {
+  allNodes: {
+    [identifier: string]: SyntheticNode
+  };
   document: SyntheticDocument;
   syntheticWindowId: string;
 } & BaseEvent;
@@ -148,8 +151,9 @@ export const createSyntheticWindowResourceLoadedEvent = (syntheticWindowId: stri
   type: SYNTHETIC_WINDOW_RESOURCE_LOADED,
 });
 
-export const createSyntheticWindowLoadedEvent = (syntheticWindowId: string, document: SyntheticDocument): SyntheticWindowLoadedEvent => ({
-  syntheticWindowId,
+export const createSyntheticWindowLoadedEvent = (syntheticWindowId: string, document: SyntheticDocument, allNodes: { [identifier: string]: SyntheticNode }): SyntheticWindowLoadedEvent => ({
+  allNodes,
   document,
+  syntheticWindowId,
   type: SYNTHETIC_WINDOW_LOADED,
 });
