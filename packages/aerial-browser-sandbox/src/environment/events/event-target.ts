@@ -13,8 +13,10 @@ export const getSEnvEventTargetClass = weakMemo((context?: any) => {
     }
 
     private _preconstructed: boolean;
+    readonly constructed: boolean;
 
     constructor() {
+      this.constructed = true;
       if (!this._preconstructed) {
         this.$$preconstruct();
       }

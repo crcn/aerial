@@ -63,7 +63,7 @@ describe(__filename + "#", () => {
     window.close();
   });
 
-  xit("can append an element immediately after the script", async () => {
+  it("can append an element immediately after the script", async () => {
     const logs = [];
     const window = openTestWindow(wrapHTML(`<span><script>
       const script = document.querySelector("script");

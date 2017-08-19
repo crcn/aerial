@@ -18,9 +18,11 @@ import {
   createPropertyMutation,
   expressionLocationEquals,
 } from "aerial-common2";
+import { SEnvParentNodeInterface } from "./parent-node";
 import { SyntheticNode, SyntheticValueNode, BasicValueNode, BasicNode } from "../../state";
 
 export interface SEnvNodeInterface extends Node {
+  readonly constructed: boolean;
   uid: string;
   $$id: string;
   structType: string;
@@ -47,7 +49,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
   return class SEnvNode extends SEnvEventTarget implements SEnvNodeInterface {
 
-    public $$parentNode: Node;
+    public $$parentNode: SEnvParentNodeInterface;
     public $$parentElement: HTMLElement;
     public $$type: string;
     public $$id: string;
@@ -295,7 +297,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     dispatchEvent(event: Event): boolean {
       super.dispatchEvent(event);
-      if (event.bubbles && this.parentNode) {
+      if (event.bubbles && this.$$parentNode && this.$$parentNode.constructed) {
         this.parentNode.dispatchEvent(event);
       }
       return true;
