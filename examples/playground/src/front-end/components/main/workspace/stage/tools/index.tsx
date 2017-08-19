@@ -19,7 +19,7 @@ export type ToolsComponentProps = {
 };
 
 export const ToolsLayerComponent = pure((({ workspace, browser, dispatch }: ToolsComponentProps) => <div className="m-stage-tools">
-  <GridStageToolComponent settings={workspace.visualEditorSettings} />
+  <GridStageToolComponent settings={workspace.stage} />
   <SelectionStageToolComponent workspace={workspace} browser={browser} dispatch={dispatch} />
   <NodeOverlaysToolComponent workspace={workspace} browser={browser} dispatch={dispatch} />
   <WindowsStageToolComponent workspace={workspace} browser={browser} dispatch={dispatch} />

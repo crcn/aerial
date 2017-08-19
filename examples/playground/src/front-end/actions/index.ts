@@ -32,7 +32,7 @@ export const STAGE_TOOL_EDIT_TEXT_BLUR = "STAGE_TOOL_EDIT_TEXT_BLUR";
  * Types
  */
 
-export type VisualEditorWheel = {
+export type StageWheel = {
   mouseX: number;
   mouseY: number;
   workspaceId: string;
@@ -257,7 +257,7 @@ export const toggleRightGutterPressed = (): BaseEvent => ({
   type: TOGGLE_RIGHT_GUTTER_PRESSED,
 });
 
-export const visualEditorWheel = (workspaceId: string, canvasWidth: number, canvasHeight: number, mousePosition: Point, { metaKey, ctrlKey, deltaX, deltaY, clientX, clientY }: React.WheelEvent<any>): VisualEditorWheel => ({
+export const stageWheel = (workspaceId: string, canvasWidth: number, canvasHeight: number, mousePosition: Point, { metaKey, ctrlKey, deltaX, deltaY, clientX, clientY }: React.WheelEvent<any>): StageWheel => ({
   workspaceId,
   metaKey,
   mouseX: mousePosition.left,

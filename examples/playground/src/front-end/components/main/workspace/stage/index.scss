@@ -1,11 +1,11 @@
-.visual-editor-component {
+.stage-component {
   width: 100%;
   height: 100%;
   float: left;
   background: #FEFEFE;
   position: relative;
 
-  .visual-editor-component-isolate {
+  .stage-component-isolate {
     // prevents the canvas content from moving around
     position: absolute;
     overflow: hidden;
@@ -23,13 +23,13 @@
   }
 }
 
-.visual-editor-outer {
+.stage-outer {
   background: transparent;
   width: 100%;
   height: 100%;
 }
 
-.visual-editor-inner {
+.stage-inner {
   width: 100%;
   height: 100%;
   overflow: visible;

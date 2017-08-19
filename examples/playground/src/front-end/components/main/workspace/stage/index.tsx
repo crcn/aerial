@@ -8,19 +8,19 @@ import { CanvasComponent } from "./canvas";
 import { IsolateComponent } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
-import { visualEditorWheel } from "front-end/actions";
+import { stageWheel } from "front-end/actions";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
 
-export type VisualEditorOuterComponentProps = {
+export type StageOuterComponentProps = {
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
-export type VisualEditorInnerComponentProps = {
+export type StageInnerComponentProps = {
   canvasOuter: HTMLElement;
   onWheel: (event: React.SyntheticEvent<MouseEvent>) => any;
   mousePosition: Point;
@@ -30,9 +30,9 @@ export type VisualEditorInnerComponentProps = {
   onDragEnter: (event: React.SyntheticEvent<any>) => any;
   onDragExit: (event: React.SyntheticEvent<any>) => any;
   setCanvasOuter: (element: HTMLElement) => any;
-} & VisualEditorOuterComponentProps;
+} & StageOuterComponentProps;
 
-const enhanceVisualEditorComponent = compose<VisualEditorOuterComponentProps, VisualEditorInnerComponentProps>(
+const enhanceStageComponent = compose<StageOuterComponentProps, StageInnerComponentProps>(
   pure,
   withState('canvasOuter', 'setCanvasOuter', null),
   withState('mousePosition', 'setMousePosition', null),
@@ -40,15 +40,15 @@ const enhanceVisualEditorComponent = compose<VisualEditorOuterComponentProps, Vi
     onMouseEvent: ({ setMousePosition }) => (event: React.MouseEvent<any>) => {
       setMousePosition({ left: event.pageX, top: event.pageY });
     },
-    onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: VisualEditorInnerComponentProps) => (event: React.WheelEvent<any>) => {
+    onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: StageInnerComponentProps) => (event: React.WheelEvent<any>) => {
       const rect = canvasOuter.getBoundingClientRect();
       event.preventDefault();
-      dispatch(visualEditorWheel(workspace.$$id, rect.width, rect.height, mousePosition, event));
+      dispatch(stageWheel(workspace.$$id, rect.width, rect.height, mousePosition, event));
     }
   })
 );
 
-export const VisualEditorComponentBase = ({ 
+export const StageComponentBase = ({ 
   setCanvasOuter,
   workspace, 
   browser,
@@ -59,10 +59,10 @@ export const VisualEditorComponentBase = ({
   onDragEnter,
   onMouseDown,
   onDragExit
-}: VisualEditorInnerComponentProps) => {
+}: StageInnerComponentProps) => {
   if (!workspace) return null;
 
-  const { translate, cursor } = workspace.visualEditorSettings;
+  const { translate, cursor } = workspace.stage;
 
   const outerStyle = {
     cursor: cursor || "default"
@@ -72,11 +72,11 @@ export const VisualEditorComponentBase = ({
     transform: `translate(${translate.left}px, ${translate.top}px) scale(${translate.zoom})`
   };
 
-  return <div className="visual-editor-component">
+  return <div className="stage-component">
     <IsolateComponent 
     inheritCSS 
     ignoreInputEvents
-    className="visual-editor-component-isolate"
+    className="stage-component-isolate"
     onWheel={onWheel} 
     scrolling={false} 
     translateMousePositions={false}
@@ -97,9 +97,9 @@ export const VisualEditorComponentBase = ({
           onMouseDown={onMouseDown}
           tabIndex={-1}
           onDragExit={onDragExit}
-          className="visual-editor-inner"
+          className="stage-inner"
           style={outerStyle}>
-          <div style={innerStyle} className="visual-editor-inner">
+          <div style={innerStyle} className="stage-inner">
             <CanvasComponent browser={browser} dispatch={dispatch} />
             <ToolsLayerComponent workspace={workspace} dispatch={dispatch} browser={browser} />
           </div>
@@ -110,7 +110,7 @@ export const VisualEditorComponentBase = ({
 }
 
 
-export const VisualEditorComponent = enhanceVisualEditorComponent(VisualEditorComponentBase as any) as any as Component<VisualEditorOuterComponentProps>;
+export const StageComponent = enhanceStageComponent(StageComponentBase as any) as any as Component<StageOuterComponentProps>;
 
 export * from "./canvas";
 export * from "./tools";

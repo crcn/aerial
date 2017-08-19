@@ -55,7 +55,7 @@ export type WindowsStageToolComponentInnerProps = {
 };
 
 export const WindowsStageToolComponentBase = ({ workspace, browser, dispatch }: WindowsStageToolComponentInnerProps) => {
-  const { translate, backgroundColor } = workspace.visualEditorSettings;
+  const { translate, backgroundColor } = workspace.stage;
   
   const backgroundStyle = {
     backgroundColor: backgroundColor || "rgba(0, 0, 0, 0.05)",

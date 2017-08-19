@@ -94,7 +94,7 @@ export const NodeOverlaysToolComponentBase = ({ workspace, browser, dispatch }: 
   return <div className="visual-tools-layer-component">
     {
       browser.windows.map((window) => {
-        return <WindowOverlayTools key={window.$$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={workspace.visualEditorSettings.translate.zoom} />;
+        return <WindowOverlayTools key={window.$$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={workspace.stage.translate.zoom} />;
       })
     }
   </div>

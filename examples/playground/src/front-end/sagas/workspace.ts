@@ -99,7 +99,7 @@ function* handleSelectionMoved() {
     const { point, workspaceId, point: newPoint } = (yield take(RESIZER_MOVED)) as ResizerMoved;
     const state = (yield select()) as ApplicationState;
     const workspace = getWorkspaceById(state, workspaceId);
-    const translate = workspace.visualEditorSettings.translate;
+    const translate = workspace.stage.translate;
 
     const bounds = getWorkspaceSelectionBox(state, workspace);
     for (const item of getBoxedWorkspaceSelection(state, workspace)) {

@@ -24,7 +24,7 @@ const POINT_RADIUS       = 4;
 export const ResizerComponentBase = ({ workspace, browser, dispatch, onMouseDown }: ResizerComponentInnerProps) => {
 
   const box = getWorkspaceSelectionBox(browser, workspace);
-  const zoom = workspace.visualEditorSettings.translate.zoom;
+  const zoom = workspace.stage.translate.zoom;
 
   // offset stroke
   const resizerStyle = {
@@ -71,7 +71,7 @@ const enhanceResizerComponent = compose<ResizerComponentInnerProps, ResizerCompo
   pure,
   withHandlers({
     onMouseDown: ({ dispatch, workspace, browser }: ResizerComponentOuterProps) => (event: React.MouseEvent<any>) => {
-      const { translate } = workspace.visualEditorSettings;
+      const { translate } = workspace.stage;
       const box = getWorkspaceSelectionBox(browser, workspace);
       const translateLeft = translate.left;
       const translateTop  = translate.top;

@@ -64,7 +64,7 @@ export const DIRECTORY         = "DIRECTORY";
 export const WORKSPACE         = "WORKSPACE";
 export const APPLICATION_STATE = "APPLICATION_STATE";
 
-export type VisualEditorSettings = {
+export type Stage = {
   backgroundColor?: string;
   translate: Translate;
   cursor?: string;
@@ -77,7 +77,7 @@ export type Workspace = {
   browserId: string;
   hoveringRefs: StructReference[];
   selectedFileId?: string;
-  visualEditorSettings: VisualEditorSettings;
+  stage: Stage;
   textCursorPosition: ExpressionPosition;
   secondarySelection?: boolean;
 } & Struct;
@@ -175,7 +175,7 @@ export const getSelectedWorkspace = (state: ApplicationState) => state.selectedW
  */
 
 export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, {
-  visualEditorSettings: {
+  stage: {
     translate: { left: 0, top: 0, zoom: 1 },
     showLeftGutter: true,
     showRightGutter: true,
@@ -205,7 +205,7 @@ export const getStageToolMouseNodeTargetReference = (state: ApplicationState, ev
   const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
   const window = getSyntheticWindow(state, windowId);
   const workspace = getSyntheticWindowWorkspace(state, windowId);
-  const zoom = workspace.visualEditorSettings.translate.zoom;
+  const zoom = workspace.stage.translate.zoom;
 
   // TODO - move to reducer
   const target = sourceEvent.nativeEvent.target as Element;

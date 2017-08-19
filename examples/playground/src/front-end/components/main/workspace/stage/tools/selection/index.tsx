@@ -20,7 +20,7 @@ const SelectionBoundsComponent = ({ workspace, browser }: { workspace: Workspace
   const selection = getBoxedWorkspaceSelection(browser, workspace);
   const entireBounds = mergeBoxes(...selection.map(value => getSyntheticBrowserBox(browser, value)));
   const style = {};
-  const borderWidth = 1 / workspace.visualEditorSettings.translate.zoom;
+  const borderWidth = 1 / workspace.stage.translate.zoom;
   const boundsStyle = {
     position: "absolute",
     top: entireBounds.top,

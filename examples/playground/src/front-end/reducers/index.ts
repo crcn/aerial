@@ -93,7 +93,7 @@ import {
   DELETE_SHORCUT_PRESSED,
   DeleteShortcutPressed,
   VISUAL_EDITOR_WHEEL,
-  VisualEditorWheel,
+  StageWheel,
 } from "front-end/actions";
 
 import { 
@@ -135,7 +135,7 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
   // state = canvasReducer(state, event);
   // state = syntheticBrowserReducer(state, event);
   state = syntheticBrowserReducer(state, event);
-  state = visualEditorReducer(state, event);
+  state = stageReducer(state, event);
   state = windowPaneReducer(state, event);
   state = shortcutServiceReducer(state, event);
   state = fileCacheReducer(state, event);
@@ -165,13 +165,13 @@ const MIN_ZOOM = 0.02;
 const MAX_ZOOM = 6400 / 100;
 
 
-const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
+const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
   switch(event.type) {
     case VISUAL_EDITOR_WHEEL: {
-      const { workspaceId, metaKey, ctrlKey, deltaX, deltaY, mouseX, mouseY, canvasHeight, canvasWidth } = event as VisualEditorWheel;
+      const { workspaceId, metaKey, ctrlKey, deltaX, deltaY, mouseX, mouseY, canvasHeight, canvasWidth } = event as StageWheel;
       const workspace = getWorkspaceById(state, workspaceId);
-      let translate = workspace.visualEditorSettings.translate;
+      let translate = workspace.stage.translate;
 
       if (metaKey || ctrlKey) {
         translate = centerTransformZoom(translate, boxFromRect({
@@ -188,8 +188,8 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
       }
 
       return updateWorkspace(state, workspace.$$id, {
-        visualEditorSettings: {
-          ...workspace.visualEditorSettings,
+        stage: {
+          ...workspace.stage,
           translate
         }
       });
@@ -229,9 +229,9 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case TOGGLE_LEFT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       return updateWorkspace(state, workspace.$$id, {
-        visualEditorSettings: {
-          ...workspace.visualEditorSettings,
-          showLeftGutter: !workspace.visualEditorSettings.showLeftGutter
+        stage: {
+          ...workspace.stage,
+          showLeftGutter: !workspace.stage.showLeftGutter
         }
       });
     }
@@ -293,9 +293,9 @@ const visualEditorReducer = (state: ApplicationState, event: BaseEvent) => {
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       return updateWorkspace(state, workspace.$$id, {
-        visualEditorSettings: {
-          ...workspace.visualEditorSettings,
-          showRightGutter: !workspace.visualEditorSettings.showRightGutter
+        stage: {
+          ...workspace.stage,
+          showRightGutter: !workspace.stage.showRightGutter
         }
       });
     }

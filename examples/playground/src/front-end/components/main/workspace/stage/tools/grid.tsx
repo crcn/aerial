@@ -1,10 +1,10 @@
 import "./grid.scss";
 
 import React =  require("react");
-import { Workspace, VisualEditorSettings } from "front-end/state";
+import { Workspace, Stage } from "front-end/state";
 import { pure } from "recompose";
 
-export const GridStageToolComponent = pure((({ settings }: { settings: VisualEditorSettings }) => {
+export const GridStageToolComponent = pure((({ settings }: { settings: Stage }) => {
   if (settings.translate.zoom <= 12) return null;
 
   const size = 20000;
