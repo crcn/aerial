@@ -29,6 +29,7 @@ import { clamp } from "lodash";
 import { fileCacheReducer, getFileCacheItemByUri, FileCacheItem, updateFileCacheItem } from "aerial-sandbox2";
 
 import { 
+  Workspace,
   ApplicationState,
   updateWorkspace,
   getWorkspaceById,
@@ -65,6 +66,8 @@ import {
   StageToolNodeOverlayHoverOver,
   StageToolNodeOverlayClicked,
   STAGE_TOOL_WINDOW_KEY_DOWN,
+  RESIZER_MOUSE_DOWN,
+  ResizerMouseDown,
   STAGE_TOOL_WINDOW_BACKGROUND_CLICKED,
   StageWillWindowKeyDown,
   keyboardShortcutAdded,
@@ -244,6 +247,18 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       });
     }
 
+    case RESIZER_MOUSE_DOWN: {
+      const { sourceEvent, workspaceId } = event as ResizerMouseDown;
+      const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
+      const workspace = getWorkspaceById(state, workspaceId);
+
+      if (metaKey && workspace.selectionRefs.length === 1) {
+        return setSelectedFileFromNodeId(state, workspace.$$id, workspace.selectionRefs[0][1]);
+      }
+
+      return state;
+    }
+
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
@@ -251,15 +266,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (metaKey) {
-        const { source: { uri, start } } = getSyntheticNodeById(state, targetRef[1]) as SyntheticNode;
-        const fileCacheItem = getFileCacheItemByUri(state, uri);
-        if (fileCacheItem) {
-          return updateWorkspace(state, workspace.$$id, {
-            textCursorPosition: start,
-            selectedFileId: fileCacheItem.$$id,
-          });
-        }
-        return state;
+        return setSelectedFileFromNodeId(state, workspace.$$id, targetRef[1]);
       } else {
         state = handleWindowSelectionFromAction(state, targetRef, event as StageToolNodeOverlayClicked);
         return state;
@@ -363,7 +370,17 @@ const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
   return state;
 };
 
-
+const setSelectedFileFromNodeId = (state: ApplicationState, workspaceId: string, nodeId: string) => {
+  const { source: { uri, start } } = getSyntheticNodeById(state, nodeId) as SyntheticNode;
+  const fileCacheItem = getFileCacheItemByUri(state, uri);
+  if (fileCacheItem) {
+    return updateWorkspace(state, workspaceId, {
+      textCursorPosition: start,
+      selectedFileId: fileCacheItem.$$id,
+    });
+  }
+  return state;
+}
 const shortcutServiceReducer = <T extends ShortcutServiceState>(state: ApplicationState, event: BaseEvent) => {
   switch(event.type) {
     case KEYBOARD_SHORTCUT_ADDED: {

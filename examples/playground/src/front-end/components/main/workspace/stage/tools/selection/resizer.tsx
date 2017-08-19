@@ -3,7 +3,7 @@ import React =  require("react");
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { pure, compose, withHandlers } from "recompose";
 import { Workspace, getBoxedWorkspaceSelection, getWorkspaceSelectionBox } from "front-end/state";
-import { resizerMoved, resizerStoppedMoving } from "front-end/actions";
+import { resizerMoved, resizerStoppedMoving, resizerMouseDown } from "front-end/actions";
 import { startDOMDrag, Dispatcher, mergeBoxes, moveBox } from "aerial-common2";
 import { PathComponent } from "./path";
 
@@ -71,6 +71,7 @@ const enhanceResizerComponent = compose<ResizerComponentInnerProps, ResizerCompo
   pure,
   withHandlers({
     onMouseDown: ({ dispatch, workspace, browser }: ResizerComponentOuterProps) => (event: React.MouseEvent<any>) => {
+      dispatch(resizerMouseDown(workspace.$$id, event));
       const { translate } = workspace.stage;
       const box = getWorkspaceSelectionBox(browser, workspace);
       const translateLeft = translate.left;

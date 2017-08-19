@@ -2,7 +2,7 @@ very simple online playground for visually creating web applications
 
 HI PRIO:
 
-- [ ] localized DND for elements
+- [ ] DND working for everything (must be tested)
 - [ ] move style to class shortcut
 - [ ] CSS inspector
 - [ ] rename visual to stage, visualSettings to stage

@@ -2,7 +2,8 @@ import { FileCacheItem } from "aerial-sandbox2";
 import { TreeNode, Box, Action, BaseEvent, Point, WrappedEvent, publicObject, Struct } from "aerial-common2";
 
 export const RESIZER_MOVED               = "RESIZER_MOVED";
-export const RESIZER_STOPPED_MOVING               = "RESIZER_STOPPED_MOVING";
+export const RESIZER_STOPPED_MOVING      = "RESIZER_STOPPED_MOVING";
+export const RESIZER_MOUSE_DOWN          = "RESIZER_MOUSE_DOWN";
 export const WINDOW_PANE_ROW_CLICKED     = "WINDOW_PANE_ROW_CLICKED";
 export const PROMPTED_NEW_WINDOW_URL     = "PROMPTED_NEW_WINDOW_URL";
 export const KEYBOARD_SHORTCUT_ADDED     = "KEYBOARD_SHORTCUT_ADDED";
@@ -60,6 +61,10 @@ export type ResizerMoved = {
   point: Point;
   workspaceId: string;
 } & BaseEvent;
+
+export type ResizerMouseDown = {
+  workspaceId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
 
 export type TreeNodeLabelClickedEvent = {
   node: TreeNode<any>
@@ -174,6 +179,12 @@ export const resizerStoppedMoving = (workspaceId: string, point: Point): Resizer
   workspaceId,
   point,
   type: RESIZER_STOPPED_MOVING,
+});
+
+export const resizerMouseDown = (workspaceId: string, sourceEvent: React.MouseEvent<any>): ResizerMouseDown => ({
+  workspaceId,
+  sourceEvent,
+  type: RESIZER_MOUSE_DOWN,
 });
 
 export const textEditorChanged = (file: FileCacheItem, value: string): textEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });

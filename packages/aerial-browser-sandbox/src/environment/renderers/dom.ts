@@ -40,12 +40,6 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   constructor(sourceWindow: SEnvWindowInterface, readonly targetDocument: Document) {
     super(sourceWindow);
     this.mount = targetDocument.createElement("div");
-    this._deferRecalc = () => {
-      if (this._rendering) return;
-      requestAnimationFrame(() => {
-        
-      })
-    }
   }
 
   protected _onDocumentLoad(event: Event) {
