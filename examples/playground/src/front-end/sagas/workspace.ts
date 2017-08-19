@@ -61,6 +61,7 @@ function* handleAltClickElement() {
     const event: StageToolOverlayClicked = yield take((action: StageToolOverlayClicked) => action.type === STAGE_TOOL_OVERLAY_MOUSE_CLICKED && action.sourceEvent.altKey);
     const state = yield select();
     const targetRef = getStageToolMouseNodeTargetReference(state, event);
+    if (!targetRef) continue;
     const node = getSyntheticNodeById(state, targetRef[1]);
     if (node.nodeType === SEnvNodeTypes.ELEMENT) {
       const element = node as SyntheticElement;

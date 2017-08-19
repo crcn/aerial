@@ -4,10 +4,9 @@ export const startDOMDrag = (startEvent: any, update: (event: MouseEvent, data?:
   const sx = startEvent.clientX;
   const sy = startEvent.clientY;
   const doc = startEvent.target.ownerDocument;
-
-  function drag(event) {
-
-    // stops text from getting highlighted
+  let _animating: boolean;
+  
+  const drag = (event) => {
     event.preventDefault();
     update(event, {
       delta: {
@@ -15,7 +14,7 @@ export const startDOMDrag = (startEvent: any, update: (event: MouseEvent, data?:
         y: event.clientY - sy,
       },
     });
-  }
+  };
 
   function cleanup() {
     doc.removeEventListener("mousemove", drag);

@@ -223,6 +223,7 @@ export const getStageToolMouseNodeTargetReference = (state: ApplicationState, ev
       intersectingBoxMap.set(box, uid);
     }
   }
+  if (!intersectingBoxes.length) return null;
   const smallestBox = getSmallestBox(...intersectingBoxes);
   return [SYNTHETIC_ELEMENT, intersectingBoxMap.get(smallestBox)] as [string, string];
 }

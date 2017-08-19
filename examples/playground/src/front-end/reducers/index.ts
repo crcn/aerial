@@ -242,8 +242,9 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
       const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
+      const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved);
       return updateWorkspace(state, workspace.$$id, {
-        hoveringRefs: [getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved)]
+        hoveringRefs: targetRef ? [targetRef] : []
       });
     }
 
@@ -265,10 +266,16 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const altKey = sourceEvent.altKey;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
+      if (!targetRef) {
+        return clearWorkspaceSelection(state, workspace.$$id);
+      }
       if (metaKey) {
         return setSelectedFileFromNodeId(state, workspace.$$id, targetRef[1]);
       } else {
         state = handleWindowSelectionFromAction(state, targetRef, event as StageToolNodeOverlayClicked);
+        state = updateWorkspace(state, workspace.$$id, {
+          secondarySelection: false
+        });
         return state;
       }
     }
@@ -277,6 +284,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
+      if (!targetRef) return state;      
 
       state = updateWorkspace(state, workspace.$$id, {
         secondarySelection: true

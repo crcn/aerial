@@ -25,5 +25,3 @@ export const ToolsLayerComponent = pure((({ workspace, browser, dispatch }: Tool
   <WindowsStageToolComponent workspace={workspace} browser={browser} dispatch={dispatch} />
   <EditTextToolComponent workspace={workspace}  browser={browser} dispatch={dispatch} />
 </div>) as any);
-
-export * from "./selection";

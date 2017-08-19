@@ -1,9 +1,10 @@
 import "./overlay.scss";
 const cx = require("classnames");
 import * as React from "react";
+import * as Hammer from "react-hammerjs";
 import { Workspace } from "front-end/state";
-import { compose, pure, withHandlers } from "recompose";
 import { mapValues, values } from "lodash";
+import { compose, pure, withHandlers } from "recompose";
 import { SyntheticNode, SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, Box, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
 import { 
@@ -74,13 +75,15 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom }: Windo
         dispatch={dispatch} 
         hovering={true} />)
     }
-    <div 
-      style={{ width: "100%", height: "100%", position: "absolute" } as any} 
-      onMouseMove={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))} 
-      onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, window.$$id))} 
-      onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$$id))} 
-      onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))}
-      />
+    <Hammer onSwipe={e => console.log("SWIPE")}>
+      <div 
+        style={{ width: "100%", height: "100%", position: "absolute" } as any} 
+        onMouseMove={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))} 
+        onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, window.$$id))} 
+        onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$$id))} 
+        onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))}
+        />
+    </Hammer>
   </div>
 };
 
