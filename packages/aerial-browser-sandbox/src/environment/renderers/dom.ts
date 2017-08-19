@@ -5,7 +5,7 @@ import { SEnvWindowInterface, patchWindow, patchNode } from "../window";
 import { SEnvParentNodeMutationTypes, createParentNodeInsertChildMutation, SEnvParentNodeInterface, SEnvCommentInterface, SEnvElementInterface, SEnvTextInterface, createParentNodeRemoveChildMutation } from "../nodes";
 import { SEnvMutationEventInterface } from "../events";
 import { BaseSyntheticWindowRenderer } from "./base";
-import { InsertChildMutation, RemoveChildMutation, MoveChildMutation } from "aerial-common2";
+import { InsertChildMutation, RemoveChildMutation, MoveChildMutation, Mutation } from "aerial-common2";
 
 const NODE_NAME_MAP = {
   head: "span",
@@ -35,10 +35,17 @@ const getNodeByPath = (path: string[], root: Node) => {
 
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   readonly mount: HTMLElement;
+  private _rendering: boolean;
+  private _mutations: Mutation<any>[];
   constructor(sourceWindow: SEnvWindowInterface, readonly targetDocument: Document) {
     super(sourceWindow);
     this.mount = targetDocument.createElement("div");
-    this._deferRecalc = debounce(this._deferRecalc.bind(this), 1);
+    this._deferRecalc = () => {
+      if (this._rendering) return;
+      requestAnimationFrame(() => {
+        
+      })
+    }
   }
 
   protected _onDocumentLoad(event: Event) {
@@ -56,6 +63,27 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   protected _onWindowMutation({ mutation }: SEnvMutationEventInterface) {
+    this._batchMutation(mutation);
+  }
+
+  private _batchMutation(mutation: Mutation<any>) {
+    if (typeof window !== "undefined")  {
+      if (!this._mutations) {
+        this._mutations = [];
+        requestAnimationFrame(() => {
+          const mutations = this._mutations;
+          this._mutations = undefined;
+          mutations.forEach((mutation) => this._applyMutation(mutation));
+          this._resetClientRects();
+        });
+      }
+      this._mutations.push(mutation);
+    } else {
+      this._applyMutation(mutation);
+    }
+  }
+
+  private _applyMutation(mutation: Mutation<any>) {
     const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.uid), this._sourceWindow.document), this.mount.lastElementChild);
 
     if (mutation.$$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
@@ -68,11 +96,6 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     }
 
     patchNode(targetNode, mutation);
-    this._deferRecalc();
-  }
-
-  private _deferRecalc() {
-    this._resetClientRects();
   }
 
   protected _onWindowResize(event: Event) {
