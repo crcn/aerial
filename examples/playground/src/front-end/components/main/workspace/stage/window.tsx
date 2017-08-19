@@ -1,4 +1,4 @@
-import "./canvas.scss";
+import "./window.scss";
 const VOID_ELEMENTS = require("void-elements");
 import * as React from "react";
 import { findDOMNode } from "react-dom";
@@ -14,12 +14,12 @@ import {
 } from "aerial-browser-sandbox";
 import { IsolateComponent } from "front-end/components/isolated";
 
-export type CanvasComponentOuterProps = {
+export type WindowsComponentOuterProps = {
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>
 };
 
-export type CanvasComponentInnerProps = CanvasComponentOuterProps;
+export type WindowsComponentInnerProps = WindowsComponentOuterProps;
 
 type WindowComponentProps = {
   window: SyntheticWindow,
@@ -77,7 +77,7 @@ const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
     height: box.bottom - box.top
   };
 
-  return <div className="visual-canvas-window-component" style={style}>
+  return <div className="preview-window-component" style={style}>
     <IsolateComponent>
       <WindowMount mount={window.mount} />
     </IsolateComponent>

@@ -4,7 +4,7 @@ import "./index.scss";
 import * as React from "react";
 import { Workspace } from "front-end/state";
 import { ToolsLayerComponent } from "./tools";
-import { CanvasComponent } from "./canvas";
+import { WindowsComponent } from "./windows";
 import { IsolateComponent } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
@@ -100,7 +100,7 @@ export const StageComponentBase = ({
           className="stage-inner"
           style={outerStyle}>
           <div style={innerStyle} className="stage-inner">
-            <CanvasComponent browser={browser} dispatch={dispatch} />
+            <WindowsComponent browser={browser} dispatch={dispatch} />
             <ToolsLayerComponent workspace={workspace} dispatch={dispatch} browser={browser} />
           </div>
         </div>
@@ -112,5 +112,4 @@ export const StageComponentBase = ({
 
 export const StageComponent = enhanceStageComponent(StageComponentBase as any) as any as Component<StageOuterComponentProps>;
 
-export * from "./canvas";
 export * from "./tools";
