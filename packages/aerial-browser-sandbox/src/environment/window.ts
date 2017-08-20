@@ -24,6 +24,7 @@ import { SEnvNodeTypes } from "./constants";
 type OpenTarget = "_self" | "_blank";
 
 export interface SEnvWindowInterface extends Window {
+  uid: string;
   struct: SyntheticWindow;
   document: SEnvDocumentInterface;
   childObjects: Map<string, any>;
@@ -49,11 +50,14 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
   const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(context);
   const SEnvElement     = getSEnvElementClass(context);
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
-  const { SEnvEvent, SEnvMutationEvent } = getSEnvEventClasses(context);
+  const { SEnvEvent, SEnvMutationEvent, SEnvWindowOpenedEvent } = getSEnvEventClasses(context);
 
   // register default HTML tag names
   const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
-  
+
+  const DEFAULT_WINDOW_WIDTH = 1366;
+  const DEFAULT_WINDOW_HEIGHT = 768;
+
   return class SEnvWindow extends SEnvEventTarget implements SEnvWindowInterface {
 
     readonly location: Location;
@@ -79,8 +83,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly frameElement: Element;
     readonly frames: Window;
     readonly history: History;
-    readonly innerHeight: number;
-    readonly innerWidth: number;
+    innerHeight: number;
+    innerWidth: number;
     readonly isSecureContext: boolean;
     readonly length: number;
     readonly locationbar: BarProp;
@@ -199,11 +203,11 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly parent: Window;
     readonly performance: Performance;
     readonly personalbar: BarProp;
-    readonly screen: Screen;
-    readonly screenLeft: number;
-    readonly screenTop: number;
-    readonly screenX: number;
-    readonly screenY: number;
+    screen: Screen;
+    screenLeft: number;
+    screenTop: number;
+    screenX: number;
+    screenY: number;
     readonly scrollbars: BarProp;
     scrollX: number = 0;
     scrollY: number = 0;
@@ -238,6 +242,9 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       this.document = new SEnvDocument(this);
       this.window   = this;
       this.renderer = (createRenderer || createNoopRenderer)(this);
+      this.innerWidth = DEFAULT_WINDOW_WIDTH;
+      this.innerHeight = DEFAULT_WINDOW_HEIGHT;
+      this.moveTo(0, 0);
 
       const customElements = this.customElements = new SEnvCustomElementRegistry(this);
       for (const tagName in TAG_NAME_MAP) {
@@ -320,8 +327,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
     }
 
-    setInterval(...args): number {
-      return 0;
+    setInterval(handler, ms: number, ...args): number {
+      return setInterval(handler, ms, ...args);
     }
 
 
@@ -342,7 +349,11 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     moveTo(x?: number, y?: number): void {
-
+      this.screenLeft = this.screenY = x;
+      this.screenTop  = this.screenX = y;
+      const e = new SEnvEvent();
+      e.initEvent("move", true, true);
+      this.dispatchEvent(e);
     }
 
     msWriteProfilerMark(profilerMarkName: string): void {
@@ -350,7 +361,11 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     open(url?: string, target?: string, features?: string, replace?: boolean): Window {
-      return null;
+      const window = openSyntheticEnvironmentWindow(url, context)
+      const event = new SEnvWindowOpenedEvent();
+      event.initWindowOpenedEvent(window);
+      this.dispatchEvent(event);
+      return window;
     }
 
     postMessage(message: any, targetOrigin: string, transfer?: any[]): void {
@@ -378,6 +393,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     resizeTo(x?: number, y?: number): void {
+      this.innerWidth = x;
+      this.innerHeight = y;
       const event = new SEnvEvent();
       event.initEvent("resize", true, true);
       this.dispatchEvent(event);

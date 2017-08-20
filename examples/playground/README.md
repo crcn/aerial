@@ -2,7 +2,6 @@ very simple online playground for visually creating web applications
 
 TOMORROW:
 
-- [ ] absolute position elements
 - [ ] paperclip DSL
 - [ ] preview server
   - [ ] auto layout windows
@@ -15,17 +14,11 @@ OBJECTIVE:
 - POLISH:
 
 - [ ] show original position
+- [ ] measurement tooling
 - [ ] multi select
 - [ ] ability to move any item around
 - [ ] copy + paste elements
 - [ ] full screen window
-
-STAGE 1:
-
-- [ ] inline styles
-- [ ] swipe to scroll
-- [ ] DSL that transpiles to react code
-- [ ] DND elements around relative to their current style
 
 STAGE 2:
 
@@ -49,6 +42,7 @@ OPTIMIZATIONS:
 CLEANUP:
 
 - [ ] change box to bounds
+- [ ] synthetic window timers
 
 LOW PRIO:
 

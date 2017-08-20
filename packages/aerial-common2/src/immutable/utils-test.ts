@@ -1,10 +1,8 @@
 import {expect} from "chai";
 import {
-  getPath,
   mutable, 
   immutable, 
   mapImmutable,
-  flattenObject,
   ImmutableArray, 
   ImmutableObject,
 } from "./index";
@@ -83,27 +81,6 @@ describe(__filename + "#", () => {
       const result = mapImmutable(target, { [target.indexOf(2)]: v => v * 10 });
       expect(result.length).to.eql(3);
       expect(result[1]).to.eql(20);
-    });
-  });
-
-  describe("flattenObject#", () => {
-    it("can flatten a simple object", () => {
-      const obj = { a: { b: 1 } };
-      expect(flattenObject(obj)).to.eql({
-        a: { b: 1 },
-        "a.b": 1
-      });
-    });
-  });
-
-  describe("getPath#", () => {
-    it("can find a path for a simple value", () => {
-      const obj = { a: { b: 1 } };
-      expect(getPath(obj, (value) => value === 1)).to.eql("a.b".split("."));
-    });
-    it("can find a path within a few arrays", () => {
-      const obj = { a: [{b: 1}, { b: [{ c: 2 }]}] };
-      expect(getPath(obj, (value) => value === 2)).to.eql("a.1.b.0.c".split("."));
     });
   });
 });

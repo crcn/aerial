@@ -40,6 +40,8 @@ import {
   getStageToolMouseNodeTargetReference,
 } from "../state";
 
+const WINDOW_PADDING = 20;
+
 export function* mainWorkspaceSaga() {
   yield fork(openDefaultWindow);
   yield fork(handleAltClickElement);
@@ -54,8 +56,8 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    // yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
-    yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
+    yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
+    // yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
     return true;
   });
 }
@@ -83,7 +85,7 @@ function* handleAltClickElement() {
 
 function* openNewWindow(href: string, origin: SyntheticWindow, workspace: Workspace) {
   const uri = getUri(href, origin.location);
-  yield put(openSyntheticWindowRequest(uri, workspace.browserId));
+  yield put(openSyntheticWindowRequest(uri, workspace.browserId, origin.bounds.right + WINDOW_PADDING, origin.bounds.top));
 }
 
 function* handleDeleteKeyPressed() {

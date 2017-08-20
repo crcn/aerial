@@ -18,12 +18,16 @@ import { 
   SyntheticWindowResourceLoaded,
   SYNTHETIC_WINDOW_LOADED,
   SYNTHETIC_WINDOW_RECTS_UPDATED,
+  SyntheticWindowChanged,
   SYNTHETIC_WINDOW_SCROLLED,
   SyntheticWindowScrolled,
+  syntheticWindowOpened,
+  SYNTHETIC_WINDOW_MOVED,
   SyntheticWindowRectsUpdated,
-  SYNTHETIC_WINDOW_SOURCE_CHANGED,
   SyntheticWindowSourceChanged,
   OPEN_SYNTHETIC_WINDOW, 
+  SYNTHETIC_WINDOW_OPENED,
+  SyntheticWindowOpened,
   OpenSyntheticBrowserWindow,
   NewSyntheticWindowEntryResolved,
 } from "../actions";
@@ -33,7 +37,6 @@ import {
   SYNTHETIC_WINDOW,
   removeSyntheticWindow,
   isSyntheticNodeType,
-  DEFAULT_SYNTHETIC_WINDOW_BOX,
   getSyntheticWindow,
   createSyntheticBrowser, 
   updateSyntheticWindow,
@@ -64,30 +67,25 @@ const getBestWindowBounds = (browser: SyntheticBrowser, bounds: Bounds) => {
 export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootState>(root: TRootState = createSyntheticBrowserRootState() as TRootState, event: BaseEvent) => {
 
   switch(event.type) {
-    case OPEN_SYNTHETIC_WINDOW: {
-      const { uri, syntheticBrowserId } = event as OpenSyntheticBrowserWindow;
+    case SYNTHETIC_WINDOW_OPENED: {
+      const { instance, parentWindowId, browserId } = event as SyntheticWindowOpened;
       let syntheticBrowser: SyntheticBrowser;
-      if (!syntheticBrowserId) {
-        root = addSyntheticBrowser(root, syntheticBrowser = createSyntheticBrowser());
-      } else {
-        syntheticBrowser = getSyntheticBrowser(root, syntheticBrowserId);
-      }
-      
+      syntheticBrowser = getSyntheticBrowser(root, browserId);
       return updateSyntheticBrowser(root, syntheticBrowser.$$id, {
         windows: [
           ...syntheticBrowser.windows,
           createSyntheticWindow({
-            location: uri,
-            bounds: getBestWindowBounds(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
+            $$id: instance.uid,
+            location: instance.location.toString(),
+            mount: instance.renderer.mount,
+            bounds: {
+              left: instance.screenLeft,
+              top: instance.screenTop,
+              right: instance.screenLeft + instance.innerWidth,
+              bottom: instance.screenTop + instance.innerHeight,
+            }
           })
         ]
-      });
-    }
-
-    case SYNTHETIC_WINDOW_SOURCE_CHANGED: {
-      const { window, syntheticWindowId } = event as SyntheticWindowSourceChanged;
-      return updateSyntheticWindow(root, syntheticWindowId, {
-        mount: window.renderer.mount
       });
     }
     
@@ -109,6 +107,17 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
         }
         break;
       }
+    }
+    
+    case SYNTHETIC_WINDOW_MOVED: {
+      const { instance: { uid, screenLeft, screenTop } } = event as SyntheticWindowChanged;
+      const struct = getSyntheticWindow(root, uid);
+      return updateSyntheticWindow(root, uid, {
+        bounds: moveBounds(struct.bounds, {
+          left: screenLeft,
+          top: screenTop
+        })
+      });
     }
 
     case MOVED: {

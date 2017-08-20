@@ -1,12 +1,11 @@
 // import { SEnvWindowInterface } from "../environment";
 import { SyntheticDocument, SyntheticNode } from "../state";
 import { Request, BaseEvent, generateDefaultId, Mutation, Point } from "aerial-common2";
-import { RenderedClientRects, RenderedComputedStyleDeclarations } from "../environment";
+import { RenderedClientRects, RenderedComputedStyleDeclarations, SEnvWindowInterface } from "../environment";
 
 export const OPEN_SYNTHETIC_WINDOW               = "OPEN_SYNTHETIC_WINDOW";
 export const SYNTHETIC_WINDOW_RESOURCE_LOADED    = "SYNTHETIC_WINDOW_RESOURCE_LOADED";
 export const NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED = "NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED";
-export const SYNTHETIC_WINDOW_SOURCE_CHANGED     = "SYNTHETIC_WINDOW_SOURCE_CHANGED";
 export const FETCH_REQUEST                       = "FETCH_REQUEST";
 export const SYNTHETIC_WINDOW_RECTS_UPDATED      = "SYNTHETIC_WINDOW_RECTS_UPDATED";
 export const SYNTHETIC_WINDOW_LOADED             = "SYNTHETIC_WINDOW_LOADED";
@@ -15,6 +14,8 @@ export const NODE_VALUE_STOPPED_EDITING          = "NODE_VALUE_STOPPED_EDITING";
 export const EDIT_SOURCE_CONTENT                 = "EDIT_SOURCE_CONTENT";
 export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
 export const SYNTHETIC_WINDOW_SCROLLED           = "SYNTHETIC_WINDOW_SCROLLED";
+export const SYNTHETIC_WINDOW_OPENED             = "SYNTHETIC_WINDOW_OPENED";
+export const SYNTHETIC_WINDOW_MOVED              = "SYNTHETIC_WINDOW_MOVED";
 
 export type FetchRequest = {
   info: RequestInfo;
@@ -29,6 +30,8 @@ export type SyntheticWindowSourceChanged = {
 export type OpenSyntheticBrowserWindow = {
   uri: string;
   syntheticBrowserId: string;
+  left?: number;
+  top?: number;
 } & Request;
 
 export type NewSyntheticWindowEntryResolved = {
@@ -71,6 +74,16 @@ export type SyntheticWindowScrolled = {
   syntheticWindowId: string;
 } & BaseEvent;
 
+export type SyntheticWindowOpened = {
+  instance: SEnvWindowInterface;
+  browserId: string;
+  parentWindowId: string;
+} & BaseEvent;
+
+export type SyntheticWindowChanged = {
+  instance: SEnvWindowInterface;
+} & BaseEvent;
+
 export type MutateSourceContentRequest<T extends Mutation<any>> = {
   type: string;
   mutation: T;
@@ -89,18 +102,24 @@ export type windowPatched = {
   document: SyntheticDocument;
 } & BaseEvent;
 
-export const syntheticWindowSourceChanged = (syntheticWindowId: string, window: any): SyntheticWindowSourceChanged => ({
-  window,
-  syntheticWindowId,
-  type: SYNTHETIC_WINDOW_SOURCE_CHANGED
-});
-
 export const mutateSourceContentRequest = (content: string, contentType: string, mutation: Mutation<any>): MutateSourceContentRequest<any> => ({
   content,
   mutation,
   contentType,
   $$id: generateDefaultId(),
   type: EDIT_SOURCE_CONTENT,
+});
+
+export const syntheticWindowOpened = (instance: SEnvWindowInterface, browserId: string, parentWindowId?: string): SyntheticWindowOpened => ({
+  parentWindowId,
+  browserId,
+  instance,
+  type: SYNTHETIC_WINDOW_OPENED
+});
+
+export const syntheticWindowMoved = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({
+  instance,
+  type: SYNTHETIC_WINDOW_MOVED
 });
 
 export const applyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutations => ({
@@ -136,8 +155,10 @@ export const fetchRequest = (info: RequestInfo): FetchRequest => ({
   $$id: generateDefaultId()
 });
 
-export const openSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string): OpenSyntheticBrowserWindow => ({
+export const openSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string, left?: number, top?: number): OpenSyntheticBrowserWindow => ({
   uri,
+  left,
+  top,
   syntheticBrowserId,
   type: OPEN_SYNTHETIC_WINDOW,
   $$id: generateDefaultId()

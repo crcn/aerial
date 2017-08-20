@@ -34,14 +34,6 @@ export const SYNTHETIC_WINDOW = "SYNTHETIC_WINDOW";
 export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
 export const SYNTHETIC_COMMENT = "SYNTHETIC_COMMENT";
 
-export const DEFAULT_SYNTHETIC_WINDOW_BOX: Bounds = {
-  left: 0,
-  top: 0,
-
-  // small screen size
-  right: 1366,
-  bottom: 768
-};
 
 /**
  * Basic nodes contain information that all DOM-like structures share
@@ -150,7 +142,6 @@ export type SyntheticBrowserRootState = {
 export const createSyntheticBrowserStore = (syntheticBrowsers?: SyntheticBrowser[]) => dsIndex(createDataStore(syntheticBrowsers), "$$id");
 
 export const createSyntheticWindow = createStructFactory<SyntheticWindow>(SYNTHETIC_WINDOW, {
-  bounds: DEFAULT_SYNTHETIC_WINDOW_BOX,
   externalResourceUris: [],
   allNodes: {}
 });

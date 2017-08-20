@@ -5,6 +5,7 @@ import { createQueue } from "mesh";
 
 import { 
   FileCacheItem,
+  URI_CACHE_BUSTED,
   getFileCacheStore,
   FileCacheRootState,
   createReadUriRequest,
@@ -39,16 +40,18 @@ import {
   SYNTHETIC_WINDOW_SCROLLED,
   applyFileMutationsRequest,
   NODE_VALUE_STOPPED_EDITING,
+  syntheticWindowMoved,
+  SYNTHETIC_WINDOW_OPENED,
   SyntheticNodeValueStoppedEditing,
   SyntheticNodeTextContentChanged,
+  syntheticWindowOpened,
   SyntheticWindowSourceChanged,
   syntheticWindowLoaded,
-  SYNTHETIC_WINDOW_SOURCE_CHANGED,
   syntheticWindowRectsUpdated,
   OpenSyntheticBrowserWindow,
+  SyntheticWindowOpened,
   SYNTHETIC_NODE_TEXT_CONTENT_CHANGED,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
-  syntheticWindowSourceChanged,
   syntheticWindowResourceLoaded,
   newSyntheticWindowEntryResolved
 } from "../actions";
@@ -102,12 +105,14 @@ import {
   SEnvTextInterface,
   getSEnvEventClasses,
   SEnvWindowInterface,
+  SEnvWindowContext,
   SEnvElementInterface,
   SEnvHTMLElementInterface,
   SEnvCommentInterface,
   SyntheticDOMRenderer,
   SEnvDocumentInterface,
   waitForDocumentComplete,
+  SEnvWindowOpenedEventInterface,
   SyntheticWindowRendererEvent,
   createUpdateValueNodeMutation,
   openSyntheticEnvironmentWindow,
@@ -147,17 +152,243 @@ function* handleBrowserChanges() {
 
 function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
   let runningSyntheticWindowIds = [];
-  yield watch((root: SyntheticBrowserRootState) => getSyntheticBrowser(root, syntheticBrowserId), function*(syntheticBrowser: SyntheticBrowser) {
 
-    // stop the session if there is no synthetic window
-    if (!syntheticBrowser) return false;
-    const syntheticWindowIds = syntheticBrowser.windows.map(item => item.$$id);
-    yield* difference(syntheticWindowIds, runningSyntheticWindowIds).map((id) => (
-      spawn(handleSytheticWindowSession, id)
-    ));
+  yield fork(handleOpenSyntheticWindow, syntheticBrowserId);
+  yield fork(handleOpenedSyntheticWindow, syntheticBrowserId);
 
-    runningSyntheticWindowIds = syntheticWindowIds;
-    return true;
+  // yield watch((root: SyntheticBrowserRootState) => getSyntheticBrowser(root, syntheticBrowserId), function*(syntheticBrowser: SyntheticBrowser) {
+
+  //   // stop the session if there is no synthetic window
+  //   if (!syntheticBrowser) return false;
+  //   const syntheticWindowIds = syntheticBrowser.windows.map(item => item.$$id);
+  //   yield* difference(syntheticWindowIds, runningSyntheticWindowIds).map((id) => (
+  //     spawn(handleSytheticWindowSession, id)
+  //   ));
+
+  //   runningSyntheticWindowIds = syntheticWindowIds;
+  //   return true;
+  // });
+}
+
+function* handleOpenSyntheticWindow(browserId: string) {
+  while(true) {
+    const request = (yield take((action: OpenSyntheticBrowserWindow) => action.type === OPEN_SYNTHETIC_WINDOW && action.syntheticBrowserId === browserId)) as OpenSyntheticBrowserWindow;
+    const instance = (yield call(openSyntheticWindowEnvironment, request.uri)) as SEnvWindowInterface;
+    if (request.left || request.top) {
+      instance.moveTo(request.left, request.top);
+    }
+    yield put(syntheticWindowOpened(instance, browserId));
+  }
+}
+
+function* openSyntheticWindowEnvironment(location: string) {
+  const window = openSyntheticEnvironmentWindow(location, yield call(getSyntheticWindowEnvironmentContext));
+  return window;
+}
+
+function* getSyntheticWindowEnvironmentContext() {
+  return {
+    console: getSEnvWindowConsole(),
+    fetch: yield call(getSEnvWindowFetch),
+    createRenderer: createSyntheticDOMRendererFactory(document)
+  };
+};
+
+const getSEnvWindowConsole = () => ({
+  warn(...args) {
+    console.warn('VM ', ...args);
+  },
+  log(...args) {
+    console.log('VM ', ...args);
+  },
+  error(...args) {
+    console.error('VM ', ...args);
+  },
+  info(...args) {
+    console.info('VM ', ...args);
+  }
+} as any as Console);
+
+
+function* getSEnvWindowFetch() {
+  const fetchQueue = createQueue();
+
+  yield spawn(function*() {
+    while(true) {
+      const { value: [info, resolve] } = yield call(fetchQueue.next);
+      const body = (yield yield request(fetchRequest(info))).payload;
+      resolve(body);
+    }
+  });
+
+  return (info: RequestInfo) => {
+    return new Promise((resolve) => {
+      fetchQueue.unshift([info, ({ content, type }) => {
+        resolve({
+          text() {
+            return Promise.resolve(String(content));
+          }
+        } as any);
+      }]);
+    });
+  };
+}
+
+function* handleOpenedSyntheticWindow(browserId: string) {
+  while(true) {
+    const { instance } = (yield take(SYNTHETIC_WINDOW_OPENED)) as SyntheticWindowOpened;
+    yield spawn(handleSyntheticWindowInstance, instance, browserId);
+  }
+}
+
+function* handleSyntheticWindowInstance(window: SEnvWindowInterface, browserId: string) {
+  yield fork(handleSyntheticWindowEvents, window, browserId);
+  yield fork(handleSyntheticWindowMutations, window);
+}
+
+const getAllWindowObjects = (window: SEnvWindowInterface) => {
+  const allNodes = {};
+  window.childObjects.forEach((value, key) => allNodes[key] = value.struct);
+  return allNodes;
+}
+
+function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: string) {
+  const { SEnvMutationEvent, SEnvWindowOpenedEvent } = getSEnvEventClasses(window);
+
+  const chan = eventChannel(function(emit) {
+    window.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects, styles }: SyntheticWindowRendererEvent) => {
+      emit(syntheticWindowRectsUpdated(window.uid, rects, styles));
+    });
+    
+    const emitStructChange = debounce(() => {
+      emit(syntheticWindowLoaded(window.uid, window.document.struct, getAllWindowObjects(window)));
+    }, 0);
+
+    window.addEventListener(SEnvMutationEvent.MUTATION, (event) => {
+      if (window.document.readyState !== "complete") return;
+      // multiple mutations may be fired, so batch everything in one go
+      emitStructChange();
+    });
+
+    window.addEventListener("move", (event) => {
+      emit(syntheticWindowMoved(window));
+    });
+
+    window.addEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, (event: SEnvWindowOpenedEventInterface) => {
+      emit(syntheticWindowOpened(event.window, browserId, window.uid));
+    })
+
+    window.addEventListener("scroll", (event) => {
+      emit(syntheticWindowScrolled(window.uid, {
+        left: window.scrollX,
+        top: window.scrollY
+      }));
+    });
+
+    window.document.addEventListener("readystatechange", () => {
+      if (window.document.readyState !== "complete") return;
+      emit(syntheticWindowLoaded(window.uid, window.document.struct, getAllWindowObjects(window)));
+    });
+
+    return () => {
+
+    };
+  });
+
+  yield fork(function*() {
+    while(true) {
+      const e = yield take(chan);
+      yield spawn(function*() {
+        yield put(e);
+      })
+    }
+  });
+}
+
+function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
+
+  const takeWindowAction = (type) => take((action) => action.type === type && action.syntheticWindowId === window.uid);
+
+  yield fork(function* handleRemoveNode() {
+    while(true) {
+      const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
+      const target = window.childObjects.get(itemId) as Node;
+      const parent = target.parentNode;
+      const removeMutation = createParentNodeRemoveChildMutation(parent, target);
+
+      // remove immediately so that it's reflected in the canvas
+      parent.removeChild(target);
+      yield yield request(applyFileMutationsRequest(removeMutation));
+    }
+  });
+
+  yield fork(function* handleMoveNode() {
+    while(true) {
+      const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
+
+      // compute based on the data currently in the store
+      const syntheticWindow = getSyntheticWindow(yield select(), window.uid);
+      const syntheticNode = getSyntheticNodeById(yield select(), itemId);
+      
+      const originalRect = syntheticWindow.allComputedBounds[syntheticNode.$$id];
+      const computedStyle = syntheticWindow.allComputedStyles[syntheticNode.$$id];
+
+      // TODO - computed boxes MUST also contain the offset of the parent.
+      const relativeRect = roundBounds(shiftBounds(convertAbsoluteBoundsToRelative(
+        pointToBounds(point),
+        syntheticNode as SyntheticElement,
+        syntheticWindow
+      ), {
+        left: -syntheticWindow.bounds.left,
+        top: -syntheticWindow.bounds.top
+      }));
+
+      const envElement = window.childObjects.get(syntheticNode.$$id);
+
+      // TODO - get best CSS style
+      if (computedStyle.position === "static") {
+        envElement.style.position = "relative";
+      }
+      envElement.style.left = `${relativeRect.left}px`;
+      envElement.style.top  = `${relativeRect.top}px`;
+    }
+  });
+
+  yield fork(function*() {
+    while(true) {
+      const { syntheticNodeId, textContent } = (yield takeWindowAction(SYNTHETIC_NODE_TEXT_CONTENT_CHANGED)) as SyntheticNodeTextContentChanged;
+      const syntheticNode = window.childObjects.get(syntheticNodeId);
+      syntheticNode.textContent = textContent;
+    }
+  }); 
+
+  // TODO: deprecated. changes must be explicit in the editor instead of doing diff / patch work
+  // since we may end up editing the wrong node otherwise (CC).
+  yield fork(function* handleNodeStoppedEditing() {
+    while(true) {
+      const { nodeId } = (yield takeWindowAction(NODE_VALUE_STOPPED_EDITING)) as SyntheticNodeValueStoppedEditing;
+      const node = window.childObjects.get(nodeId) as HTMLElement;
+      const mutation = createSetElementTextContentMutation(node, node.textContent);
+      yield yield request(applyFileMutationsRequest(mutation));
+    }
+  });
+
+  yield fork(function* handleMoveNodeStopped() {
+    while(true) {
+      const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
+      const target = window.childObjects.get(itemId) as HTMLElement;
+
+      // TODO - prompt where to persist style
+      const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
+      yield yield request(applyFileMutationsRequest(mutation));
+    }
+  });
+
+  yield fork(function*() {
+    while(true) {
+      const { scrollPosition: { left, top }} = (yield takeWindowAction(SYNTHETIC_WINDOW_SCROLLED)) as SyntheticWindowScrolled;
+      window.scrollTo(left, top);
+    }
   });
 }
 
@@ -200,15 +431,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     });
   });
 
-  yield fork(function*() {
-    while(true) {
-      const { value: [info, resolve] } = yield call(fetchQueue.next);
-      const body = (yield yield request(fetchRequest(info))).payload;
-      yield put(syntheticWindowResourceLoaded(syntheticWindowId, String(info)));
-      resolve(body);
-      yield updateFetchedCacheFiles();
-    }
-  });
 
   function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
     yield fork(handleSizeChange, syntheticWindow),
@@ -293,144 +515,10 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       }
     } else {
       cenv = openTargetSyntheticWindow(syntheticWindow);
-      yield fork(watchNewWindow, syntheticWindow);
+      // yield fork(watchNewWindow, syntheticWindow);
     }
   }
 
-  const getAllNodes = () => {
-    const allNodes = {};
-    cenv.childObjects.forEach((value, key) => allNodes[key] = value.struct);
-    return allNodes;
-  }
-
-  function* watchNewWindow(syntheticWindow: SyntheticWindow) {
-    const { SEnvMutationEvent } = getSEnvEventClasses(cenv);
-    const chan = eventChannel((emit) => {
-
-      cenv.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects, styles }: SyntheticWindowRendererEvent) => {
-        emit(syntheticWindowRectsUpdated(syntheticWindowId, rects, styles));
-      });
-      
-      const emitStructChange = debounce(() => {
-        emit(syntheticWindowLoaded(syntheticWindowId, cenv.document.struct, getAllNodes()));
-      }, 0);
-
-      cenv.addEventListener(SEnvMutationEvent.MUTATION, (event) => {
-        if (cenv.document.readyState !== "complete") return;
-        // multiple mutations may be fired, so batch everything in one go
-        emitStructChange();
-      });
-
-      cenv.addEventListener("scroll", (event) => {
-        emit(syntheticWindowScrolled(syntheticWindowId, {
-          left: cenv.scrollX,
-          top: cenv.scrollY
-        }));
-      });
-
-      cenv.document.addEventListener("readystatechange", () => {
-        if (cenv.document.readyState !== "complete") return;
-        emit(syntheticWindowLoaded(syntheticWindowId, cenv.document.struct, getAllNodes()));
-      });
-
-      return () => {
-
-      };
-    });
-
-    yield fork(function*() {
-      while(true) {
-        const e = yield take(chan);
-        yield spawn(function*() {
-          yield put(e);
-        })
-      }
-    });
-
-    yield put(syntheticWindowSourceChanged(syntheticWindow.$$id, cenv));
-  }
-
-  yield fork(function*() {
-    while(true) {
-      const { syntheticNodeId, textContent } = (yield take((action) => action.type === SYNTHETIC_NODE_TEXT_CONTENT_CHANGED && (action as SyntheticNodeTextContentChanged).syntheticWindowId === syntheticWindowId)) as SyntheticNodeTextContentChanged;
-      const syntheticNode = cenv.childObjects.get(syntheticNodeId);
-      syntheticNode.textContent = textContent;
-    }
-  }); 
-
-  // TODO: deprecated. changes must be explicit in the editor instead of doing diff / patch work
-  // since we may end up editing the wrong node otherwise (CC).
-  yield fork(function*() {
-    while(true) {
-      const { nodeId } = (yield take(action => action.type === NODE_VALUE_STOPPED_EDITING && (action as SyntheticNodeValueStoppedEditing).syntheticWindowId === syntheticWindowId)) as SyntheticNodeValueStoppedEditing;
-      const node = cenv.childObjects.get(nodeId) as HTMLElement;
-      const mutation = createSetElementTextContentMutation(node, node.textContent);
-      yield yield request(applyFileMutationsRequest(mutation));
-    }
-  });
-
-  yield fork(function*() {
-    while(true) {
-      const { scrollPosition: { left, top }} = (yield take((action: SyntheticWindowScrolled) => action.type === SYNTHETIC_WINDOW_SCROLLED && action.syntheticWindowId === syntheticWindowId)) as SyntheticWindowScrolled;
-      cenv.scrollTo(left, top);
-    }
-  });
-
-  yield fork(function* handleRemoveNode() {
-    while(true) {
-      const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
-      const target = cenv.childObjects.get(itemId) as Node;
-      const parent = target.parentNode;
-      const removeMutation = createParentNodeRemoveChildMutation(parent, target);
-
-      // remove immediately so that it's reflected in the canvas
-      parent.removeChild(target);
-      yield yield request(applyFileMutationsRequest(removeMutation));
-    }
-  });
-
-  yield fork(function* handleMoveNode() {
-    while(true) {
-      const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
-
-      // compute based on the data currently in the store
-      const syntheticWindow = getSyntheticWindow(yield select(), cwindow.$$id);
-      const syntheticNode = getSyntheticNodeById(yield select(), itemId);
-      
-      const originalRect = syntheticWindow.allComputedBounds[syntheticNode.$$id];
-      const computedStyle = syntheticWindow.allComputedStyles[syntheticNode.$$id];
-
-      // TODO - computed boxes MUST also contain the offset of the parent.
-      const relativeRect = roundBounds(shiftBounds(convertAbsoluteBoundsToRelative(
-        pointToBounds(point),
-        syntheticNode as SyntheticElement,
-        syntheticWindow
-      ), {
-        left: -syntheticWindow.bounds.left,
-        top: -syntheticWindow.bounds.top
-      }));
-
-      const envElement = cenv.childObjects.get(syntheticNode.$$id);
-
-      // TODO - get best CSS style
-      if (computedStyle.position === "static") {
-        envElement.style.position = "relative";
-      }
-      envElement.style.left = `${relativeRect.left}px`;
-      envElement.style.top  = `${relativeRect.top}px`;
-    }
-  });
-
-  yield fork(function* handleMoveNodeStopped() {
-    while(true) {
-      const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
-      const target = cenv.childObjects.get(itemId) as HTMLElement;
-
-      // TODO - prompt where to persist style
-      const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
-      yield yield request(applyFileMutationsRequest(mutation));
-    }
-  });
 }
 
 const mapSEnvAttribute = ({name, value}: Attr) => ({

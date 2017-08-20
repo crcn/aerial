@@ -1,4 +1,5 @@
 import { weakMemo, Mutation } from "aerial-common2";
+import { SEnvWindowInterface } from "../window";
 
 export interface EventTargetInterface extends Event {
   $target: EventTarget;
@@ -7,6 +8,10 @@ export interface EventTargetInterface extends Event {
 
 export interface SEnvMutationEventInterface extends Event {
   readonly mutation: Mutation<any>;
+}
+
+export interface SEnvWindowOpenedEventInterface extends Event {
+  readonly window: SEnvWindowInterface;
 }
 
 export const getSEnvEventClasses = weakMemo((context: any = {}) => {
@@ -76,8 +81,18 @@ export const getSEnvEventClasses = weakMemo((context: any = {}) => {
     }
   }
 
+  class SEnvWindowOpenedEvent extends SEnvEvent {
+    static readonly WINDOW_OPENED = "WINDOW_OPENED";
+    public window: SEnvWindowInterface;
+    initWindowOpenedEvent(window: SEnvWindowInterface) {
+      super.initEvent(SEnvWindowOpenedEvent.WINDOW_OPENED, true, true);
+      this.window = window;
+    }
+  }
+
   return {
     SEnvEvent,
-    SEnvMutationEvent
+    SEnvMutationEvent,
+    SEnvWindowOpenedEvent
   };
 });
