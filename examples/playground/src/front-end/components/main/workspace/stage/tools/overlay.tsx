@@ -104,9 +104,10 @@ const enhanceWindowOverlayTools = compose<WindowOverlayToolsInnerProps, WindowOv
       dispatch(stageToolOverlayMousePanStart(window.$$id));
     },
     onPan: ({ dispatch, window }: WindowOverlayToolsOuterProps) => (event) => {
-      dispatch(stageToolOverlayMousePanning(window.$$id, { left: event.center.x, top: event.center.y }, event.deltaY, event.overallVelocityY));
+      dispatch(stageToolOverlayMousePanning(window.$$id, { left: event.center.x, top: event.center.y }, event.deltaY, event.velocityY));
     },
     onPanEnd: ({ dispatch, window }: WindowOverlayToolsOuterProps) => (event) => {
+
       setImmediate(() => {
         dispatch(stageToolOverlayMousePanEnd(window.$$id));
       });

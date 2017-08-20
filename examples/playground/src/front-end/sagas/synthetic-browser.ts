@@ -57,7 +57,7 @@ function* handleTextEditBlur() {
 const MOMENTUM_THRESHOLD = 100;
 const DEFAULT_MOMENTUM_DAMP = 0.1;
 const MOMENTUM_DELAY = 50;
-const VELOCITY_MULTIPLIER = 30;
+const VELOCITY_MULTIPLIER = 100;
 
 // fugly quick momentum scrolling implementation
 function* handleWindowMousePanned() {
@@ -100,7 +100,7 @@ function* handleWindowMousePanned() {
 
       const zoom = getSelectedWorkspace(yield select()).stage.translate.zoom;
       
-      yield spring(deltaY, velocityY * VELOCITY_MULTIPLIER, function*(deltaY) {
+      yield spring(deltaY, -velocityY * VELOCITY_MULTIPLIER, function*(deltaY) {
         yield scrollDelta(windowId, deltaY / zoom);
       });
     }
