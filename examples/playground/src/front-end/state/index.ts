@@ -69,6 +69,7 @@ export type Stage = {
   backgroundColor?: string;
   translate: Translate;
   cursor?: string;
+  showTextEditor?: boolean;
   showLeftGutter?: boolean;
   showRightGutter?: boolean;
 }
@@ -179,6 +180,7 @@ export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, 
   stage: {
     panning: false,
     translate: { left: 0, top: 0, zoom: 1 },
+    showTextEditor: false,
     showLeftGutter: true,
     showRightGutter: true,
   },

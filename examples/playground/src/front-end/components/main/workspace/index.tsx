@@ -17,14 +17,14 @@ export type WorkspaceProps = {
 };
 
 export const WorkspaceBase = ({ state, workspace, browser, dispatch }: WorkspaceProps) => {
-  const visualSettings = workspace.stage;
+  const stage = workspace.stage;
   return <div className="workspace-component">
-    { visualSettings.showLeftGutter ? <ProjectGutter workspace={workspace} browser={browser} dispatch={dispatch} /> : null }
+    { stage.showLeftGutter ? <ProjectGutter workspace={workspace} browser={browser} dispatch={dispatch} /> : null }
     <div className="workspace-editors">
-      <TextEditor file={getSelectedWorkspaceFile(state, workspace)} cursorPosition={workspace.textCursorPosition} dispatch={dispatch} />
+      { stage.showTextEditor ? <TextEditor file={getSelectedWorkspaceFile(state, workspace)} cursorPosition={workspace.textCursorPosition} dispatch={dispatch} /> : null }
       <Stage workspace={workspace} dispatch={dispatch} browser={browser} />
     </div>
-    { visualSettings.showRightGutter ? <VisualGutter /> : null }
+    { stage.showRightGutter ? <VisualGutter /> : null }
   </div>
 }
 

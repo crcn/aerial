@@ -34,7 +34,6 @@ export const SYNTHETIC_WINDOW = "SYNTHETIC_WINDOW";
 export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
 export const SYNTHETIC_COMMENT = "SYNTHETIC_COMMENT";
 
-
 export const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
   left: 0,
   top: 0,
@@ -252,6 +251,21 @@ export const updateSyntheticWindow = <TState extends SyntheticBrowserRootState>(
     })
   });
 }
+
+export const getSyntheticNodeAncestors = weakMemo((node: SyntheticNode, window: SyntheticWindow) => {
+  const allNodeIds = Object.keys(window.allNodes);
+  const nodeIdIndex = allNodeIds.indexOf(node.$$id);
+  let currentChild = node;
+  const ancestors: SyntheticNode[] = [];
+  for (let i = nodeIdIndex; i--;) {
+    const potentialParent = window.allNodes[nodeIdIndex[i]];
+    if (potentialParent.childNodes && (potentialParent.childNodes as SyntheticNode[]).indexOf(currentChild) !== -1) {
+      ancestors.push(potentialParent);
+      currentChild = potentialParent;
+    }
+  }
+  return ancestors;
+});
 
 export const removeSyntheticWindow = <TState extends SyntheticBrowserRootState>(root: TState, windowId: string): TState => {
   const browser = getSyntheticWindowBrowser(root, windowId);

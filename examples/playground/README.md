@@ -1,5 +1,13 @@
 very simple online playground for visually creating web applications
 
+TOMORROW:
+
+- [ ] absolute position elements
+- [ ] paperclip DSL
+- [ ] preview server
+  - [ ] auto layout windows
+  - [ ] windows should be immovable
+
 OBJECTIVE:
 
 - [ ] Use aerial playground to build itself
@@ -9,6 +17,7 @@ OBJECTIVE:
 - [ ] multi select
 - [ ] ability to move any item around
 - [ ] copy + paste elements
+- [ ] full screen window
 
 STAGE 1:
 
@@ -21,9 +30,6 @@ STAGE 2:
 
 - [ ] AST parser for inline styles. Enable dynamic content.
 
-STAGE 3:
-
-- [ ] 
 
 HI PRIO:
 
@@ -37,16 +43,9 @@ HI PRIO:
 
 OPTIMIZATIONS:
 
-- [ ] memoize computed styles
-- [ ] memoize computed boxes
+- [ ] memoize computed styles & styles
 
 CLEANUP:
-
-- [ ] remove types from names such as *Request and *Event - let name imply what kind they are.
-
-MVP:
-
-- [ ] absolute position elements
 
 LOW PRIO:
 
@@ -54,14 +53,11 @@ LOW PRIO:
 
 Immediate TODOS:
 
-- [ ] proxy remote requests to local server
-- [ ] CSS structs
 - [ ] Welcome - enter URL to start
 - [ ] files tab automatically populates from windows
 
 MVP:
 
-- load external resources
 - save workspace online
 
 After validating:

@@ -37,7 +37,7 @@ export const  SelectionStageToolBase = ({ workspace, browser, dispatch }: Selec
   if (!selection.length || workspace.secondarySelection) return null;
 
   return <div className="m-stage-selection-tool" onDoubleClick={selection.length === 1 ? wrapEventToDispatch(dispatch, selectorDoubleClicked.bind(this, selection[0])) : null }>
-    < SelectionBounds workspace={workspace} browser={browser} />
+    <SelectionBounds workspace={workspace} browser={browser} />
     <Resizer workspace={workspace} browser={browser} dispatch={dispatch} />
   </div>;
 };

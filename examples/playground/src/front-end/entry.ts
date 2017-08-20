@@ -21,7 +21,16 @@ let state = createApplicationState({
 });
 const browser = createSyntheticBrowser();
 state = addSyntheticBrowser(state, browser);
-const workspace = createWorkspace({ browserId: browser.$$id });
+const workspace = createWorkspace({ 
+  browserId: browser.$$id,
+  stage: {
+    panning: false,
+    translate: { left: 0, top: 0, zoom: 1 },
+    showLeftGutter: false,
+    showRightGutter: false,
+    showTextEditor: false
+  }
+});
 state = addWorkspace(state, workspace);
 state = selectWorkspace(state, workspace.$$id);
 
