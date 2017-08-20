@@ -51,7 +51,7 @@ function* openDefaultWindow() {
     const workspace = getSelectedWorkspace(state);
     
     // yield put(createOpenSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
-    yield put(createOpenSyntheticWindowRequest("https://www.w3.org/Style/Examples/011/mypage.html", workspace.browserId));
+    yield put(createOpenSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
     return true;
   });
 }

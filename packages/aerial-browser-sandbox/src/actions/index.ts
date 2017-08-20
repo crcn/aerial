@@ -14,8 +14,7 @@ export const SYNTHETIC_NODE_TEXT_CONTENT_CHANGED = "SYNTHETIC_NODE_TEXT_CONTENT_
 export const NODE_VALUE_STOPPED_EDITING          = "NODE_VALUE_STOPPED_EDITING";
 export const EDIT_SOURCE_CONTENT                 = "EDIT_SOURCE_CONTENT";
 export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
-export const SYNTHETIC_WINDOW_SCROLLING           = "SYNTHETIC_WINDOW_SCROLLING";
-export const SYNTHETIC_WINDOW_SCROLL           = "SYNTHETIC_WINDOW_SCROLL";
+export const SYNTHETIC_WINDOW_SCROLLED           = "SYNTHETIC_WINDOW_SCROLLED";
 
 export type FetchRequest = {
   info: RequestInfo;
@@ -67,13 +66,8 @@ export type SyntheticNodeTextContentChanged = {
   textContent: string;
 } & BaseEvent;
 
-export type SyntheticWindowScrolling = {
-  delta: Point;
-  syntheticWindowId: string;
-} & BaseEvent;
-
-export type SyntheticWindowScroll = {
-  position: Point;
+export type SyntheticWindowScrolled = {
+  scrollPosition: Point;
   syntheticWindowId: string;
 } & BaseEvent;
 
@@ -123,16 +117,10 @@ export const createSyntheticNodeValueStoppedEditing = (syntheticWindowId: string
   type: NODE_VALUE_STOPPED_EDITING
 });
 
-export const syntheticWindowScrolling = (syntheticWindowId: string, delta: Point): SyntheticWindowScrolling => ({
-  delta,
+export const syntheticWindowScrolled = (syntheticWindowId: string, scrollPosition: Point): SyntheticWindowScrolled => ({
+  scrollPosition,
   syntheticWindowId,
-  type: SYNTHETIC_WINDOW_SCROLLING
-});
-
-export const syntheticWindowScroll = (syntheticWindowId: string, position: Point): SyntheticWindowScroll => ({
-  position,
-  syntheticWindowId,
-  type: SYNTHETIC_WINDOW_SCROLL
+  type: SYNTHETIC_WINDOW_SCROLLED
 });
 
 export const createSyntheticNodeTextContentChanged = (syntheticWindowId: string, syntheticNodeId: string, textContent: string): SyntheticNodeTextContentChanged => ({

@@ -142,7 +142,9 @@ export type StageToolOverlayMousePanStart = {
 
 export type StageToolOverlayMousePanning = {
   windowId: string;
-  delta: Point;
+  deltaY: number;
+  velocityY: number;
+  center: Point;
 } & BaseEvent;
 
 export type StageToolOverlayMousePanEnd = {
@@ -216,9 +218,11 @@ export const stageToolOverlayMousePanStart = (windowId: string): StageToolOverla
   type: STAGE_TOOL_OVERLAY_MOUSE_PAN_START,
 });
 
-export const stageToolOverlayMousePanning = (windowId: string, delta: Point): StageToolOverlayMousePanning => ({
+export const stageToolOverlayMousePanning = (windowId: string, center: Point, deltaY: number, velocityY: number): StageToolOverlayMousePanning => ({
   windowId,
-  delta,
+  center,
+  deltaY,
+  velocityY,
   type: STAGE_TOOL_OVERLAY_MOUSE_PANNING,
 });
 

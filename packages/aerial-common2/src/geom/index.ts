@@ -48,6 +48,10 @@ export const moveBox = (box: Box, { left, top }: Point): Box => ({
   bottom: top + box.bottom - box.top
 });
 
+export const shiftPoint = (point: Point, delta: Point) => ({
+  left: point.left + delta.left,
+  top: point.top + delta.top
+});
 
 export const shiftBox = (box: Box, { left, top }: Point): Box => ({
   ...box,

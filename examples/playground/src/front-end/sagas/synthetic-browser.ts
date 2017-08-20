@@ -1,14 +1,16 @@
 import { delay } from "redux-saga";
+import { Point, shiftPoint } from "aerial-common2";
 import { take, fork, select, put, call } from "redux-saga/effects";
 import { 
   getSyntheticNodeWindow, 
-  syntheticWindowScrolling,
+  syntheticWindowScrolled,
   createSyntheticNodeTextContentChanged, 
   createSyntheticNodeValueStoppedEditing,
 } from "aerial-browser-sandbox";
 import { 
   ApplicationState,
   getWorkspaceById,
+  getSyntheticWindow,
   getSelectedWorkspace, 
   getSyntheticNodeWorkspace, 
 } from "front-end/state";
@@ -19,9 +21,11 @@ import {
   STAGE_TOOL_EDIT_TEXT_BLUR, 
   StageToolOverlayMousePanEnd,
   StageToolOverlayMousePanning,
+  StageToolOverlayMousePanStart,
   STAGE_TOOL_EDIT_TEXT_CHANGED, 
   STAGE_TOOL_OVERLAY_MOUSE_PANNING,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
+  STAGE_TOOL_OVERLAY_MOUSE_PAN_START
 } from "front-end/actions";
 
 export function* frontEndSyntheticBrowserSaga() {
@@ -50,43 +54,72 @@ function* handleTextEditBlur() {
   }
 }
 
+const MOMENTUM_THRESHOLD = 100;
+const DEFAULT_MOMENTUM_DAMP = 0.1;
+const MOMENTUM_DELAY = 50;
+const VELOCITY_MULTIPLIER = 30;
+
+// fugly quick momentum scrolling implementation
 function* handleWindowMousePanned() {
 
   let deltaTop  = 0;
   let deltaLeft = 0;
   let currentWindowId: string;
+  let panStartScrollPosition: Point;
+  let lastPaneEvent: StageToolOverlayMousePanning
 
   yield fork(function*() {
     while(true) {
-      const { windowId } = (yield take(STAGE_TOOL_OVERLAY_MOUSE_PAN_END)) as StageToolOverlayMousePanEnd;
-      yield spring(deltaTop, 0, function*(deltaTop) {
-        console.log(deltaTop);
-        yield put(syntheticWindowScrolling(windowId, { left: 0, top: deltaTop }));
+      const { windowId } = (yield take(STAGE_TOOL_OVERLAY_MOUSE_PAN_START)) as StageToolOverlayMousePanStart;
+      panStartScrollPosition = getSyntheticWindow(yield select(), windowId).scrollPosition || { left: 0, top: 0 };
+    }
+  });
+
+  function* scrollDelta(windowId, deltaY) {
+    yield put(syntheticWindowScrolled(windowId, shiftPoint(panStartScrollPosition, {
+      left: 0,
+      top: -deltaY
+    })));
+  }
+
+  yield fork(function*() {
+    while(true) {
+      const event = lastPaneEvent = (yield take(STAGE_TOOL_OVERLAY_MOUSE_PANNING)) as StageToolOverlayMousePanning;
+      const { windowId, deltaY, center, velocityY: newVelocityY } = event;
+
+      const zoom = getSelectedWorkspace(yield select()).stage.translate.zoom;
+
+      yield scrollDelta(windowId, deltaY / zoom);
+    }
+  });
+  
+  yield fork(function*() {
+    while(true) {
+      yield take(STAGE_TOOL_OVERLAY_MOUSE_PAN_END);
+      const { windowId, deltaY, velocityY } = lastPaneEvent;
+
+      const zoom = getSelectedWorkspace(yield select()).stage.translate.zoom;
+      
+      yield spring(deltaY, velocityY * VELOCITY_MULTIPLIER, function*(deltaY) {
+        yield scrollDelta(windowId, deltaY / zoom);
       });
     }
   });
 
-  yield fork(function*() {
-    while(true) {
-      const { windowId, delta } = (yield take(STAGE_TOOL_OVERLAY_MOUSE_PANNING)) as StageToolOverlayMousePanning;
-      deltaTop = delta.top;
-      yield put(syntheticWindowScrolling(windowId, delta));
-    }
-  });
-  
 }
 
-function* spring(start: number, end: number, iterate: Function, damp: number = 0.1, complete: Function = () => {}) {
-  const change = end - start;
+function* spring(start: number, velocityY: number, iterate: Function, damp: number = DEFAULT_MOMENTUM_DAMP, complete: Function = () => {}) {
   let i = 0;
+  let v = velocityY;
+  let currentValue = start;
   function* tick() {
     i += damp;
-    const currentValue = start + change * (i / 1);
+    currentValue += velocityY / (i / 1);
     if (i >= 1) {
       return complete();
     }
     yield iterate(currentValue);
-    yield call(delay, 50);
+    yield call(delay, MOMENTUM_DELAY);
     yield tick();
   }
   yield tick();

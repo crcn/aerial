@@ -30,9 +30,9 @@ import {
   FETCH_REQUEST,
   createFetchRequest,
   OPEN_SYNTHETIC_WINDOW,
-  syntheticWindowScroll,
-  SyntheticWindowScrolling,
-  SYNTHETIC_WINDOW_SCROLLING,
+  SyntheticWindowScrolled,
+  syntheticWindowScrolled,
+  SYNTHETIC_WINDOW_SCROLLED,
   createApplyFileMutationsRequest,
   NODE_VALUE_STOPPED_EDITING,
   SyntheticNodeValueStoppedEditing,
@@ -314,7 +314,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       });
 
       cenv.addEventListener("scroll", (event) => {
-        emit(syntheticWindowScroll(syntheticWindowId, {
+        emit(syntheticWindowScrolled(syntheticWindowId, {
           left: cenv.scrollX,
           top: cenv.scrollY
         }));
@@ -363,8 +363,8 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
   yield fork(function*() {
     while(true) {
-      const { delta: { left, top }} = (yield take((action: SyntheticWindowScrolling) => action.type === SYNTHETIC_WINDOW_SCROLLING && action.syntheticWindowId === syntheticWindowId)) as SyntheticWindowScrolling;
-      cenv.scrollTo(cenv.scrollX - left, cenv.scrollY - top);
+      const { scrollPosition: { left, top }} = (yield take((action: SyntheticWindowScrolled) => action.type === SYNTHETIC_WINDOW_SCROLLED && action.syntheticWindowId === syntheticWindowId)) as SyntheticWindowScrolled;
+      cenv.scrollTo(left, top);
     }
   });
 

@@ -18,8 +18,8 @@ import { 
   SyntheticWindowResourceLoadedEvent,
   SYNTHETIC_WINDOW_LOADED,
   SYNTHETIC_WINDOW_RECTS_UPDATED,
-  SYNTHETIC_WINDOW_SCROLL,
-  SyntheticWindowScroll,
+  SYNTHETIC_WINDOW_SCROLLED,
+  SyntheticWindowScrolled,
   SyntheticWindowRectsUpdatedEvent,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
   SyntheticWindowSourceChangedEvent,
@@ -91,10 +91,10 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
       });
     }
     
-    case SYNTHETIC_WINDOW_SCROLL: {
-      const { position, syntheticWindowId } = event as SyntheticWindowScroll;
+    case SYNTHETIC_WINDOW_SCROLLED: {
+      const { scrollPosition, syntheticWindowId } = event as SyntheticWindowScrolled;
       return updateSyntheticWindow(root, syntheticWindowId, {
-        scrollPosition: position
+        scrollPosition,
       });
     }
 

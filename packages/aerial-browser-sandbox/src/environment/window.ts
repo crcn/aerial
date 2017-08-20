@@ -407,6 +407,15 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       left = Math.max(0, left);
       top  = Math.max(0, top);
 
+      const oldScrollX = this.scrollX;
+      const oldScrollY = this.scrollY;
+
+      // no change
+      if (oldScrollX === left && oldScrollY === top) {
+        return;
+      }
+    
+
       this.scrollX = left;
       this.scrollY = top;
       
