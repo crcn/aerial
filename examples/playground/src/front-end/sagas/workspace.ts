@@ -22,7 +22,7 @@ import {
   getSyntheticNodeById, 
   SyntheticElement, 
   getSyntheticNodeWindow,
-  createOpenSyntheticWindowRequest, 
+  openSyntheticWindowRequest, 
 } from "aerial-browser-sandbox";
 
 import { 
@@ -50,8 +50,8 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    // yield put(createOpenSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
-    yield put(createOpenSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
+    // yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
+    yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
     return true;
   });
 }
@@ -79,7 +79,7 @@ function* handleAltClickElement() {
 
 function* openNewWindow(href: string, origin: SyntheticWindow, workspace: Workspace) {
   const uri = getUri(href, origin.location);
-  yield put(createOpenSyntheticWindowRequest(uri, workspace.browserId));
+  yield put(openSyntheticWindowRequest(uri, workspace.browserId));
 }
 
 function* handleDeleteKeyPressed() {

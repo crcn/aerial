@@ -47,7 +47,7 @@ export type SyntheticWindowMountChanged = {
  * Factories
  */
 
-export const openSyntheticWindowRequested = (syntheticBrowserId: string, location: string): OpenSyntheticWindowRequested => ({
+export const openSyntheticWindowRequestRequested = (syntheticBrowserId: string, location: string): OpenSyntheticWindowRequested => ({
   syntheticBrowserId,
   location,
   type: OPEN_SYNTHETIC_WINDOW_REQUESTED,

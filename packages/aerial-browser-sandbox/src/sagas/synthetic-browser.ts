@@ -28,25 +28,25 @@ import {
 import { 
   FetchRequest,
   FETCH_REQUEST,
-  createFetchRequest,
+  fetchRequest,
   OPEN_SYNTHETIC_WINDOW,
   SyntheticWindowScrolled,
   syntheticWindowScrolled,
   SYNTHETIC_WINDOW_SCROLLED,
-  createApplyFileMutationsRequest,
+  applyFileMutationsRequest,
   NODE_VALUE_STOPPED_EDITING,
   SyntheticNodeValueStoppedEditing,
   SyntheticNodeTextContentChanged,
-  SyntheticWindowSourceChangedEvent,
-  createSyntheticWindowLoadedEvent,
+  SyntheticWindowSourceChanged,
+  syntheticWindowLoaded,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
-  createSyntheticWindowRectsUpdated,
-  OpenSyntheticBrowserWindowRequest,
+  syntheticWindowRectsUpdated,
+  OpenSyntheticBrowserWindow,
   SYNTHETIC_NODE_TEXT_CONTENT_CHANGED,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
-  createSyntheticWindowSourceChangedEvent,
-  createSyntheticWindowResourceLoadedEvent,
-  createNewSyntheticWindowEntryResolvedEvent
+  syntheticWindowSourceChanged,
+  syntheticWindowResourceLoaded,
+  newSyntheticWindowEntryResolved
 } from "../actions";
 
 import { 
@@ -195,8 +195,8 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   yield fork(function*() {
     while(true) {
       const { value: [info, resolve] } = yield call(fetchQueue.next);
-      const body = (yield yield request(createFetchRequest(info))).payload;
-      yield put(createSyntheticWindowResourceLoadedEvent(syntheticWindowId, String(info)));
+      const body = (yield yield request(fetchRequest(info))).payload;
+      yield put(syntheticWindowResourceLoaded(syntheticWindowId, String(info)));
       resolve(body);
       yield updateFetchedCacheFiles();
     }
@@ -300,11 +300,11 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     const chan = eventChannel((emit) => {
 
       cenv.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects, styles }: SyntheticWindowRendererEvent) => {
-        emit(createSyntheticWindowRectsUpdated(syntheticWindowId, rects, styles));
+        emit(syntheticWindowRectsUpdated(syntheticWindowId, rects, styles));
       });
       
       const emitStructChange = debounce(() => {
-        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct, getAllNodes()));
+        emit(syntheticWindowLoaded(syntheticWindowId, cenv.document.struct, getAllNodes()));
       }, 0);
 
       cenv.addEventListener(SEnvMutationEvent.MUTATION, (event) => {
@@ -322,7 +322,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
       cenv.document.addEventListener("readystatechange", () => {
         if (cenv.document.readyState !== "complete") return;
-        emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct, getAllNodes()));
+        emit(syntheticWindowLoaded(syntheticWindowId, cenv.document.struct, getAllNodes()));
       });
 
       return () => {
@@ -339,7 +339,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       }
     });
 
-    yield put(createSyntheticWindowSourceChangedEvent(syntheticWindow.$$id, cenv));
+    yield put(syntheticWindowSourceChanged(syntheticWindow.$$id, cenv));
   }
 
   yield fork(function*() {
@@ -357,7 +357,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       const { nodeId } = (yield take(action => action.type === NODE_VALUE_STOPPED_EDITING && (action as SyntheticNodeValueStoppedEditing).syntheticWindowId === syntheticWindowId)) as SyntheticNodeValueStoppedEditing;
       const node = cenv.childObjects.get(nodeId) as HTMLElement;
       const mutation = createSetElementTextContentMutation(node, node.textContent);
-      yield yield request(createApplyFileMutationsRequest(mutation));
+      yield yield request(applyFileMutationsRequest(mutation));
     }
   });
 
@@ -377,7 +377,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
       // remove immediately so that it's reflected in the canvas
       parent.removeChild(target);
-      yield yield request(createApplyFileMutationsRequest(removeMutation));
+      yield yield request(applyFileMutationsRequest(removeMutation));
     }
   });
 
@@ -403,7 +403,7 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
       // TODO - prompt where to persist style
       const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
-      yield yield request(createApplyFileMutationsRequest(mutation));
+      yield yield request(applyFileMutationsRequest(mutation));
     }
   });
 }

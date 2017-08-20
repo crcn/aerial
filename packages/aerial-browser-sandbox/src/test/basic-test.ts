@@ -9,10 +9,10 @@
 // import { syntheticBrowserReducer } from "../reducers";
 // import { syntheticBrowserSaga } from "../sagas";
 // import { getSEnvWindowClass, openSyntheticEnvironmentWindow } from "../environment";
-// import { createOpenSyntheticWindowRequest } from "../actions";
+// import { openSyntheticWindowRequest } from "../actions";
 // // import { 
 // //   getSyntheticBrowserRootState,
-// //   createOpenSyntheticWindowRequest, 
+// //   openSyntheticWindowRequest, 
 // //   syntheticBrowserSaga,
 // //   syntheticBrowserReducer,
 // //   createSyntheticBrowserRootState

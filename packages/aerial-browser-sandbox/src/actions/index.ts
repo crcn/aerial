@@ -20,29 +20,29 @@ export type FetchRequest = {
   info: RequestInfo;
 } & Request;
 
-export type SyntheticWindowSourceChangedEvent = {
+export type SyntheticWindowSourceChanged = {
   type: string
   syntheticWindowId: string;
   window: any;
 } & BaseEvent;
 
-export type OpenSyntheticBrowserWindowRequest = {
+export type OpenSyntheticBrowserWindow = {
   uri: string;
   syntheticBrowserId: string;
 } & Request;
 
-export type NewSyntheticWindowEntryResolvedEvent = {
+export type NewSyntheticWindowEntryResolved = {
   location: string;
   syntheticBrowserId?: string;
 } & BaseEvent;
 
-export type SyntheticWindowRectsUpdatedEvent = {
+export type SyntheticWindowRectsUpdated = {
   rects: RenderedClientRects;
   styles: RenderedComputedStyleDeclarations;
   syntheticWindowId: string;
 } & BaseEvent;
 
-export type SyntheticWindowLoadedEvent = {
+export type SyntheticWindowLoaded = {
   allNodes: {
     [identifier: string]: SyntheticNode
   };
@@ -55,7 +55,7 @@ export type SyntheticNodeValueStoppedEditing = {
   nodeId: string;
 } & BaseEvent;
 
-export type SyntheticWindowResourceLoadedEvent = {
+export type SyntheticWindowResourceLoaded = {
   uri: string;
   syntheticWindowId: string;
 } & BaseEvent;
@@ -78,24 +78,24 @@ export type MutateSourceContentRequest<T extends Mutation<any>> = {
   contentType: string;
 } & Request;
 
-export type ApplyFileMutationsRequest = {
+export type ApplyFileMutations = {
   type: string;
   mutations: Mutation<any>[];
 } & Request;
 
-export type SyntheticWindowPatchedEvent = {
+export type windowPatched = {
   type: string;
   syntheticWindowId: string;
   document: SyntheticDocument;
 } & BaseEvent;
 
-export const createSyntheticWindowSourceChangedEvent = (syntheticWindowId: string, window: any): SyntheticWindowSourceChangedEvent => ({
+export const syntheticWindowSourceChanged = (syntheticWindowId: string, window: any): SyntheticWindowSourceChanged => ({
   window,
   syntheticWindowId,
   type: SYNTHETIC_WINDOW_SOURCE_CHANGED
 });
 
-export const createMutateSourceContentRequest = (content: string, contentType: string, mutation: Mutation<any>): MutateSourceContentRequest<any> => ({
+export const mutateSourceContentRequest = (content: string, contentType: string, mutation: Mutation<any>): MutateSourceContentRequest<any> => ({
   content,
   mutation,
   contentType,
@@ -103,7 +103,7 @@ export const createMutateSourceContentRequest = (content: string, contentType: s
   type: EDIT_SOURCE_CONTENT,
 });
 
-export const createApplyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutationsRequest => ({
+export const applyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutations => ({
   mutations,
   $$id: generateDefaultId(),
   type: APPLY_FILE_MUTATIONS,
@@ -111,7 +111,7 @@ export const createApplyFileMutationsRequest = (...mutations: Mutation<any>[]): 
 
 export const testMutateContentRequest = (contentType: string, mutationType?: string) => ((action: MutateSourceContentRequest<any>) => action.type === EDIT_SOURCE_CONTENT && action.contentType === contentType && (!mutationType || action.mutation.$$type === mutationType));
 
-export const createSyntheticNodeValueStoppedEditing = (syntheticWindowId: string, nodeId: string): SyntheticNodeValueStoppedEditing => ({
+export const syntheticNodeValueStoppedEditing = (syntheticWindowId: string, nodeId: string): SyntheticNodeValueStoppedEditing => ({
   nodeId,
   syntheticWindowId,
   type: NODE_VALUE_STOPPED_EDITING
@@ -123,33 +123,33 @@ export const syntheticWindowScrolled = (syntheticWindowId: string, scrollPositio
   type: SYNTHETIC_WINDOW_SCROLLED
 });
 
-export const createSyntheticNodeTextContentChanged = (syntheticWindowId: string, syntheticNodeId: string, textContent: string): SyntheticNodeTextContentChanged => ({
+export const syntheticNodeTextContentChanged = (syntheticWindowId: string, syntheticNodeId: string, textContent: string): SyntheticNodeTextContentChanged => ({
   textContent,
   syntheticNodeId,
   syntheticWindowId,
   type: SYNTHETIC_NODE_TEXT_CONTENT_CHANGED
 });
 
-export const createFetchRequest = (info: RequestInfo): FetchRequest => ({
+export const fetchRequest = (info: RequestInfo): FetchRequest => ({
   info,
   type: FETCH_REQUEST,
   $$id: generateDefaultId()
 });
 
-export const createOpenSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string): OpenSyntheticBrowserWindowRequest => ({
+export const openSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string): OpenSyntheticBrowserWindow => ({
   uri,
   syntheticBrowserId,
   type: OPEN_SYNTHETIC_WINDOW,
   $$id: generateDefaultId()
 });
 
-export const createNewSyntheticWindowEntryResolvedEvent = (location: string, syntheticBrowserId?: string): NewSyntheticWindowEntryResolvedEvent => ({
+export const newSyntheticWindowEntryResolved = (location: string, syntheticBrowserId?: string): NewSyntheticWindowEntryResolved => ({
   location,
   syntheticBrowserId,
   type: NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
 });
 
-export const createSyntheticWindowRectsUpdated = (syntheticWindowId: string, rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations): SyntheticWindowRectsUpdatedEvent => ({
+export const syntheticWindowRectsUpdated = (syntheticWindowId: string, rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations): SyntheticWindowRectsUpdated => ({
   rects,
   styles,
   syntheticWindowId,
@@ -157,13 +157,13 @@ export const createSyntheticWindowRectsUpdated = (syntheticWindowId: string, rec
 });
 
 
-export const createSyntheticWindowResourceLoadedEvent = (syntheticWindowId: string, uri: string): SyntheticWindowResourceLoadedEvent => ({
+export const syntheticWindowResourceLoaded = (syntheticWindowId: string, uri: string): SyntheticWindowResourceLoaded => ({
   uri,
   syntheticWindowId,
   type: SYNTHETIC_WINDOW_RESOURCE_LOADED,
 });
 
-export const createSyntheticWindowLoadedEvent = (syntheticWindowId: string, document: SyntheticDocument, allNodes: { [identifier: string]: SyntheticNode }): SyntheticWindowLoadedEvent => ({
+export const syntheticWindowLoaded = (syntheticWindowId: string, document: SyntheticDocument, allNodes: { [identifier: string]: SyntheticNode }): SyntheticWindowLoaded => ({
   allNodes,
   document,
   syntheticWindowId,

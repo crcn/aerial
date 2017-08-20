@@ -1,7 +1,7 @@
 import "./index.scss";
 import * as React from "react";
 import { compose, pure } from "recompose";
-import { ResizerComponent } from "./resizer";
+import { Resizer } from "./resizer";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, mergeBoxes, Boxed, wrapEventToDispatch } from "aerial-common2";
 import { Workspace, getBoxedWorkspaceSelection, getSyntheticBrowserBox } from "front-end/state";
@@ -16,7 +16,7 @@ export type SelectionOuterProps = {
 export type SelectionInnerProps = {
 } & SelectionOuterProps;
 
-const SelectionBoundsComponent = ({ workspace, browser }: { workspace: Workspace, browser: SyntheticBrowser }) => {
+const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, browser: SyntheticBrowser }) => {
   const selection = getBoxedWorkspaceSelection(browser, workspace);
   const entireBounds = mergeBoxes(...selection.map(value => getSyntheticBrowserBox(browser, value)));
   const style = {};
@@ -32,16 +32,16 @@ const SelectionBoundsComponent = ({ workspace, browser }: { workspace: Workspace
   return <div style={boundsStyle as any}></div>;
 };
 
-export const SelectionStageToolComponentBase = ({ workspace, browser, dispatch }: SelectionInnerProps) => {
+export const  SelectionStageToolBase = ({ workspace, browser, dispatch }: SelectionInnerProps) => {
   const selection = getBoxedWorkspaceSelection(browser, workspace);
   if (!selection.length || workspace.secondarySelection) return null;
 
   return <div className="m-stage-selection-tool" onDoubleClick={selection.length === 1 ? wrapEventToDispatch(dispatch, selectorDoubleClicked.bind(this, selection[0])) : null }>
-    <SelectionBoundsComponent workspace={workspace} browser={browser} />
-    <ResizerComponent workspace={workspace} browser={browser} dispatch={dispatch} />
+    < SelectionBounds workspace={workspace} browser={browser} />
+    <Resizer workspace={workspace} browser={browser} dispatch={dispatch} />
   </div>;
 };
 
-export const SelectionStageToolComponent = pure(SelectionStageToolComponentBase as any) as typeof SelectionStageToolComponentBase;
+export const  SelectionStageTool = pure( SelectionStageToolBase as any) as typeof  SelectionStageToolBase;
 
 export * from "./resizer";

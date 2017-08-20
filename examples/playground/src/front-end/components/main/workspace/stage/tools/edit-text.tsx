@@ -26,7 +26,7 @@ export type EditTextToolInnerProps = {
   setTextarea: (v: any) => any;
 } & EditTextToolOuterProps;
 
-export const EditTextToolComponentBase = ({ workspace, browser, dispatch, setTextarea }: EditTextToolInnerProps) => {
+export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea }: EditTextToolInnerProps) => {
   if (!workspace.secondarySelection) return null;
   const zoom = workspace.stage.translate.zoom;
   const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
@@ -73,7 +73,7 @@ export const EditTextToolComponentBase = ({ workspace, browser, dispatch, setTex
   </div>;
 }
 
-const enhanceEditTextToolComponent = compose<EditTextToolInnerProps, EditTextToolOuterProps>(
+const enhanceEditTextTool = compose<EditTextToolInnerProps, EditTextToolOuterProps>(
   pure,
   withState("textarea", "setTextarea", null),
   lifecycle<EditTextToolInnerProps, any>({
@@ -85,4 +85,4 @@ const enhanceEditTextToolComponent = compose<EditTextToolInnerProps, EditTextToo
   })
 );
 
-export const EditTextToolComponent = enhanceEditTextToolComponent(EditTextToolComponentBase);
+export const EditTextTool = enhanceEditTextTool(EditTextToolBase);

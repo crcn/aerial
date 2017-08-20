@@ -1,8 +1,8 @@
 // import "./index.scss";
 // import * as React from "react";
 // import { compose, pure } from "recompose";
-// import { TreeComponent } from "../../../../tree";
-// import { PaneComponent } from "../../../../pane";
+// import { Tree } from "../../../../tree";
+// import { Pane } from "../../../../pane";
 // import {DIRECTORY } from "../../../../../state";
 // import { FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED, FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED } from "front-end/actions";
 // import { immutable, TreeNode, Dispatcher, wrapEventToDispatch, wrappedEvent } from "aerial-common2";
@@ -14,7 +14,7 @@
 //   pure
 // ) as any;
 
-// export type FileNavigatorComponentProps = {
+// export type FileNavigatorProps = {
 //   directory: Directory,
 //   dispatch?: Dispatcher<any>
 // }
@@ -31,10 +31,10 @@
 
 // const FileNavigatorControls = pure(FileNavigatorControlsBase as any) as typeof FileNavigatorControlsBase;
 
-// export const FileNavigatorComponentBase = ({ directory, dispatch }: FileNavigatorComponentProps) => <div className="file-navigator-component">
-//   <PaneComponent title="Files" controls={<FileNavigatorControls dispatch={dispatch} />}>
-//     <TreeComponent rootNode={directory} getLabel={getFileLabel} collapsible={collapsible} dispatch={dispatch} />
-//   </PaneComponent>
+// export const FileNavigatorBase = ({ directory, dispatch }: FileNavigatorProps) => <div className="file-navigator-component">
+//   <Pane title="Files" controls={<FileNavigatorControls dispatch={dispatch} />}>
+//     <Tree rootNode={directory} getLabel={getFileLabel} collapsible={collapsible} dispatch={dispatch} />
+//   </Pane>
 // </div>;
 
-// export const FileNavigatorComponent = enhanceFileNavigator(FileNavigatorComponentBase) as typeof FileNavigatorComponentBase;
+// export const FileNavigator = enhanceFileNavigator(FileNavigatorBase) as typeof FileNavigatorBase;

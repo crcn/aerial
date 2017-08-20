@@ -12,20 +12,20 @@ import {
 } from "aerial-common2";
 import { uniq } from "lodash";
 import { 
-  SyntheticWindowLoadedEvent,
-  SyntheticWindowPatchedEvent,
+  SyntheticWindowLoaded,
+  windowPatched,
   SYNTHETIC_WINDOW_RESOURCE_LOADED,
-  SyntheticWindowResourceLoadedEvent,
+  SyntheticWindowResourceLoaded,
   SYNTHETIC_WINDOW_LOADED,
   SYNTHETIC_WINDOW_RECTS_UPDATED,
   SYNTHETIC_WINDOW_SCROLLED,
   SyntheticWindowScrolled,
-  SyntheticWindowRectsUpdatedEvent,
+  SyntheticWindowRectsUpdated,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
-  SyntheticWindowSourceChangedEvent,
+  SyntheticWindowSourceChanged,
   OPEN_SYNTHETIC_WINDOW, 
-  OpenSyntheticBrowserWindowRequest,
-  NewSyntheticWindowEntryResolvedEvent,
+  OpenSyntheticBrowserWindow,
+  NewSyntheticWindowEntryResolved,
 } from "../actions";
 import { 
   SyntheticNode,
@@ -65,7 +65,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
 
   switch(event.type) {
     case OPEN_SYNTHETIC_WINDOW: {
-      const { uri, syntheticBrowserId } = event as OpenSyntheticBrowserWindowRequest;
+      const { uri, syntheticBrowserId } = event as OpenSyntheticBrowserWindow;
       let syntheticBrowser: SyntheticBrowser;
       if (!syntheticBrowserId) {
         root = addSyntheticBrowser(root, syntheticBrowser = createSyntheticBrowser());
@@ -85,7 +85,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
     }
 
     case SYNTHETIC_WINDOW_SOURCE_CHANGED: {
-      const { window, syntheticWindowId } = event as SyntheticWindowSourceChangedEvent;
+      const { window, syntheticWindowId } = event as SyntheticWindowSourceChanged;
       return updateSyntheticWindow(root, syntheticWindowId, {
         mount: window.renderer.mount
       });
@@ -135,12 +135,12 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
     }
 
     case SYNTHETIC_WINDOW_LOADED: {
-      const { syntheticWindowId, document, allNodes } = event as SyntheticWindowLoadedEvent;
+      const { syntheticWindowId, document, allNodes } = event as SyntheticWindowLoaded;
       return updateSyntheticWindow(root, syntheticWindowId, { document, allNodes });
     }
 
     case SYNTHETIC_WINDOW_RECTS_UPDATED: {
-      const { rects, styles, syntheticWindowId } = event as SyntheticWindowRectsUpdatedEvent;
+      const { rects, styles, syntheticWindowId } = event as SyntheticWindowRectsUpdated;
       return updateSyntheticWindow(root, syntheticWindowId, {
         computedBoxes: rects,
         computedStyles: styles
@@ -148,7 +148,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
     }
 
     case SYNTHETIC_WINDOW_RESOURCE_LOADED: {
-      const { uri, syntheticWindowId } = event as SyntheticWindowResourceLoadedEvent;
+      const { uri, syntheticWindowId } = event as SyntheticWindowResourceLoaded;
       const window = getSyntheticWindow(root, syntheticWindowId);
       return updateSyntheticWindow(root, syntheticWindowId, {
         externalResourceUris: uniq(window.externalResourceUris, uri)

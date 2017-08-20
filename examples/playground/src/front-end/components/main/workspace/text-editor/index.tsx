@@ -35,7 +35,7 @@ const MODES = {
   "text/css": "css",
 };
 
-export const TextEditorComponentBase = ({ options, file, dispatch, setCodeMirror }: TextEditorInnerProps) => {
+export const TextEditorBase = ({ options, file, dispatch, setCodeMirror }: TextEditorInnerProps) => {
   return <div className="text-editor-component">
     <CodeMirror ref={setCodeMirror} options={{ 
       theme: "dracula",
@@ -44,7 +44,7 @@ export const TextEditorComponentBase = ({ options, file, dispatch, setCodeMirror
   </div>
 }
 
-export const TextEditorComponent = compose<TextEditorInnerProps, TextEditorProps>(
+export const TextEditor = compose<TextEditorInnerProps, TextEditorProps>(
   pure,
   withState("codeMirror", "setCodeMirror", null),
   lifecycle({
@@ -64,4 +64,4 @@ export const TextEditorComponent = compose<TextEditorInnerProps, TextEditorProps
       }
     }
   })
-)(TextEditorComponentBase);
+)(TextEditorBase);

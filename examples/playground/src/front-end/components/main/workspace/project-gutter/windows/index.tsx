@@ -1,7 +1,7 @@
 import "./index.scss";
 import * as React from "react";
 import { Workspace } from "front-end/state";
-import { PaneComponent } from "front-end/components/pane";
+import { Pane } from "front-end/components/pane";
 import { SyntheticWindow } from "aerial-browser-sandbox";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { pure, compose, withHandlers } from "recompose";
@@ -12,7 +12,7 @@ const WindowRow = ({ window, dispatch }: { window: SyntheticWindow, dispatch: Di
   {window.document && window.document.title || window.location} 
 </div>
 
-const WindowsPaneComponentControlsBase = ({ workspace, dispatch, onAddWindow }: { workspace: Workspace, dispatch: Dispatcher<any>, onAddWindow: any }) => <span>
+const WindowsPaneControlsBase = ({ workspace, dispatch, onAddWindow }: { workspace: Workspace, dispatch: Dispatcher<any>, onAddWindow: any }) => <span>
     <i className="icon ion-plus" onClick={onAddWindow}></i>
 </span>;
 
@@ -26,11 +26,11 @@ const enhanceControls = compose(
   })
 );
 
-const WindowsPaneComponentControls = enhanceControls(WindowsPaneComponentControlsBase as any) as any;
+const WindowsPaneControls = enhanceControls(WindowsPaneControlsBase as any) as any;
 
 
-export const WindowsPaneComponent = pure((({ workspace, browser, dispatch }: { workspace: Workspace, browser: SyntheticBrowser, dispatch: Dispatcher<any> }) => <PaneComponent title="Windows" className="m-windows-pane" controls={<WindowsPaneComponentControls workspace={workspace} dispatch={dispatch} />}>
+export const WindowsPane = pure((({ workspace, browser, dispatch }: { workspace: Workspace, browser: SyntheticBrowser, dispatch: Dispatcher<any> }) => <Pane title="Windows" className="m-windows-pane" controls={<WindowsPaneControls workspace={workspace} dispatch={dispatch} />}>
   {
     browser.windows.map((window) => <WindowRow key={window.$$id} window={window} dispatch={dispatch} />)
   }
-</PaneComponent>) as any);
+</Pane>) as any);

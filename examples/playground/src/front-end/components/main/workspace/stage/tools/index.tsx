@@ -6,22 +6,22 @@ import { pure } from "recompose";
 import { Workspace } from "front-end/state";
 import { Dispatcher } from "aerial-common2";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
-import { EditTextToolComponent } from "./edit-text";
-import { GridStageToolComponent } from "./grid";
-import { WindowsStageToolComponent } from "./windows";
-import { NodeOverlaysToolComponent } from "./overlay";
-import { SelectionStageToolComponent } from "./selection";
+import { EditTextTool } from "./edit-text";
+import { GridStageTool } from "./grid";
+import { WindowsStageTool } from "./windows";
+import { NodeOverlaysTool } from "./overlay";
+import { SelectionStageTool } from "./selection";
 
-export type ToolsComponentProps = {
+export type ToolsProps = {
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
-export const ToolsLayerComponent = pure((({ workspace, browser, dispatch }: ToolsComponentProps) => <div className="m-stage-tools">
-  <GridStageToolComponent settings={workspace.stage} />
-  <SelectionStageToolComponent workspace={workspace} browser={browser} dispatch={dispatch} />
-  <NodeOverlaysToolComponent workspace={workspace} browser={browser} dispatch={dispatch} />
-  <WindowsStageToolComponent workspace={workspace} browser={browser} dispatch={dispatch} />
-  <EditTextToolComponent workspace={workspace}  browser={browser} dispatch={dispatch} />
+export const ToolsLayer = pure((({ workspace, browser, dispatch }: ToolsProps) => <div className="m-stage-tools">
+  <GridStageTool settings={workspace.stage} />
+  <SelectionStageTool workspace={workspace} browser={browser} dispatch={dispatch} />
+  <NodeOverlaysTool workspace={workspace} browser={browser} dispatch={dispatch} />
+  <WindowsStageTool workspace={workspace} browser={browser} dispatch={dispatch} />
+  <EditTextTool workspace={workspace}  browser={browser} dispatch={dispatch} />
 </div>) as any);

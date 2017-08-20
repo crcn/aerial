@@ -5,7 +5,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { circular, parallel } from "mesh";
 import { flowRight } from "lodash";
-import { MainComponent } from "./components";
+import { Main } from "./components";
 import { applicationReducer } from "./reducers";
 import { createApplicationState, ApplicationState } from "./state";
 import { mainSaga } from "./sagas";
@@ -33,6 +33,6 @@ export const initApplication = (initialState: ApplicationState) => {
     createWorkerMiddleware()
   );
   ReactDOM.render(<Provider store={store}>
-    <MainComponent dispatch={action => store.dispatch(action)} />
+    <Main dispatch={action => store.dispatch(action)} />
   </Provider>, initialState.element);
 }

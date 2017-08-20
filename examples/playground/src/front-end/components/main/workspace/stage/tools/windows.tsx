@@ -12,7 +12,7 @@ type WindowItemInnerProps = {
   translate: Translate;
 };
 
-const WindowItemComponentBase = ({ window, translate, dispatch }: WindowItemInnerProps) => {
+const WindowItemBase = ({ window, translate, dispatch }: WindowItemInnerProps) => {
 
   const style = {
     left: window.box.left,
@@ -46,15 +46,15 @@ const WindowItemComponentBase = ({ window, translate, dispatch }: WindowItemInne
   </div>
 };
 
-const WindowItemComponent = pure(WindowItemComponentBase as any) as typeof WindowItemComponentBase;
+const WindowItem = pure(WindowItemBase as any) as typeof WindowItemBase;
 
-export type WindowsStageToolComponentInnerProps = {
+export type WindowsStageToolInnerProps = {
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
-export const WindowsStageToolComponentBase = ({ workspace, browser, dispatch }: WindowsStageToolComponentInnerProps) => {
+export const WindowsStageToolBase = ({ workspace, browser, dispatch }: WindowsStageToolInnerProps) => {
   const { translate, backgroundColor } = workspace.stage;
   
   const backgroundStyle = {
@@ -65,9 +65,9 @@ export const WindowsStageToolComponentBase = ({ workspace, browser, dispatch }: 
   return <div className="m-windows-stage-tool">
     <div style={backgroundStyle} className="m-windows-stage-tool-background" onClick={wrapEventToDispatch(dispatch, stageToolWindowBackgroundClicked)} /> 
     {
-      browser.windows.map((window) => <WindowItemComponent key={window.$$id} window={window} dispatch={dispatch} translate={translate} />)
+      browser.windows.map((window) => <WindowItem key={window.$$id} window={window} dispatch={dispatch} translate={translate} />)
     }
   </div>;
 }
 
-export const WindowsStageToolComponent = pure(WindowsStageToolComponentBase as any) as typeof WindowsStageToolComponentBase;
+export const WindowsStageTool = pure(WindowsStageToolBase as any) as typeof WindowsStageToolBase;

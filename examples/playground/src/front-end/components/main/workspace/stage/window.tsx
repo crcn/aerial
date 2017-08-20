@@ -12,16 +12,16 @@ import {
   SyntheticWindow,
   SyntheticBrowser,
 } from "aerial-browser-sandbox";
-import { IsolateComponent } from "front-end/components/isolated";
+import { Isolate } from "front-end/components/isolated";
 
-export type WindowsComponentOuterProps = {
+export type WindowsOuterProps = {
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>
 };
 
-export type WindowsComponentInnerProps = WindowsComponentOuterProps;
+export type WindowsInnerProps = WindowsOuterProps;
 
-type WindowComponentProps = {
+type WindowProps = {
   window: SyntheticWindow,
   dispatch: Dispatcher<any>
 };
@@ -59,7 +59,7 @@ const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>
 
 const WindowMount = enhanceWindowMount(WindowMountBase);
 
-const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
+const WindowBase = ({ window, dispatch }: WindowProps) => {
   const { box, document } = window;
   
   const style = {
@@ -70,10 +70,10 @@ const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
   };
 
   return <div className="preview-window-component" style={style}>
-    <IsolateComponent scrollPosition={window.scrollPosition}>
+    <Isolate scrollPosition={window.scrollPosition}>
       <WindowMount mount={window.mount} />
-    </IsolateComponent>
+    </Isolate>
   </div>;
 }
 
-export const WindowComponent = pure(WindowComponentBase as any) as typeof WindowComponentBase;
+export const Window = pure(WindowBase as any) as typeof WindowBase;

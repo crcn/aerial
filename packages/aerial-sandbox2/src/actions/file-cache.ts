@@ -2,13 +2,13 @@ import { BaseEvent, Request } from "aerial-common2";
 
 export const URI_CACHE_BUSTED = "URI_CACHE_BUSTED";
 
-export type UriCacheBustedEvent = {
+export type UriCacheBusted = {
   uri: string;
   content: string|Buffer;
   contentType: string;
 } & BaseEvent;
 
-export const createUriCacheBustedEvent = (uri: string, content: string|Buffer, contentType: string): UriCacheBustedEvent => ({
+export const uriCacheBusted = (uri: string, content: string|Buffer, contentType: string): UriCacheBusted => ({
   uri,
   content, 
   contentType, 

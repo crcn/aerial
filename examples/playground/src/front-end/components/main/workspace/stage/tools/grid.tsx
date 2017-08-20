@@ -4,7 +4,7 @@ import React =  require("react");
 import { Workspace, Stage } from "front-end/state";
 import { pure } from "recompose";
 
-export const GridStageToolComponent = pure((({ settings }: { settings: Stage }) => {
+export const GridStageTool = pure((({ settings }: { settings: Stage }) => {
   if (settings.translate.zoom <= 12) return null;
 
   const size = 20000;

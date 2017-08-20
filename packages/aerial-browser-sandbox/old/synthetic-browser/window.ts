@@ -321,7 +321,7 @@ export class SyntheticWindow extends Observable implements SyntheticWindowInterf
   }, { length: 0, async: true })
 }
 
-export const openSyntheticWindow = (uri: string, options?: any) => {
+export const openSyntheticWindowRequest = (uri: string, options?: any) => {
   const window = new SyntheticWindow(uri, null);
   return window;
 }

@@ -95,7 +95,7 @@ import {
   TOGGLE_RIGHT_GUTTER_PRESSED,
   PromptedNewWindowUrl,
   TREE_NODE_LABEL_CLICKED,
-  TreeNodeLabelClickedEvent,
+  TreeNodeLabelClicked,
   WindowPaneRowClicked,
   WINDOW_PANE_ROW_CLICKED,
   PROMPTED_NEW_WINDOW_URL,
@@ -111,7 +111,7 @@ import {
   getSyntheticWindow, 
   getSyntheticBrowser,
   syntheticBrowserReducer, 
-  createOpenSyntheticWindowRequest,
+  openSyntheticWindowRequest,
   getSyntheticNodeById
 } from "aerial-browser-sandbox";
 
@@ -120,7 +120,7 @@ import reduceReducers = require("reduce-reducers");
 export const applicationReducer = (state: ApplicationState = createApplicationState(), event: BaseEvent) => {
   switch(event.type) {
     case TREE_NODE_LABEL_CLICKED: {
-      const { node } = event as TreeNodeLabelClickedEvent;
+      const { node } = event as TreeNodeLabelClicked;
       return updateWorkspace(state, state.selectedWorkspaceId, {
         selectedFileId: node.$$id
       });
@@ -233,7 +233,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case PROMPTED_NEW_WINDOW_URL: {
       const { workspaceId, location } = event as PromptedNewWindowUrl;
-      return applicationReducer(state, createOpenSyntheticWindowRequest(location, getWorkspaceById(state, workspaceId).browserId));
+      return applicationReducer(state, openSyntheticWindowRequest(location, getWorkspaceById(state, workspaceId).browserId));
     }
 
     case TOGGLE_LEFT_GUTTER_PRESSED: {

@@ -1,8 +1,8 @@
 import "./index.scss";
 import * as React from "react";
 
-export const GutterComponentBase = ({ children }) => <div className="gutter">
+export const GutterBase = ({ children }) => <div className="gutter">
   { children }
 </div>;
 
-export const GutterComponent = GutterComponentBase;
+export const Gutter = GutterBase;

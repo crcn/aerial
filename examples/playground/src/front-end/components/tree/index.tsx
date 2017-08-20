@@ -36,12 +36,12 @@ export type TreeNodeProps = {
   node: TreeNode<any>,
 } & TreeNodeBaseProps;
 
-export type TreeComponentProps = {
+export type TreeProps = {
   dispatch: Dispatcher<any>,
   rootNode: TreeNode<any>
 } & TreeNodeBaseProps;
 
-const TreeNodeComponentBase = ({ rootNode, node, getLabel, collapsed, collapsible, onLabelClick, dispatch }: TreeNodeProps) => {
+const TreeNodeBase = ({ rootNode, node, getLabel, collapsed, collapsible, onLabelClick, dispatch }: TreeNodeProps) => {
   const isCollapsible = collapsible(node);
 
  return <div className="tree-node">
@@ -53,14 +53,14 @@ const TreeNodeComponentBase = ({ rootNode, node, getLabel, collapsed, collapsibl
     </div>
     <div className="tree-node-children">
       {
-        collapsed ? null : node.childNodes.map((child, i) => <TreeNodeComponent key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} dispatch={dispatch} />)
+        collapsed ? null : node.childNodes.map((child, i) => <TreeNode key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} dispatch={dispatch} />)
       }
     </div>
   </div>
 };
 
 
-const TreeNodeComponent = compose(
+const TreeNode = compose(
   pure,
   withState("collapsed", "setCollapsed", () => false),
   withHandlers({
@@ -73,17 +73,17 @@ const TreeNodeComponent = compose(
       }
     }
   })
-)(TreeNodeComponentBase) as any as (props: TreeNodeProps) => React.Component<TreeNodeProps>;
+)(TreeNodeBase) as any as (props: TreeNodeProps) => React.Component<TreeNodeProps>;
 
-export const TreeComponentBase = ({ rootNode, getLabel, collapsible, dispatch }: TreeNodeProps) => <div className="tree-component">
+export const TreeBase = ({ rootNode, getLabel, collapsible, dispatch }: TreeNodeProps) => <div className="tree-component">
   {
-    rootNode.childNodes.map((child, i) => <TreeNodeComponent key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} dispatch={dispatch} />)
+    rootNode.childNodes.map((child, i) => <TreeNode key={i} rootNode={rootNode} node={child} getLabel={getLabel} collapsible={collapsible} dispatch={dispatch} />)
   }
 </div>;
 
-export const TreeComponent = compose(
+export const Tree = compose(
   pure,
   defaultProps({
     collapsible: () => false
   })
-)(TreeComponentBase) as any as (props: TreeComponentProps) => React.Component<TreeComponentProps>;
+)(TreeBase) as any as (props: TreeProps) => React.Component<TreeProps>;

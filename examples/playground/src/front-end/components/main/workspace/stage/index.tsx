@@ -3,9 +3,9 @@
 import "./index.scss";
 import * as React from "react";
 import { Workspace } from "front-end/state";
-import { ToolsLayerComponent } from "./tools";
-import { WindowsComponent } from "./windows";
-import { IsolateComponent } from "front-end/components/isolated";
+import { ToolsLayer } from "./tools";
+import { Windows } from "./windows";
+import { Isolate } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
@@ -14,13 +14,13 @@ import { stageWheel, stageContainerMounted } from "front-end/actions";
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
 
-export type StageOuterComponentProps = {
+export type StageOuterProps = {
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
-export type StageInnerComponentProps = {
+export type StageInnerProps = {
   canvasOuter: HTMLElement;
   onWheel: (event: React.SyntheticEvent<MouseEvent>) => any;
   mousePosition: Point;
@@ -31,9 +31,9 @@ export type StageInnerComponentProps = {
   onDragEnter: (event: React.SyntheticEvent<any>) => any;
   onDragExit: (event: React.SyntheticEvent<any>) => any;
   setCanvasOuter: (element: HTMLElement) => any;
-} & StageOuterComponentProps;
+} & StageOuterProps;
 
-const enhanceStageComponent = compose<StageOuterComponentProps, StageInnerComponentProps>(
+const enhanceStage = compose<StageOuterProps, StageInnerProps>(
   pure,
   withState('canvasOuter', 'setCanvasOuter', null),
   withState('mousePosition', 'setMousePosition', null),
@@ -44,7 +44,7 @@ const enhanceStageComponent = compose<StageOuterComponentProps, StageInnerCompon
     setStageContainer: ({ dispatch }) => (element: HTMLDivElement) => {
       dispatch(stageContainerMounted(element));
     },
-    onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: StageInnerComponentProps) => (event: React.WheelEvent<any>) => {
+    onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: StageInnerProps) => (event: React.WheelEvent<any>) => {
       const rect = canvasOuter.getBoundingClientRect();
       event.preventDefault();
       dispatch(stageWheel(workspace.$$id, rect.width, rect.height, mousePosition, event));
@@ -52,7 +52,7 @@ const enhanceStageComponent = compose<StageOuterComponentProps, StageInnerCompon
   })
 );
 
-export const StageComponentBase = ({ 
+export const StageBase = ({ 
   setCanvasOuter,
   setStageContainer,
   workspace, 
@@ -64,7 +64,7 @@ export const StageComponentBase = ({
   onDragEnter,
   onMouseDown,
   onDragExit
-}: StageInnerComponentProps) => {
+}: StageInnerProps) => {
   if (!workspace) return null;
 
   const { translate, cursor } = workspace.stage;
@@ -78,7 +78,7 @@ export const StageComponentBase = ({
   };
 
   return <div className="stage-component" ref={setStageContainer}>
-    <IsolateComponent 
+    <Isolate 
     inheritCSS 
     ignoreInputEvents
     className="stage-component-isolate"
@@ -105,16 +105,16 @@ export const StageComponentBase = ({
           className="stage-inner"
           style={outerStyle}>
           <div style={innerStyle} className="stage-inner">
-            <WindowsComponent browser={browser} dispatch={dispatch} />
-            <ToolsLayerComponent workspace={workspace} dispatch={dispatch} browser={browser} />
+            <Windows browser={browser} dispatch={dispatch} />
+            <ToolsLayer workspace={workspace} dispatch={dispatch} browser={browser} />
           </div>
         </div>
       </span>
-    </IsolateComponent>
+    </Isolate>
   </div>;
 }
 
 
-export const StageComponent = enhanceStageComponent(StageComponentBase as any) as any as Component<StageOuterComponentProps>;
+export const Stage = enhanceStage(StageBase as any) as any as Component<StageOuterProps>;
 
 export * from "./tools";

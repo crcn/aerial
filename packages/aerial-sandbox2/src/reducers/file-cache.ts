@@ -1,11 +1,11 @@
-import { UriCacheBustedEvent, URI_CACHE_BUSTED, UriWrittenEvent, URI_WRITTEN } from "../actions";
+import { UriCacheBusted, URI_CACHE_BUSTED, UriWrittenEvent, URI_WRITTEN } from "../actions";
 import { BaseEvent, dsInsert, dsUpdate, dsUpdateOne } from "aerial-common2";
 import { FileCacheRootState, FileCacheItem, createFileCacheRootState, createFileCacheItem, getFileCacheItemByUri } from "../state";
 
 export const fileCacheReducer = <TRootState extends FileCacheRootState>(root: TRootState = createFileCacheRootState() as TRootState, event: BaseEvent): TRootState => {
   switch(event.type) {
     case URI_CACHE_BUSTED: {
-      const { uri, content, contentType } = event as UriCacheBustedEvent;
+      const { uri, content, contentType } = event as UriCacheBusted;
       const item = getFileCacheItemByUri(root, uri);
       const newProperties = {
         sourceUri: uri,

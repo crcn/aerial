@@ -2,7 +2,7 @@ import React =  require("react");
 import ReactDOM = require("react-dom");
 import { bubbleHTMLIframeEvents, Point } from "aerial-common2";
 
-export class IsolateComponent extends React.Component<{ 
+export class Isolate extends React.Component<{ 
   inheritCSS?: boolean, 
   onMouseDown?: any, 
   onKeyDown?: any,

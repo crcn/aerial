@@ -8,7 +8,7 @@ import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, Box } from "a
 export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
 
 
-export type PathComponentOuterProps = {
+export type PathOuterProps = {
   points: Point[];
   zoom: number;
   pointRadius: number;
@@ -19,11 +19,11 @@ export type PathComponentOuterProps = {
   dispatch: Dispatcher<any>;
 }
 
-export type PathComponentInnerProps = {
+export type PathInnerProps = {
   onPointClick: (point: Point, event: React.MouseEvent<any>) => {};
-} & PathComponentOuterProps;
+} & PathOuterProps;
 
-export const PathComponentBase = ({ box , points, zoom, pointRadius, strokeWidth, showPoints = true, onPointClick }: PathComponentInnerProps) => {
+export const PathBase = ({ box , points, zoom, pointRadius, strokeWidth, showPoints = true, onPointClick }: PathInnerProps) => {
 
   let d = "";
 
@@ -67,10 +67,10 @@ export const PathComponentBase = ({ box , points, zoom, pointRadius, strokeWidth
   </svg>;
 };
 
-const enhancePathComponent = compose<PathComponentInnerProps, PathComponentOuterProps>(
+const enhancePath = compose<PathInnerProps, PathOuterProps>(
   pure,
   withHandlers({
-    onPointClick: ({ box, dispatch, zoom, workspace }: PathComponentOuterProps) => (point: Point, event: React.MouseEvent<any>) => {
+    onPointClick: ({ box, dispatch, zoom, workspace }: PathOuterProps) => (point: Point, event: React.MouseEvent<any>) => {
       event.stopPropagation();
       const sourceEvent = {...event};
       startDOMDrag(event, (event2, info) => {
@@ -91,4 +91,4 @@ const enhancePathComponent = compose<PathComponentInnerProps, PathComponentOuter
   })
 )
 
-export const PathComponent = enhancePathComponent(PathComponentBase as any);
+export const Path = enhancePath(PathBase as any);

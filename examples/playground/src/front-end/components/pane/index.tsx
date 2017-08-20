@@ -6,16 +6,16 @@ const cx = require("classnames");
 
 // TODOS
 // collapsible
-const enhancePaneComponent = pure;
+const enhancePane = pure;
 
-export type PaneComponentProps = {
+export type PaneProps = {
   title: string | Component<any>;
   controls?: any;
   children: any;
   className?: string;
 }
 
-export const PaneComponentBase = ({ title, controls, children, className }: PaneComponentProps) => <div className={cx("pane-component", className)}>
+export const PaneBase = ({ title, controls, children, className }: PaneProps) => <div className={cx("pane-component", className)}>
   <div className="header">
     { title } <span className="controls">{ controls }</span>
   </div>
@@ -24,4 +24,4 @@ export const PaneComponentBase = ({ title, controls, children, className }: Pan
   </div>
 </div>;
 
-export const PaneComponent = enhancePaneComponent(PaneComponentBase);
+export const Pane = enhancePane(PaneBase);

@@ -73,7 +73,7 @@ export type ResizerMouseDown = {
   workspaceId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
-export type TreeNodeLabelClickedEvent = {
+export type TreeNodeLabelClicked = {
   node: TreeNode<any>
 } & BaseEvent;
 
@@ -185,7 +185,7 @@ export const canvasElementsComputedPropsChanged = (syntheticWindowId: string, co
   computedStyles
 });
 
-export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClickedEvent => ({ type: TREE_NODE_LABEL_CLICKED, node });
+export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClicked => ({ type: TREE_NODE_LABEL_CLICKED, node });
 export const stageToolWindowTitleClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageWillWindowTitleClicked => ({ type: STAGE_TOOL_WINDOW_TITLE_CLICKED, windowId, sourceEvent });
 export const stageToolWindowKeyDown = (windowId: string, sourceEvent: React.KeyboardEvent<any>): StageWillWindowKeyDown => ({ type: STAGE_TOOL_WINDOW_KEY_DOWN, windowId, sourceEvent });
 

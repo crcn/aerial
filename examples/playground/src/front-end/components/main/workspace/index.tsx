@@ -3,32 +3,32 @@ import * as React from "react";
 import { pure } from "recompose";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, Message } from "aerial-common2";
-import { VisualGutterComponent } from "./element-gutter";
-import { ProjectGutterComponent } from "./project-gutter";
-import { StageComponent } from "./stage";
-import { TextEditorComponent } from "./text-editor";
-import { Workspace, getSelectedWorkspaceFile, ApplicationState } from "front-end/state";
+import { VisualGutter } from "./element-gutter";
+import { ProjectGutter } from "./project-gutter";
+import { Stage } from "./stage";
+import { TextEditor } from "./text-editor";
+import { Workspace as WorkspaceStruct, getSelectedWorkspaceFile, ApplicationState } from "front-end/state";
 
-export type WorkspaceComponentProps = {
-  workspace: Workspace;
+export type WorkspaceProps = {
+  workspace: WorkspaceStruct;
   browser: SyntheticBrowser;
   state: ApplicationState;
   dispatch?:  Dispatcher<any>
 };
 
-export const WorkspaceComponentBase = ({ state, workspace, browser, dispatch }: WorkspaceComponentProps) => {
+export const WorkspaceBase = ({ state, workspace, browser, dispatch }: WorkspaceProps) => {
   const visualSettings = workspace.stage;
   return <div className="workspace-component">
-    { visualSettings.showLeftGutter ? <ProjectGutterComponent workspace={workspace} browser={browser} dispatch={dispatch} /> : null }
+    { visualSettings.showLeftGutter ? <ProjectGutter workspace={workspace} browser={browser} dispatch={dispatch} /> : null }
     <div className="workspace-editors">
-      <TextEditorComponent file={getSelectedWorkspaceFile(state, workspace)} cursorPosition={workspace.textCursorPosition} dispatch={dispatch} />
-      <StageComponent workspace={workspace} dispatch={dispatch} browser={browser} />
+      <TextEditor file={getSelectedWorkspaceFile(state, workspace)} cursorPosition={workspace.textCursorPosition} dispatch={dispatch} />
+      <Stage workspace={workspace} dispatch={dispatch} browser={browser} />
     </div>
-    { visualSettings.showRightGutter ? <VisualGutterComponent /> : null }
+    { visualSettings.showRightGutter ? <VisualGutter /> : null }
   </div>
 }
 
-export const WorkspaceComponent = pure(WorkspaceComponentBase as any) as typeof WorkspaceComponentBase;
+export const Workspace = pure(WorkspaceBase as any) as typeof WorkspaceBase;
 
 export * from "./element-gutter";
 export * from "./project-gutter";

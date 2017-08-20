@@ -16,7 +16,7 @@ import {
   stageToolOverlayMouseDoubleClicked,
 } from "front-end/actions";
 
-export type VisualToolsComponentProps = {
+export type VisualToolsProps = {
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
@@ -122,7 +122,7 @@ const getHoveringSyntheticNodes = weakMemo((hoveringRefs: StructReference[], { a
   return hoveringRefs.map(([type, id]) => allNodes[id]).filter((id) => !!id);
 });
 
-export const NodeOverlaysToolComponentBase = ({ workspace, browser, dispatch }: VisualToolsComponentProps) => {
+export const  NodeOverlaysToolBase = ({ workspace, browser, dispatch }: VisualToolsProps) => {
   return <div className="visual-tools-layer-component">
     {
       browser.windows.map((window) => {
@@ -132,4 +132,4 @@ export const NodeOverlaysToolComponentBase = ({ workspace, browser, dispatch }: 
   </div>
 }
 
-export const NodeOverlaysToolComponent = pure(NodeOverlaysToolComponentBase as any) as typeof NodeOverlaysToolComponentBase;
+export const  NodeOverlaysTool = pure( NodeOverlaysToolBase as any) as typeof  NodeOverlaysToolBase;

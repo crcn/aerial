@@ -5,23 +5,23 @@ import { pure, compose, withHandlers } from "recompose";
 import { Workspace, getBoxedWorkspaceSelection, getWorkspaceSelectionBox } from "front-end/state";
 import { resizerMoved, resizerStoppedMoving, resizerMouseDown } from "front-end/actions";
 import { startDOMDrag, Dispatcher, mergeBoxes, moveBox } from "aerial-common2";
-import { PathComponent } from "./path";
+import { Path } from "./path";
 
-export type ResizerComponentOuterProps = {
+export type ResizerOuterProps = {
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
   workspace: Workspace;
 }
 
-export type ResizerComponentInnerProps = {
+export type ResizerInnerProps = {
   onMouseDown: (event: React.MouseEvent<any>) => any;
-} & ResizerComponentOuterProps;
+} & ResizerOuterProps;
 
 const POINT_STROKE_WIDTH = 1;
 const POINT_RADIUS       = 4;
 
 
-export const ResizerComponentBase = ({ workspace, browser, dispatch, onMouseDown }: ResizerComponentInnerProps) => {
+export const ResizerBase = ({ workspace, browser, dispatch, onMouseDown }: ResizerInnerProps) => {
 
   const box = getWorkspaceSelectionBox(browser, workspace);
   const zoom = workspace.stage.translate.zoom;
@@ -54,7 +54,7 @@ export const ResizerComponentBase = ({ workspace, browser, dispatch, onMouseDown
       style={resizerStyle as any}
       onMouseDown={onMouseDown}
     >
-      <PathComponent
+      <Path
         zoom={zoom}
         points={points}
         workspace={workspace}
@@ -67,10 +67,10 @@ export const ResizerComponentBase = ({ workspace, browser, dispatch, onMouseDown
   </div>
 }
 
-const enhanceResizerComponent = compose<ResizerComponentInnerProps, ResizerComponentOuterProps>(
+const enhanceResizer = compose<ResizerInnerProps, ResizerOuterProps>(
   pure,
   withHandlers({
-    onMouseDown: ({ dispatch, workspace, browser }: ResizerComponentOuterProps) => (event: React.MouseEvent<any>) => {
+    onMouseDown: ({ dispatch, workspace, browser }: ResizerOuterProps) => (event: React.MouseEvent<any>) => {
       dispatch(resizerMouseDown(workspace.$$id, event));
       const { translate } = workspace.stage;
       const box = getWorkspaceSelectionBox(browser, workspace);
@@ -88,5 +88,5 @@ const enhanceResizerComponent = compose<ResizerComponentInnerProps, ResizerCompo
   })
 );
 
-export const ResizerComponent = enhanceResizerComponent(ResizerComponentBase);
+export const Resizer = enhanceResizer(ResizerBase);
 export * from "./path";
