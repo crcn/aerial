@@ -70,14 +70,14 @@ export type DependencyContentLoadedEvent = {
 export const createLoadDependencyRequest = (uri: string): LoadDependencyRequest => ({
   uri,
   type: LOAD_DEPENDENCY,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createAddDependencyRequest = (uri: string, originUri?: string): AddDependencyRequest => ({
   uri,
   originUri,
   type: ADD_DEPENDENCY,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createDependencyCreatedEvent = (info: ResolvedDependencyInfo): DependencyCreatedEvent => ({
@@ -89,7 +89,7 @@ export const createResolveDependencyRequest = (uri: string, originUri?: string):
   uri,
   originUri,
   type: RESOLVE_DEPENDENCY,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createLoadDependencyContentRequest = (dependency: Dependency, content: string|Buffer, contentType: string, options: any): LoadDependencyContentRequest => ({
@@ -98,7 +98,7 @@ export const createLoadDependencyContentRequest = (dependency: Dependency, conte
   options,
   contentType,
   type: LOAD_DEPENDENCY_CONTENT,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createDependencyContentLoadedEvent = (dependencyId: string, result: LoadedDependencyContentResult): DependencyContentLoadedEvent => ({
@@ -118,5 +118,5 @@ export const createDefaultGraphStrategyLoadContentRequest = (dependency: Depende
   content,
   contentType,
   type: DEFAULT_GRAPH_STRATEGY_LOAD_CONTENT,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });

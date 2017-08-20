@@ -66,7 +66,7 @@ function* loadDependency(dep: Dependency) {
   const { payload: loadedResult } = (yield yield request(createLoadDependencyContentRequest(dep, readResult.content, readResult.type, dep.contentLoaderOptions))) as LoadedDependencyContentResponse;
 
   // save current snapshot
-  yield put(createDependencyContentLoadedEvent(dep.$$id, loadedResult));
+  yield put(createDependencyContentLoadedEvent(dep.$id, loadedResult));
 }
 
 function* loadChildDependencies(dep: Dependency) {
@@ -77,7 +77,7 @@ function* loadChildDependencies(dep: Dependency) {
   }
 
   // save current snapshot
-  yield put(createDependencyChildrenAddedEvent(dep.$$id, importedDependencyHashes));
+  yield put(createDependencyChildrenAddedEvent(dep.$id, importedDependencyHashes));
 }
 
 function* handleDefaultDependencyGraphStragy(options = { rootDirectoryUri: null }) {

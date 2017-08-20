@@ -118,9 +118,9 @@ import {
   waitForDocumentComplete,
   getSEnvWindowProxyClass,
   SEnvHTMLElementInterface,
-  SEnvWindowOpenedEventInterface,
   SyntheticWindowRendererEvent,
   createUpdateValueNodeMutation,
+  SEnvWindowOpenedEventInterface,
   openSyntheticEnvironmentWindow,
   createSetElementAttributeMutation,
   createSyntheticDOMRendererFactory,
@@ -139,15 +139,14 @@ export function* syntheticBrowserSaga() {
 function* handleFetchRequests() {
   while(true) {
     const req = (yield take(FETCH_REQUEST)) as FetchRequest;
-    yield put(createRequestResponse(req.$$id, (yield yield request(createReadCacheableUriRequest(String(req.info)))).payload));
-   
+    yield put(createRequestResponse(req.$id, (yield yield request(createReadCacheableUriRequest(String(req.info)))).payload));
   }
 }
 
 function* handleBrowserChanges() {
   let runningSyntheticBrowserIds = [];
   yield watch((root: SyntheticBrowserRootState) => getSyntheticBrowsers(root), function*(browsers: SyntheticBrowser[]) {
-    const syntheticBrowserIds = browsers.map(item => item.$$id);
+    const syntheticBrowserIds = browsers.map(item => item.$id);
     yield* difference(syntheticBrowserIds, runningSyntheticBrowserIds).map((id) => (
       spawn(handleSyntheticBrowserSession, id)
     ));
@@ -314,9 +313,7 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
     window.document.addEventListener("readystatechange", triggerLoaded);
     triggerLoaded();
 
-    return () => {
-
-    };
+    return () => { };
   });
 
   yield fork(function*() {
@@ -354,8 +351,8 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
       const syntheticWindow = getSyntheticWindow(yield select(), window.uid);
       const syntheticNode = getSyntheticNodeById(yield select(), itemId);
       
-      const originalRect = syntheticWindow.allComputedBounds[syntheticNode.$$id];
-      const computedStyle = syntheticWindow.allComputedStyles[syntheticNode.$$id];
+      const originalRect = syntheticWindow.allComputedBounds[syntheticNode.$id];
+      const computedStyle = syntheticWindow.allComputedStyles[syntheticNode.$id];
 
       // TODO - computed boxes MUST also contain the offset of the parent.
       const relativeRect = roundBounds(shiftBounds(convertAbsoluteBoundsToRelative(
@@ -367,7 +364,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
         top: -syntheticWindow.bounds.top
       }));
 
-      const envElement = window.childObjects.get(syntheticNode.$$id);
+      const envElement = window.childObjects.get(syntheticNode.$id);
 
       // TODO - get best CSS style
       if (computedStyle.position === "static") {

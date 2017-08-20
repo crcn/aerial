@@ -133,7 +133,7 @@ const updateDOMFromLegacyMutation = (root: any, { mutation, syntheticWindowId, l
 const mapLegacyDOMNodeToPOJO = (node: SyntheticDOMNode) => {
 
   const base = {
-    $$id: node.$uid,
+    $id: node.$uid,
     $source: node.$source,
     nodeName: node.nodeName,
     nodeType: node.nodeType,
@@ -143,7 +143,7 @@ const mapLegacyDOMNodeToPOJO = (node: SyntheticDOMNode) => {
   if (node.nodeType === DOMNodeType.DOCUMENT) {
     return {
       ...base,
-      $$type: DOM_DOCUMENT,
+      $type: DOM_DOCUMENT,
     } as SyntheticDOMDocument2;
   } else if (node.nodeType === DOMNodeType.ELEMENT) {
     const element = node as SyntheticDOMElement;
@@ -152,13 +152,13 @@ const mapLegacyDOMNodeToPOJO = (node: SyntheticDOMNode) => {
     return {
       ...base,
       attributes: attrs,
-      $$type: DOM_ELEMENT,
+      $type: DOM_ELEMENT,
     } as SyntheticDOMElement2;
   } else if (node.nodeType === DOMNodeType.TEXT || node.nodeType === DOMNodeType.COMMENT) {
     return {
       ...base,
       nodeValue: (node as SyntheticDOMValueNode).nodeValue,
-      $$type: node.nodeType === DOMNodeType.TEXT ? DOM_TEXT_NODE : DOM_COMMENT,
+      $type: node.nodeType === DOMNodeType.TEXT ? DOM_TEXT_NODE : DOM_COMMENT,
     } as SyntheticDOMValueNode2;
   }
 

@@ -72,11 +72,11 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
       const { instance, parentWindowId, browserId } = event as SyntheticWindowOpened;
       let syntheticBrowser: SyntheticBrowser;
       syntheticBrowser = getSyntheticBrowser(root, browserId);
-      return updateSyntheticBrowser(root, syntheticBrowser.$$id, {
+      return updateSyntheticBrowser(root, syntheticBrowser.$id, {
         windows: [
           ...syntheticBrowser.windows,
           createSyntheticWindow({
-            $$id: instance.uid,
+            $id: instance.uid,
             location: instance.location.toString(),
             mount: instance.renderer.mount,
             bounds: {

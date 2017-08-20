@@ -79,7 +79,7 @@ const enhancePath = compose<PathInnerProps, PathOuterProps>(
           top: info.delta.y / zoom
         };
         
-        dispatch(resizerPathMoved(workspace.$$id, point, {
+        dispatch(resizerPathMoved(workspace.$id, point, {
           left: point.left === 0 ? bounds.left + delta.left : bounds.left,
           top: point.top === 0 ? bounds.top + delta.top : bounds.top,
           right: point.left === 1 ? bounds.right + delta.left : bounds.right,

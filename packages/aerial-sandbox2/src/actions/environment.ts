@@ -30,7 +30,7 @@ export type EvaluateDependencyRequest = {
 export const createAddSandboxEnvironmentRequest = (uri: string): AddSandboxEnvironmentRequest => ({
   uri,
   type: ADD_SANDBOX_ENVIRONMENT,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createSandboxEnvironmentCreatedEvent = (entryHash: string): SandboxEnvironmentCreatedEvent => ({
@@ -49,5 +49,5 @@ export const createEvaluateDependencyRequest = (context: any, entry: Dependency,
   graph,
   entry,
   type: EVALUATE_DEPENDENCY,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });

@@ -71,18 +71,18 @@ const enhanceResizer = compose<ResizerInnerProps, ResizerOuterProps>(
   pure,
   withHandlers({
     onMouseDown: ({ dispatch, workspace, browser }: ResizerOuterProps) => (event: React.MouseEvent<any>) => {
-      dispatch(resizerMouseDown(workspace.$$id, event));
+      dispatch(resizerMouseDown(workspace.$id, event));
       const { translate } = workspace.stage;
       const bounds = getWorkspaceSelectionBounds(browser, workspace);
       const translateLeft = translate.left;
       const translateTop  = translate.top;
       startDOMDrag(event, (event2, { delta }) => {
-        dispatch(resizerMoved(workspace.$$id, {
+        dispatch(resizerMoved(workspace.$id, {
           left: bounds.left + delta.x / translate.zoom,
           top: bounds.top + delta.y / translate.zoom,
         }));
       }, () => {
-        dispatch(resizerStoppedMoving(workspace.$$id, null));
+        dispatch(resizerStoppedMoving(workspace.$id, null));
       });
     }
   })

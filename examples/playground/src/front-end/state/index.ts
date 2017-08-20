@@ -75,7 +75,7 @@ export type Stage = {
 }
 
 export type Workspace = {
-  selectionRefs: StructReference[]; // $$type:$$id;
+  selectionRefs: StructReference[]; // $type:$id;
   browserId: string;
   hoveringRefs: StructReference[];
   selectedFileId?: string;
@@ -102,7 +102,7 @@ export const getSelectedWorkspaceFile = (state: ApplicationState, workspace: Wor
   return workspace.selectedFileId && getFileCacheItemById(state, workspace.selectedFileId);
 }
 
-export const getSyntheticWindowWorkspace = (root: ApplicationState, windowId: string): Workspace => getSyntheticBrowserWorkspace(root, getSyntheticWindowBrowser(root, windowId).$$id);
+export const getSyntheticWindowWorkspace = (root: ApplicationState, windowId: string): Workspace => getSyntheticBrowserWorkspace(root, getSyntheticWindowBrowser(root, windowId).$id);
 
 export const getSyntheticBrowserWorkspace = weakMemo((root: ApplicationState, browserId: string) => {
   return root.workspaces.find(workspace => workspace.browserId === browserId);
@@ -163,13 +163,13 @@ const getFrontEndItemByReference = (root: ApplicationState|SyntheticBrowser, ref
 };
 
 export const getSyntheticNodeWorkspace = weakMemo((root: ApplicationState, nodeId: string): Workspace => {
-  return getSyntheticWindowWorkspace(root, getSyntheticNodeWindow(root, nodeId).$$id);
+  return getSyntheticWindowWorkspace(root, getSyntheticNodeWindow(root, nodeId).$id);
 });
 
 export const getBoundedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Bounded & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserBounds(state, item)));
 export const getWorkspaceSelectionBounds = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBounds(...getBoundedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserBounds(state, boxed))));
 
-export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => state.workspaces.find((workspace) => workspace.$$id === id);
+export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => state.workspaces.find((workspace) => workspace.$id === id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
 
 /**

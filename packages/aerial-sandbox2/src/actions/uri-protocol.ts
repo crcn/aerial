@@ -36,7 +36,7 @@ export type UriWrittenEvent = {
 const createUriActionFactory = <T extends BaseUriRequest>(type: string) => (uri: string): BaseUriRequest => ({
   type,
   uri,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createReadUriRequest = createUriActionFactory<ReadUriRequest>(READ_URI);
@@ -47,7 +47,7 @@ export const createWatchUriRequest = createUriActionFactory<WatchUriRequest>(WAT
 export const createUnwatchUriRequest = (watchRequestId: string): UnwatchUriRequest => ({
   type: UNWATCH_URI,
   watchRequestId,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createWriteUriRequest = (uri: string, content: string|Buffer, contentType?: string): WriteUriRequest => ({
@@ -55,7 +55,7 @@ export const createWriteUriRequest = (uri: string, content: string|Buffer, conte
   contentType,
   content: content,
   uri: uri,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const createUriWrittenEvent = (uri: string, content: string|Buffer, contentType?: string): UriWrittenEvent => ({

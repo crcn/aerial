@@ -20,8 +20,8 @@ import {
  * Creates a typed structure
  */
 
-export type Typed  = { $$type: string };
-export type IDd    = { $$id: string };
+export type Typed  = { $type: string };
+export type IDd    = { $id: string };
 export type Struct = Typed & IDd;
 
 export type ErrorShape = {
@@ -29,9 +29,9 @@ export type ErrorShape = {
   message: string;
 }
 
-export const typed = <TType extends string, VInst>($$type: TType, factory: (...args) => VInst): ((...args) => VInst & Typed) => {
+export const typed = <TType extends string, VInst>($type: TType, factory: (...args) => VInst): ((...args) => VInst & Typed) => {
    return (...args) => {
-     return { ...factory(...args) as any, $$type };
+     return { ...factory(...args) as any, $type };
    };
 };
 
@@ -46,14 +46,14 @@ export const generateDefaultId = (...args) => `${ID_SEED}.${String(++_idCount)}`
 
 export const idd = <VInst>(factory: (...args) => VInst, generateId: (...args) => string = generateDefaultId): ((...args) => VInst & IDd) => {
    return (...args) => {
-     return { $$id: generateDefaultId(...args), ...factory(...args) as any };
+     return { $id: generateDefaultId(...args), ...factory(...args) as any };
    }
 };
 
 /**
  */
 
-const pathIdFilter = weakMemo(id => (value: IDd) => value && value.$$id === id);
+const pathIdFilter = weakMemo(id => (value: IDd) => value && value.$id === id);
 
 /**
  * @param type 
@@ -85,5 +85,5 @@ export const createStructFactory = <T>(type: string, defaults: Partial<T> = {}) 
 
 export type StructReference = [string, string];
 
-export const getReferenceString = ({ $$id, $$type }: Struct) => `${$$type}:${$$id}`;
-export const getStructReference = ({ $$id, $$type }: Struct): [string, string] => [$$type, $$id];
+export const getReferenceString = ({ $id, $type }: Struct) => `${$type}:${$id}`;
+export const getStructReference = ({ $id, $type }: Struct): [string, string] => [$type, $id];

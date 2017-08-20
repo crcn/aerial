@@ -14,6 +14,8 @@ import {
   TextEditorChanged,
   RESIZER_PATH_MOUSE_MOVED,
   DeleteShortcutPressed, 
+  PROMPTED_NEW_WINDOW_URL,
+  PromptedNewWindowUrl,
   DELETE_SHORCUT_PRESSED, 
   StageToolOverlayClicked, 
   workspaceSelectionDeleted,
@@ -55,6 +57,7 @@ export function* mainWorkspaceSaga() {
   yield fork(handleSelectionKeyDown);
   yield fork(handleTextEditorChange);
   yield fork(handleSelectionResized);
+  yield fork(handleNewLocationPrompt);
 }
 
 function* openDefaultWindow() {
@@ -80,8 +83,8 @@ function* handleAltClickElement() {
       if (element.nodeName === "A") {
         const href = element.attributes.find((a) => a.name === "href");
         if (href) {
-          const window = getSyntheticNodeWindow(state, node.$$id);
-          const workspace = getSyntheticWindowWorkspace(state, window.$$id);
+          const window = getSyntheticNodeWindow(state, node.$id);
+          const workspace = getSyntheticWindowWorkspace(state, window.$id);
           yield openNewWindow(href.value, window, workspace);
         }
       }
@@ -103,7 +106,7 @@ function* handleDeleteKeyPressed() {
     for (const [type, id] of workspace.selectionRefs) {
       yield put(removed(id, type));
     }
-    yield put(workspaceSelectionDeleted(workspace.$$id));
+    yield put(workspaceSelectionDeleted(workspace.$id));
   }
 }
 
@@ -117,7 +120,7 @@ function* handleSelectionMoved() {
     const bounds = getWorkspaceSelectionBounds(state, workspace);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
       const bounds = getSyntheticBrowserBounds(state, item);
-      yield put(moved(item.$$id, item.$$type, scaleInnerBounds(bounds, bounds, moveBounds(bounds, newPoint))));
+      yield put(moved(item.$id, item.$type, scaleInnerBounds(bounds, bounds, moveBounds(bounds, newPoint))));
     }
   }
 }
@@ -132,7 +135,7 @@ function* handleSelectionResized() {
 
     // TODO - possibly use BoundsStruct instead of Bounds since there are cases where bounds prop doesn't exist
     const bounds = getWorkspaceSelectionBounds(state, workspace);
-    
+
 
     const keepAspectRatio = sourceEvent.shiftKey;
     const keepCenter      = sourceEvent.altKey;
@@ -148,8 +151,15 @@ function* handleSelectionResized() {
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
       const bounds = getSyntheticBrowserBounds(state, item);
       const scaledBounds = scaleInnerBounds(bounds, bounds, newBounds);
-      yield put(resized(item.$$id, item.$$type, scaleInnerBounds(bounds, bounds, newBounds)));
+      yield put(resized(item.$id, item.$type, scaleInnerBounds(bounds, bounds, newBounds)));
     }
+  }
+}
+
+function* handleNewLocationPrompt() {
+  while(true) {
+    const { workspaceId, location } = (yield take(PROMPTED_NEW_WINDOW_URL)) as PromptedNewWindowUrl;
+    yield put(openSyntheticWindowRequest(location, getWorkspaceById(yield select(), workspaceId).browserId))
   }
 }
 
@@ -188,7 +198,7 @@ function* handleSelectionStoppedMoving() {
     const workspace = getWorkspaceById(state, workspaceId);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
       const bounds = getSyntheticBrowserBounds(state, item);
-      yield put(stoppedMoving(item.$$id, item.$$type));
+      yield put(stoppedMoving(item.$id, item.$type));
     }
   }
 }

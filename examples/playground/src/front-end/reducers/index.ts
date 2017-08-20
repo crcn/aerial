@@ -123,7 +123,7 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
     case TREE_NODE_LABEL_CLICKED: {
       const { node } = event as TreeNodeLabelClicked;
       return updateWorkspace(state, state.selectedWorkspaceId, {
-        selectedFileId: node.$$id
+        selectedFileId: node.$id
       });
     }
   }
@@ -183,7 +183,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         };
       }
 
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         stage: {
           ...workspace.stage,
           translate
@@ -191,15 +191,9 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       });
     }
 
-
-    case PROMPTED_NEW_WINDOW_URL: {
-      const { workspaceId, location } = event as PromptedNewWindowUrl;
-      return applicationReducer(state, openSyntheticWindowRequest(location, getWorkspaceById(state, workspaceId).browserId));
-    }
-
     case TOGGLE_LEFT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         stage: {
           ...workspace.stage,
           showLeftGutter: !workspace.stage.showLeftGutter
@@ -212,11 +206,11 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSyntheticWindowWorkspace(state, windowId);
 
       // disable hovering while panning (scrolling)
-      if (workspace.stage.panning) return updateWorkspace(state, workspace.$$id, {
+      if (workspace.stage.panning) return updateWorkspace(state, workspace.$id, {
         hoveringRefs: []
       });
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved);
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         hoveringRefs: targetRef ? [targetRef] : []
       });
     }
@@ -224,7 +218,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_LEAVE: {
       const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         hoveringRefs: []
       });
     }
@@ -235,7 +229,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getWorkspaceById(state, workspaceId);
 
       if (metaKey && workspace.selectionRefs.length === 1) {
-        return setSelectedFileFromNodeId(state, workspace.$$id, workspace.selectionRefs[0][1]);
+        return setSelectedFileFromNodeId(state, workspace.$id, workspace.selectionRefs[0][1]);
       }
 
       return state;
@@ -265,7 +259,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         (height - INITIAL_ZOOM_PADDING) / innerSize.height
       );
 
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         stage: {
           ...workspace.stage,
           translate: centerTransformZoom({
@@ -279,7 +273,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_PAN_START: {
       const { windowId } = event as StageToolOverlayMousePanStart;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         stage: {
           ...workspace.stage,
           panning: true
@@ -290,7 +284,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_PAN_END: {
       const { windowId } = event as StageToolOverlayMousePanEnd;
       const workspace = getSyntheticWindowWorkspace(state, windowId)
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         stage: {
           ...workspace.stage,
           panning: false
@@ -311,13 +305,13 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (!targetRef) {
-        return clearWorkspaceSelection(state, workspace.$$id);
+        return clearWorkspaceSelection(state, workspace.$id);
       }
       if (metaKey) {
-        return setSelectedFileFromNodeId(state, workspace.$$id, targetRef[1]);
+        return setSelectedFileFromNodeId(state, workspace.$id, targetRef[1]);
       } else if (!altKey) {
         state = handleWindowSelectionFromAction(state, targetRef, event as StageToolNodeOverlayClicked);
-        state = updateWorkspace(state, workspace.$$id, {
+        state = updateWorkspace(state, workspace.$id, {
           secondarySelection: false
         });
         return state;
@@ -331,28 +325,28 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (!targetRef) return state;      
 
-      state = updateWorkspace(state, workspace.$$id, {
+      state = updateWorkspace(state, workspace.$id, {
         secondarySelection: true
       });
 
-      state = setWorkspaceSelection(state, workspace.$$id, targetRef);
+      state = setWorkspaceSelection(state, workspace.$id, targetRef);
 
       return state;
     }
 
     case SELECTOR_DOUBLE_CLICKED: {
       const { sourceEvent, item } = event as SelectorDoubleClicked;
-      const workspace = getSyntheticNodeWorkspace(state, item.$$id);
-      state = updateWorkspace(state, workspace.$$id, {
+      const workspace = getSyntheticNodeWorkspace(state, item.$id);
+      state = updateWorkspace(state, workspace.$id, {
         secondarySelection: true
       });
-      state = setWorkspaceSelection(state, workspace.$$id, getStructReference(item));
+      state = setWorkspaceSelection(state, workspace.$id, getStructReference(item));
       return state;
     }
 
     case TOGGLE_RIGHT_GUTTER_PRESSED: {
       const workspace = getSelectedWorkspace(state);
-      return updateWorkspace(state, workspace.$$id, {
+      return updateWorkspace(state, workspace.$id, {
         stage: {
           ...workspace.stage,
           showRightGutter: !workspace.stage.showRightGutter
@@ -372,7 +366,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case STAGE_TOOL_WINDOW_BACKGROUND_CLICKED: {
       const workspace = getSelectedWorkspace(state);
-      return clearWorkspaceSelection(state, workspace.$$id);
+      return clearWorkspaceSelection(state, workspace.$id);
     }
   }
 
@@ -382,7 +376,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, ref: StructReference, event: T) => {
   const { windowId, sourceEvent } = event;
   const workspace = getSyntheticWindowWorkspace(state, windowId);
-  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$$id, ref) : toggleWorkspaceSelection(state, workspace.$$id, ref);
+  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$id, ref) : toggleWorkspaceSelection(state, workspace.$id, ref);
 }
 
 const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
@@ -400,7 +394,7 @@ const setSelectedFileFromNodeId = (state: ApplicationState, workspaceId: string,
   if (fileCacheItem) {
     return updateWorkspace(state, workspaceId, {
       textCursorPosition: start,
-      selectedFileId: fileCacheItem.$$id,
+      selectedFileId: fileCacheItem.$id,
     });
   }
   return state;

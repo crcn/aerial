@@ -13,8 +13,8 @@ export const createStringMutation = (startIndex: number, endIndex: number, value
   startIndex,
   endIndex,
   value,
-  $$id: generateDefaultId(),
-  $$type: REPLACE
+  $id: generateDefaultId(),
+  $type: REPLACE
 });
 
 export const editString = (input: string, mutations: StringMutation[]) => {

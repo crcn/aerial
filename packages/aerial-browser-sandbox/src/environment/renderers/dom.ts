@@ -98,11 +98,11 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   private _applyMutation(mutation: Mutation<any>) {
     const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.uid), this._sourceWindow.document), this.mount.lastElementChild);
 
-    if (mutation.$$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
-    } else if (mutation.$$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
+    if (mutation.$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
+    } else if (mutation.$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
       const insertChildMutation = mutation as InsertChildMutation<any, any>;
       mutation = createParentNodeInsertChildMutation(targetNode as SEnvParentNodeInterface, mapNode(insertChildMutation.child.cloneNode(true), this.targetDocument), insertChildMutation.index);
-    } else if (mutation.$$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
+    } else if (mutation.$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
       const removeChildMutation = mutation as RemoveChildMutation<any, any>;
       mutation = createParentNodeRemoveChildMutation(targetNode, null, removeChildMutation.index);
     }

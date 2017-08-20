@@ -400,7 +400,7 @@ export const diffElement = (oldElement: BasicElement, newElement: BasicElement) 
 };
 
 export const patchElement = (oldElement: Element, mutation: Mutation<any>) => {
-  if (mutation.$$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
+  if (mutation.$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
     
 
     const { name, oldName, newValue } = <SetPropertyMutation<any>>mutation;

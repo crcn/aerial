@@ -24,7 +24,7 @@ import { SyntheticNode, SyntheticValueNode, BasicValueNode, BasicNode } from ".
 export interface SEnvNodeInterface extends Node {
   readonly constructed: boolean;
   uid: string;
-  $$id: string;
+  $id: string;
   structType: string;
   struct: SyntheticNode;
   source: ExpressionLocation;
@@ -52,8 +52,8 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     public $$parentNode: SEnvParentNodeInterface;
     public $$parentElement: HTMLElement;
-    public $$type: string;
-    public $$id: string;
+    public $type: string;
+    public $id: string;
     public contentLoaded: Promise<any>;
     public interactiveLoaded: Promise<any>;
     public source: any;
@@ -108,7 +108,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     $$preconstruct() {
       super.$$preconstruct();
-      this.uid = this.$$id = generateDefaultId();
+      this.uid = this.$id = generateDefaultId();
       this.childNodes = this.childNodesArray = new SEnvNodeList();
     }
     
@@ -159,12 +159,12 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     protected createStruct(parentNode?: SEnvNodeInterface): SyntheticNode {
       return {
-        parentId: parentNode ? parentNode.$$id : null,
+        parentId: parentNode ? parentNode.$id : null,
         nodeType: this.nodeType,
         nodeName: this.nodeName,
         source: this.source,
-        $$type: this.structType,
-        $$id: this.uid
+        $type: this.structType,
+        $id: this.uid
       };
     }
 
@@ -176,7 +176,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     cloneNode(deep?: boolean): Node {
       const clone = this.cloneShallow();
       clone.source = this.source;
-      clone.uid    = clone.$$id = this.uid;
+      clone.uid    = clone.$id = this.uid;
 
       if (deep !== false) {
         for (let i = 0, n = this.childNodes.length; i < n; i++) {
@@ -355,7 +355,7 @@ export const diffBaseNode = (oldNode: Partial<SyntheticNode>, newNode: Partial<S
 };
 
 export const patchBaseNode = (oldNode: Partial<SEnvNodeInterface>, mutation: Mutation<any>) => {
-  if (mutation.$$type === SET_SYNTHETIC_SOURCE_CHANGE && oldNode.setSource) {
+  if (mutation.$type === SET_SYNTHETIC_SOURCE_CHANGE && oldNode.setSource) {
     oldNode.setSource(JSON.parse(JSON.stringify((mutation as SetPropertyMutation<any>).newValue)) as ExpressionLocation);
   }
 };
@@ -375,7 +375,7 @@ export const diffValueNode = (oldNode: BasicValueNode, newNode: BasicValueNode) 
 };
 
 export const patchValueNode = (oldNode: BasicValueNode, mutation: Mutation<any>) => {
-  if (mutation.$$type === UPDATE_VALUE_NODE) {
+  if (mutation.$type === UPDATE_VALUE_NODE) {
     oldNode.nodeValue = (mutation as SetValueMutation<any>).newValue;
   } else {
     patchBaseNode(oldNode, mutation);

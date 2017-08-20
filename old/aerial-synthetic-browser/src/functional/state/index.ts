@@ -133,7 +133,7 @@ export const getAllSyntheticDOMNodesAsIdMap = weakMemo((root: any): { [identifie
   const allNodes = getAllSyntheticDOMNodes(root);
   const map = {};
   for (const node of allNodes) {
-    map[node.$$id] = node;
+    map[node.$id] = node;
   }
   return map;
 });

@@ -139,7 +139,7 @@ export type SyntheticBrowserRootState = {
   windowStore?: DataStore<SyntheticWindow>;
 };
 
-export const createSyntheticBrowserStore = (syntheticBrowsers?: SyntheticBrowser[]) => dsIndex(createDataStore(syntheticBrowsers), "$$id");
+export const createSyntheticBrowserStore = (syntheticBrowsers?: SyntheticBrowser[]) => dsIndex(createDataStore(syntheticBrowsers), "$id");
 
 export const createSyntheticWindow = createStructFactory<SyntheticWindow>(SYNTHETIC_WINDOW, {
   externalResourceUris: [],
@@ -179,8 +179,8 @@ export const addSyntheticWindow = <TState extends SyntheticBrowserRootState>(roo
 export const getSyntheticBrowserBounds = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, item: Partial<Struct & Bounded>) => {
   if (!item) return null;
   if (item.bounds) return item.bounds;
-  const window = getSyntheticNodeWindow(root, item.$$id);
-  return window && shiftBounds(window.allComputedBounds[item.$$id], window.bounds);
+  const window = getSyntheticNodeWindow(root, item.$id);
+  return window && shiftBounds(window.allComputedBounds[item.$id], window.bounds);
 });
 
 export const getSyntheticBrowserStoreItemByReference = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, [type, id]: StructReference) => {
@@ -214,12 +214,12 @@ export const isSyntheticDOMNode = (value) => value && value.constructor === Obje
 export const getSyntheticBrowsers = weakMemo((root: SyntheticBrowserRootState): SyntheticBrowser[] => root.browserStore.records);
 
 const getIdQuery = weakMemo((id: string) => ({
-  $$id: id
+  $id: id
 }));
 
 export const getSyntheticBrowser = (root: SyntheticBrowserRootState, id: string): SyntheticBrowser => dsFind(root.browserStore, getIdQuery(id));
 export const getSyntheticWindow = (root: SyntheticBrowserRootState|SyntheticBrowser, id: string): SyntheticWindow => {
-  const filter = (window: SyntheticWindow) => window.$$id === id;
+  const filter = (window: SyntheticWindow) => window.$id === id;
   return (root as SyntheticBrowserRootState).browserStore ? eachSyntheticWindow(root as SyntheticBrowserRootState, filter) : (root as SyntheticBrowser).windows.find(filter);
 };
 
@@ -227,7 +227,7 @@ export const updateSyntheticBrowser = <TState extends SyntheticBrowserRootState>
   const browser = getSyntheticBrowser(root, browserId);
   return {
     ...(root as any),
-    browserStore: dsUpdate(root.browserStore, { $$id: browser.$$id }, {
+    browserStore: dsUpdate(root.browserStore, { $id: browser.$id }, {
       ...browser,
       ...properties
     })
@@ -237,7 +237,7 @@ export const updateSyntheticBrowser = <TState extends SyntheticBrowserRootState>
 export const updateSyntheticWindow = <TState extends SyntheticBrowserRootState>(root: TState, windowId: string, properties: Partial<SyntheticWindow>): TState => {
   const browser = getSyntheticWindowBrowser(root, windowId);
   const window = getSyntheticWindow(browser, windowId);
-  return updateSyntheticBrowser(root, browser.$$id, {
+  return updateSyntheticBrowser(root, browser.$id, {
     windows: arrayReplaceItem(browser.windows, window, {
       ...window,
       ...properties
@@ -260,7 +260,7 @@ export const getSyntheticParentNode = (node: SyntheticNode, window: SyntheticWin
 
 export const removeSyntheticWindow = <TState extends SyntheticBrowserRootState>(root: TState, windowId: string): TState => {
   const browser = getSyntheticWindowBrowser(root, windowId);
-  return updateSyntheticBrowser(root, browser.$$id, {
+  return updateSyntheticBrowser(root, browser.$id, {
     windows: arrayRemoveItem(browser.windows, getSyntheticWindow(browser, windowId))
   });
 }
@@ -268,7 +268,7 @@ export const removeSyntheticWindow = <TState extends SyntheticBrowserRootState>(
 export const getSyntheticWindowBrowser = weakMemo((root: SyntheticBrowserRootState, windowId: string): SyntheticBrowser => {
   for (const browser of getSyntheticBrowsers(root)) {
     for (const window of browser.windows) {
-      if (window.$$id === windowId) return browser;
+      if (window.$id === windowId) return browser;
     }
   }
   return null;
@@ -309,8 +309,8 @@ export const syntheticWindowContainsNode = weakMemo((window: SyntheticWindow, no
 });
 
 export const isSyntheticBrowserItemMovable = (root: SyntheticBrowserRootState, item: Struct) => {
-  if (item.$$type === SYNTHETIC_WINDOW) return true;
-  if (isSyntheticNodeType(item.$$type) && (item as SyntheticNode).nodeType === SEnvNodeTypes.ELEMENT) {
+  if (item.$type === SYNTHETIC_WINDOW) return true;
+  if (isSyntheticNodeType(item.$type) && (item as SyntheticNode).nodeType === SEnvNodeTypes.ELEMENT) {
     const element = item as SyntheticElement;
   }
   return false;

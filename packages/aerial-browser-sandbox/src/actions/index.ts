@@ -107,7 +107,7 @@ export const mutateSourceContentRequest = (content: string, contentType: string,
   content,
   mutation,
   contentType,
-  $$id: generateDefaultId(),
+  $id: generateDefaultId(),
   type: EDIT_SOURCE_CONTENT,
 });
 
@@ -130,11 +130,11 @@ export const syntheticWindowResized = (instance: SEnvWindowInterface): Synthetic
 
 export const applyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutations => ({
   mutations,
-  $$id: generateDefaultId(),
+  $id: generateDefaultId(),
   type: APPLY_FILE_MUTATIONS,
 });
 
-export const testMutateContentRequest = (contentType: string, mutationType?: string) => ((action: MutateSourceContentRequest<any>) => action.type === EDIT_SOURCE_CONTENT && action.contentType === contentType && (!mutationType || action.mutation.$$type === mutationType));
+export const testMutateContentRequest = (contentType: string, mutationType?: string) => ((action: MutateSourceContentRequest<any>) => action.type === EDIT_SOURCE_CONTENT && action.contentType === contentType && (!mutationType || action.mutation.$type === mutationType));
 
 export const syntheticNodeValueStoppedEditing = (syntheticWindowId: string, nodeId: string): SyntheticNodeValueStoppedEditing => ({
   nodeId,
@@ -158,7 +158,7 @@ export const syntheticNodeTextContentChanged = (syntheticWindowId: string, synth
 export const fetchRequest = (info: RequestInfo): FetchRequest => ({
   info,
   type: FETCH_REQUEST,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const openSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string, left?: number, top?: number): OpenSyntheticBrowserWindow => ({
@@ -167,7 +167,7 @@ export const openSyntheticWindowRequest = (uri: string, syntheticBrowserId?: str
   top,
   syntheticBrowserId,
   type: OPEN_SYNTHETIC_WINDOW,
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const newSyntheticWindowEntryResolved = (location: string, syntheticBrowserId?: string): NewSyntheticWindowEntryResolved => ({

@@ -128,7 +128,7 @@ describe(__filename + "#", () => {
       const mutex = yield request(req);
       yield fork(function*() {
         results.push((yield mutex).payload);
-        yield put(createUnwatchUriRequest(req.$$id));
+        yield put(createUnwatchUriRequest(req.$id));
       });
 
       yield yield request(createWriteUriRequest("local://a", "local a3 content"));

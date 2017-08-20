@@ -35,7 +35,7 @@ function syntheticWindowSaga(kernel: Kernel) {
     FileCacheProvider.getInstance(kernel).syncWithLocalFiles();
     
     yield watch((root) => root, function*(root) {
-      const diffs = diffArray(Array.from(openSyntheticBrowsers.keys()), getValuesByType(root, SYTNTHETIC_BROWSER_WINDOW), (a, b) => a.$$id === b.$$id ? 1 : -1);
+      const diffs = diffArray(Array.from(openSyntheticBrowsers.keys()), getValuesByType(root, SYTNTHETIC_BROWSER_WINDOW), (a, b) => a.$id === b.$id ? 1 : -1);
       const forks = [];
 
       eachArrayValueMutation(diffs, {
@@ -77,11 +77,11 @@ function* observeSyntheticBrowserDOMState(browser: SyntheticBrowser, state: Synt
   const chan = eventChannel((emit) => {
     
     const dispatchLegacySyntheticDOMChanged = (mutation?: Mutation<any>) => {
-      emit(legacySyntheticDOMChanged(state.$$id, browser.document, mutation));
+      emit(legacySyntheticDOMChanged(state.$id, browser.document, mutation));
     };
 
     const dispatchSyntheticDOMMount = (window: SyntheticBrowserWindow2, mount: HTMLElement) => {
-      emit(syntheticWindowMountChanged(window.$$id, mount));
+      emit(syntheticWindowMountChanged(window.$id, mount));
     };
 
     const onDocumentEvent = (event) => {
@@ -92,7 +92,7 @@ function* observeSyntheticBrowserDOMState(browser: SyntheticBrowser, state: Synt
 
     const dispatchTitleChanged = () => {
       const titleEl = browser.document.querySelector("title");
-      emit(syntheticWindowTitleChanged(state.$$id, titleEl && titleEl.textContent));
+      emit(syntheticWindowTitleChanged(state.$id, titleEl && titleEl.textContent));
     };
     
     const onStatusChange = (status: Status) => {

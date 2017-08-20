@@ -41,7 +41,7 @@ function* handleTextEditChanges() {
     const window = getSyntheticNodeWindow(state, nodeId);
     const text = String(sourceEvent.target.value || "").trim();
     const workspace = getSyntheticNodeWorkspace(state, nodeId);
-    yield put(syntheticNodeTextContentChanged(window.$$id, nodeId, text));
+    yield put(syntheticNodeTextContentChanged(window.$id, nodeId, text));
   }
 }
 
@@ -50,7 +50,7 @@ function* handleTextEditBlur() {
     const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_BLUR)) as StageToolEditTextBlur;
     const state = yield select();
     const window = getSyntheticNodeWindow(state, nodeId);
-    yield put(syntheticNodeValueStoppedEditing(window.$$id, nodeId));
+    yield put(syntheticNodeValueStoppedEditing(window.$id, nodeId));
   }
 }
 

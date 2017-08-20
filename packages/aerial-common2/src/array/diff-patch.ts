@@ -155,7 +155,7 @@ export type ArrayValueMutationHandlers<T> = {
 
 export const eachArrayValueMutation = <T>(diff: ArrayMutation<T>, handlers: ArrayValueMutationHandlers<T>) => {
   diff.mutations.forEach((mutation) => {
-    switch(mutation.$$type) {
+    switch(mutation.$type) {
       case ARRAY_INSERT: return handlers.insert(mutation as ArrayInsertMutation<T>);
       case ARRAY_DELETE: return handlers.delete(mutation as ArrayDeleteMutation<T>);
       case ARRAY_UPDATE: return handlers.update(mutation as ArrayUpdateMutation<T>);

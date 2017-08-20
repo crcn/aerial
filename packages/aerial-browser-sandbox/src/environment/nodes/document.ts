@@ -747,7 +747,7 @@ export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SE
 
 export const patchDocument = (oldDocument: SEnvDocumentInterface, mutation: Mutation<any>) => {
   patchParentNode(oldDocument, mutation);
-  if (mutation.$$type === READY_STATE_CHANGE) {
+  if (mutation.$type === READY_STATE_CHANGE) {
     oldDocument.$$setReadyState((mutation as SetValueMutation<SEnvDocumentInterface>).newValue);
   }
 };

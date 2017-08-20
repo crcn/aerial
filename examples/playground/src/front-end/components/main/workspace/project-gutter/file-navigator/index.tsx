@@ -8,7 +8,7 @@
 // import { immutable, TreeNode, Dispatcher, wrapEventToDispatch, wrappedEvent } from "aerial-common2";
 
 // const getFileLabel = (node: File) => `/${node.name}`;
-// const collapsible = (node: File) => node.$$type === DIRECTORY;
+// const collapsible = (node: File) => node.$type === DIRECTORY;
 
 // const enhanceFileNavigator = compose(
 //   pure

@@ -31,9 +31,9 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea }: 
   const zoom = workspace.stage.translate.zoom;
   const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
   if (!isSyntheticDOMNode(selectedNode)) return null;
-  const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(browser, selectedNode.$$id);
-  const bounds = nodeWindow.allComputedBounds[selectedNode.$$id];
-  const computedStyle = (nodeWindow.allComputedStyles[selectedNode.$$id] || {}) as CSSStyleDeclaration;
+  const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(browser, selectedNode.$id);
+  const bounds = nodeWindow.allComputedBounds[selectedNode.$id];
+  const computedStyle = (nodeWindow.allComputedStyles[selectedNode.$id] || {}) as CSSStyleDeclaration;
   if (!bounds) return null;
 
   const { width, height } = getBoundsSize(bounds);
@@ -67,8 +67,8 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea }: 
      ref={setTextarea}
     style={{ width: "100%", height: "100%", padding: 0, ...textStyle }} 
     defaultValue={getSyntheticNodeTextContent(selectedNode).trim()}
-    onChange={wrapEventToDispatch(dispatch, stageToolEditTextChanged.bind(this, selectedNode.$$id))}
-    onBlur={wrapEventToDispatch(dispatch, stageToolEditTextBlur.bind(this, selectedNode.$$id))}
+    onChange={wrapEventToDispatch(dispatch, stageToolEditTextChanged.bind(this, selectedNode.$id))}
+    onBlur={wrapEventToDispatch(dispatch, stageToolEditTextBlur.bind(this, selectedNode.$id))}
     ></textarea>
   </div>;
 }

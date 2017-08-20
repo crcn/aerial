@@ -15,7 +15,7 @@ export const fileCacheReducer = <TRootState extends FileCacheRootState>(root: TR
 
       return {
         ...(root as any),
-        fileCacheStore: item ? dsUpdateOne(root.fileCacheStore, { $$id: item.$$id }, newProperties) : dsInsert(root.fileCacheStore, createFileCacheItem
+        fileCacheStore: item ? dsUpdateOne(root.fileCacheStore, { $id: item.$id }, newProperties) : dsInsert(root.fileCacheStore, createFileCacheItem
         (newProperties))
       };
     }
@@ -26,7 +26,7 @@ export const fileCacheReducer = <TRootState extends FileCacheRootState>(root: TR
       if (!item) return root;
       return {
         ...(root as any),
-        fileCacheStore: dsUpdateOne(root.fileCacheStore, { $$id: item.$$id }, {
+        fileCacheStore: dsUpdateOne(root.fileCacheStore, { $id: item.$id }, {
           sourceUri: uri,
           content, 
           contentType: contentType || item.contentType

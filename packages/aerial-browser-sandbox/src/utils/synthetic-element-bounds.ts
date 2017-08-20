@@ -25,7 +25,7 @@ export type ConvertedMeasurementsResult<T> = {
 
 export const convertAbsoluteBoundsToRelative = weakMemo((newBounds: Bounds, element: SyntheticElement, window: SyntheticWindow) => {
   const { left, top } = getElementStartPosition(element, window);
-  const oldBounds = window.allComputedBounds[element.$$id];
+  const oldBounds = window.allComputedBounds[element.$id];
   return moveBounds(newBounds, {
     left: newBounds.left - left,
     top: newBounds.top - top
@@ -35,7 +35,7 @@ export const convertAbsoluteBoundsToRelative = weakMemo((newBounds: Bounds, elem
 export const getElementStartPosition = weakMemo((element: SyntheticElement, window: SyntheticWindow) => {
   // if the element is relative, then we just need to subtract the css style from the computed bounds to figure out where its static position is.
   let { left, top, borderLeftWidth, borderTopWidth } = convertElementMeasurementsToNumbers(element, window);
-  return shiftBounds(window.allComputedBounds[element.$$id], {
+  return shiftBounds(window.allComputedBounds[element.$id], {
     left: -left,
     top: -top
   });
@@ -73,7 +73,7 @@ const convertablePropertyNames = [
 
 export const convertElementMeasurements = weakMemo((element: SyntheticElement, unit: CSSMeasurementTypes, window: SyntheticWindow): ConvertedMeasurementsResult<string> => {
 
-  const computedStyle = window.allComputedStyles[element.$$id];
+  const computedStyle = window.allComputedStyles[element.$id];
 
   if (unit === CSSMeasurementTypes.PX) {
     return computedStyle;

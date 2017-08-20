@@ -140,14 +140,14 @@ export const timeout = (ms = 10) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const omit$$idDeep = (obj) => {
+export const omit$idDeep = (obj) => {
   if (Array.isArray(obj)) {
-    return obj.map(omit$$idDeep);
+    return obj.map(omit$idDeep);
   } else if (obj && obj.constructor === Object || obj.constructor === ImmutableObject) {
     const clone = {};
     for (const k in obj) {
-      if (k === "$$id") continue;
-      clone[k] = omit$$idDeep(obj[k]);
+      if (k === "$id") continue;
+      clone[k] = omit$idDeep(obj[k]);
     }
     return clone;
   }

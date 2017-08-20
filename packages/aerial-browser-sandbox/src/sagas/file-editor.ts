@@ -40,7 +40,7 @@ export function* fileEditorSaga() {
         yield put(uriCacheBusted(uri, newContent, fileCacheItem.contentType));
       }
 
-      yield put(createRequestResponse(req.$$id, true));
+      yield put(createRequestResponse(req.$id, true));
     }
   }); 
 }

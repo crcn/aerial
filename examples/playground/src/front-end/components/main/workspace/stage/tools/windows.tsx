@@ -36,8 +36,8 @@ const WindowItemBase = ({ window, translate, dispatch }: WindowItemInnerProps) =
     className="m-windows-stage-tool-item-title" 
     tabIndex={-1} 
     style={titleStyle} 
-    onKeyDown={wrapEventToDispatch(dispatch, stageToolWindowKeyDown.bind(this, window.$$id))} 
-    onClick={wrapEventToDispatch(dispatch, stageToolWindowTitleClicked.bind(this, window.$$id))}>
+    onKeyDown={wrapEventToDispatch(dispatch, stageToolWindowKeyDown.bind(this, window.$id))} 
+    onClick={wrapEventToDispatch(dispatch, stageToolWindowTitleClicked.bind(this, window.$id))}>
       { window.document && window.document.title || window.location }
     </div>
     <div className="m-windows-stage-tool-item-content" style={contentStyle}>
@@ -65,7 +65,7 @@ export const WindowsStageToolBase = ({ workspace, browser, dispatch }: WindowsSt
   return <div className="m-windows-stage-tool">
     <div style={backgroundStyle} className="m-windows-stage-tool-background" onClick={wrapEventToDispatch(dispatch, stageToolWindowBackgroundClicked)} /> 
     {
-      browser.windows.map((window) => <WindowItem key={window.$$id} window={window} dispatch={dispatch} translate={translate} />)
+      browser.windows.map((window) => <WindowItem key={window.$id} window={window} dispatch={dispatch} translate={translate} />)
     }
   </div>;
 }

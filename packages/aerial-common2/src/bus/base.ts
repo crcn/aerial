@@ -62,17 +62,17 @@ export const takeResponse = (requestId: string) => {
 
 export const request = (request: Request) => call(function*() {
   yield put(request);
-  return takeResponse(request.$$id);
+  return takeResponse(request.$id);
 });
 
 export const reuseRequest = (request: Request): Request => ({ 
   ...(request as any), 
-  $$id: generateDefaultId()
+  $id: generateDefaultId()
 });
 
 export const takeRequest = (test: string | ((action: Action) => boolean), handleRequest: (request: Request) => any) => call(function*() {
   const request = (yield take(test)) as Request;
   yield fork(function*() {
-    yield put(createRequestResponse(request.$$id, yield call(handleRequest, request)));
+    yield put(createRequestResponse(request.$id, yield call(handleRequest, request)));
   });
 });

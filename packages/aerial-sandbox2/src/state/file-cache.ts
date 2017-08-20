@@ -38,7 +38,7 @@ export type FileCacheRootState = {
 };
 
 export const createFileCacheItem = createStructFactory<FileCacheItem>(FILE_CACHE_ITEM);
-export const createFileCacheStore = (items?: FileCacheItem[]) => dsIndex(dsIndex(createDataStore(items), "$$id", true), "sourceUri", true);
+export const createFileCacheStore = (items?: FileCacheItem[]) => dsIndex(dsIndex(createDataStore(items), "$id", true), "sourceUri", true);
 export const createFileCacheRootState  = (items?: FileCacheItem[]): FileCacheRootState => ({
   fileCacheStore: createFileCacheStore(items)
 });
@@ -50,12 +50,12 @@ export const getFileCacheItemByUri = (root: FileCacheRootState, uri: string) => 
 };
 
 export const getFileCacheItemById = (root: FileCacheRootState, id: string) => {
-  return dsFind(root.fileCacheStore, createDSQuery("$$id", id));
+  return dsFind(root.fileCacheStore, createDSQuery("$id", id));
 };
 
 export const updateFileCacheItem = <TState extends FileCacheRootState>(root: TState, fileCacheItemId: string, properties: Partial<FileCacheItem>): TState => {
   return {
     ...(root as any),
-    fileCacheStore: dsUpdateOne(root.fileCacheStore, createDSQuery("$$id", fileCacheItemId), properties)
+    fileCacheStore: dsUpdateOne(root.fileCacheStore, createDSQuery("$id", fileCacheItemId), properties)
   };
 };

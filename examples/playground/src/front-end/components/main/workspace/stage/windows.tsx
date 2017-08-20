@@ -22,7 +22,7 @@ export type WindowsInnerProps = WindowsOuterProps;
 
 export const WindowsBase = ({ browser = null, dispatch }: WindowsInnerProps) => browser && <div className="preview-component">
   {
-    browser.windows.map((window) => <Window dispatch={dispatch} key={window.$$id} window={window} />)
+    browser.windows.map((window) => <Window dispatch={dispatch} key={window.$id} window={window} />)
   }
 </div>;
 

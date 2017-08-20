@@ -228,13 +228,13 @@ const insertChildNodeAt = (parent: Node, child: Node, index: number) => {
 }
 
 export const patchParentNode = (oldNode: ParentNode & Node, mutation: Mutation<any>, createNode = (child: SEnvNodeInterface) => child) => {
-  if (mutation.$$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
+  if (mutation.$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
     const { child, index } = <InsertChildMutation<any, SEnvNodeInterface>>mutation;
     (oldNode as any as Element).removeChild(oldNode.childNodes[index] as any);
-  } if (mutation.$$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
+  } if (mutation.$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
     const moveMutation = <MoveChildMutation<any, SEnvNodeInterface>>mutation;
     insertChildNodeAt(oldNode, oldNode.childNodes[moveMutation.oldIndex] as any, moveMutation.index);
-  } else if (mutation.$$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
+  } else if (mutation.$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
     const insertMutation = <InsertChildMutation<SEnvParentNodeInterface, SEnvNodeInterface>>mutation;
     const newChild = createNode(insertMutation.child);
     insertChildNodeAt(oldNode, cloneNode(newChild, true), insertMutation.index);

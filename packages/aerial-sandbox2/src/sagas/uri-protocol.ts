@@ -78,7 +78,7 @@ function* handleWatchRequest(adapter: URIProtocolAdapter) {
   // watching
   yield fork(function*() {
     while(true) {
-      const { $$id, uri } = (yield take((request: WatchUriRequest) => request.type === WATCH_URI && hasProtocol(adapter.name, request.uri))) as WatchUriRequest;
+      const { $id, uri } = (yield take((request: WatchUriRequest) => request.type === WATCH_URI && hasProtocol(adapter.name, request.uri))) as WatchUriRequest;
       if (!watchers[uri]) {
         const listener = (result: URIProtocolReadResult) => {
 
@@ -92,8 +92,8 @@ function* handleWatchRequest(adapter: URIProtocolAdapter) {
         };
       }
 
-      watchers[uri].requestIds.push($$id);
-      watcherByRequestId[$$id] = watchers[uri];
+      watchers[uri].requestIds.push($id);
+      watcherByRequestId[$id] = watchers[uri];
     }
   });
 

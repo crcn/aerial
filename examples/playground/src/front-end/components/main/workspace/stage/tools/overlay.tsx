@@ -79,19 +79,19 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom, onPanSt
     <Hammer onPanStart={onPanStart} onPan={onPan} onPanEnd={onPanEnd} direction="DIRECTION_ALL">
       <div 
         style={{ width: "100%", height: "100%", position: "absolute" } as any} 
-        onMouseMove={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))} 
-        onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, window.$$id))} 
-        onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$$id))} 
-        onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseLeave.bind(this, window.$$id))}
+        onMouseMove={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$id))} 
+        onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, window.$id))} 
+        onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$id))} 
+        onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseLeave.bind(this, window.$id))}
         />
     </Hammer>
     {
       hoveringNodes.map((node) => <NodeOverlay 
-        windowId={window.$$id} 
+        windowId={window.$id} 
         zoom={zoom} 
-        key={node.$$id} 
+        key={node.$id} 
         node={node} 
-        bounds={window.allComputedBounds[node.$$id]} 
+        bounds={window.allComputedBounds[node.$id]} 
         dispatch={dispatch} 
         hovering={true} />)
     }
@@ -102,15 +102,15 @@ const enhanceWindowOverlayTools = compose<WindowOverlayToolsInnerProps, WindowOv
   pure,
   withHandlers({
     onPanStart: ({ dispatch, window }: WindowOverlayToolsOuterProps) => (event) => {
-      dispatch(stageToolOverlayMousePanStart(window.$$id));
+      dispatch(stageToolOverlayMousePanStart(window.$id));
     },
     onPan: ({ dispatch, window }: WindowOverlayToolsOuterProps) => (event) => {
-      dispatch(stageToolOverlayMousePanning(window.$$id, { left: event.center.x, top: event.center.y }, event.deltaY, event.velocityY));
+      dispatch(stageToolOverlayMousePanning(window.$id, { left: event.center.x, top: event.center.y }, event.deltaY, event.velocityY));
     },
     onPanEnd: ({ dispatch, window }: WindowOverlayToolsOuterProps) => (event) => {
 
       setImmediate(() => {
-        dispatch(stageToolOverlayMousePanEnd(window.$$id));
+        dispatch(stageToolOverlayMousePanEnd(window.$id));
       });
     }
   })
@@ -127,7 +127,7 @@ export const  NodeOverlaysToolBase = ({ workspace, browser, dispatch }: VisualT
   return <div className="visual-tools-layer-component">
     {
       browser.windows.map((window) => {
-        return <WindowOverlayTools key={window.$$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={workspace.stage.translate.zoom} />;
+        return <WindowOverlayTools key={window.$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={workspace.stage.translate.zoom} />;
       })
     }
   </div>

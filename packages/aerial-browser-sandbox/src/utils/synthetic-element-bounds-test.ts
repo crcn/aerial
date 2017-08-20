@@ -50,7 +50,7 @@ describe(__filename + "#", () => {
     document: createSyntheticDocument({
       title: "document 1",
       childNodes: createSyntheticElement({
-        $$id: "n1",
+        $id: "n1",
         nodeName: "html",
         attributes: {},
         childNodes: [
@@ -60,26 +60,26 @@ describe(__filename + "#", () => {
             childNodes: []
           }),
           createSyntheticElement({
-            $$id: "n2",
+            $id: "n2",
             parentId: "n1",
             nodeName: "body",
             attributes: {},
             childNodes: [
               createSyntheticElement({
-                $$id: "n21",
+                $id: "n21",
                 parentId: "n2",
                 attributes: {},
                 nodeName: "bounds",
                 childNodes: [
                   createSyntheticElement({
-                    $$id: "n211",
+                    $id: "n211",
                     parentId: "n21",
                     attributes: {},
                     nodeName: "bounds",
                     childNodes: []
                   }),
                   createSyntheticElement({
-                    $$id: "n212",
+                    $id: "n212",
                     parentId: "n21",
                     attributes: {},
                     nodeName: "bounds",
@@ -98,7 +98,7 @@ describe(__filename + "#", () => {
 
   traverseObject(SYNTHETIC_WINDOW_FIXTURE_1, (node) => {
     if (node && node.constructor === Object && node.nodeType != null) {
-      allNodes[node.$$id] = node;
+      allNodes[node.$id] = node;
     }
   })
 

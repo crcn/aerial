@@ -42,8 +42,7 @@ OPTIMIZATIONS:
 CLEANUP:
 
 - [ ] synthetic window timers
-- [ ] change $$id to $id
-- [ ] change $$type to $type
+- [ ] do not set relative position on double click
 
 LOW PRIO:
 

@@ -33,5 +33,5 @@ function* runSandboxEnvironment(environment: SandboxEnvironment) {
 
   const { payload: exports } = yield yield request(createEvaluateDependencyRequest(context, getDependency(root, environment.entryHash), getDependencyGraph(root)));
 
-  yield put(createSandboxEnvironmentEvaluatedEvent(environment.$$id, exports));
+  yield put(createSandboxEnvironmentEvaluatedEvent(environment.$id, exports));
 }

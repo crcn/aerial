@@ -53,7 +53,7 @@ const enhanceSelectionStageTool = compose<SelectionInnerProps, SelectionOuterPro
       }
     },
     onKeyDown: ({ workspace, dispatch }) => (event: React.KeyboardEvent<any>) => {
-      dispatch(stageToolSelectionKeyDown(workspace.$$id, event));
+      dispatch(stageToolSelectionKeyDown(workspace.$id, event));
     }
   })
 );
