@@ -10,6 +10,7 @@ import { Dispatcher, Box, wrapEventToDispatch, weakMemo, StructReference } from 
 import { 
   stageToolOverlayMouseClicked,
   stageToolOverlayMouseMoved,
+  stageToolOverlayMouseLeave,
   stageToolOverlayMousePanStart,
   stageToolOverlayMousePanning,
   stageToolOverlayMousePanEnd,
@@ -81,7 +82,7 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom, onPanSt
         onMouseMove={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))} 
         onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, window.$$id))} 
         onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$$id))} 
-        onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$$id))}
+        onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseLeave.bind(this, window.$$id))}
         />
     </Hammer>
     {

@@ -22,6 +22,7 @@ export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
 export const STAGE_TOOL_WINDOW_BACKGROUND_CLICKED = "STAGE_TOOL_WINDOW_BACKGROUND_CLICKED";
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_MOVED = "STAGE_TOOL_OVERLAY_MOUSE_MOVED";
+export const STAGE_TOOL_OVERLAY_MOUSE_LEAVE = "STAGE_TOOL_OVERLAY_MOUSE_LEAVE";
 export const STAGE_TOOL_OVERLAY_MOUSE_PAN_START = "STAGE_TOOL_OVERLAY_MOUSE_PAN_START";
 export const STAGE_TOOL_OVERLAY_MOUSE_PANNING = "STAGE_TOOL_OVERLAY_MOUSE_PANNING";
 export const STAGE_TOOL_OVERLAY_MOUSE_PAN_END = "STAGE_TOOL_OVERLAY_MOUSE_PAN_END";
@@ -214,6 +215,13 @@ export const textEditorChanged = (file: FileCacheItem, value: string): textEdito
 export const stageToolOverlayMouseMoved = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayMouseMoved => ({
   windowId,
   type: STAGE_TOOL_OVERLAY_MOUSE_MOVED,
+  sourceEvent
+});
+
+
+export const stageToolOverlayMouseLeave = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayMouseMoved => ({
+  windowId,
+  type: STAGE_TOOL_OVERLAY_MOUSE_LEAVE,
   sourceEvent
 });
 

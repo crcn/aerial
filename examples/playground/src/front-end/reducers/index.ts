@@ -59,6 +59,7 @@ import {
   StageToolEditTextChanged,
   STAGE_TOOL_EDIT_TEXT_CHANGED,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
+  STAGE_TOOL_OVERLAY_MOUSE_LEAVE,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_START,
   StageToolOverlayMousePanStart,
   StageToolOverlayMousePanEnd,
@@ -257,6 +258,14 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved);
       return updateWorkspace(state, workspace.$$id, {
         hoveringRefs: targetRef ? [targetRef] : []
+      });
+    }
+
+    case STAGE_TOOL_OVERLAY_MOUSE_LEAVE: {
+      const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
+      const workspace = getSyntheticWindowWorkspace(state, windowId);
+      return updateWorkspace(state, workspace.$$id, {
+        hoveringRefs: []
       });
     }
 
