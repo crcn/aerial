@@ -205,8 +205,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly screenX: number;
     readonly screenY: number;
     readonly scrollbars: BarProp;
-    readonly scrollX: number;
-    readonly scrollY: number;
+    scrollX: number = 0;
+    scrollY: number = 0;
     readonly self: Window;
     readonly speechSynthesis: SpeechSynthesis;
     status: string;
@@ -393,6 +393,26 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
     scrollTo(...args): void {
 
+      let left: number;
+      let top: number;
+
+      // scroll with options
+      if (typeof args[0] === "object") {
+
+      } else {
+        [left, top] = args;
+      }
+
+      // TODO - use computed bounds here too
+      left = Math.max(0, left);
+      top  = Math.max(0, top);
+
+      this.scrollX = left;
+      this.scrollY = top;
+      
+      const event = new SEnvEvent();
+      event.initEvent("scroll", true, true);
+      this.dispatchEvent(event);
     }
 
     stop(): void {

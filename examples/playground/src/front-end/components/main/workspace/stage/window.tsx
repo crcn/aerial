@@ -26,14 +26,6 @@ type WindowComponentProps = {
   dispatch: Dispatcher<any>
 };
 
-const NODE_NAME_MAP = {
-  "html": "span",
-  "body": "span",
-  "head": "span",
-  "link": "span",
-  "script": "span"
-};
-
 type WindowMountOuterProps = {
   mount: HTMLElement;
 }
@@ -78,7 +70,7 @@ const WindowComponentBase = ({ window, dispatch }: WindowComponentProps) => {
   };
 
   return <div className="preview-window-component" style={style}>
-    <IsolateComponent>
+    <IsolateComponent scrollPosition={window.scrollPosition}>
       <WindowMount mount={window.mount} />
     </IsolateComponent>
   </div>;

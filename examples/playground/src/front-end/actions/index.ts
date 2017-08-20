@@ -22,6 +22,9 @@ export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
 export const STAGE_TOOL_WINDOW_BACKGROUND_CLICKED = "STAGE_TOOL_WINDOW_BACKGROUND_CLICKED";
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_MOVED = "STAGE_TOOL_OVERLAY_MOUSE_MOVED";
+export const STAGE_TOOL_OVERLAY_MOUSE_PAN_START = "STAGE_TOOL_OVERLAY_MOUSE_PAN_START";
+export const STAGE_TOOL_OVERLAY_MOUSE_PANNING = "STAGE_TOOL_OVERLAY_MOUSE_PANNING";
+export const STAGE_TOOL_OVERLAY_MOUSE_PAN_END = "STAGE_TOOL_OVERLAY_MOUSE_PAN_END";
 export const WORKSPACE_DELETION_SELECTED = "WORKSPACE_DELETION_SELECTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_CLICKED";
 export const STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED";
@@ -133,6 +136,19 @@ export type StageToolOverlayMouseMoved = {
   windowId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
+export type StageToolOverlayMousePanStart = {
+  windowId: string;
+} & BaseEvent;
+
+export type StageToolOverlayMousePanning = {
+  windowId: string;
+  delta: Point;
+} & BaseEvent;
+
+export type StageToolOverlayMousePanEnd = {
+  windowId: string;
+} & BaseEvent;
+
 export type StageToolOverlayClicked = {
   windowId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
@@ -193,6 +209,22 @@ export const stageToolOverlayMouseMoved = (windowId: string, sourceEvent: React.
   windowId,
   type: STAGE_TOOL_OVERLAY_MOUSE_MOVED,
   sourceEvent
+});
+
+export const stageToolOverlayMousePanStart = (windowId: string): StageToolOverlayMousePanStart => ({
+  windowId,
+  type: STAGE_TOOL_OVERLAY_MOUSE_PAN_START,
+});
+
+export const stageToolOverlayMousePanning = (windowId: string, delta: Point): StageToolOverlayMousePanning => ({
+  windowId,
+  delta,
+  type: STAGE_TOOL_OVERLAY_MOUSE_PANNING,
+});
+
+export const stageToolOverlayMousePanEnd = (windowId: string): StageToolOverlayMousePanEnd => ({
+  windowId,
+  type: STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
 });
 
 export const stageToolOverlayMouseClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayClicked => ({

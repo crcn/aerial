@@ -30,6 +30,9 @@ import {
   FETCH_REQUEST,
   createFetchRequest,
   OPEN_SYNTHETIC_WINDOW,
+  syntheticWindowScroll,
+  SyntheticWindowScrolling,
+  SYNTHETIC_WINDOW_SCROLLING,
   createApplyFileMutationsRequest,
   NODE_VALUE_STOPPED_EDITING,
   SyntheticNodeValueStoppedEditing,
@@ -310,6 +313,13 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
         emitStructChange();
       });
 
+      cenv.addEventListener("scroll", (event) => {
+        emit(syntheticWindowScroll(syntheticWindowId, {
+          left: cenv.scrollX,
+          top: cenv.scrollY
+        }));
+      });
+
       cenv.document.addEventListener("readystatechange", () => {
         if (cenv.document.readyState !== "complete") return;
         emit(createSyntheticWindowLoadedEvent(syntheticWindowId, cenv.document.struct, getAllNodes()));
@@ -322,7 +332,10 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
 
     yield fork(function*() {
       while(true) {
-        yield put(yield take(chan));
+        const e = yield take(chan);
+        yield spawn(function*() {
+          yield put(e);
+        })
       }
     });
 
@@ -345,6 +358,13 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       const node = cenv.childObjects.get(nodeId) as HTMLElement;
       const mutation = createSetElementTextContentMutation(node, node.textContent);
       yield yield request(createApplyFileMutationsRequest(mutation));
+    }
+  });
+
+  yield fork(function*() {
+    while(true) {
+      const { delta: { left, top }} = (yield take((action: SyntheticWindowScrolling) => action.type === SYNTHETIC_WINDOW_SCROLLING && action.syntheticWindowId === syntheticWindowId)) as SyntheticWindowScrolling;
+      cenv.scrollTo(cenv.scrollX - left, cenv.scrollY - top);
     }
   });
 

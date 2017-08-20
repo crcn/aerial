@@ -33,6 +33,7 @@ const getNodeByPath = (path: string[], root: Node) => {
   return current;
 }
 
+// TODO - this should contain an iframe
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   readonly mount: HTMLElement;
   private _rendering: boolean;
@@ -93,6 +94,10 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   protected _onWindowResize(event: Event) {
+    this._resetClientRects();
+  }
+
+  protected _onWindowScroll(event: Event) {
     this._resetClientRects();
   }
 

@@ -65,6 +65,7 @@ export const WORKSPACE         = "WORKSPACE";
 export const APPLICATION_STATE = "APPLICATION_STATE";
 
 export type Stage = {
+  panning: boolean;
   backgroundColor?: string;
   translate: Translate;
   cursor?: string;
@@ -176,6 +177,7 @@ export const getSelectedWorkspace = (state: ApplicationState) => state.selectedW
 
 export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, {
   stage: {
+    panning: false,
     translate: { left: 0, top: 0, zoom: 1 },
     showLeftGutter: true,
     showRightGutter: true,

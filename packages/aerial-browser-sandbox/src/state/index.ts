@@ -1,5 +1,6 @@
 import { 
   Box, 
+  Point,
   Boxed,
   Struct, 
   dsFind,
@@ -123,6 +124,7 @@ export type SyntheticWindow = {
   allNodes: {
     [identifier: string]: SyntheticNode
   }
+  scrollPosition: Point;
   mount: HTMLElement;
   location: string;
   document: SyntheticDocument;

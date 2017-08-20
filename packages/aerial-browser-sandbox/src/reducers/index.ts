@@ -18,6 +18,8 @@ import { 
   SyntheticWindowResourceLoadedEvent,
   SYNTHETIC_WINDOW_LOADED,
   SYNTHETIC_WINDOW_RECTS_UPDATED,
+  SYNTHETIC_WINDOW_SCROLL,
+  SyntheticWindowScroll,
   SyntheticWindowRectsUpdatedEvent,
   SYNTHETIC_WINDOW_SOURCE_CHANGED,
   SyntheticWindowSourceChangedEvent,
@@ -60,6 +62,7 @@ const getBestWindowBox = (browser: SyntheticBrowser, box: Box) => {
 
 
 export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootState>(root: TRootState = createSyntheticBrowserRootState() as TRootState, event: BaseEvent) => {
+
   switch(event.type) {
     case OPEN_SYNTHETIC_WINDOW: {
       const { uri, syntheticBrowserId } = event as OpenSyntheticBrowserWindowRequest;
@@ -85,6 +88,13 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
       const { window, syntheticWindowId } = event as SyntheticWindowSourceChangedEvent;
       return updateSyntheticWindow(root, syntheticWindowId, {
         mount: window.renderer.mount
+      });
+    }
+    
+    case SYNTHETIC_WINDOW_SCROLL: {
+      const { position, syntheticWindowId } = event as SyntheticWindowScroll;
+      return updateSyntheticWindow(root, syntheticWindowId, {
+        scrollPosition: position
       });
     }
 

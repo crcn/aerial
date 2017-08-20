@@ -55,6 +55,10 @@ import {
   StageToolOverlayClicked,
   StageToolEditTextChanged,
   STAGE_TOOL_EDIT_TEXT_CHANGED,
+  STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
+  STAGE_TOOL_OVERLAY_MOUSE_PAN_START,
+  StageToolOverlayMousePanStart,
+  StageToolOverlayMousePanEnd,
   SELECTOR_DOUBLE_CLICKED,
   SelectorDoubleClicked,
   WorkspaceSelectionDeleted,
@@ -242,6 +246,11 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
       const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
+
+      // disable hovering while panning (scrolling)
+      if (workspace.stage.panning) return updateWorkspace(state, workspace.$$id, {
+        hoveringRefs: []
+      });
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved);
       return updateWorkspace(state, workspace.$$id, {
         hoveringRefs: targetRef ? [targetRef] : []
@@ -260,11 +269,37 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
+    case STAGE_TOOL_OVERLAY_MOUSE_PAN_START: {
+      const { windowId } = event as StageToolOverlayMousePanStart;
+      const workspace = getSyntheticWindowWorkspace(state, windowId);
+      return updateWorkspace(state, workspace.$$id, {
+        stage: {
+          ...workspace.stage,
+          panning: true
+        }
+      });
+    }
+    
+    case STAGE_TOOL_OVERLAY_MOUSE_PAN_END: {
+      const { windowId } = event as StageToolOverlayMousePanEnd;
+      const workspace = getSyntheticWindowWorkspace(state, windowId)
+      return updateWorkspace(state, workspace.$$id, {
+        stage: {
+          ...workspace.stage,
+          panning: false
+        }
+      });
+    }
+
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
       const altKey = sourceEvent.altKey;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
+      
+      // do not allow selection while window is panning (scrolling)
+      if (workspace.stage.panning) return state;
+
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (!targetRef) {
         return clearWorkspaceSelection(state, workspace.$$id);

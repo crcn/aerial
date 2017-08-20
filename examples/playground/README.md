@@ -27,10 +27,20 @@ STAGE 3:
 HI PRIO:
 
 - [ ] saved workspaces
+- [ ] karma test runner* (needed for DNDing anything)
 
 - [ ] DND working for everything (must be tested)
 - [ ] move style to class shortcut
 - [ ] CSS inspector
+
+OPTIMIZATIONS:
+
+- [ ] memoize computed styles
+- [ ] memoize computed boxes
+
+CLEANUP:
+
+- [ ] remove types from names such as *Request and *Event - let name imply what kind they are.
 
 MVP:
 

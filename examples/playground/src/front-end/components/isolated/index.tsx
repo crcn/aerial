@@ -1,12 +1,13 @@
 import React =  require("react");
 import ReactDOM = require("react-dom");
-import { bubbleHTMLIframeEvents } from "aerial-common2";
+import { bubbleHTMLIframeEvents, Point } from "aerial-common2";
 
 export class IsolateComponent extends React.Component<{ 
   inheritCSS?: boolean, 
   onMouseDown?: any, 
   onKeyDown?: any,
   onLoad?: any,
+  scrollPosition?: Point;
   children: any,
   ignoreInputEvents?: boolean;
   translateMousePositions?: boolean;
@@ -56,9 +57,16 @@ export class IsolateComponent extends React.Component<{
 
   componentDidUpdate() {
     this._render();
+    const scrollPosition = this.props.scrollPosition as Point;
+
+    if (this.window && scrollPosition) {
+      if (scrollPosition.left !== this.window.scrollX || scrollPosition.top !== this.window.scrollY) {
+        this.window.scrollTo(scrollPosition.left, scrollPosition.top);
+      }
+    }
   }
 
-  get window() {
+  get window(): Window {
     return (this.refs as any).container.contentWindow;
   }
 

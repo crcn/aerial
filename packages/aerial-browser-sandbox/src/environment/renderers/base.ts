@@ -44,6 +44,7 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
     this._onDocumentLoad = this._onDocumentLoad.bind(this);
     this._onDocumentLoad2 = this._onDocumentLoad2.bind(this);
     this._onWindowResize = this._onWindowResize.bind(this);
+    this._onWindowScroll = this._onWindowScroll.bind(this);
     this._onWindowMutation = this._onWindowMutation.bind(this);
     this._addTargetListeners();
   }
@@ -71,6 +72,7 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
   protected _addTargetListeners() {
     this._sourceWindow.document.addEventListener("load", this._onDocumentLoad2);
     this._sourceWindow.addEventListener("resize", this._onWindowResize);
+    this._sourceWindow.addEventListener("scroll", this._onWindowScroll);
   }
 
   private _onDocumentLoad2(event: Event) {
@@ -88,6 +90,10 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
 
   protected _onWindowResize(event: Event) {
 
+  }
+
+  protected _onWindowScroll(event: Event) {
+    
   }
 
   protected _onWindowMutation(event: SEnvMutationEventInterface) {
