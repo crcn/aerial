@@ -38,23 +38,23 @@ type WindowOverlayToolsInnerProps = {
 
 type NodeOverlayProps = {
   windowId: string;
-  box: Bounds;
+  bounds: Bounds;
   zoom: number;
   hovering: boolean;
   node: SyntheticNode;
   dispatch: Dispatcher<any>;
 };
 
-const NodeOverlayBase = ({ windowId, zoom, box, node, dispatch, hovering }: NodeOverlayProps) => {
+const NodeOverlayBase = ({ windowId, zoom, bounds, node, dispatch, hovering }: NodeOverlayProps) => {
 
   const borderWidth = 2 / zoom;
 
   const style = {
-    left: box.left,
-    top: box.top,
-    width: box.right - box.left,
+    left: bounds.left,
+    top: bounds.top,
+    width: bounds.right - bounds.left,
     pointerEvents: "none",
-    height: box.bottom - box.top,
+    height: bounds.bottom - bounds.top,
     boxShadow: `inset 0 0 0 ${borderWidth}px #00B5FF`,
   };
 
@@ -69,10 +69,10 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom, onPanSt
 
   const style = {
     position: "absolute",
-    left: window.box.left,
-    top: window.box.top,
-    width: window.box.right - window.box.left,
-    height: window.box.bottom - window.box.top
+    left: window.bounds.left,
+    top: window.bounds.top,
+    width: window.bounds.right - window.bounds.left,
+    height: window.bounds.bottom - window.bounds.top
   };
 
   return <div style={style as any}>
@@ -91,7 +91,7 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom, onPanSt
         zoom={zoom} 
         key={node.$$id} 
         node={node} 
-        box={window.allComputedBounds[node.$$id]} 
+        bounds={window.allComputedBounds[node.$$id]} 
         dispatch={dispatch} 
         hovering={true} />)
     }

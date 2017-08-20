@@ -9,7 +9,7 @@ export const REMOVED = "REMOVED";
 export type Resized = {
   itemId: string;
   itemType: string;
-  box: Bounds;
+  bounds: Bounds;
 } & BaseEvent;
 
 export type Moved = {
@@ -23,10 +23,10 @@ export type Removed = {
   itemType: string;
 } & BaseEvent;
 
-export const resized = (itemId: string, itemType: string, box: Bounds): Resized => ({
+export const resized = (itemId: string, itemType: string, bounds: Bounds): Resized => ({
   itemId,
   itemType,
-  box,
+  bounds,
   type: RESIZED
 });
 

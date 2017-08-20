@@ -48,15 +48,15 @@ import {
 
 const WINDOW_PADDING = 50;
 
-const getBestWindowBounds = (browser: SyntheticBrowser, box: Bounds) => {
-  if (!browser.windows.length) return box;
+const getBestWindowBounds = (browser: SyntheticBrowser, bounds: Bounds) => {
+  if (!browser.windows.length) return bounds;
   const rightMostWindow = browser.windows.length > 1 ? browser.windows.reduce((a, b) => {
-    return a.box.right > b.box.right ? a : b;
+    return a.bounds.right > b.bounds.right ? a : b;
   }) : browser.windows[0];
 
-  return moveBounds(box, {
-    left: rightMostWindow.box.right + WINDOW_PADDING,
-    top: rightMostWindow.box.top
+  return moveBounds(bounds, {
+    left: rightMostWindow.bounds.right + WINDOW_PADDING,
+    top: rightMostWindow.bounds.top
   });
 };
 
@@ -78,7 +78,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
           ...syntheticBrowser.windows,
           createSyntheticWindow({
             location: uri,
-            box: getBestWindowBounds(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
+            bounds: getBestWindowBounds(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
           })
         ]
       });
@@ -99,12 +99,12 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
     }
 
     case RESIZED: {
-      const { itemId, itemType, box } = event as Resized;
+      const { itemId, itemType, bounds } = event as Resized;
       if (itemType === SYNTHETIC_WINDOW) {
         const window = getSyntheticWindow(root, itemId);
         if (window) {
           return updateSyntheticWindow(root, itemId, {
-            box
+            bounds
           });
         }
         break;
@@ -117,7 +117,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
         const window = getSyntheticWindow(root, itemId);
         if (window) {
           return updateSyntheticWindow(root, itemId, {
-            box: moveBounds(window.box, point)
+            bounds: moveBounds(window.bounds, point)
           });
         }
         break;

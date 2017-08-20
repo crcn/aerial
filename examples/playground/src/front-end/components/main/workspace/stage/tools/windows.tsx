@@ -15,9 +15,9 @@ type WindowItemInnerProps = {
 const WindowItemBase = ({ window, translate, dispatch }: WindowItemInnerProps) => {
 
   const style = {
-    left: window.box.left,
-    top: window.box.top,
-    ...getBoundsSize(window.box)
+    left: window.bounds.left,
+    top: window.bounds.top,
+    ...getBoundsSize(window.bounds)
   };
 
   const titleScale = Math.max(1 / translate.zoom, 0.03);

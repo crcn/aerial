@@ -85,9 +85,9 @@ function calculateTransform(node: HTMLElement, includeIframes: boolean = true) {
 }
 
 export function calculateUntransformedBoundingRect(node: HTMLElement) {
-  const box: Bounds = node.getBoundingClientRect();
+  const bounds: Bounds = node.getBoundingClientRect();
   const matrix = calculateTransform(node, false);
-  return zoomBounds(moveBounds(box, { left: -matrix[4], top: -matrix[5] }), 1 / matrix[0]);
+  return zoomBounds(moveBounds(bounds, { left: -matrix[4], top: -matrix[5] }), 1 / matrix[0]);
 }
 
 function hasMeasurement(key) {
@@ -126,7 +126,7 @@ function calculateTransforms(node: HTMLElement) {
   node.style.left = "0px";
   node.style.top = "0px";
   node.style.width = "100px";
-  node.style.boxSizing = "border-box";
+  node.style.boxSizing = "border-bounds";
 
   const bounds = this.bounds;
 

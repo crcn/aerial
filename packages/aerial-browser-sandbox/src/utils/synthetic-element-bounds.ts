@@ -1,4 +1,4 @@
-import { Bounds, weakMemo, Point, moveBounds, createZeroBounds, shiftBounds } from "aerial-common2";
+import { Bounds, weakMemo, Point, moveBounds, roundBounds, createZeroBounds, shiftBounds } from "aerial-common2";
 import { CSSMeasurementTypes, Axis } from "../constants";
 import { SyntheticElement, SyntheticWindow, getSyntheticParentNode } from "../state";
 
@@ -35,13 +35,6 @@ export const convertAbsoluteBoundsToRelative = weakMemo((newBounds: Bounds, elem
 export const getElementStartPosition = weakMemo((element: SyntheticElement, window: SyntheticWindow) => {
   // if the element is relative, then we just need to subtract the css style from the computed bounds to figure out where its static position is.
   let { left, top, borderLeftWidth, borderTopWidth } = convertElementMeasurementsToNumbers(element, window);
-  const computedStyle = window.allComputedStyles[element.$$id];
-
-  if (computedStyle.boxSizing === "border-box") {
-    // left -= borderLeftWidth;
-    // top -= borderTopWidth;
-  }
-
   return shiftBounds(window.allComputedBounds[element.$$id], {
     left: -left,
     top: -top

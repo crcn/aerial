@@ -60,13 +60,13 @@ const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>
 const WindowMount = enhanceWindowMount(WindowMountBase);
 
 const WindowBase = ({ window, dispatch }: WindowProps) => {
-  const { box, document } = window;
+  const { bounds, document } = window;
   
   const style = {
-    left: box.left,
-    top: box.top,
-    width: box.right - box.left,
-    height: box.bottom - box.top
+    left: bounds.left,
+    top: bounds.top,
+    width: bounds.right - bounds.left,
+    height: bounds.bottom - bounds.top
   };
 
   return <div className="preview-window-component" style={style}>

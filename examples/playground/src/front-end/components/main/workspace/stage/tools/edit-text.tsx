@@ -32,18 +32,18 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea }: 
   const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
   if (!isSyntheticDOMNode(selectedNode)) return null;
   const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(browser, selectedNode.$$id);
-  const box = nodeWindow.allComputedBounds[selectedNode.$$id];
+  const bounds = nodeWindow.allComputedBounds[selectedNode.$$id];
   const computedStyle = (nodeWindow.allComputedStyles[selectedNode.$$id] || {}) as CSSStyleDeclaration;
-  if (!box) return null;
+  if (!bounds) return null;
 
-  const { width, height } = getBoundsSize(box);
+  const { width, height } = getBoundsSize(bounds);
 
   const style = {
     fontSize: computedStyle.fontSize,
     color: computedStyle.color,
     position: "absolute",
-    left: nodeWindow.box.left + box.left,
-    top: nodeWindow.box.top + box.top,
+    left: nodeWindow.bounds.left + bounds.left,
+    top: nodeWindow.bounds.top + bounds.top,
     width: width,
     height: height,
     zIndex: 99999999

@@ -209,10 +209,10 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     }
 
     case RESIZER_PATH_MOUSE_MOVED: {
-      let { workspaceId, anchor, box: newBounds, sourceEvent } = event as ResizerPathMoved;
+      let { workspaceId, anchor, bounds: newBounds, sourceEvent } = event as ResizerPathMoved;
       const workspace = getWorkspaceById(state, workspaceId);
 
-      // TODO - possibly use BoundsStruct instead of Bounds since there are cases where box prop doesn't exist
+      // TODO - possibly use BoundsStruct instead of Bounds since there are cases where bounds prop doesn't exist
       const bounds = getWorkspaceSelectionBounds(state, workspace);
 
       const keepAspectRatio = sourceEvent.shiftKey;
@@ -227,9 +227,9 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       }
 
       for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-        const box = getSyntheticBrowserBounds(state, item);
-        const scaledBounds = scaleInnerBounds(box, bounds, newBounds);
-        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBounds(box, bounds, newBounds)));
+        const bounds = getSyntheticBrowserBounds(state, item);
+        const scaledBounds = scaleInnerBounds(bounds, bounds, newBounds);
+        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBounds(bounds, bounds, newBounds)));
       }
       return state;
     }
@@ -288,7 +288,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const { width, height } = element.getBoundingClientRect();
       const workspace = getSelectedWorkspace(state);
 
-      const innerBounds = getSyntheticBrowser(state, workspace.browserId).windows.map(window => window.box).reduce((a, b) => ({
+      const innerBounds = getSyntheticBrowser(state, workspace.browserId).windows.map(window => window.bounds).reduce((a, b) => ({
         left: Math.min(a.left, b.left),
         top: Math.min(a.top, b.top),
         right: Math.max(a.right, b.right),

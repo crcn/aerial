@@ -61,6 +61,7 @@ import {
   request,
   shiftBounds,
   moveBounds,
+  roundBounds,
   Mutation,
   diffArray,
   takeRequest, 
@@ -216,10 +217,10 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   }
 
   function* handleSizeChange(syntheticWindow: SyntheticWindow) {
-    if (!cwindow || cwindow.box === syntheticWindow.box) {
+    if (!cwindow || cwindow.bounds === syntheticWindow.bounds) {
       return;
     }
-    cenv.resizeTo(syntheticWindow.box.right - syntheticWindow.box.left, syntheticWindow.box.bottom - syntheticWindow.box.top)
+    cenv.resizeTo(syntheticWindow.bounds.right - syntheticWindow.bounds.left, syntheticWindow.bounds.bottom - syntheticWindow.bounds.top)
   }
 
   function* handleLocationChange(syntheticWindow: SyntheticWindow) {
@@ -400,14 +401,14 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       const computedStyle = syntheticWindow.allComputedStyles[syntheticNode.$$id];
 
       // TODO - computed boxes MUST also contain the offset of the parent.
-      const relativeRect = shiftBounds(convertAbsoluteBoundsToRelative(
+      const relativeRect = roundBounds(shiftBounds(convertAbsoluteBoundsToRelative(
         pointToBounds(point),
         syntheticNode as SyntheticElement,
         syntheticWindow
       ), {
-        left: -syntheticWindow.box.left,
-        top: -syntheticWindow.box.top
-      });
+        left: -syntheticWindow.bounds.left,
+        top: -syntheticWindow.bounds.top
+      }));
 
       const envElement = cenv.childObjects.get(syntheticNode.$$id);
 
@@ -415,8 +416,8 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       if (computedStyle.position === "static") {
         envElement.style.position = "relative";
       }
-      envElement.style.left = `${relativeRect.left.toFixed(2)}px`;
-      envElement.style.top  = `${relativeRect.top.toFixed(2)}px`;
+      envElement.style.left = `${relativeRect.left}px`;
+      envElement.style.top  = `${relativeRect.top}px`;
     }
   });
 

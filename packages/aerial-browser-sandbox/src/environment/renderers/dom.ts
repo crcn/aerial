@@ -33,7 +33,7 @@ const getNodeByPath = (path: string[], root: Node) => {
   return current;
 }
 
-const RECOMPUTE_TIMEOUT = 100;
+const RECOMPUTE_TIMEOUT = 1;
 
 // TODO - this should contain an iframe
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {

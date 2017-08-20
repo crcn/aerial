@@ -7,7 +7,7 @@ describe(__filename + "#", () => {
   const createSquareBounds = (left, top) => createBounds(left, left + 100, top, top + 100);
 
   const SYNTHETIC_WINDOW_FIXTURE_1 = createSyntheticWindow({
-    box: createBounds(0, 0, 1366, 768),
+    bounds: createBounds(0, 0, 1366, 768),
     allComputedBounds: {
       n1: createBounds(0, 0, 1366, 768),
       n2: createBounds(0, 0, 1366, 768),
@@ -69,20 +69,20 @@ describe(__filename + "#", () => {
                 $$id: "n21",
                 parentId: "n2",
                 attributes: {},
-                nodeName: "box",
+                nodeName: "bounds",
                 childNodes: [
                   createSyntheticElement({
                     $$id: "n211",
                     parentId: "n21",
                     attributes: {},
-                    nodeName: "box",
+                    nodeName: "bounds",
                     childNodes: []
                   }),
                   createSyntheticElement({
                     $$id: "n212",
                     parentId: "n21",
                     attributes: {},
-                    nodeName: "box",
+                    nodeName: "bounds",
                     childNodes: []
                   })
                 ]

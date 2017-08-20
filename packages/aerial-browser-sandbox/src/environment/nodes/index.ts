@@ -8,4 +8,4 @@ export * from "./text";
 export * from "./comment";
 export * from "./node";
 export * from "./utils";
-export * from "./box-utils";
+export * from "./bound-utils";

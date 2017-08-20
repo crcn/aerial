@@ -23,16 +23,16 @@ const POINT_RADIUS       = 4;
 
 export const ResizerBase = ({ workspace, browser, dispatch, onMouseDown }: ResizerInnerProps) => {
 
-  const box = getWorkspaceSelectionBounds(browser, workspace);
+  const bounds = getWorkspaceSelectionBounds(browser, workspace);
   const zoom = workspace.stage.translate.zoom;
 
   // offset stroke
   const resizerStyle = {
     position : "absolute",
-    left     : box.left,
-    top      : box.top,
-    width    : box.right - box.left,
-    height   : box.bottom - box.top,
+    left     : bounds.left,
+    top      : bounds.top,
+    width    : bounds.right - bounds.left,
+    height   : bounds.bottom - bounds.top,
     transform: `translate(-${POINT_RADIUS / zoom}px, -${POINT_RADIUS / zoom}px)`,
     transformOrigin: "top left"
   };
@@ -58,7 +58,7 @@ export const ResizerBase = ({ workspace, browser, dispatch, onMouseDown }: Resiz
         zoom={zoom}
         points={points}
         workspace={workspace}
-        box={box}
+        bounds={bounds}
         strokeWidth={POINT_STROKE_WIDTH}
         dispatch={dispatch}
         pointRadius={POINT_RADIUS}
@@ -73,13 +73,13 @@ const enhanceResizer = compose<ResizerInnerProps, ResizerOuterProps>(
     onMouseDown: ({ dispatch, workspace, browser }: ResizerOuterProps) => (event: React.MouseEvent<any>) => {
       dispatch(resizerMouseDown(workspace.$$id, event));
       const { translate } = workspace.stage;
-      const box = getWorkspaceSelectionBounds(browser, workspace);
+      const bounds = getWorkspaceSelectionBounds(browser, workspace);
       const translateLeft = translate.left;
       const translateTop  = translate.top;
       startDOMDrag(event, (event2, { delta }) => {
         dispatch(resizerMoved(workspace.$$id, {
-          left: box.left + delta.x / translate.zoom,
-          top: box.top + delta.y / translate.zoom,
+          left: bounds.left + delta.x / translate.zoom,
+          top: bounds.top + delta.y / translate.zoom,
         }));
       }, () => {
         dispatch(resizerStoppedMoving(workspace.$$id, null));

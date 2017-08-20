@@ -128,7 +128,7 @@ export type SyntheticWindow = {
   mount: HTMLElement;
   location: string;
   document: SyntheticDocument;
-  box: Bounds;
+  bounds: Bounds;
   allComputedBounds: {
     [identifier: string]: Bounds;
   };
@@ -150,7 +150,7 @@ export type SyntheticBrowserRootState = {
 export const createSyntheticBrowserStore = (syntheticBrowsers?: SyntheticBrowser[]) => dsIndex(createDataStore(syntheticBrowsers), "$$id");
 
 export const createSyntheticWindow = createStructFactory<SyntheticWindow>(SYNTHETIC_WINDOW, {
-  box: DEFAULT_SYNTHETIC_WINDOW_BOX,
+  bounds: DEFAULT_SYNTHETIC_WINDOW_BOX,
   externalResourceUris: [],
   allNodes: {}
 });
@@ -187,9 +187,9 @@ export const addSyntheticWindow = <TState extends SyntheticBrowserRootState>(roo
 
 export const getSyntheticBrowserBounds = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, item: Partial<Struct & Bounded>) => {
   if (!item) return null;
-  if (item.box) return item.box;
+  if (item.bounds) return item.bounds;
   const window = getSyntheticNodeWindow(root, item.$$id);
-  return window && shiftBounds(window.allComputedBounds[item.$$id], window.box);
+  return window && shiftBounds(window.allComputedBounds[item.$$id], window.bounds);
 });
 
 export const getSyntheticBrowserStoreItemByReference = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, [type, id]: StructReference) => {

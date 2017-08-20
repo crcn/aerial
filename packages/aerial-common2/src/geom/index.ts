@@ -14,7 +14,7 @@ export type Size = {
 };
 
 export type Bounded = {
-  box: Bounds;
+  bounds: Bounds;
 };
 
 export type Rectangle = {
@@ -47,6 +47,16 @@ export const moveBounds = (bounds: Bounds, { left, top }: Point): Bounds => ({
   right: left + bounds.right - bounds.left,
   bottom: top + bounds.bottom - bounds.top
 });
+
+export const mapBounds = (bounds: Bounds, map: (value: number, key?: string) => number): Bounds => ({
+  ...bounds,
+  left: map(bounds.left, "left"),
+  right: map(bounds.right, "right"),
+  top: map(bounds.top, "top"),
+  bottom: map(bounds.bottom, "bottom"),
+});
+
+export const roundBounds = (bounds: Bounds) => mapBounds(bounds, (v) => Math.round(v));
 
 export const createZeroBounds = () => createBounds(0, 0, 0, 0);
 

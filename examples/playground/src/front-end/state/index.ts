@@ -221,10 +221,10 @@ export const getStageToolMouseNodeTargetReference = (state: ApplicationState, ev
   const intersectingBounds: Bounds[] = [];
   const intersectingBoundsMap = new Map<Bounds, string>();
   for (const uid in allComputedBounds) {
-    const box = allComputedBounds[uid];
-    if (pointIntersectsBounds({ left: mouseX, top: mouseY }, zoomBounds(box, zoom))) {
-      intersectingBounds.push(box);
-      intersectingBoundsMap.set(box, uid);
+    const bounds = allComputedBounds[uid];
+    if (pointIntersectsBounds({ left: mouseX, top: mouseY }, zoomBounds(bounds, zoom))) {
+      intersectingBounds.push(bounds);
+      intersectingBoundsMap.set(bounds, uid);
     }
   }
   if (!intersectingBounds.length) return null;

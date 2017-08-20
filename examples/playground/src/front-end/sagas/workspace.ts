@@ -108,8 +108,8 @@ function* handleSelectionMoved() {
 
     const bounds = getWorkspaceSelectionBounds(state, workspace);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-      const box = getSyntheticBrowserBounds(state, item);
-      yield put(moved(item.$$id, item.$$type, scaleInnerBounds(box, bounds, moveBounds(bounds, newPoint))));
+      const bounds = getSyntheticBrowserBounds(state, item);
+      yield put(moved(item.$$id, item.$$type, scaleInnerBounds(bounds, bounds, moveBounds(bounds, newPoint))));
     }
   }
 }
@@ -148,7 +148,7 @@ function* handleSelectionStoppedMoving() {
     const state = (yield select()) as ApplicationState;
     const workspace = getWorkspaceById(state, workspaceId);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-      const box = getSyntheticBrowserBounds(state, item);
+      const bounds = getSyntheticBrowserBounds(state, item);
       yield put(stoppedMoving(item.$$id, item.$$type));
     }
   }

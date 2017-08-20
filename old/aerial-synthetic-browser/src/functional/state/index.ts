@@ -73,7 +73,7 @@ export type SyntheticBrowserWindow2 = {
   document: SyntheticDOMDocument2;
   location: string;
   title: string;
-  box: Bounds;
+  bounds: Bounds;
   allComputedBounds: {
     [identifier: string]: Bounds;
   };
@@ -107,7 +107,7 @@ export const createSyntheticBrowser2 = createStructFactory<SyntheticBrowser2>(SY
 export const createSyntheticBrowserWindow2 = createStructFactory<SyntheticBrowserWindow2>(SYTNTHETIC_BROWSER_WINDOW, {
   allComputedStyles: {},
   allComputedBounds: {},
-  box: DEFAULT_SYNTHETIC_WINDOW_BOX
+  bounds: DEFAULT_SYNTHETIC_WINDOW_BOX
 });
 
 export const getSyntheticBrowserWindow = (root: any, id: string): SyntheticBrowserWindow2 => {

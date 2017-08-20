@@ -82,11 +82,11 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
     }
     
     case RESIZED: {
-      const { itemId, itemType, box } = event as Resized;
+      const { itemId, itemType, bounds } = event as Resized;
       if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
         const window = getSyntheticBrowserWindow(root, itemId);
         if (window) {
-          return updateStructProperty(root, window, "box", box);
+          return updateStructProperty(root, window, "bounds", bounds);
         }
         break;
       }
@@ -97,7 +97,7 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
       if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
         const window = getSyntheticBrowserWindow(root, itemId);
         if (window) {
-          return updateStructProperty(root, window, "box", moveBounds(window.box, point));
+          return updateStructProperty(root, window, "bounds", moveBounds(window.bounds, point));
         }
         break;
       }

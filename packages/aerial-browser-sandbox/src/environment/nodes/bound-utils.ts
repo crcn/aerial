@@ -131,7 +131,7 @@ function calculateElementTransforms(node: HTMLElement) {
   node.style.left = "0px";
   node.style.top = "0px";
   node.style.width = "100px";
-  node.style.boxSizing = "border-box";
+  node.style.boxSizing = "border-bounds";
 
   const bounds = this.bounds;
 
