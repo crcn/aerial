@@ -36,10 +36,41 @@ export type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response
 
 export type SEnvWindowContext = {
   fetch: Fetch;
+  reload: () => {};
   proxyHost?: string;
   createRenderer?: SyntheticDOMRendererFactory;
   console?: Console;
 };
+
+export const getSEnvWindowProxyClass = weakMemo((context: SEnvWindowContext) => {
+  const SEnvWindow = getSEnvWindowClass(context);
+  const { SEnvMutationEvent } = getSEnvEventClasses(context);
+
+  class SEnvWindowProxy extends SEnvWindow {
+    private _target: SEnvWindowInterface;
+    constructor(location) {
+      super(location);
+      this._onTargetMutation = this._onTargetMutation.bind(this);
+    }
+    get target() {
+      return this._target;
+    }
+    set target(value: SEnvWindowInterface) {
+      if (this._target) {
+        this._target.removeEventListener(SEnvMutationEvent.MUTATION, this._onTargetMutation)
+      }
+      this._target = value;
+      this._target.addEventListener(SEnvMutationEvent.MUTATION, this._onTargetMutation);
+      patchWindow(this, diffWindow(this, value));
+    }
+    _onTargetMutation(event: SEnvMutationEventInterface) {
+      patchWindow(this, [event.mutation]);
+      this.dispatchEvent(event);
+    }
+  }
+
+  return SEnvWindowProxy;
+});
 
 export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
   const { createRenderer, fetch } = context;
@@ -233,12 +264,12 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly HTMLElement: typeof HTMLElement = SEnvHTMLElement;
     fetch: Fetch = fetch;
     
-    constructor(readonly $$id: string, origin: string, readonly $$dispatch: Dispatcher<any>) {
+    constructor(origin: string) {
       super();
 
       this.uid = generateDefaultId();
       this.childObjects = new Map();
-      this.location = new SEnvLocation(origin);
+      this.location = new SEnvLocation(origin, context.reload);
       this.document = new SEnvDocument(this);
       this.window   = this;
       this.renderer = (createRenderer || createNoopRenderer)(this);
@@ -481,7 +512,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
 export const openSyntheticEnvironmentWindow = (location: string, context: SEnvWindowContext) => {
   const SEnvWindow = getSEnvWindowClass(context);
-  const window = new SEnvWindow(null, location, null);
+  const window = new SEnvWindow(location);
   window.$load();
   return window;
 }
@@ -510,6 +541,10 @@ export const patchNode = (node: Node, mutation: Mutation<any>) => {
     case SEnvNodeTypes.ELEMENT: {
       patchElement(node as Element, mutation);
       break;      
+    }
+    case SEnvNodeTypes.DOCUMENT: {
+      patchDocument(node as SEnvDocumentInterface, mutation);
+      break;
     }
   }
 }

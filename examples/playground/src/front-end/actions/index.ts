@@ -175,7 +175,7 @@ export type WorkspaceSelectionDeleted = {
 
 export type DeleteShortcutPressed = ShortcutEvent;
 
-export type textEditorChanged = {
+export type TextEditorChanged = {
   file: FileCacheItem,
   value: string
 } & BaseEvent;
@@ -217,7 +217,7 @@ export const resizerMouseDown = (workspaceId: string, sourceEvent: React.MouseEv
   type: RESIZER_MOUSE_DOWN,
 });
 
-export const textEditorChanged = (file: FileCacheItem, value: string): textEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
+export const textEditorChanged = (file: FileCacheItem, value: string): TextEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
 
 export const stageToolOverlayMouseMoved = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayMouseMoved => ({
   windowId,

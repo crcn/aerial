@@ -49,7 +49,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     readonly clientLeft: number;
     readonly clientTop: number;
     readonly clientWidth: number;
-    readonly constructClone: boolean = true;
+    constructClone: boolean;
     readonly structType: string = SYNTHETIC_ELEMENT;
     attributes: NamedNodeMap;
     nodeType: number = SEnvNodeTypes.ELEMENT;
@@ -111,6 +111,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
 
     $$preconstruct() {
       super.$$preconstruct();
+      this.constructClone = true;
       this.nodeType = SEnvNodeTypes.ELEMENT;
 
       this.attributes = new Proxy(new SEnvNamedNodeMap(), {

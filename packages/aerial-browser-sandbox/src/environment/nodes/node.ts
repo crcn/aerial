@@ -59,7 +59,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     public source: any;
     private _struct: SyntheticNode;
     private _constructed: boolean;
-    readonly constructNode: boolean;
+    readonly constructClone: boolean;
     readonly structType: string;
 
     readonly attributes: NamedNodeMap;
@@ -183,7 +183,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
           clone.appendChild(this.childNodes[i].cloneNode(true));
         }
       }
-      if (this.constructNode) {
+      if (this.constructClone) {
         constructNode(clone);
       }
       return clone;

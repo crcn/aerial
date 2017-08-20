@@ -16,6 +16,7 @@ export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
 export const SYNTHETIC_WINDOW_SCROLLED           = "SYNTHETIC_WINDOW_SCROLLED";
 export const SYNTHETIC_WINDOW_OPENED             = "SYNTHETIC_WINDOW_OPENED";
 export const SYNTHETIC_WINDOW_MOVED              = "SYNTHETIC_WINDOW_MOVED";
+export const SYNTHETIC_WINDOW_RESIZED              = "SYNTHETIC_WINDOW_RESIZED";
 
 export type FetchRequest = {
   info: RequestInfo;
@@ -120,6 +121,11 @@ export const syntheticWindowOpened = (instance: SEnvWindowInterface, browserId: 
 export const syntheticWindowMoved = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({
   instance,
   type: SYNTHETIC_WINDOW_MOVED
+});
+
+export const syntheticWindowResized = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({
+  instance,
+  type: SYNTHETIC_WINDOW_RESIZED
 });
 
 export const applyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutations => ({

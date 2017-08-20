@@ -23,6 +23,7 @@ import { 
   SyntheticWindowScrolled,
   syntheticWindowOpened,
   SYNTHETIC_WINDOW_MOVED,
+  SYNTHETIC_WINDOW_RESIZED,
   SyntheticWindowRectsUpdated,
   SyntheticWindowSourceChanged,
   OPEN_SYNTHETIC_WINDOW, 
@@ -96,27 +97,16 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
       });
     }
 
-    case RESIZED: {
-      const { itemId, itemType, bounds } = event as Resized;
-      if (itemType === SYNTHETIC_WINDOW) {
-        const window = getSyntheticWindow(root, itemId);
-        if (window) {
-          return updateSyntheticWindow(root, itemId, {
-            bounds
-          });
-        }
-        break;
-      }
-    }
-    
+    case SYNTHETIC_WINDOW_RESIZED: 
     case SYNTHETIC_WINDOW_MOVED: {
-      const { instance: { uid, screenLeft, screenTop } } = event as SyntheticWindowChanged;
-      const struct = getSyntheticWindow(root, uid);
+      const { instance: { uid, screenLeft, screenTop, innerWidth, innerHeight } } = event as SyntheticWindowChanged;
       return updateSyntheticWindow(root, uid, {
-        bounds: moveBounds(struct.bounds, {
+        bounds: {
           left: screenLeft,
-          top: screenTop
-        })
+          top: screenTop,
+          right: screenLeft + innerWidth,
+          bottom: screenTop + innerHeight,
+        }
       });
     }
 

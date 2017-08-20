@@ -1,4 +1,4 @@
-import { watch, removed, Struct, moved, stoppedMoving, moveBounds, scaleInnerBounds } from "aerial-common2";
+import { watch, removed, Struct, moved, stoppedMoving, moveBounds, scaleInnerBounds, resized, keepBoundsAspectRatio } from "aerial-common2";
 import { take, select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
 import { 
@@ -10,6 +10,8 @@ import {
   StageToolSelectionKeyDown,
   ResizerPathMoved,
   resizerMoved,
+  TEXT_EDITOR_CHANGED,
+  TextEditorChanged,
   RESIZER_PATH_MOUSE_MOVED,
   DeleteShortcutPressed, 
   DELETE_SHORCUT_PRESSED, 
@@ -17,6 +19,8 @@ import {
   workspaceSelectionDeleted,
   STAGE_TOOL_OVERLAY_MOUSE_CLICKED, 
 } from "../actions";
+
+import { URI_CACHE_BUSTED, uriCacheBusted } from "aerial-sandbox2";
 
 import { 
   getUri,
@@ -49,6 +53,8 @@ export function* mainWorkspaceSaga() {
   yield fork(handleSelectionMoved);
   yield fork(handleSelectionStoppedMoving);
   yield fork(handleSelectionKeyDown);
+  yield fork(handleTextEditorChange);
+  yield fork(handleSelectionResized);
 }
 
 function* openDefaultWindow() {
@@ -116,6 +122,37 @@ function* handleSelectionMoved() {
   }
 }
 
+function* handleSelectionResized() {
+  while(true) {
+    let { workspaceId, anchor, bounds: newBounds, sourceEvent } = (yield take(RESIZER_PATH_MOUSE_MOVED)) as ResizerPathMoved;
+
+    const state: ApplicationState = yield select();
+
+    const workspace = getWorkspaceById(state, workspaceId);
+
+    // TODO - possibly use BoundsStruct instead of Bounds since there are cases where bounds prop doesn't exist
+    const bounds = getWorkspaceSelectionBounds(state, workspace);
+    
+
+    const keepAspectRatio = sourceEvent.shiftKey;
+    const keepCenter      = sourceEvent.altKey;
+
+    if (keepCenter) {
+      // newBounds = keepBoundsCenter(newBounds, bounds, anchor);
+    }
+
+    if (keepAspectRatio) {
+      newBounds = keepBoundsAspectRatio(newBounds, bounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
+    }
+
+    for (const item of getBoundedWorkspaceSelection(state, workspace)) {
+      const bounds = getSyntheticBrowserBounds(state, item);
+      const scaledBounds = scaleInnerBounds(bounds, bounds, newBounds);
+      yield put(resized(item.$$id, item.$$type, scaleInnerBounds(bounds, bounds, newBounds)));
+    }
+  }
+}
+
 function* handleSelectionKeyDown() {
   while(true) {
     const { workspaceId, sourceEvent } = (yield take(STAGE_TOOL_SELECTION_KEY_DOWN)) as StageToolSelectionKeyDown;
@@ -153,5 +190,12 @@ function* handleSelectionStoppedMoving() {
       const bounds = getSyntheticBrowserBounds(state, item);
       yield put(stoppedMoving(item.$$id, item.$$type));
     }
+  }
+}
+
+function* handleTextEditorChange() {
+  while(true) {
+    const { value, file } = (yield take(TEXT_EDITOR_CHANGED)) as TextEditorChanged;
+    yield put(uriCacheBusted(file.sourceUri, value, file.contentType));
   }
 }

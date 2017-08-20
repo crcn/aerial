@@ -92,8 +92,6 @@ import {
   ResizerMoved,
   RESIZER_MOVED,
   KeyboardShortcutAdded,
-  TEXT_EDITOR_CHANGED,
-  textEditorChanged,
   TOGGLE_LEFT_GUTTER_PRESSED,
   TOGGLE_RIGHT_GUTTER_PRESSED,
   PromptedNewWindowUrl,
@@ -127,21 +125,6 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
       return updateWorkspace(state, state.selectedWorkspaceId, {
         selectedFileId: node.$$id
       });
-    }
-
-    case TEXT_EDITOR_CHANGED: {
-      const { file, value } = event as textEditorChanged;
-      return updateFileCacheItem(state, file.$$id, { content: value });
-    }
-
-    case FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED: {
-      const changedEvent = event as textEditorChanged;
-      break;
-    }
-
-    case FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED: {
-      const changedEvent = event as textEditorChanged;
-      break;
     }
   }
   
@@ -208,31 +191,6 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       });
     }
 
-    case RESIZER_PATH_MOUSE_MOVED: {
-      let { workspaceId, anchor, bounds: newBounds, sourceEvent } = event as ResizerPathMoved;
-      const workspace = getWorkspaceById(state, workspaceId);
-
-      // TODO - possibly use BoundsStruct instead of Bounds since there are cases where bounds prop doesn't exist
-      const bounds = getWorkspaceSelectionBounds(state, workspace);
-
-      const keepAspectRatio = sourceEvent.shiftKey;
-      const keepCenter      = sourceEvent.altKey;
-
-      if (keepCenter) {
-        // newBounds = keepBoundsCenter(newBounds, bounds, anchor);
-      }
-
-      if (keepAspectRatio) {
-        newBounds = keepBoundsAspectRatio(newBounds, bounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
-      }
-
-      for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-        const bounds = getSyntheticBrowserBounds(state, item);
-        const scaledBounds = scaleInnerBounds(bounds, bounds, newBounds);
-        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBounds(bounds, bounds, newBounds)));
-      }
-      return state;
-    }
 
     case PROMPTED_NEW_WINDOW_URL: {
       const { workspaceId, location } = event as PromptedNewWindowUrl;

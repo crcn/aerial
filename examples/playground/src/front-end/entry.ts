@@ -28,7 +28,7 @@ const workspace = createWorkspace({
     translate: { left: 0, top: 0, zoom: 1 },
     showLeftGutter: false,
     showRightGutter: false,
-    showTextEditor: false
+    showTextEditor: true
   }
 });
 state = addWorkspace(state, workspace);

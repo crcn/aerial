@@ -28,11 +28,9 @@ function* handleReadFileRequest() {
         continue;
       }
 
-      yield fork(function*() {
-        const { payload: result } = yield yield request({...req, type: READ_URI, noCache: true } as ReadUriRequest & NoCacheable);
-        yield put(uriCacheBusted(req.uri, result.content, result.type));
-        yield put(createRequestResponse(req.$$id, result));
-      });
+      const { payload: result } = yield yield request({...req, type: READ_URI, noCache: true } as ReadUriRequest & NoCacheable);
+      yield put(uriCacheBusted(req.uri, result.content, result.type));
+      yield put(createRequestResponse(req.$$id, result));
     }
   });
 }

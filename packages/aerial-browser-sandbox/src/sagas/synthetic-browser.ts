@@ -5,6 +5,7 @@ import { createQueue } from "mesh";
 
 import { 
   FileCacheItem,
+  UriCacheBusted,
   URI_CACHE_BUSTED,
   getFileCacheStore,
   FileCacheRootState,
@@ -50,6 +51,7 @@ import {
   syntheticWindowRectsUpdated,
   OpenSyntheticBrowserWindow,
   SyntheticWindowOpened,
+  syntheticWindowResized,
   SYNTHETIC_NODE_TEXT_CONTENT_CHANGED,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
   syntheticWindowResourceLoaded,
@@ -65,12 +67,15 @@ import {
   shiftBounds,
   moveBounds,
   roundBounds,
+  createRequestResponse,
+  Resized,
   Mutation,
   diffArray,
   takeRequest, 
   Moved,
   pointToBounds,
   MOVED,
+  RESIZED,
   eachArrayValueMutation,
 } from "aerial-common2";
 
@@ -107,11 +112,12 @@ import {
   SEnvWindowInterface,
   SEnvWindowContext,
   SEnvElementInterface,
-  SEnvHTMLElementInterface,
   SEnvCommentInterface,
   SyntheticDOMRenderer,
   SEnvDocumentInterface,
   waitForDocumentComplete,
+  getSEnvWindowProxyClass,
+  SEnvHTMLElementInterface,
   SEnvWindowOpenedEventInterface,
   SyntheticWindowRendererEvent,
   createUpdateValueNodeMutation,
@@ -132,9 +138,9 @@ export function* syntheticBrowserSaga() {
 
 function* handleFetchRequests() {
   while(true) {
-    yield takeRequest(FETCH_REQUEST, function*({ info }: FetchRequest) {
-      return (yield yield request(createReadCacheableUriRequest(String(info)))).payload;
-    });
+    const req = (yield take(FETCH_REQUEST)) as FetchRequest;
+    yield put(createRequestResponse(req.$$id, (yield yield request(createReadCacheableUriRequest(String(req.info)))).payload));
+   
   }
 }
 
@@ -151,23 +157,8 @@ function* handleBrowserChanges() {
 }
 
 function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
-  let runningSyntheticWindowIds = [];
-
   yield fork(handleOpenSyntheticWindow, syntheticBrowserId);
   yield fork(handleOpenedSyntheticWindow, syntheticBrowserId);
-
-  // yield watch((root: SyntheticBrowserRootState) => getSyntheticBrowser(root, syntheticBrowserId), function*(syntheticBrowser: SyntheticBrowser) {
-
-  //   // stop the session if there is no synthetic window
-  //   if (!syntheticBrowser) return false;
-  //   const syntheticWindowIds = syntheticBrowser.windows.map(item => item.$$id);
-  //   yield* difference(syntheticWindowIds, runningSyntheticWindowIds).map((id) => (
-  //     spawn(handleSytheticWindowSession, id)
-  //   ));
-
-  //   runningSyntheticWindowIds = syntheticWindowIds;
-  //   return true;
-  // });
 }
 
 function* handleOpenSyntheticWindow(browserId: string) {
@@ -182,16 +173,29 @@ function* handleOpenSyntheticWindow(browserId: string) {
 }
 
 function* openSyntheticWindowEnvironment(location: string) {
-  const window = openSyntheticEnvironmentWindow(location, yield call(getSyntheticWindowEnvironmentContext));
-  return window;
+
+  const reload = async () => {
+    const newWindow = openSyntheticEnvironmentWindow(location, {...context, createRenderer: null});
+    await waitForDocumentComplete(newWindow);
+    proxy.target = newWindow;
+  };
+
+  const context = yield call(createSyntheticWindowEnvironmentContext, reload);
+  const SEnvWindowProxy = getSEnvWindowProxyClass(context);
+  const proxy = new SEnvWindowProxy(location);
+
+  reload();
+  
+  return proxy;
 }
 
-function* getSyntheticWindowEnvironmentContext() {
+function* createSyntheticWindowEnvironmentContext(reload: () => any) {
   return {
+    reload,
     console: getSEnvWindowConsole(),
-    fetch: yield call(getSEnvWindowFetch),
+    fetch: yield call(getSEnvWindowFetch, reload),
     createRenderer: createSyntheticDOMRendererFactory(document)
-  };
+  } as any;
 };
 
 const getSEnvWindowConsole = () => ({
@@ -210,14 +214,27 @@ const getSEnvWindowConsole = () => ({
 } as any as Console);
 
 
-function* getSEnvWindowFetch() {
+function* getSEnvWindowFetch(reload) {
   const fetchQueue = createQueue();
+  let externalResources: string[] = [];
 
   yield spawn(function*() {
     while(true) {
       const { value: [info, resolve] } = yield call(fetchQueue.next);
       const body = (yield yield request(fetchRequest(info))).payload;
+      externalResources.push(info);
       resolve(body);
+    }
+  });
+
+  // watch for changes
+  yield spawn(function*() {
+    while(true) {
+      const { uri } = (yield take(URI_CACHE_BUSTED)) as UriCacheBusted;
+      if (externalResources.indexOf(uri) !== -1) {
+        externalResources = [];
+        reload();
+      }
     }
   });
 
@@ -274,6 +291,10 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
       emit(syntheticWindowMoved(window));
     });
 
+    window.addEventListener("resize", (event) => {
+      emit(syntheticWindowResized(window));
+    });
+
     window.addEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, (event: SEnvWindowOpenedEventInterface) => {
       emit(syntheticWindowOpened(event.window, browserId, window.uid));
     })
@@ -285,10 +306,13 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
       }));
     });
 
-    window.document.addEventListener("readystatechange", () => {
+    const triggerLoaded = () => {
       if (window.document.readyState !== "complete") return;
       emit(syntheticWindowLoaded(window.uid, window.document.struct, getAllWindowObjects(window)));
-    });
+    };
+
+    window.document.addEventListener("readystatechange", triggerLoaded);
+    triggerLoaded();
 
     return () => {
 
@@ -307,7 +331,7 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
 
 function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
 
-  const takeWindowAction = (type) => take((action) => action.type === type && action.syntheticWindowId === window.uid);
+  const takeWindowAction = (type, test = (action) => action.syntheticWindowId === window.uid) => take((action) => action.type === type && test(action));
 
   yield fork(function* handleRemoveNode() {
     while(true) {
@@ -390,6 +414,27 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
       window.scrollTo(left, top);
     }
   });
+
+
+  // case RESIZED: {
+  //   const { itemId, itemType, bounds } = event as Resized;
+  //   if (itemType === SYNTHETIC_WINDOW) {
+  //     const window = getSyntheticWindow(root, itemId);
+  //     if (window) {
+  //       return updateSyntheticWindow(root, itemId, {
+  //         bounds
+  //       });
+  //     }
+  //     break;
+  //   }
+  // }
+
+  yield fork(function* handleResized() {
+    while(true) {
+      const { bounds } = (yield takeWindowAction(RESIZED, (action: Resized) => action.itemId === window.uid)) as Resized;
+      window.resizeTo(bounds.right - bounds.left, bounds.bottom - bounds.top);
+    }
+  })
 }
 
 function* handleSytheticWindowSession(syntheticWindowId: string) {
@@ -397,19 +442,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   let cenv: SEnvWindowInterface;
   let cachedFiles: FileCacheItem[];
   const fetchQueue = createQueue();
-
-  yield fork(function*() {
-    yield watch((root: SyntheticBrowserRootState) => getSyntheticWindow(root, syntheticWindowId), function*(syntheticWindow) {
-      if (!syntheticWindow) {
-        if (cenv) {
-          cenv.close();
-        }
-        return false;
-      }
-      yield spawn(handleSyntheticWindowChange, syntheticWindow);
-      return true;
-    });
-  });
 
   function* getFetchedCacheFiles() {
     const state = yield select();
@@ -420,24 +452,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     cachedFiles = yield getFetchedCacheFiles();
   }
 
-  yield fork(function*() {
-    yield watch((root: FileCacheRootState) => root.fileCacheStore, function*(fileCache) {
-      const updatedCachedFiles = yield getFetchedCacheFiles();
-      if (cachedFiles && cenv.document.readyState === "complete" && difference(cachedFiles, updatedCachedFiles).length !== 0) {
-        yield spawn(reload);
-      }
-      yield updateFetchedCacheFiles();
-      return true;
-    });
-  });
-
-
-  function* handleSyntheticWindowChange(syntheticWindow: SyntheticWindow) {
-    yield fork(handleSizeChange, syntheticWindow),
-    yield fork(handleLocationChange, syntheticWindow)
-    cwindow = syntheticWindow;
-  }
-
   function* handleSizeChange(syntheticWindow: SyntheticWindow) {
     if (!cwindow || cwindow.bounds === syntheticWindow.bounds) {
       return;
@@ -445,79 +459,72 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
     cenv.resizeTo(syntheticWindow.bounds.right - syntheticWindow.bounds.left, syntheticWindow.bounds.bottom - syntheticWindow.bounds.top)
   }
 
-  function* handleLocationChange(syntheticWindow: SyntheticWindow) {
-    if (cwindow && cwindow.location === syntheticWindow.location) {
-      return;
-    }
-    yield reload(syntheticWindow);
-  }
-
   function openTargetSyntheticWindow(syntheticWindow: SyntheticWindow) {
-    return openSyntheticEnvironmentWindow(syntheticWindow.location, {
-      console: {
-        warn(...args) {
-          console.warn('VM ', ...args);
-        },
-        log(...args) {
-          console.log('VM ', ...args);
-        },
-        error(...args) {
-          console.error('VM ', ...args);
-        },
-        info(...args) {
-          console.info('VM ', ...args);
-        }
-      } as any,
-      fetch(info: RequestInfo) {
-        return new Promise((resolve) => {
-          fetchQueue.unshift([info, ({ content, type }) => {
-            resolve({
-              text() {
-                return Promise.resolve(String(content));
-              }
-            } as any);
-          }]);
-        });
-      },
-      createRenderer: !cenv && typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
-    });
+    // return openSyntheticEnvironmentWindow(syntheticWindow.location, {
+    //   console: {
+    //     warn(...args) {
+    //       console.warn('VM ', ...args);
+    //     },
+    //     log(...args) {
+    //       console.log('VM ', ...args);
+    //     },
+    //     error(...args) {
+    //       console.error('VM ', ...args);
+    //     },
+    //     info(...args) {
+    //       console.info('VM ', ...args);
+    //     }
+    //   } as any,
+    //   fetch(info: RequestInfo) {
+    //     return new Promise((resolve) => {
+    //       fetchQueue.unshift([info, ({ content, type }) => {
+    //         resolve({
+    //           text() {
+    //             return Promise.resolve(String(content));
+    //           }
+    //         } as any);
+    //       }]);
+    //     });
+    //   },
+    //   createRenderer: !cenv && typeof window !== "undefined" ? createSyntheticDOMRendererFactory(document) : null
+    // });
   }
 
-  async function getCurrentSyntheticWindowDiffs(syntheticWindow: SyntheticWindow = cwindow) {
-    const nenv = openTargetSyntheticWindow(syntheticWindow);
-    await waitForDocumentComplete(nenv);
-    return diffWindow(cenv, nenv);
-  }
+  // async function getCurrentSyntheticWindowDiffs(syntheticWindow: SyntheticWindow = cwindow) {
+  //   const nenv = openTargetSyntheticWindow(syntheticWindow);
+  //   await waitForDocumentComplete(nenv);
+  //   return diffWindow(cenv, nenv);
+  // }
 
-  let _reloading: boolean;
-  let _shouldReloadAgain: boolean;
+  // let _reloading: boolean;
+  // let _shouldReloadAgain: boolean;
 
-  function* reload(syntheticWindow: SyntheticWindow = cwindow) {
+  // function* reload(syntheticWindow: SyntheticWindow = cwindow) {
 
-    if (_reloading) {
-      _shouldReloadAgain = true;
-      return;
-    }
+  //   if (_reloading) {
+  //     _shouldReloadAgain = true;
+  //     return;
+  //   }
 
-    if (cenv) {
-      try {
-        _reloading = true;
-        const diffs = yield call(getCurrentSyntheticWindowDiffs, syntheticWindow);
-        patchWindow(cenv, diffs);
+  //   if (cenv) {
+  //     try {
+  //       _reloading = true;
+  //       const diffs = yield call(getCurrentSyntheticWindowDiffs, syntheticWindow);
+  //       patchWindow(cenv, diffs);
 
-      } catch(e) {
-        console.warn(e);
-      }
-      _reloading = false;
-      if (_shouldReloadAgain) {
-        _shouldReloadAgain = false;
-        yield reload(syntheticWindow);
-      }
-    } else {
-      cenv = openTargetSyntheticWindow(syntheticWindow);
-      // yield fork(watchNewWindow, syntheticWindow);
-    }
-  }
+  //     } catch(e) {
+  //       console.warn(e);
+  //     }
+  //     _reloading = false;
+  //     if (_shouldReloadAgain) {
+  //       _shouldReloadAgain = false;
+  //       yield reload(syntheticWindow);
+  //     }
+  //   } else {
+  //     cenv = openTargetSyntheticWindow(syntheticWindow);
+  //     // yield fork(watchNewWindow, syntheticWindow);
+  //   }
+  // }
 
 }
 

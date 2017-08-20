@@ -16,7 +16,7 @@ export const getSEnvLocationClass = weakMemo((context: any) => {
     public search: string = "";
     public host: string = "";
 
-    constructor(private _urlStr: string) {
+    constructor(private _urlStr: string, private _reload?: () => any) {
       // super();
       const parts = Url.parse(_urlStr);
       for (const key in parts) {
@@ -30,7 +30,9 @@ export const getSEnvLocationClass = weakMemo((context: any) => {
     }
 
     reload(forceReload?: boolean) {
-
+      if (this._reload) {
+        this._reload();
+      }
     }
 
     replace(uri: string) {

@@ -42,7 +42,7 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
   constructor(protected _sourceWindow: SEnvWindowInterface) {
     super();
     this._onDocumentLoad = this._onDocumentLoad.bind(this);
-    this._onDocumentLoad2 = this._onDocumentLoad2.bind(this);
+    this._onDocumentReadyStateChange = this._onDocumentReadyStateChange.bind(this);
     this._onWindowResize = this._onWindowResize.bind(this);
     this._onWindowScroll = this._onWindowScroll.bind(this);
     this._onWindowMutation = this._onWindowMutation.bind(this);
@@ -70,14 +70,15 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
   }
 
   protected _addTargetListeners() {
-    this._sourceWindow.document.addEventListener("load", this._onDocumentLoad2);
+    this._sourceWindow.document.addEventListener("readystatechange", this._onDocumentReadyStateChange);
     this._sourceWindow.addEventListener("resize", this._onWindowResize);
     this._sourceWindow.addEventListener("scroll", this._onWindowScroll);
   }
 
-  private _onDocumentLoad2(event: Event) {
-    if (event.target !== this._sourceWindow.document) return;
-    this._onDocumentLoad(event);
+  protected _onDocumentReadyStateChange(event: Event) {
+    if (this._sourceWindow.document.readyState === "complete") {
+      this._onDocumentLoad(event);
+    }
   }
 
 

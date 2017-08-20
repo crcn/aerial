@@ -41,8 +41,9 @@ OPTIMIZATIONS:
 
 CLEANUP:
 
-- [ ] change box to bounds
 - [ ] synthetic window timers
+- [ ] change $$id to $id
+- [ ] change $$type to $type
 
 LOW PRIO:
 

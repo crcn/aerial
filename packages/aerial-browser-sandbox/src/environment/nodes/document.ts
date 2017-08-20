@@ -1,4 +1,4 @@
-import { weakMemo, Mutation, diffArray, eachArrayValueMutation } from "aerial-common2";
+import { weakMemo, Mutation, diffArray, eachArrayValueMutation, createPropertyMutation, SetPropertyMutation, SetValueMutation, createSetValueMutation } from "aerial-common2";
 import { SEnvWindowInterface } from "../window";
 import { getSEnvNodeClass, SEnvNodeInterface, patchValueNode } from "./node";
 import { getSEnvParentNodeClass, diffParentNode, patchParentNode, SEnvParentNodeInterface } from "./parent-node";
@@ -20,6 +20,7 @@ export interface SEnvDocumentInterface extends SEnvParentNodeInterface, Document
   defaultView: SEnvWindowInterface;
   childNodes: SEnvNodeListInterface;
   $load(content: string): void;
+  $$setReadyState(readyState: string): any;
   $createElementWithoutConstruct(tagName: string): SEnvHTMLElementInterface;
   createDocumentFragment(): DocumentFragment & SEnvNodeInterface;
   createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
@@ -38,7 +39,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   const SEnvText = getSEnvTextClass(context);
   const SEnvComment = getSEnvCommentClass(context);
   const { SEnvMutationEvent } = getL3EventClasses(context);
-  const { SEnvEvent } = getSEnvEventClasses(context);
+  const { SEnvEvent, SEnvMutationEvent: SEnvMutationEvent2 } = getSEnvEventClasses(context);
   const SEnvDocumentFragment = getSEnvDocumentFragment(context);
   const SENvHTMLElement = getSEnvHTMLElementClass(context);
   const { SEnvStyleSheetList, SEnvHTMLAllCollection } = getSEnvHTMLCollectionClasses(context);
@@ -148,12 +149,12 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     async $load(content: string) {
 
       // TODO - use sax parsing here instead
-      this._setReadyState("loading");
+      this.$$setReadyState("loading");
 
       const expression = parseHTMLDocument(content);
       await mapExpressionToNode(expression, this, this, true);
 
-      this._setReadyState("interactive");
+      this.$$setReadyState("interactive");
 
       const domContentLoadedEvent = new SEnvEvent();
       domContentLoadedEvent.initEvent("DOMContentLoaded", true, true);
@@ -171,14 +172,17 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       loadEvent.initEvent("load", true, true);
       this.dispatchEvent(loadEvent);
 
-      this._setReadyState("complete");
+      this.$$setReadyState("complete");
     }
 
-    private _setReadyState(state) {
+    $$setReadyState(state) {
       this._readyState = state;
       const event = new SEnvEvent();
       event.initEvent("readystatechange", true, true);
       this.dispatchEvent(event);
+      const me = new SEnvMutationEvent2();
+      me.initMutationEvent(createReadyStateChangeMutation(this, this.readyState));
+      this.dispatchEvent(me);
     }
 
     private _onChildLoad({ target }: Event) {
@@ -724,12 +728,28 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
   };
 });
 
-export const diffDocument = (oldDocument: BasicDocument, newDocument: BasicDocument) => {
-  return diffParentNode(oldDocument, newDocument, diffElementChild);
+export const READY_STATE_CHANGE = "READY_STATE_CHANGE";
+
+const createReadyStateChangeMutation = (target: SEnvDocumentInterface, readyState: string): SetValueMutation<SEnvDocumentInterface> => createSetValueMutation(READY_STATE_CHANGE, target, readyState)
+
+export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SEnvDocumentInterface) => {
+  const mutations = [];
+  if (oldDocument.readyState !== newDocument.readyState) {
+    mutations.push(createReadyStateChangeMutation(oldDocument, newDocument.readyState));
+  }
+  return [
+    ...diffParentNode(oldDocument, newDocument, diffElementChild),
+
+    // ready state mutation must come last
+    ...mutations
+  ];
 };
 
 export const patchDocument = (oldDocument: SEnvDocumentInterface, mutation: Mutation<any>) => {
   patchParentNode(oldDocument, mutation);
+  if (mutation.$$type === READY_STATE_CHANGE) {
+    oldDocument.$$setReadyState((mutation as SetValueMutation<SEnvDocumentInterface>).newValue);
+  }
 };
 
 
