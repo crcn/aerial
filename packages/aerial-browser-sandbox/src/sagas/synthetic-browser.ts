@@ -22,6 +22,11 @@ import {
 } from "./html-content-editor";
 
 import {
+  getAbsoluteElementBounds,
+  absoluteElementBoundsToRelative,
+} from "../utils";
+
+import {
   fileEditorSaga
 } from "./file-editor";
 
@@ -55,8 +60,8 @@ import {
   Removed,
   STOPPED_MOVING,
   request,
-  shiftBox,
-  moveBox,
+  shiftBounds,
+  moveBounds,
   Mutation,
   diffArray,
   takeRequest, 
@@ -387,7 +392,6 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       const target = cenv.childObjects.get(itemId) as HTMLElement;
       
       const originalRect = target.getBoundingClientRect();
-
 
       // TODO - get best CSS style
       target.style.position = "fixed";

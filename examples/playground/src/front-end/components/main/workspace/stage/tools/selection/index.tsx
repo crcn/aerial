@@ -3,8 +3,8 @@ import * as React from "react";
 import { compose, pure } from "recompose";
 import { Resizer } from "./resizer";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
-import { Dispatcher, mergeBoxes, Boxed, wrapEventToDispatch } from "aerial-common2";
-import { Workspace, getBoxedWorkspaceSelection, getSyntheticBrowserBox } from "front-end/state";
+import { Dispatcher, mergeBounds, Bounded, wrapEventToDispatch } from "aerial-common2";
+import { Workspace, getBoundedWorkspaceSelection, getSyntheticBrowserBounds } from "front-end/state";
 import { selectorDoubleClicked } from "front-end/actions";
 
 export type SelectionOuterProps = {
@@ -17,8 +17,8 @@ export type SelectionInnerProps = {
 } & SelectionOuterProps;
 
 const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, browser: SyntheticBrowser }) => {
-  const selection = getBoxedWorkspaceSelection(browser, workspace);
-  const entireBounds = mergeBoxes(...selection.map(value => getSyntheticBrowserBox(browser, value)));
+  const selection = getBoundedWorkspaceSelection(browser, workspace);
+  const entireBounds = mergeBounds(...selection.map(value => getSyntheticBrowserBounds(browser, value)));
   const style = {};
   const borderWidth = 1 / workspace.stage.translate.zoom;
   const boundsStyle = {
@@ -33,7 +33,7 @@ const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, brows
 };
 
 export const  SelectionStageToolBase = ({ workspace, browser, dispatch }: SelectionInnerProps) => {
-  const selection = getBoxedWorkspaceSelection(browser, workspace);
+  const selection = getBoundedWorkspaceSelection(browser, workspace);
   if (!selection.length || workspace.secondarySelection) return null;
 
   return <div className="m-stage-selection-tool" onDoubleClick={selection.length === 1 ? wrapEventToDispatch(dispatch, selectorDoubleClicked.bind(this, selection[0])) : null }>

@@ -1,28 +1,28 @@
 import { 
-  Box,
+  Bounds,
   IDd,
   moved,
   removed,
   resized,
   update,
   Struct,
-  moveBox,
-  zoomBox,
+  moveBounds,
+  zoomBounds,
   updateIn, 
   Translate,
   BaseEvent, 
   boxFromRect,
-  getBoxSize,
-  mergeBoxes,
+  getBoundsSize,
+  mergeBounds,
   mapImmutable, 
-  keepBoxCenter,
-  getSmallestBox,
-  scaleInnerBox,
+  keepBoundsCenter,
+  getSmallestBounds,
+  scaleInnerBounds,
   boxesIntersect,
   StructReference,
   getStructReference,
-  pointIntersectsBox,
-  keepBoxAspectRatio,
+  pointIntersectsBounds,
+  keepBoundsAspectRatio,
   centerTransformZoom,
 } from "aerial-common2";
 
@@ -38,15 +38,15 @@ import {
   getSelectedWorkspace,
   addWorkspaceSelection,
   setWorkspaceSelection,
-  getSyntheticBrowserBox,
+  getSyntheticBrowserBounds,
   createApplicationState,
   clearWorkspaceSelection,
   removeWorkspaceSelection,
   toggleWorkspaceSelection,
   getSelectedWorkspaceFile,
-  getWorkspaceSelectionBox,
+  getWorkspaceSelectionBounds,
   getSyntheticNodeWorkspace,
-  getBoxedWorkspaceSelection,
+  getBoundedWorkspaceSelection,
   getSyntheticWindowWorkspace,
   getStageToolMouseNodeTargetReference,
 } from "front-end/state";
@@ -157,12 +157,12 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
 // const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
 //   switch(event.type) {
 //     case CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED: {
-//       const { computedStyles, computedBoxes, syntheticWindowId } = event as CanvasElementsComputedPropsChanged;
+//       const { allComputedStyles, allComputedBounds, syntheticWindowId } = event as CanvasElementsComputedPropsChanged;
 //       const window = getSyntheticBrowserWindow(state, syntheticWindowId);
 //       return updateStruct(state, window, {
 //         ...window,
-//         computedBoxes,
-//         computedStyles
+//         allComputedBounds,
+//         allComputedStyles
 //       });
 //     }
 //   }
@@ -210,24 +210,24 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       let { workspaceId, anchor, box: newBounds, sourceEvent } = event as ResizerPathMoved;
       const workspace = getWorkspaceById(state, workspaceId);
 
-      // TODO - possibly use BoxStruct instead of Box since there are cases where box prop doesn't exist
-      const bounds = getWorkspaceSelectionBox(state, workspace);
+      // TODO - possibly use BoundsStruct instead of Bounds since there are cases where box prop doesn't exist
+      const bounds = getWorkspaceSelectionBounds(state, workspace);
 
       const keepAspectRatio = sourceEvent.shiftKey;
       const keepCenter      = sourceEvent.altKey;
 
       if (keepCenter) {
-        // newBounds = keepBoxCenter(newBounds, bounds, anchor);
+        // newBounds = keepBoundsCenter(newBounds, bounds, anchor);
       }
 
       if (keepAspectRatio) {
-        newBounds = keepBoxAspectRatio(newBounds, bounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
+        newBounds = keepBoundsAspectRatio(newBounds, bounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
       }
 
-      for (const item of getBoxedWorkspaceSelection(state, workspace)) {
-        const box = getSyntheticBrowserBox(state, item);
-        const scaledBox = scaleInnerBox(box, bounds, newBounds);
-        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBox(box, bounds, newBounds)));
+      for (const item of getBoundedWorkspaceSelection(state, workspace)) {
+        const box = getSyntheticBrowserBounds(state, item);
+        const scaledBounds = scaleInnerBounds(box, bounds, newBounds);
+        state = applicationReducer(state, resized(item.$$id, item.$$type, scaleInnerBounds(box, bounds, newBounds)));
       }
       return state;
     }
@@ -284,21 +284,20 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_MOUNTED: {
       const { element } = event as StageMounted;
       const { width, height } = element.getBoundingClientRect();
-      console.log(width, height);
       const workspace = getSelectedWorkspace(state);
 
-      const innerBox = getSyntheticBrowser(state, workspace.browserId).windows.map(window => window.box).reduce((a, b) => ({
+      const innerBounds = getSyntheticBrowser(state, workspace.browserId).windows.map(window => window.box).reduce((a, b) => ({
         left: Math.min(a.left, b.left),
         top: Math.min(a.top, b.top),
         right: Math.max(a.right, b.right),
         bottom: Math.max(a.bottom, b.bottom)
       }), { left: 0, top: 0, right: 0, bottom: 0 });
 
-      const innerSize = getBoxSize(innerBox);
+      const innerSize = getBoundsSize(innerBounds);
 
       const centered = {
-        left: innerBox.left + width / 2 - (innerBox.right - innerBox.left) / 2,
-        top: innerBox.top + height / 2 - (innerBox.bottom - innerBox.top) / 2,
+        left: innerBounds.left + width / 2 - (innerBounds.right - innerBounds.left) / 2,
+        top: innerBounds.top + height / 2 - (innerBounds.bottom - innerBounds.top) / 2,
       };
 
       const scale = Math.min(
@@ -429,20 +428,20 @@ const moveItemFromAction = <T extends { sourceEvent: React.KeyboardEvent<any> }>
   const { sourceEvent } = event;
   const item = getSyntheticNodeById(state, itemId);
 
-  // TODO - prop may not exist here -- need to use getBox instead
+  // TODO - prop may not exist here -- need to use getBounds instead
   const box = item.box;
   switch(sourceEvent.key) {
     case "ArrowDown": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, top: box.top + 1 })));
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, top: box.top + 1 })));
     }
     case "ArrowUp": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, top: box.top - 1 })));
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, top: box.top - 1 })));
     }
     case "ArrowLeft": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, left: box.left - 1 })));
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, left: box.left - 1 })));
     }
     case "ArrowRight": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBox(box, { ...box, left: box.left + 1 })));
+      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, left: box.left + 1 })));
     }
   }
 

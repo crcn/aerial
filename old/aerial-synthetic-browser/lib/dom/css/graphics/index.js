@@ -149,15 +149,15 @@ function evaluateCSSDeclValue2(value, property) {
     }
     return property && isUnitBasedCSSProperty(property) ? value.map(declaration_1.SyntheticCSSMeasurment.cast) : value;
 }
-var SyntheticCSSBox = (function (_super) {
-    __extends(SyntheticCSSBox, _super);
-    function SyntheticCSSBox() {
+var SyntheticCSSBounds = (function (_super) {
+    __extends(SyntheticCSSBounds, _super);
+    function SyntheticCSSBounds() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    SyntheticCSSBox.prototype.setProperty = function (name, value) {
+    SyntheticCSSBounds.prototype.setProperty = function (name, value) {
         this[name] = evaluateCSSDeclValue2(value, name)[0];
     };
-    Object.defineProperty(SyntheticCSSBox.prototype, "width", {
+    Object.defineProperty(SyntheticCSSBounds.prototype, "width", {
         get: function () {
             return [this.topWidth, this.rightWidth, this.bottomWidth, this.leftWidth];
         },
@@ -175,7 +175,7 @@ var SyntheticCSSBox = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    SyntheticCSSBox.prototype.getStyleProperties = function () {
+    SyntheticCSSBounds.prototype.getStyleProperties = function () {
         if (String(this.leftWidth) === String(this.rightWidth) && String(this.topWidth) === String(this.bottomWidth)) {
             return (this.topWidth || 0) + " " + (this.rightWidth || 0);
         }
@@ -186,22 +186,22 @@ var SyntheticCSSBox = (function (_super) {
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSBox.prototype, "leftWidth", void 0);
+    ], SyntheticCSSBounds.prototype, "leftWidth", void 0);
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSBox.prototype, "topWidth", void 0);
+    ], SyntheticCSSBounds.prototype, "topWidth", void 0);
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSBox.prototype, "rightWidth", void 0);
+    ], SyntheticCSSBounds.prototype, "rightWidth", void 0);
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSBox.prototype, "bottomWidth", void 0);
-    return SyntheticCSSBox;
+    ], SyntheticCSSBounds.prototype, "bottomWidth", void 0);
+    return SyntheticCSSBounds;
 }(aerial_common_1.Observable));
-exports.SyntheticCSSBox = SyntheticCSSBox;
+exports.SyntheticCSSBounds = SyntheticCSSBounds;
 var SyntheticCSSBorder = (function (_super) {
     __extends(SyntheticCSSBorder, _super);
     function SyntheticCSSBorder() {
@@ -337,17 +337,17 @@ var SyntheticCSSBorder = (function (_super) {
         aerial_common_1.bubble()
     ], SyntheticCSSBorder.prototype, "bottomStyle", void 0);
     return SyntheticCSSBorder;
-}(SyntheticCSSBox));
+}(SyntheticCSSBounds));
 exports.SyntheticCSSBorder = SyntheticCSSBorder;
-var SyntheticCSSStyleBoxShadow = (function (_super) {
-    __extends(SyntheticCSSStyleBoxShadow, _super);
-    function SyntheticCSSStyleBoxShadow(properties) {
+var SyntheticCSSStyleBoundsShadow = (function (_super) {
+    __extends(SyntheticCSSStyleBoundsShadow, _super);
+    function SyntheticCSSStyleBoundsShadow(properties) {
         var _this = _super.call(this) || this;
         if (properties)
             _this.setProperties(properties);
         return _this;
     }
-    SyntheticCSSStyleBoxShadow.prototype.setProperties = function (properties) {
+    SyntheticCSSStyleBoundsShadow.prototype.setProperties = function (properties) {
         var color, inset, dims = [];
         for (var _i = 0, properties_2 = properties; _i < properties_2.length; _i++) {
             var value = properties_2[_i];
@@ -368,10 +368,10 @@ var SyntheticCSSStyleBoxShadow = (function (_super) {
         this.setProperty("blur", dims[2]);
         this.setProperty("spread", dims[3]);
     };
-    SyntheticCSSStyleBoxShadow.prototype.setProperty = function (name, value) {
+    SyntheticCSSStyleBoundsShadow.prototype.setProperty = function (name, value) {
         this[name] = evaluateCSSDeclValue2(value, name)[0];
     };
-    SyntheticCSSStyleBoxShadow.prototype.toString = function () {
+    SyntheticCSSStyleBoundsShadow.prototype.toString = function () {
         var params = [];
         if (this.inset) {
             params.push("inset");
@@ -382,29 +382,29 @@ var SyntheticCSSStyleBoxShadow = (function (_super) {
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSStyleBoxShadow.prototype, "inset", void 0);
+    ], SyntheticCSSStyleBoundsShadow.prototype, "inset", void 0);
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSStyleBoxShadow.prototype, "x", void 0);
+    ], SyntheticCSSStyleBoundsShadow.prototype, "x", void 0);
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSStyleBoxShadow.prototype, "y", void 0);
+    ], SyntheticCSSStyleBoundsShadow.prototype, "y", void 0);
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSStyleBoxShadow.prototype, "blur", void 0);
+    ], SyntheticCSSStyleBoundsShadow.prototype, "blur", void 0);
     __decorate([
         aerial_common_1.bindable(true),
         aerial_common_1.bubble()
-    ], SyntheticCSSStyleBoxShadow.prototype, "spread", void 0);
+    ], SyntheticCSSStyleBoundsShadow.prototype, "spread", void 0);
     __decorate([
         aerial_common_1.bindable(true)
-    ], SyntheticCSSStyleBoxShadow.prototype, "color", void 0);
-    return SyntheticCSSStyleBoxShadow;
+    ], SyntheticCSSStyleBoundsShadow.prototype, "color", void 0);
+    return SyntheticCSSStyleBoundsShadow;
 }(aerial_common_1.Observable));
-exports.SyntheticCSSStyleBoxShadow = SyntheticCSSStyleBoxShadow;
+exports.SyntheticCSSStyleBoundsShadow = SyntheticCSSStyleBoundsShadow;
 function isUnitBasedCSSProperty(property) {
     return /^(x|y|blur|spread|letterSpacing|fontSize|lineHeight|width|height|minWidth|minHeight|maxWidth|maxHeight|left|top|right|bottom)$/.test(property);
 }
@@ -415,8 +415,8 @@ var SyntheticCSSStyleGraphics = (function (_super) {
         var _this = _super.call(this) || this;
         _this.style = style;
         _this.border = new SyntheticCSSBorder();
-        _this.margin = new SyntheticCSSBox();
-        _this.padding = new SyntheticCSSBox();
+        _this.margin = new SyntheticCSSBounds();
+        _this.padding = new SyntheticCSSBounds();
         _this.backgrounds = new aerial_common_1.ObservableCollection();
         _this.boxShadows = new aerial_common_1.ObservableCollection();
         _this.filters = new aerial_common_1.ObservableCollection();
@@ -507,7 +507,7 @@ var SyntheticCSSStyleGraphics = (function (_super) {
                     value = [value];
                 for (var _i = 0, value_2 = value; _i < value_2.length; _i++) {
                     var v = value_2[_i];
-                    _this.addBoxShadow(v);
+                    _this.addBoundsShadow(v);
                 }
             }
         };
@@ -538,8 +538,8 @@ var SyntheticCSSStyleGraphics = (function (_super) {
             this.backgrounds.splice(index, 1);
         return background;
     };
-    SyntheticCSSStyleGraphics.prototype.addBoxShadow = function (params) {
-        var boxShadow = new SyntheticCSSStyleBoxShadow(params);
+    SyntheticCSSStyleGraphics.prototype.addBoundsShadow = function (params) {
+        var boxShadow = new SyntheticCSSStyleBoundsShadow(params);
         this.boxShadows.push(boxShadow);
         return boxShadow;
     };
@@ -564,7 +564,7 @@ var SyntheticCSSStyleGraphics = (function (_super) {
         }
         return filter;
     };
-    SyntheticCSSStyleGraphics.prototype.removeBoxShadow = function (boxShadow) {
+    SyntheticCSSStyleGraphics.prototype.removeBoundsShadow = function (boxShadow) {
         var index = this.boxShadows.indexOf(boxShadow);
         if (index !== -1)
             this.boxShadows.splice(index, 1);

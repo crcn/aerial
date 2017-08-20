@@ -2,7 +2,7 @@ import "./window.scss";
 const VOID_ELEMENTS = require("void-elements");
 import * as React from "react";
 import { findDOMNode } from "react-dom";
-import { weakMemo, Dispatcher, Box, BaseEvent, calculateAbsoluteBounds, shiftBox} from "aerial-common2";
+import { weakMemo, Dispatcher, Bounds, BaseEvent, calculateAbsoluteBounds, shiftBounds} from "aerial-common2";
 import { lifecycle, compose, withState, pure, onlyUpdateForKeys, withHandlers } from "recompose";
 import { canvasElementsComputedPropsChanged } from "front-end/actions";
 import { 

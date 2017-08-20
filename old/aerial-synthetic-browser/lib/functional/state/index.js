@@ -25,8 +25,8 @@ exports.createSyntheticBrowser2 = aerial_common2_1.createStructFactory(exports.S
     windows: []
 });
 exports.createSyntheticBrowserWindow2 = aerial_common2_1.createStructFactory(exports.SYTNTHETIC_BROWSER_WINDOW, {
-    computedStyles: {},
-    computedBoxes: {},
+    allComputedStyles: {},
+    allComputedBounds: {},
     box: DEFAULT_SYNTHETIC_WINDOW_BOX
 });
 exports.getSyntheticBrowserWindow = function (root, id) {

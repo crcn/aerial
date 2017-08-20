@@ -106,14 +106,14 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     const body = this.mount.lastChild;
 
     const boundingClientRects = {};
-    const computedStyles = {};
+    const allComputedStyles = {};
     Array.prototype.forEach.call(this.mount.lastElementChild.querySelectorAll("*"), (element) => {
       const sourceUID = element.dataset.sourceUID;
       boundingClientRects[sourceUID] = element.getBoundingClientRect();
-      computedStyles[sourceUID] = targetWindow.getComputedStyle(element);
+      allComputedStyles[sourceUID] = targetWindow.getComputedStyle(element);
     });
 
-    this.setPaintedInfo(boundingClientRects, computedStyles);
+    this.setPaintedInfo(boundingClientRects, allComputedStyles);
   }
 }
 

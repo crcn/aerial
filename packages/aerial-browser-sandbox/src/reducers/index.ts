@@ -1,9 +1,9 @@
 import { 
-  Box,
+  Bounds,
   Moved, 
   MOVED, 
   Mutation,
-  moveBox,
+  moveBounds,
   Resized, 
   Removed,
   REMOVED,
@@ -48,13 +48,13 @@ import {
 
 const WINDOW_PADDING = 50;
 
-const getBestWindowBox = (browser: SyntheticBrowser, box: Box) => {
+const getBestWindowBounds = (browser: SyntheticBrowser, box: Bounds) => {
   if (!browser.windows.length) return box;
   const rightMostWindow = browser.windows.length > 1 ? browser.windows.reduce((a, b) => {
     return a.box.right > b.box.right ? a : b;
   }) : browser.windows[0];
 
-  return moveBox(box, {
+  return moveBounds(box, {
     left: rightMostWindow.box.right + WINDOW_PADDING,
     top: rightMostWindow.box.top
   });
@@ -78,7 +78,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
           ...syntheticBrowser.windows,
           createSyntheticWindow({
             location: uri,
-            box: getBestWindowBox(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
+            box: getBestWindowBounds(syntheticBrowser, DEFAULT_SYNTHETIC_WINDOW_BOX)
           })
         ]
       });
@@ -117,7 +117,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
         const window = getSyntheticWindow(root, itemId);
         if (window) {
           return updateSyntheticWindow(root, itemId, {
-            box: moveBox(window.box, point)
+            box: moveBounds(window.box, point)
           });
         }
         break;
@@ -142,8 +142,8 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
     case SYNTHETIC_WINDOW_RECTS_UPDATED: {
       const { rects, styles, syntheticWindowId } = event as SyntheticWindowRectsUpdated;
       return updateSyntheticWindow(root, syntheticWindowId, {
-        computedBoxes: rects,
-        computedStyles: styles
+        allComputedBounds: rects,
+        allComputedStyles: styles
       });
     }
 

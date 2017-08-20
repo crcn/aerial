@@ -2,7 +2,7 @@ import { DOMNodeType } from "../../dom";
 import { SourceLocation2 } from "aerial-sandbox2";
 import { 
   Struct, 
-  Box, 
+  Bounds, 
   Point, 
   weakMemo,
   traverseObject,
@@ -20,7 +20,7 @@ export const DOM_COMMENT                = "DOM_COMMENT";
 export const SYTNTHETIC_BROWSER_WINDOW  = "SYNTHETIC_BROWSER_WINDOW";
 export const SYNTHETIC_BROWSER          = "SYNTHETIC_BROWSER";
 
-const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
+const DEFAULT_SYNTHETIC_WINDOW_BOX: Bounds = {
   left: 0,
   top: 0,
 
@@ -73,11 +73,11 @@ export type SyntheticBrowserWindow2 = {
   document: SyntheticDOMDocument2;
   location: string;
   title: string;
-  box: Box;
-  computedBoxes: {
-    [identifier: string]: Box;
+  box: Bounds;
+  allComputedBounds: {
+    [identifier: string]: Bounds;
   };
-  computedStyles: {
+  allComputedStyles: {
     [identifier: string]: CSSStyleDeclaration
   }
 } & Struct;
@@ -105,8 +105,8 @@ export const createSyntheticBrowser2 = createStructFactory<SyntheticBrowser2>(SY
 });
 
 export const createSyntheticBrowserWindow2 = createStructFactory<SyntheticBrowserWindow2>(SYTNTHETIC_BROWSER_WINDOW, {
-  computedStyles: {},
-  computedBoxes: {},
+  allComputedStyles: {},
+  allComputedBounds: {},
   box: DEFAULT_SYNTHETIC_WINDOW_BOX
 });
 

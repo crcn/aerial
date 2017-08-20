@@ -123,7 +123,7 @@ function calculateTransforms(node: HTMLElement) {
   const oldWidth     = node.style.width;
   const oldTop       = node.style.top;
   const oldLeft      = node.style.left;
-  const oldBoxSizing = node.style.boxSizing;
+  const oldBoundsSizing = node.style.boxSizing;
 
   node.style.left = "0px";
   node.style.top = "0px";
@@ -139,7 +139,7 @@ function calculateTransforms(node: HTMLElement) {
   node.style.left      = oldLeft;
   node.style.top       = oldTop;
   node.style.width     = oldWidth;
-  node.style.boxSizing = oldBoxSizing;
+  node.style.boxSizing = oldBoundsSizing;
 
   return { scale, left, top };
 }

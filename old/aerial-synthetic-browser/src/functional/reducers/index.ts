@@ -9,7 +9,7 @@ import {
   RESIZED,
   Resized,
   updateIn, 
-  moveBox,
+  moveBounds,
   BaseEvent, 
   updateStructProperty, 
 } from "aerial-common2";
@@ -97,7 +97,7 @@ const syntheticBrowserWindowReducer = (root: any, event: BaseEvent) => {
       if (itemType === SYTNTHETIC_BROWSER_WINDOW) {
         const window = getSyntheticBrowserWindow(root, itemId);
         if (window) {
-          return updateStructProperty(root, window, "box", moveBox(window.box, point));
+          return updateStructProperty(root, window, "box", moveBounds(window.box, point));
         }
         break;
       }

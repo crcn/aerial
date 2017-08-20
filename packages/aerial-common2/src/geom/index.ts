@@ -1,7 +1,7 @@
 // import { getV } from "../struct";
 import { weakMemo } from "../memo";
 
-export type Box = {
+export type Bounds = {
   left: number;
   right: number;
   top: number;
@@ -13,8 +13,8 @@ export type Size = {
   height: number;
 };
 
-export type Boxed = {
-  box: Box
+export type Bounded = {
+  box: Bounds
 };
 
 export type Rectangle = {
@@ -33,14 +33,14 @@ export type Translate = {
   zoom: number;
 };
 
-export const createBox = (left: number, right: number, top: number, bottom: number): Box => ({
+export const createBounds = (left: number, right: number, top: number, bottom: number): Bounds => ({
   left,
   right,
   top, 
   bottom
 });
 
-export const moveBox = (box: Box, { left, top }: Point): Box => ({
+export const moveBounds = (box: Bounds, { left, top }: Point): Bounds => ({
   ...box,
   left: left,
   top: top,
@@ -53,7 +53,7 @@ export const shiftPoint = (point: Point, delta: Point) => ({
   top: point.top + delta.top
 });
 
-export const shiftBox = (box: Box, { left, top }: Point): Box => ({
+export const shiftBounds = (box: Bounds, { left, top }: Point): Bounds => ({
   ...box,
   left: box.left + left,
   top: box.top + top,
@@ -61,23 +61,23 @@ export const shiftBox = (box: Box, { left, top }: Point): Box => ({
   bottom: box.bottom + top
 });
 
-export const keepBoxAspectRatio = (newBox: Box, oldBox: Box, anchor: Point, centerPoint = anchor): Box => {
-  const newBoxSize = getBoxSize(newBox);
-  const oldBoxSize = getBoxSize(oldBox);
+export const keepBoundsAspectRatio = (newBounds: Bounds, oldBounds: Bounds, anchor: Point, centerPoint = anchor): Bounds => {
+  const newBoundsSize = getBoundsSize(newBounds);
+  const oldBoundsSize = getBoundsSize(oldBounds);
   
-  let left   = newBox.left;
-  let top    = newBox.top;
-  let width  = newBoxSize.width;
-  let height = newBoxSize.height;
+  let left   = newBounds.left;
+  let top    = newBounds.top;
+  let width  = newBoundsSize.width;
+  let height = newBoundsSize.height;
 
   if (anchor.top === 0 || anchor.top === 1) {
-    const perc = height / oldBoxSize.height;
-    width = oldBoxSize.width * perc;
-    left = oldBox.left + (oldBoxSize.width - width) * (1 - centerPoint.left);
+    const perc = height / oldBoundsSize.height;
+    width = oldBoundsSize.width * perc;
+    left = oldBounds.left + (oldBoundsSize.width - width) * (1 - centerPoint.left);
   } else if (anchor.top === 0.5) {
-    const perc = width / oldBoxSize.width;
-    height = oldBoxSize.height * perc;
-    top = oldBox.top + (oldBoxSize.height - height) * (1 - centerPoint.top);
+    const perc = width / oldBoundsSize.width;
+    height = oldBoundsSize.height * perc;
+    top = oldBounds.top + (oldBoundsSize.height - height) * (1 - centerPoint.top);
   }
 
   return {
@@ -87,24 +87,24 @@ export const keepBoxAspectRatio = (newBox: Box, oldBox: Box, anchor: Point, cent
     bottom: top + height
   }
 };
-export const keepBoxCenter = (newBox: Box, oldBox: Box, anchor: Point): Box => {
-  const newBoxSize = getBoxSize(newBox);
-  const oldBoxSize = getBoxSize(oldBox);
+export const keepBoundsCenter = (newBounds: Bounds, oldBounds: Bounds, anchor: Point): Bounds => {
+  const newBoundsSize = getBoundsSize(newBounds);
+  const oldBoundsSize = getBoundsSize(oldBounds);
   
-  let left   = oldBox.left;
-  let top    = oldBox.top;
-  let width  = oldBoxSize.width;
-  let height = oldBoxSize.height;
-  const delta = { left: newBox.left - oldBox.left, top: newBox.top - oldBox.top };
+  let left   = oldBounds.left;
+  let top    = oldBounds.top;
+  let width  = oldBoundsSize.width;
+  let height = oldBoundsSize.height;
+  const delta = { left: newBounds.left - oldBounds.left, top: newBounds.top - oldBounds.top };
 
   if (anchor.top === 0) {
     top += delta.top;
     height += delta.top;
-    height = oldBox.top - newBox.top;
+    height = oldBounds.top - newBounds.top;
   }
 
   if (anchor.top === 1) {
-    const hdiff = oldBoxSize.height - newBoxSize.height;
+    const hdiff = oldBoundsSize.height - newBoundsSize.height;
     top += hdiff;
     height -= hdiff;
   }
@@ -112,12 +112,12 @@ export const keepBoxCenter = (newBox: Box, oldBox: Box, anchor: Point): Box => {
   if (anchor.left === 0) {
     left += delta.left;
     top += delta.top;
-    width += oldBox.left - newBox.left;
+    width += oldBounds.left - newBounds.left;
   }
 
   if (anchor.left === 1) {
     width += delta.left;
-    const wdiff = oldBoxSize.width - newBoxSize.width;
+    const wdiff = oldBoundsSize.width - newBoundsSize.width;
     left += wdiff;
     width -= wdiff;
   }
@@ -130,7 +130,7 @@ export const keepBoxCenter = (newBox: Box, oldBox: Box, anchor: Point): Box => {
   }
 };
 
-export const zoomBox = (box: Box, zoom: number): Box => ({
+export const zoomBounds = (box: Bounds, zoom: number): Bounds => ({
   ...box,
   left: box.left * zoom,
   top: box.top * zoom,
@@ -138,25 +138,25 @@ export const zoomBox = (box: Box, zoom: number): Box => ({
   bottom: box.bottom * zoom
 });
 
-export const boxFromRect = ({ width, height }: Rectangle): Box => ({
+export const boxFromRect = ({ width, height }: Rectangle): Bounds => ({
   left: 0,
   top: 0,
   right: width,
   bottom: height
 });
 
-export const getBoxWidth  = (box: Box) => box.right - box.left;
-export const getBoxHeight = (box: Box) => box.bottom - box.top;
-export const getBoxSize   = weakMemo((box: Box): Size => ({
-  width: getBoxWidth(box),
-  height: getBoxHeight(box)
+export const getBoundsWidth  = (box: Bounds) => box.right - box.left;
+export const getBoundsHeight = (box: Bounds) => box.bottom - box.top;
+export const getBoundsSize   = weakMemo((box: Bounds): Size => ({
+  width: getBoundsWidth(box),
+  height: getBoundsHeight(box)
 }));
 
-export const scaleInnerBox = (inner: Box, oldBounds: Box, newBounds: Box): Box => {
+export const scaleInnerBounds = (inner: Bounds, oldBounds: Bounds, newBounds: Bounds): Bounds => {
 
-  const oldBoundsSize = getBoxSize(oldBounds);
-  const newBoundsSize = getBoxSize(newBounds);
-  const innerBoundsSize = getBoxSize(inner);
+  const oldBoundsSize = getBoundsSize(oldBounds);
+  const newBoundsSize = getBoundsSize(newBounds);
+  const innerBoundsSize = getBoundsSize(inner);
 
   const percLeft   = (inner.left - oldBounds.left) / oldBoundsSize.width;
   const percTop    = (inner.top  - oldBounds.top)  / oldBoundsSize.height;
@@ -176,10 +176,10 @@ export const scaleInnerBox = (inner: Box, oldBounds: Box, newBounds: Box): Box =
   };
 };
 
-export const isBox = (box: any) => box && box.left != null && box.top != null && box.right != null && box.bottom != null;
-export const filterBoxed = (values: any[]): Boxed[] => values.filter(value => isBox(value.box));
+export const isBounds = (box: any) => box && box.left != null && box.top != null && box.right != null && box.bottom != null;
+export const filterBounded = (values: any[]): Bounded[] => values.filter(value => isBounds(value.box));
 
-export const mergeBoxes = (...boxes: Box[]) => {
+export const mergeBounds = (...boxes: Bounds[]) => {
   let left   = Infinity;
   let bottom = -Infinity;
   let top    = Infinity;
@@ -192,10 +192,10 @@ export const mergeBoxes = (...boxes: Box[]) => {
     bottom = Math.max(bottom, box.bottom);
   }
 
-  return createBox(left, right, top, bottom);
+  return createBounds(left, right, top, bottom);
 }
 
-export const centerTransformZoom = (translate: Translate, box: Box, nz: number, point?: Point): Translate => {
+export const centerTransformZoom = (translate: Translate, box: Bounds, nz: number, point?: Point): Translate => {
   const oz = translate.zoom;
 
   const zd   = (nz / oz);
@@ -237,10 +237,10 @@ export const centerTransformZoom = (translate: Translate, box: Box, nz: number, 
   };
 };
 
-export const boxesIntersect = (a: Box, b: Box) => !(a.left > b.right || a.right < b.left || a.top > b.bottom || a.bottom < a.top);
-export const pointIntersectsBox = (point: Point, box: Box) => !(point.left < box.left || point.left > box.right || point.top < box.top || point.top > box.bottom);
-export const getSmallestBox = (...boxes: Box[]) => boxes.reduce((a, b) => {
-  const asize = getBoxSize(a);
-  const bsize = getBoxSize(b);
+export const boxesIntersect = (a: Bounds, b: Bounds) => !(a.left > b.right || a.right < b.left || a.top > b.bottom || a.bottom < a.top);
+export const pointIntersectsBounds = (point: Point, box: Bounds) => !(point.left < box.left || point.left > box.right || point.top < box.top || point.top > box.bottom);
+export const getSmallestBounds = (...boxes: Bounds[]) => boxes.reduce((a, b) => {
+  const asize = getBoundsSize(a);
+  const bsize = getBoundsSize(b);
   return asize.width * asize.height < bsize.width * bsize.height ? a : b;
 }, { left: Infinity, right: Infinity, top: Infinity, bottom: Infinity });

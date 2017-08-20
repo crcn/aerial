@@ -1,5 +1,5 @@
 
-import { Box, createBox, moveBox, zoomBox, Translate, shiftBox } from "aerial-common2";
+import { Bounds, createBounds, moveBounds, zoomBounds, Translate, shiftBounds } from "aerial-common2";
 
 export function translateAbsoluteToRelativePoint(event, relativeElement) {
 
@@ -86,9 +86,9 @@ function calculateTransform(node: HTMLElement, includeIframes: boolean = true) {
 
 export function calculateUntransformedBoundingRect(node: HTMLElement) {
   const rect = node.getBoundingClientRect();
-  const bounds = createBox(rect.left, rect.right, rect.top, rect.bottom);
+  const bounds = createBounds(rect.left, rect.right, rect.top, rect.bottom);
   const matrix = calculateTransform(node, false);
-  return zoomBox(shiftBox(bounds, { left: -matrix[4], top: -matrix[5] }), 1 / matrix[0]);
+  return zoomBounds(shiftBounds(bounds, { left: -matrix[4], top: -matrix[5] }), 1 / matrix[0]);
 }
 
 function hasMeasurement(key) {
@@ -116,7 +116,7 @@ export const getRelativeElementPosition = (element: HTMLElement) => {
 }
 
 export function calculateAbsoluteBounds(node: HTMLElement) {
-  let rect: Box = calculateUntransformedBoundingRect(node);
+  let rect: Bounds = calculateUntransformedBoundingRect(node);
   return rect;
 }
 
@@ -126,7 +126,7 @@ function calculateElementTransforms(node: HTMLElement) {
   const oldWidth     = node.style.width;
   const oldTop       = node.style.top;
   const oldLeft      = node.style.left;
-  const oldBoxSizing = node.style.boxSizing;
+  const oldBoundsSizing = node.style.boxSizing;
 
   node.style.left = "0px";
   node.style.top = "0px";
@@ -142,7 +142,7 @@ function calculateElementTransforms(node: HTMLElement) {
   node.style.left      = oldLeft;
   node.style.top       = oldTop;
   node.style.width     = oldWidth;
-  node.style.boxSizing = oldBoxSizing;
+  node.style.boxSizing = oldBoundsSizing;
 
   return { scale, left, top };
 }

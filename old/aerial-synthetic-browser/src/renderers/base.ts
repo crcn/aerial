@@ -99,7 +99,7 @@ export abstract class BaseRenderer extends Observable implements ISyntheticDocum
 
   private _shouldRenderAgain: boolean;
   private _targetObserver: IBus<any, any>;
-  private _computedStyles: any;
+  private _allComputedStyles: any;
   private _currentRenderPromise: Promise<any>;
 
   protected readonly logger: Logger;
@@ -111,7 +111,7 @@ export abstract class BaseRenderer extends Observable implements ISyntheticDocum
     this.nodeFactory = nodeFactory || (typeof document !== "undefined" ? document : undefined);
 
     this._running = false;
-    this._computedStyles = {};
+    this._allComputedStyles = {};
 
     this.rectsWatcher = new PropertyWatcher<BaseRenderer, boolean>(this, "rects");
 
@@ -170,7 +170,7 @@ export abstract class BaseRenderer extends Observable implements ISyntheticDocum
   }
 
   getComputedStyle(uid: string) {
-    return this._computedStyles[uid];
+    return this._allComputedStyles[uid];
   }
 
   getBoundingRect(uid: string) {
@@ -190,7 +190,7 @@ export abstract class BaseRenderer extends Observable implements ISyntheticDocum
   protected setRects(rects: { [IDentifier: string]: BoundingRect }, styles: { [IDentifier: string]: SyntheticCSSStyle }) {
     const oldRects = this.$rects;
     this.$rects          = rects;
-    this._computedStyles = styles;
+    this._allComputedStyles = styles;
     this._rendered = true;
     this.notify(new PropertyMutation(PropertyMutation.PROPERTY_CHANGE, this, "rects", rects, oldRects).toEvent());
 

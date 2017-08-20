@@ -51,7 +51,7 @@ var syntheticBrowserWindowReducer = function (root, event) {
             if (itemType === state_1.SYTNTHETIC_BROWSER_WINDOW) {
                 var window_2 = state_1.getSyntheticBrowserWindow(root, itemId);
                 if (window_2) {
-                    return aerial_common2_1.updateStructProperty(root, window_2, "box", aerial_common2_1.moveBox(window_2.box, point));
+                    return aerial_common2_1.updateStructProperty(root, window_2, "box", aerial_common2_1.moveBounds(window_2.box, point));
                 }
                 break;
             }

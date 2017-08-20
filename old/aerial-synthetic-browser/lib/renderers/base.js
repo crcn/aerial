@@ -64,7 +64,7 @@ var BaseRenderer = (function (_super) {
         var _this = _super.call(this) || this;
         _this.nodeFactory = nodeFactory || (typeof document !== "undefined" ? document : undefined);
         _this._running = false;
-        _this._computedStyles = {};
+        _this._allComputedStyles = {};
         _this.rectsWatcher = new aerial_common_2.PropertyWatcher(_this, "rects");
         // may be running in a worker. Do not create an element if that's the case.
         if (_this.nodeFactory) {
@@ -145,7 +145,7 @@ var BaseRenderer = (function (_super) {
         this._running = false;
     };
     BaseRenderer.prototype.getComputedStyle = function (uid) {
-        return this._computedStyles[uid];
+        return this._allComputedStyles[uid];
     };
     BaseRenderer.prototype.getBoundingRect = function (uid) {
         return (this.$rects && this.$rects[uid]) || new aerial_common_2.BoundingRect(0, 0, 0, 0);
@@ -158,7 +158,7 @@ var BaseRenderer = (function (_super) {
     BaseRenderer.prototype.setRects = function (rects, styles) {
         var oldRects = this.$rects;
         this.$rects = rects;
-        this._computedStyles = styles;
+        this._allComputedStyles = styles;
         this._rendered = true;
         this.notify(new aerial_common_2.PropertyMutation(aerial_common_2.PropertyMutation.PROPERTY_CHANGE, this, "rects", rects, oldRects).toEvent());
         // DEPRECATED

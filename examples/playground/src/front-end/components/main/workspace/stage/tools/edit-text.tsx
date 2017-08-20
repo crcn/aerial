@@ -3,7 +3,7 @@ import * as React from "react";
 import {findDOMNode} from "react-dom";
 import { Workspace } from "front-end/state";
 import { compose, pure, lifecycle, withState } from "recompose";
-import { Dispatcher, getBoxSize ,wrapEventToDispatch } from "aerial-common2";
+import { Dispatcher, getBoundsSize ,wrapEventToDispatch } from "aerial-common2";
 import { stageToolEditTextChanged, stageToolEditTextBlur } from "front-end/actions";
 import { 
   SyntheticNode, 
@@ -32,11 +32,11 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea }: 
   const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
   if (!isSyntheticDOMNode(selectedNode)) return null;
   const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(browser, selectedNode.$$id);
-  const box = nodeWindow.computedBoxes[selectedNode.$$id];
-  const computedStyle = (nodeWindow.computedStyles[selectedNode.$$id] || {}) as CSSStyleDeclaration;
+  const box = nodeWindow.allComputedBounds[selectedNode.$$id];
+  const computedStyle = (nodeWindow.allComputedStyles[selectedNode.$$id] || {}) as CSSStyleDeclaration;
   if (!box) return null;
 
-  const { width, height } = getBoxSize(box);
+  const { width, height } = getBoundsSize(box);
 
   const style = {
     fontSize: computedStyle.fontSize,

@@ -1,4 +1,4 @@
-import { watch, removed, Struct, moved, stoppedMoving, moveBox, scaleInnerBox } from "aerial-common2";
+import { watch, removed, Struct, moved, stoppedMoving, moveBounds, scaleInnerBounds } from "aerial-common2";
 import { take, select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
 import { 
@@ -27,12 +27,12 @@ import {
 
 import { 
   Workspace,
-  getSyntheticBrowserBox,
+  getSyntheticBrowserBounds,
   getWorkspaceById,
   ApplicationState, 
   getSelectedWorkspace, 
-  getWorkspaceSelectionBox,
-  getBoxedWorkspaceSelection,
+  getWorkspaceSelectionBounds,
+  getBoundedWorkspaceSelection,
   getSyntheticWindowWorkspace,
   getStageToolMouseNodeTargetReference,
 } from "../state";
@@ -102,10 +102,10 @@ function* handleSelectionMoved() {
     const workspace = getWorkspaceById(state, workspaceId);
     const translate = workspace.stage.translate;
 
-    const bounds = getWorkspaceSelectionBox(state, workspace);
-    for (const item of getBoxedWorkspaceSelection(state, workspace)) {
-      const box = getSyntheticBrowserBox(state, item);
-      yield put(moved(item.$$id, item.$$type, scaleInnerBox(box, bounds, moveBox(bounds, newPoint))));
+    const bounds = getWorkspaceSelectionBounds(state, workspace);
+    for (const item of getBoundedWorkspaceSelection(state, workspace)) {
+      const box = getSyntheticBrowserBounds(state, item);
+      yield put(moved(item.$$id, item.$$type, scaleInnerBounds(box, bounds, moveBounds(bounds, newPoint))));
     }
   }
 }
@@ -115,8 +115,8 @@ function* handleSelectionStoppedMoving() {
     const { point, workspaceId } = (yield take(RESIZER_STOPPED_MOVING)) as ResizerMoved;
     const state = (yield select()) as ApplicationState;
     const workspace = getWorkspaceById(state, workspaceId);
-    for (const item of getBoxedWorkspaceSelection(state, workspace)) {
-      const box = getSyntheticBrowserBox(state, item);
+    for (const item of getBoundedWorkspaceSelection(state, workspace)) {
+      const box = getSyntheticBrowserBounds(state, item);
       yield put(stoppedMoving(item.$$id, item.$$type));
     }
   }

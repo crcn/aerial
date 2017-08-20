@@ -136,7 +136,7 @@ describe(__filename + "#", function () {
                     chai_1.expect(test_1.omit$$idDeep(state)).to.eql({
                         "windows": [
                             {
-                                "computedStyles": [],
+                                "allComputedStyles": [],
                                 "location": "file://test.html",
                                 "$$type": "SYNTHETIC_BROWSER_WINDOW",
                                 "document": {

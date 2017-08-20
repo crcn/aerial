@@ -1,5 +1,5 @@
 import { FileCacheItem } from "aerial-sandbox2";
-import { TreeNode, Box, Action, BaseEvent, Point, WrappedEvent, publicObject, Struct } from "aerial-common2";
+import { TreeNode, Bounds, Action, BaseEvent, Point, WrappedEvent, publicObject, Struct } from "aerial-common2";
 
 export const RESIZER_MOVED               = "RESIZER_MOVED";
 export const RESIZER_STOPPED_MOVING      = "RESIZER_STOPPED_MOVING";
@@ -57,10 +57,10 @@ export type StageMounted = {
 
 export type CanvasElementsComputedPropsChanged = {
   syntheticWindowId: string,
-  computedBoxes: {
-    [identifier: string]: Box
+  allComputedBounds: {
+    [identifier: string]: Bounds
   },
-  computedStyles: {
+  allComputedStyles: {
     [identifier: string]: CSSStyleDeclaration
   }
 } & BaseEvent;
@@ -101,7 +101,7 @@ export type KeyboardShortcutAdded = {
 } & BaseEvent;
 
 export type ResizerPathMoved = {
-  box: Box;
+  box: Bounds;
   anchor: Point;
   workspaceId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
@@ -179,11 +179,11 @@ export type textEditorChanged = {
  * Factories
  */
 
-export const canvasElementsComputedPropsChanged = (syntheticWindowId: string, computedBoxes: { [identififer: string]: Box }, computedStyles: { [identifier: string]: CSSStyleDeclaration }): CanvasElementsComputedPropsChanged => ({
+export const canvasElementsComputedPropsChanged = (syntheticWindowId: string, allComputedBounds: { [identififer: string]: Bounds }, allComputedStyles: { [identifier: string]: CSSStyleDeclaration }): CanvasElementsComputedPropsChanged => ({
   syntheticWindowId,
   type: CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED,
-  computedBoxes,
-  computedStyles
+  allComputedBounds,
+  allComputedStyles
 });
 
 export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClicked => ({ type: TREE_NODE_LABEL_CLICKED, node });
@@ -261,7 +261,7 @@ export const selectorDoubleClicked = (item: Struct, sourceEvent: React.MouseEven
   sourceEvent
 });
 
-export const resizerPathMoved = (workspaceId: string, anchor: Point, box: Box, sourceEvent: React.MouseEvent<any>): ResizerPathMoved => ({
+export const resizerPathMoved = (workspaceId: string, anchor: Point, box: Bounds, sourceEvent: React.MouseEvent<any>): ResizerPathMoved => ({
   type: RESIZER_PATH_MOUSE_MOVED,
   workspaceId,
   anchor,

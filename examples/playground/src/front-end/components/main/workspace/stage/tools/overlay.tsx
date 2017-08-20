@@ -6,7 +6,7 @@ import { Workspace } from "front-end/state";
 import { mapValues, values } from "lodash";
 import { compose, pure, withHandlers } from "recompose";
 import { SyntheticNode, SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
-import { Dispatcher, Box, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
+import { Dispatcher, Bounds, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
 import { 
   stageToolOverlayMouseClicked,
   stageToolOverlayMouseMoved,
@@ -38,7 +38,7 @@ type WindowOverlayToolsInnerProps = {
 
 type NodeOverlayProps = {
   windowId: string;
-  box: Box;
+  box: Bounds;
   zoom: number;
   hovering: boolean;
   node: SyntheticNode;
@@ -91,7 +91,7 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom, onPanSt
         zoom={zoom} 
         key={node.$$id} 
         node={node} 
-        box={window.computedBoxes[node.$$id]} 
+        box={window.allComputedBounds[node.$$id]} 
         dispatch={dispatch} 
         hovering={true} />)
     }

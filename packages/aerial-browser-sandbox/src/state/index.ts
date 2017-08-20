@@ -1,11 +1,11 @@
 import { 
-  Box, 
+  Bounds, 
   Point,
-  Boxed,
+  Bounded,
   Struct, 
   dsFind,
   weakMemo, 
-  shiftBox,
+  shiftBounds,
   dsIndex,
   DataStore,
   dsUpdate,
@@ -34,7 +34,7 @@ export const SYNTHETIC_WINDOW = "SYNTHETIC_WINDOW";
 export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
 export const SYNTHETIC_COMMENT = "SYNTHETIC_COMMENT";
 
-export const DEFAULT_SYNTHETIC_WINDOW_BOX: Box = {
+export const DEFAULT_SYNTHETIC_WINDOW_BOX: Bounds = {
   left: 0,
   top: 0,
 
@@ -127,12 +127,12 @@ export type SyntheticWindow = {
   mount: HTMLElement;
   location: string;
   document: SyntheticDocument;
-  box: Box;
-  computedBoxes: {
-    [identifier: string]: Box;
+  box: Bounds;
+  allComputedBounds: {
+    [identifier: string]: Bounds;
   };
   externalResourceUris: string[],
-  computedStyles: {
+  allComputedStyles: {
     [identifier: string]: CSSStyleDeclaration
   }
 } & Struct;
@@ -184,11 +184,11 @@ export const addSyntheticWindow = <TState extends SyntheticBrowserRootState>(roo
   };
 }
 
-export const getSyntheticBrowserBox = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, item: Partial<Struct & Boxed>) => {
+export const getSyntheticBrowserBounds = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, item: Partial<Struct & Bounded>) => {
   if (!item) return null;
   if (item.box) return item.box;
   const window = getSyntheticNodeWindow(root, item.$$id);
-  return window && shiftBox(window.computedBoxes[item.$$id], window.box);
+  return window && shiftBounds(window.allComputedBounds[item.$$id], window.box);
 });
 
 export const getSyntheticBrowserStoreItemByReference = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, [type, id]: StructReference) => {

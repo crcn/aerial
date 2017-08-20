@@ -103,6 +103,6 @@ export abstract class VisibleSyntheticDOMElement<T extends { uid: string }> exte
   
   protected onUpdateComputedVisibility() { }
 
-  protected abstract computeAbsoluteBounds(style: any, computedBounds: BoundingRect): BoundingRect;
+  protected abstract computeAbsoluteBounds(style: any, allComputedBounds: BoundingRect): BoundingRect;
   protected abstract computeCapabilities(style: any): VisibleDOMNodeCapabilities;
 }

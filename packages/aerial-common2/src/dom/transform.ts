@@ -1,5 +1,5 @@
 
-import { Box, moveBox, zoomBox } from "../geom";
+import { Bounds, moveBounds, zoomBounds } from "../geom";
 
 export function translateAbsoluteToRelativePoint(event, relativeElement) {
 
@@ -85,9 +85,9 @@ function calculateTransform(node: HTMLElement, includeIframes: boolean = true) {
 }
 
 export function calculateUntransformedBoundingRect(node: HTMLElement) {
-  const box: Box = node.getBoundingClientRect();
+  const box: Bounds = node.getBoundingClientRect();
   const matrix = calculateTransform(node, false);
-  return zoomBox(moveBox(box, { left: -matrix[4], top: -matrix[5] }), 1 / matrix[0]);
+  return zoomBounds(moveBounds(box, { left: -matrix[4], top: -matrix[5] }), 1 / matrix[0]);
 }
 
 function hasMeasurement(key) {
@@ -111,7 +111,7 @@ function roundMeasurements(style) {
 }
 
 export function calculateAbsoluteBounds(node: HTMLElement) {
-  let rect: Box = calculateUntransformedBoundingRect(node);
+  let rect: Bounds = calculateUntransformedBoundingRect(node);
   return rect;
 }
 
@@ -121,7 +121,7 @@ function calculateTransforms(node: HTMLElement) {
   const oldWidth     = node.style.width;
   const oldTop       = node.style.top;
   const oldLeft      = node.style.left;
-  const oldBoxSizing = node.style.boxSizing;
+  const oldBoundsSizing = node.style.boxSizing;
 
   node.style.left = "0px";
   node.style.top = "0px";
@@ -137,7 +137,7 @@ function calculateTransforms(node: HTMLElement) {
   node.style.left      = oldLeft;
   node.style.top       = oldTop;
   node.style.width     = oldWidth;
-  node.style.boxSizing = oldBoxSizing;
+  node.style.boxSizing = oldBoundsSizing;
 
   return { scale, left, top };
 }

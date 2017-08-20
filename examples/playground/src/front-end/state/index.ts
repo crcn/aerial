@@ -1,23 +1,23 @@
 import {
-  Box,
-  Boxed,
+  Bounds,
+  Bounded,
   Action,
   Struct,
-  shiftBox,
-  zoomBox,
+  shiftBounds,
+  zoomBounds,
   TreeNode,
   weakMemo,
   Translate,
-  mergeBoxes,
-  filterBoxed,
-  getSmallestBox,
+  mergeBounds,
+  filterBounded,
+  getSmallestBounds,
   ImmutableArray, 
   StructReference,
   arrayReplaceIndex,
   ImmutableObject,
   getStructReference,
   ExpressionPosition,
-  pointIntersectsBox,
+  pointIntersectsBounds,
   createStructFactory,
   getReferenceString,
   BaseApplicationState,
@@ -39,7 +39,7 @@ import {
   getSyntheticWindow,
   getSyntheticNodeById,
   getSyntheticNodeWindow,
-  getSyntheticBrowserBox,
+  getSyntheticBrowserBounds,
   getSyntheticWindowBrowser,
   SyntheticBrowserRootState,
   createSyntheticBrowserStore,
@@ -166,8 +166,8 @@ export const getSyntheticNodeWorkspace = weakMemo((root: ApplicationState, nodeI
   return getSyntheticWindowWorkspace(root, getSyntheticNodeWindow(root, nodeId).$$id);
 });
 
-export const getBoxedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Boxed & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserBox(state, item)));
-export const getWorkspaceSelectionBox = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBoxes(...getBoxedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserBox(state, boxed))));
+export const getBoundedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Bounded & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserBounds(state, item)));
+export const getWorkspaceSelectionBounds = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBounds(...getBoundedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserBounds(state, boxed))));
 
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => state.workspaces.find((workspace) => workspace.$$id === id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
@@ -217,19 +217,19 @@ export const getStageToolMouseNodeTargetReference = (state: ApplicationState, ev
   const mouseX = sourceEvent.pageX - rect.left;
   const mouseY = sourceEvent.pageY - rect.top;
 
-  const computedBoxes = window.computedBoxes;
-  const intersectingBoxes: Box[] = [];
-  const intersectingBoxMap = new Map<Box, string>();
-  for (const uid in computedBoxes) {
-    const box = computedBoxes[uid];
-    if (pointIntersectsBox({ left: mouseX, top: mouseY }, zoomBox(box, zoom))) {
-      intersectingBoxes.push(box);
-      intersectingBoxMap.set(box, uid);
+  const allComputedBounds = window.allComputedBounds;
+  const intersectingBounds: Bounds[] = [];
+  const intersectingBoundsMap = new Map<Bounds, string>();
+  for (const uid in allComputedBounds) {
+    const box = allComputedBounds[uid];
+    if (pointIntersectsBounds({ left: mouseX, top: mouseY }, zoomBounds(box, zoom))) {
+      intersectingBounds.push(box);
+      intersectingBoundsMap.set(box, uid);
     }
   }
-  if (!intersectingBoxes.length) return null;
-  const smallestBox = getSmallestBox(...intersectingBoxes);
-  return [SYNTHETIC_ELEMENT, intersectingBoxMap.get(smallestBox)] as [string, string];
+  if (!intersectingBounds.length) return null;
+  const smallestBounds = getSmallestBounds(...intersectingBounds);
+  return [SYNTHETIC_ELEMENT, intersectingBoundsMap.get(smallestBounds)] as [string, string];
 }
 
 export * from "./shortcuts";

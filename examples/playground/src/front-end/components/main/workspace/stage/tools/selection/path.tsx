@@ -3,7 +3,7 @@ import * as  React from "react";
 import { compose, pure, withHandlers } from "recompose";
 import { getWorkspaceById, Workspace } from "front-end/state";
 import { resizerPathMoved } from "front-end/actions";
-import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, Box } from "aerial-common2";
+import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, Bounds } from "aerial-common2";
 
 export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
 
@@ -15,7 +15,7 @@ export type PathOuterProps = {
   strokeWidth: number;
   workspace: Workspace;
   showPoints?: boolean;
-  box: Box;
+  box: Bounds;
   dispatch: Dispatcher<any>;
 }
 
@@ -49,7 +49,7 @@ export const PathBase = ({ box , points, zoom, pointRadius, strokeWidth, showPoi
     {
       showPoints !== false ? points.map((path, key) =>
         <rect
-           onMouseDown={(event) => onPointClick(path, event)} 
+          onMouseDown={(event) => onPointClick(path, event)} 
           className={`point-circle-${(path.top * 100)}-${path.left * 100}`}
           strokeWidth={0}
           stroke="black"

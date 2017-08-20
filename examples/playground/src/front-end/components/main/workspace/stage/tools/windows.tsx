@@ -3,7 +3,7 @@ import * as React from "react";
 import { compose, pure } from "recompose";
 import { Workspace } from "front-end/state";
 import { SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
-import { Dispatcher, getBoxSize, Translate, wrapEventToDispatch } from "aerial-common2";
+import { Dispatcher, getBoundsSize, Translate, wrapEventToDispatch } from "aerial-common2";
 import { stageToolWindowTitleClicked, stageToolWindowKeyDown, stageToolWindowBackgroundClicked } from "front-end/actions";
 
 type WindowItemInnerProps = {
@@ -17,7 +17,7 @@ const WindowItemBase = ({ window, translate, dispatch }: WindowItemInnerProps) =
   const style = {
     left: window.box.left,
     top: window.box.top,
-    ...getBoxSize(window.box)
+    ...getBoundsSize(window.box)
   };
 
   const titleScale = Math.max(1 / translate.zoom, 0.03);
