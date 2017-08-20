@@ -8,6 +8,7 @@ OBJECTIVE:
 
 - [ ] multi select
 - [ ] ability to move any item around
+- [ ] copy + paste elements
 
 STAGE 1:
 
@@ -32,6 +33,7 @@ HI PRIO:
 - [ ] DND working for everything (must be tested)
 - [ ] move style to class shortcut
 - [ ] CSS inspector
+
 
 OPTIMIZATIONS:
 

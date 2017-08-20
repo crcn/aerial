@@ -12,6 +12,7 @@ import {
   Translate,
   BaseEvent, 
   boxFromRect,
+  getBoxSize,
   mergeBoxes,
   mapImmutable, 
   keepBoxCenter,
@@ -53,6 +54,8 @@ import {
 import {
   StageToolOverlayMouseMoved,
   StageToolOverlayClicked,
+  STAGE_MOUNTED,
+  StageMounted,
   StageToolEditTextChanged,
   STAGE_TOOL_EDIT_TEXT_CHANGED,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
@@ -170,7 +173,7 @@ const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
 const MIN_ZOOM = 0.02;
 const MAX_ZOOM = 6400 / 100;
-
+const INITIAL_ZOOM_PADDING = 50;
 
 const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
@@ -269,6 +272,42 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
+    case STAGE_MOUNTED: {
+      const { element } = event as StageMounted;
+      const { width, height } = element.getBoundingClientRect();
+      console.log(width, height);
+      const workspace = getSelectedWorkspace(state);
+
+      const innerBox = getSyntheticBrowser(state, workspace.browserId).windows.map(window => window.box).reduce((a, b) => ({
+        left: Math.min(a.left, b.left),
+        top: Math.min(a.top, b.top),
+        right: Math.max(a.right, b.right),
+        bottom: Math.max(a.bottom, b.bottom)
+      }), { left: 0, top: 0, right: 0, bottom: 0 });
+
+      const innerSize = getBoxSize(innerBox);
+
+      const centered = {
+        left: innerBox.left + width / 2 - (innerBox.right - innerBox.left) / 2,
+        top: innerBox.top + height / 2 - (innerBox.bottom - innerBox.top) / 2,
+      };
+
+      const scale = Math.min(
+        (width - INITIAL_ZOOM_PADDING) / innerSize.width,
+        (height - INITIAL_ZOOM_PADDING) / innerSize.height
+      );
+
+      return updateWorkspace(state, workspace.$$id, {
+        stage: {
+          ...workspace.stage,
+          translate: centerTransformZoom({
+            ...centered,
+            zoom: 1
+          }, { left: 0, top: 0, right: width, bottom: height }, scale)
+        }
+      });
+    };
+
     case STAGE_TOOL_OVERLAY_MOUSE_PAN_START: {
       const { windowId } = event as StageToolOverlayMousePanStart;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
@@ -294,6 +333,8 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
+
+      // alt key opens up a new link
       const altKey = sourceEvent.altKey;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
       
@@ -306,13 +347,14 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       }
       if (metaKey) {
         return setSelectedFileFromNodeId(state, workspace.$$id, targetRef[1]);
-      } else {
+      } else if (!altKey) {
         state = handleWindowSelectionFromAction(state, targetRef, event as StageToolNodeOverlayClicked);
         state = updateWorkspace(state, workspace.$$id, {
           secondarySelection: false
         });
         return state;
       }
+      return state;
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED: {

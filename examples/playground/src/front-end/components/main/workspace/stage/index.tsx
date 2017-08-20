@@ -8,8 +8,8 @@ import { WindowsComponent } from "./windows";
 import { IsolateComponent } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
 import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
-import { stageWheel } from "front-end/actions";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
+import { stageWheel, stageContainerMounted } from "front-end/actions";
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
@@ -24,6 +24,7 @@ export type StageInnerComponentProps = {
   canvasOuter: HTMLElement;
   onWheel: (event: React.SyntheticEvent<MouseEvent>) => any;
   mousePosition: Point;
+  setStageContainer(element: HTMLElement);
   onDrop: (event: React.SyntheticEvent<any>) => any;
   onMouseEvent: (event: React.SyntheticEvent<any>) => any;
   onMouseDown: (event: React.SyntheticEvent<any>) => any;
@@ -40,6 +41,9 @@ const enhanceStageComponent = compose<StageOuterComponentProps, StageInnerCompon
     onMouseEvent: ({ setMousePosition }) => (event: React.MouseEvent<any>) => {
       setMousePosition({ left: event.pageX, top: event.pageY });
     },
+    setStageContainer: ({ dispatch }) => (element: HTMLDivElement) => {
+      dispatch(stageContainerMounted(element));
+    },
     onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: StageInnerComponentProps) => (event: React.WheelEvent<any>) => {
       const rect = canvasOuter.getBoundingClientRect();
       event.preventDefault();
@@ -50,6 +54,7 @@ const enhanceStageComponent = compose<StageOuterComponentProps, StageInnerCompon
 
 export const StageComponentBase = ({ 
   setCanvasOuter,
+  setStageContainer,
   workspace, 
   browser,
   dispatch, 
@@ -72,7 +77,7 @@ export const StageComponentBase = ({
     transform: `translate(${translate.left}px, ${translate.top}px) scale(${translate.zoom})`
   };
 
-  return <div className="stage-component">
+  return <div className="stage-component" ref={setStageContainer}>
     <IsolateComponent 
     inheritCSS 
     ignoreInputEvents
