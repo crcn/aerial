@@ -74,6 +74,8 @@ import {
   StageToolNodeOverlayHoverOver,
   StageToolNodeOverlayClicked,
   STAGE_TOOL_WINDOW_KEY_DOWN,
+  STAGE_TOOL_SELECTION_KEY_DOWN,
+  StageToolSelectionKeyDown,
   RESIZER_MOUSE_DOWN,
   ResizerMouseDown,
   STAGE_TOOL_WINDOW_BACKGROUND_CLICKED,
@@ -409,11 +411,6 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return handleWindowSelectionFromAction(state, getStructReference(getSyntheticWindow(state, (event as WindowPaneRowClicked).windowId)), event as WindowPaneRowClicked);
     }
 
-    case STAGE_TOOL_WINDOW_KEY_DOWN: {
-      const e = event as StageWillWindowKeyDown;
-      // return moveItemFromAction(state, e.windowId, e);
-      return state;
-    }
 
     case STAGE_TOOL_WINDOW_BACKGROUND_CLICKED: {
       const workspace = getSelectedWorkspace(state);
@@ -423,30 +420,6 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
   return state;
 }
-
-const moveItemFromAction = <T extends { sourceEvent: React.KeyboardEvent<any> }>(state: ApplicationState, itemId: string, event: T) => {
-  const { sourceEvent } = event;
-  const item = getSyntheticNodeById(state, itemId);
-
-  // TODO - prop may not exist here -- need to use getBounds instead
-  const box = item.box;
-  switch(sourceEvent.key) {
-    case "ArrowDown": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, top: box.top + 1 })));
-    }
-    case "ArrowUp": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, top: box.top - 1 })));
-    }
-    case "ArrowLeft": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, left: box.left - 1 })));
-    }
-    case "ArrowRight": {
-      return applicationReducer(state, moved(item.$$id, item.$$type, moveBounds(box, { ...box, left: box.left + 1 })));
-    }
-  }
-
-  return state;
-};
 
 const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, ref: StructReference, event: T) => {
   const { windowId, sourceEvent } = event;

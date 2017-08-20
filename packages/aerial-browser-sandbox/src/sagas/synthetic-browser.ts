@@ -399,11 +399,15 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
       const originalRect = syntheticWindow.allComputedBounds[syntheticNode.$$id];
       const computedStyle = syntheticWindow.allComputedStyles[syntheticNode.$$id];
 
-      const relativeRect = convertAbsoluteBoundsToRelative(
+      // TODO - computed boxes MUST also contain the offset of the parent.
+      const relativeRect = shiftBounds(convertAbsoluteBoundsToRelative(
         pointToBounds(point),
         syntheticNode as SyntheticElement,
         syntheticWindow
-      );
+      ), {
+        left: -syntheticWindow.box.left,
+        top: -syntheticWindow.box.top
+      });
 
       const envElement = cenv.childObjects.get(syntheticNode.$$id);
 

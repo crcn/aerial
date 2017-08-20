@@ -1,11 +1,11 @@
 import "./index.scss";
 import * as React from "react";
-import { compose, pure } from "recompose";
+import { compose, pure, lifecycle, withHandlers } from "recompose";
 import { Resizer } from "./resizer";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, mergeBounds, Bounded, wrapEventToDispatch } from "aerial-common2";
 import { Workspace, getBoundedWorkspaceSelection, getSyntheticBrowserBounds } from "front-end/state";
-import { selectorDoubleClicked } from "front-end/actions";
+import { selectorDoubleClicked, stageToolSelectionKeyDown } from "front-end/actions";
 
 export type SelectionOuterProps = {
   workspace: Workspace;
@@ -14,6 +14,8 @@ export type SelectionOuterProps = {
 }
 
 export type SelectionInnerProps = {
+  setSelectionElement(element: HTMLDivElement);
+  onKeyDown(event: React.KeyboardEvent<any>);
 } & SelectionOuterProps;
 
 const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, browser: SyntheticBrowser }) => {
@@ -32,16 +34,30 @@ const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, brows
   return <div style={boundsStyle as any}></div>;
 };
 
-export const  SelectionStageToolBase = ({ workspace, browser, dispatch }: SelectionInnerProps) => {
+export const  SelectionStageToolBase = ({ setSelectionElement, workspace, browser, onKeyDown, dispatch }: SelectionInnerProps) => {
   const selection = getBoundedWorkspaceSelection(browser, workspace);
   if (!selection.length || workspace.secondarySelection) return null;
 
-  return <div className="m-stage-selection-tool" onDoubleClick={selection.length === 1 ? wrapEventToDispatch(dispatch, selectorDoubleClicked.bind(this, selection[0])) : null }>
+  return <div ref={setSelectionElement} className="m-stage-selection-tool" tabIndex={-1} onDoubleClick={selection.length === 1 ? wrapEventToDispatch(dispatch, selectorDoubleClicked.bind(this, selection[0])) : null } onKeyDown={onKeyDown}>
     <SelectionBounds workspace={workspace} browser={browser} />
     <Resizer workspace={workspace} browser={browser} dispatch={dispatch} />
   </div>;
 };
 
-export const  SelectionStageTool = pure( SelectionStageToolBase as any) as typeof  SelectionStageToolBase;
+const enhanceSelectionStageTool = compose<SelectionInnerProps, SelectionOuterProps>(
+  pure,
+  withHandlers({
+    setSelectionElement: () => (element: HTMLDivElement) => {
+      if (element) {
+        element.focus();
+      }
+    },
+    onKeyDown: ({ workspace, dispatch }) => (event: React.KeyboardEvent<any>) => {
+      dispatch(stageToolSelectionKeyDown(workspace.$$id, event));
+    }
+  })
+);
+
+export const  SelectionStageTool = enhanceSelectionStageTool(SelectionStageToolBase);
 
 export * from "./resizer";

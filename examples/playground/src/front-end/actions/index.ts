@@ -19,6 +19,7 @@ export const FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED = "FILE_NAVIGATOR_ADD_FOLD
 export const VISUAL_EDITOR_WHEEL = "VISUAL_EDITOR_WHEEL";
 export const STAGE_TOOL_WINDOW_TITLE_CLICKED = "STAGE_TOOL_WINDOW_TITLE_CLICKED";
 export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
+export const STAGE_TOOL_SELECTION_KEY_DOWN = "STAGE_TOOL_SELECTION_KEY_DOWN";
 export const STAGE_TOOL_WINDOW_BACKGROUND_CLICKED = "STAGE_TOOL_WINDOW_BACKGROUND_CLICKED";
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_MOVED = "STAGE_TOOL_OVERLAY_MOUSE_MOVED";
@@ -114,6 +115,10 @@ export type StageWillWindowKeyDown = {
   windowId: string;
 } & WrappedEvent<React.KeyboardEvent<any>>;
 
+export type StageToolSelectionKeyDown = {
+  workspaceId: string;
+} & WrappedEvent<React.KeyboardEvent<any>>;
+
 export type StageToolNodeOverlayClicked = {
   windowId: string;
   nodeId: string;
@@ -189,6 +194,8 @@ export const canvasElementsComputedPropsChanged = (syntheticWindowId: string, al
 export const treeNodeLabelClicked = (node: TreeNode<any>): TreeNodeLabelClicked => ({ type: TREE_NODE_LABEL_CLICKED, node });
 export const stageToolWindowTitleClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageWillWindowTitleClicked => ({ type: STAGE_TOOL_WINDOW_TITLE_CLICKED, windowId, sourceEvent });
 export const stageToolWindowKeyDown = (windowId: string, sourceEvent: React.KeyboardEvent<any>): StageWillWindowKeyDown => ({ type: STAGE_TOOL_WINDOW_KEY_DOWN, windowId, sourceEvent });
+
+export const stageToolSelectionKeyDown = (workspaceId, sourceEvent: React.KeyboardEvent<any>): StageToolSelectionKeyDown => ({ type: STAGE_TOOL_SELECTION_KEY_DOWN, workspaceId, sourceEvent });
 
 export const stageToolWindowBackgroundClicked = (sourceEvent: React.KeyboardEvent<any>): WrappedEvent<React.KeyboardEvent<any>> => ({ type: STAGE_TOOL_WINDOW_BACKGROUND_CLICKED, sourceEvent });
 

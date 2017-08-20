@@ -48,7 +48,7 @@ export const ResizerBase = ({ workspace, browser, dispatch, onMouseDown }: Resiz
     { left: 0, top: 0.5 },
   ];
 
-  return <div className="m-resizer-component">
+  return <div className="m-resizer-component" tabIndex={-1}>
     <div
       className="m-resizer-component--selection"
       style={resizerStyle as any}

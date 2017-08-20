@@ -6,7 +6,10 @@ import {
   RESIZER_STOPPED_MOVING,
   ResizerMoved,
   resizerStoppedMoving,
+  STAGE_TOOL_SELECTION_KEY_DOWN,
+  StageToolSelectionKeyDown,
   ResizerPathMoved,
+  resizerMoved,
   RESIZER_PATH_MOUSE_MOVED,
   DeleteShortcutPressed, 
   DELETE_SHORCUT_PRESSED, 
@@ -43,6 +46,7 @@ export function* mainWorkspaceSaga() {
   yield fork(handleDeleteKeyPressed);
   yield fork(handleSelectionMoved);
   yield fork(handleSelectionStoppedMoving);
+  yield fork(handleSelectionKeyDown);
 }
 
 function* openDefaultWindow() {
@@ -106,6 +110,34 @@ function* handleSelectionMoved() {
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
       const box = getSyntheticBrowserBounds(state, item);
       yield put(moved(item.$$id, item.$$type, scaleInnerBounds(box, bounds, moveBounds(bounds, newPoint))));
+    }
+  }
+}
+
+function* handleSelectionKeyDown() {
+  while(true) {
+    const { workspaceId, sourceEvent } = (yield take(STAGE_TOOL_SELECTION_KEY_DOWN)) as StageToolSelectionKeyDown;
+    const state = yield select();
+
+    const workspace = getWorkspaceById(state, workspaceId);
+    const bounds = getWorkspaceSelectionBounds(state, workspace);
+    switch(sourceEvent.key) {
+      case "ArrowDown": {
+        yield put(resizerMoved(workspaceId, { left: bounds.left, top: bounds.top + 1 }));
+        break;
+      }
+      case "ArrowUp": {
+        yield put(resizerMoved(workspaceId, { left: bounds.left, top: bounds.top - 1 }));
+        break;
+      }
+      case "ArrowLeft": {
+        yield put(resizerMoved(workspaceId, { left: bounds.left - 1, top: bounds.top }));
+        break;
+      }
+      case "ArrowRight": {
+        yield put(resizerMoved(workspaceId, { left: bounds.left + 1, top: bounds.top }));
+        break;
+      }
     }
   }
 }
