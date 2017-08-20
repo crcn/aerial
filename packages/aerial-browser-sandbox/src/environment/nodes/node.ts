@@ -26,6 +26,7 @@ export interface SEnvNodeInterface extends Node {
   uid: string;
   $$id: string;
   structType: string;
+  struct: SyntheticNode;
   source: ExpressionLocation;
   contentLoaded: Promise<any>;
   interactiveLoaded: Promise<any>;
@@ -153,11 +154,12 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     }
 
     protected updateStruct() {
-      this._struct = this.createStruct();
+      this._struct = this.createStruct(this.parentNode);
     }
 
-    protected createStruct(): SyntheticNode {
+    protected createStruct(parentNode?: SEnvNodeInterface): SyntheticNode {
       return {
+        parentId: parentNode ? parentNode.$$id : null,
         nodeType: this.nodeType,
         nodeName: this.nodeName,
         source: this.source,

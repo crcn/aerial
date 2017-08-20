@@ -14,6 +14,7 @@ OBJECTIVE:
 
 - POLISH:
 
+- [ ] show original position
 - [ ] multi select
 - [ ] ability to move any item around
 - [ ] copy + paste elements
@@ -46,6 +47,8 @@ OPTIMIZATIONS:
 - [ ] memoize computed styles & styles
 
 CLEANUP:
+
+- [ ] change box to bounds
 
 LOW PRIO:
 

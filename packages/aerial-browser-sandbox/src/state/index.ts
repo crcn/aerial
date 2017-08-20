@@ -85,6 +85,7 @@ export type BasicComment = BasicValueNode;
 
 export type SyntheticBaseNode = {
   source: ExpressionLocation;
+  parentId?: string;
 } & BasicNode & Struct;
 
 export type SyntheticNode = {
@@ -215,8 +216,9 @@ export const createSyntheticComment  = createStructFactory<SyntheticComment>(SYN
   nodeType: SEnvNodeTypes.COMMENT
 });
 
-export const isSyntheticDOMNode = (value) => value && value.constructor === Object && value.nodeType != null;
+// TODO - move all utils here to utils folder
 
+export const isSyntheticDOMNode = (value) => value && value.constructor === Object && value.nodeType != null;
 
 export const getSyntheticBrowsers = weakMemo((root: SyntheticBrowserRootState): SyntheticBrowser[] => root.browserStore.records);
 
@@ -253,19 +255,17 @@ export const updateSyntheticWindow = <TState extends SyntheticBrowserRootState>(
 }
 
 export const getSyntheticNodeAncestors = weakMemo((node: SyntheticNode, window: SyntheticWindow) => {
-  const allNodeIds = Object.keys(window.allNodes);
-  const nodeIdIndex = allNodeIds.indexOf(node.$$id);
-  let currentChild = node;
+  let current = window.allNodes[node.parentId];
   const ancestors: SyntheticNode[] = [];
-  for (let i = nodeIdIndex; i--;) {
-    const potentialParent = window.allNodes[nodeIdIndex[i]];
-    if (potentialParent.childNodes && (potentialParent.childNodes as SyntheticNode[]).indexOf(currentChild) !== -1) {
-      ancestors.push(potentialParent);
-      currentChild = potentialParent;
-    }
+  while(current) {
+    ancestors.push(current);
+    current = window.allNodes[node.parentId];
   }
   return ancestors;
 });
+
+
+export const getSyntheticParentNode = (node: SyntheticNode, window: SyntheticWindow) => window.allNodes[node.parentId];
 
 export const removeSyntheticWindow = <TState extends SyntheticBrowserRootState>(root: TState, windowId: string): TState => {
   const browser = getSyntheticWindowBrowser(root, windowId);

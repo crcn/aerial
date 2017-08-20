@@ -59,9 +59,9 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       return this.insertChildAt(newChild, index);
     }
 
-    createStruct(): SyntheticParentNode {
+    createStruct(parentNode?: SEnvNodeInterface): SyntheticParentNode {
       return {
-        ...(super.createStruct() as any),
+        ...(super.createStruct(parentNode) as any),
         childNodes: Array.prototype.map.call(this.childNodes, child => child.struct)
       };
     }

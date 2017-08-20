@@ -1,4 +1,4 @@
-import { debounce } from "lodash";
+import { debounce, throttle } from "lodash";
 import { SEnvNodeTypes } from "../constants";
 import { SEnvNodeInterface } from "../nodes";
 import { SEnvWindowInterface, patchWindow, patchNode } from "../window";
@@ -33,6 +33,8 @@ const getNodeByPath = (path: string[], root: Node) => {
   return current;
 }
 
+const RECOMPUTE_TIMEOUT = 100;
+
 // TODO - this should contain an iframe
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   readonly mount: HTMLElement;
@@ -65,16 +67,31 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     if (typeof window !== "undefined")  {
       if (!this._mutations) {
         this._mutations = [];
-        requestAnimationFrame(() => {
+
+        const run = () => requestAnimationFrame(() => {
           const mutations = this._mutations;
-          this._mutations = undefined;
+          this._mutations = [];
           mutations.forEach((mutation) => this._applyMutation(mutation));
-          this._resetClientRects();
+
+          // must have a timeout since the bounding client rect
+          // may change a few MS after a style is added
+          setTimeout(() => {
+            if (this._mutations.length) {
+              run();
+            } else {
+              this._mutations = undefined;
+            }
+            this._resetClientRects();
+          }, RECOMPUTE_TIMEOUT);
         });
+
+        run();
+        
       }
       this._mutations.push(mutation);
     } else {
       this._applyMutation(mutation);
+      this._resetClientRects();
     }
   }
 

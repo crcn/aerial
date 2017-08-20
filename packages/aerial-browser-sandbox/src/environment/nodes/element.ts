@@ -180,9 +180,9 @@ export const getSEnvElementClass = weakMemo((context: any) => {
       const documentFragment = evaluateHTMLDocumentFragment(value, this.ownerDocument, this);
     }
 
-    createStruct(): SyntheticElement {
+    createStruct(parentNode?: SEnvNodeInterface): SyntheticElement {
       return {
-        ...(super.createStruct() as any),
+        ...(super.createStruct(parentNode) as any),
         attributes: Array.prototype.map.call(this.attributes, attr => attr.struct)
       };
     }

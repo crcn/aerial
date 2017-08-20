@@ -1,1 +1,1 @@
-export * from "./synthetic-element-box";
+export * from "./synthetic-element-bounds";

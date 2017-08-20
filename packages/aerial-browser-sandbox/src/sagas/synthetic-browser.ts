@@ -22,8 +22,7 @@ import {
 } from "./html-content-editor";
 
 import {
-  getAbsoluteElementBounds,
-  absoluteElementBoundsToRelative,
+  convertAbsoluteBoundsToRelative,
 } from "../utils";
 
 import {
@@ -66,6 +65,7 @@ import {
   diffArray,
   takeRequest, 
   Moved,
+  pointToBounds,
   MOVED,
   eachArrayValueMutation,
 } from "aerial-common2";
@@ -82,6 +82,7 @@ import {
   SyntheticBrowserRootState,
   isSyntheticNodeType,
   SyntheticComment,
+  getSyntheticNodeById,
   SyntheticDocument,
   BasicValueNode,
   SyntheticWindow,
@@ -101,6 +102,7 @@ import {
   getSEnvEventClasses,
   SEnvWindowInterface,
   SEnvElementInterface,
+  SEnvHTMLElementInterface,
   SEnvCommentInterface,
   SyntheticDOMRenderer,
   SEnvDocumentInterface,
@@ -389,14 +391,28 @@ function* handleSytheticWindowSession(syntheticWindowId: string) {
   yield fork(function* handleMoveNode() {
     while(true) {
       const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && cenv.childObjects.get(action.itemId)));
-      const target = cenv.childObjects.get(itemId) as HTMLElement;
+
+      // compute based on the data currently in the store
+      const syntheticWindow = getSyntheticWindow(yield select(), cwindow.$$id);
+      const syntheticNode = getSyntheticNodeById(yield select(), itemId);
       
-      const originalRect = target.getBoundingClientRect();
+      const originalRect = syntheticWindow.allComputedBounds[syntheticNode.$$id];
+      const computedStyle = syntheticWindow.allComputedStyles[syntheticNode.$$id];
+
+      const relativeRect = convertAbsoluteBoundsToRelative(
+        pointToBounds(point),
+        syntheticNode as SyntheticElement,
+        syntheticWindow
+      );
+
+      const envElement = cenv.childObjects.get(syntheticNode.$$id);
 
       // TODO - get best CSS style
-      target.style.position = "fixed";
-      target.style.left = String(point.left - cwindow.box.left) + "px";
-      target.style.top  = String(point.top - cwindow.box.top) + "px";
+      if (computedStyle.position === "static") {
+        envElement.style.position = "relative";
+      }
+      envElement.style.left = `${relativeRect.left.toFixed(2)}px`;
+      envElement.style.top  = `${relativeRect.top.toFixed(2)}px`;
     }
   });
 

@@ -11,14 +11,14 @@ import {
   updateIn, 
   Translate,
   BaseEvent, 
-  boxFromRect,
+  boundsFromRect,
   getBoundsSize,
   mergeBounds,
   mapImmutable, 
   keepBoundsCenter,
   getSmallestBounds,
   scaleInnerBounds,
-  boxesIntersect,
+  boundsIntersect,
   StructReference,
   getStructReference,
   pointIntersectsBounds,
@@ -185,7 +185,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       let translate = workspace.stage.translate;
 
       if (metaKey || ctrlKey) {
-        translate = centerTransformZoom(translate, boxFromRect({
+        translate = centerTransformZoom(translate, boundsFromRect({
           width: canvasWidth,
           height: canvasHeight
         }), clamp(translate.zoom + translate.zoom * deltaY / ZOOM_SENSITIVITY, MIN_ZOOM, MAX_ZOOM), { left: mouseX, top: mouseY });
