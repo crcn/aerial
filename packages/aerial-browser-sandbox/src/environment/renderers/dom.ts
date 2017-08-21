@@ -10,6 +10,7 @@ import { SET_SYNTHETIC_SOURCE_CHANGE } from "../nodes";
 import { getNodeByPath, getNodePath } from "../../utils";
 
 const NODE_NAME_MAP = {
+  style: "span",
   head: "span",
   html: "span",
   body: "span",
@@ -17,8 +18,14 @@ const NODE_NAME_MAP = {
   script: "span",
 };
 
+const HIDDEN_NODE_NAME_MAP = {
+  style: true,
+  script: true,
+  link: true,
+};
 
 const RECOMPUTE_TIMEOUT = 1;
+
 
 // TODO - this should contain an iframe
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
@@ -32,10 +39,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
 
   protected _onDocumentLoad(event: Event) {
     super._onDocumentLoad(event);
-    const css = Array.prototype.map.call(this.sourceWindow.document.stylesheets, (ss: CSSStyleSheet) => (
-      ss.cssText
-    )).join("\n");
-    
+    const css = this._getSourceCSSText();
     const html = this.sourceWindow.document.body.innerHTML;
 
     this.mount.innerHTML = `<style>${css}</style><span></span>`;
@@ -50,12 +54,24 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     }
   }
 
+  private _getSourceCSSText() {
+    return Array.prototype.map.call(this.sourceWindow.document.stylesheets, (ss: CSSStyleSheet) => (
+      ss.cssText
+    )).join("\n");
+  }
+
   private _batchMutation(mutation: Mutation<any>) {
     if (typeof window !== "undefined")  {
       if (!this._mutations) {
         this._mutations = [];
 
         const run = () => requestAnimationFrame(() => {
+          const css = this._getSourceCSSText();
+
+          if (this.mount.style.cssText !== css) {
+            this.mount.style.cssText = css;
+          }
+
           const mutations = this._mutations;
           this._mutations = [];
           mutations.forEach((mutation) => this._applyMutation(mutation));
@@ -142,9 +158,10 @@ const mapNode = (a: SEnvNodeInterface, document: Document) => {
     break;
     case SEnvNodeTypes.ELEMENT: 
       const el = a as SEnvElementInterface;
-      const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || encodeURIComponent(el.nodeName)) as HTMLElement;
+      const lowerNodeName = el.nodeName.toLowerCase();
+      const bel = document.createElement(NODE_NAME_MAP[lowerNodeName] || encodeURIComponent(el.nodeName)) as HTMLElement;
       bel.dataset.sourceUID = el.uid;
-      if (el.nodeName.toLowerCase() === "script") {
+      if (HIDDEN_NODE_NAME_MAP[lowerNodeName]) {
         bel.style.display = "none";
       }
       for (let i = 0, n = el.attributes.length; i < n; i++) {

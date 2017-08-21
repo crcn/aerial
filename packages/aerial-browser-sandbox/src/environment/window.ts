@@ -17,7 +17,9 @@ import {
   diffDocument, 
   diffComment, 
   filterNodes,
-  patchElement
+  diffHTMLNode,
+  patchHTMLNode,
+  patchBaseElement
 } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 import nwmatcher = require("nwmatcher");
@@ -74,6 +76,7 @@ export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInte
     if (source.document.readyState !== "complete") {
       return;
     }
+
     sync();
     source.addEventListener(SEnvMutationEvent.MUTATION, onMutation);
   };
@@ -631,7 +634,7 @@ export const patchNode = (node: Node, mutation: Mutation<any>) => {
       break;
     }
     case SEnvNodeTypes.ELEMENT: {
-      patchElement(node as Element, mutation);
+      patchHTMLNode(node as any, mutation);
       break;      
     }
     case SEnvNodeTypes.DOCUMENT: {

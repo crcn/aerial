@@ -368,7 +368,7 @@ export const getSEnvValueNode = weakMemo((context) => {
 export const SET_SYNTHETIC_SOURCE_CHANGE = "SET_SYNTHETIC_SOURCE_CHANGE";
 export const createSyntheticSourceChangeMutation = (target: any, value: ExpressionLocation) => createPropertyMutation(SET_SYNTHETIC_SOURCE_CHANGE, target, "source", value);
 
-export const diffBaseNode = (oldNode: Partial<SEnvNodeInterface>, newNode: Partial<SEnvNodeInterface>) => {
+export const diffNodeBase = (oldNode: Partial<SEnvNodeInterface>, newNode: Partial<SEnvNodeInterface>) => {
   const mutations = [];
   if (!expressionLocationEquals(oldNode.source, newNode.source)) {
     mutations.push(createSyntheticSourceChangeMutation(oldNode, newNode.source));
@@ -394,7 +394,7 @@ export const diffValueNode = (oldNode: BasicValueNode, newNode: BasicValueNode) 
   if(oldNode.nodeValue !== newNode.nodeValue) {
     mutations.push(createUpdateValueNodeMutation(oldNode, newNode.nodeValue));
   }
-  return [...mutations, ...diffBaseNode(oldNode, newNode)];
+  return [...mutations, ...diffNodeBase(oldNode, newNode)];
 };
 
 export const patchValueNode = (oldNode: BasicValueNode, mutation: Mutation<any>) => {

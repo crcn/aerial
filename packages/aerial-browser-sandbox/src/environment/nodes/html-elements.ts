@@ -1,19 +1,23 @@
 import * as vm from "vm";
-import { weakMemo } from "aerial-common2";
 import { hasURIProtocol } from "aerial-sandbox2";
 import { getSEnvEventClasses } from "../events";
 import path = require("path");
+import { getUri } from "../utils";
+import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { SEnvNodeListInterface, getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvCSSStyleSheetClass, getSEnvCSSStyleDeclarationClass } from "../css";
-import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
-import { getSEnvElementClass, SEnvElementInterface } from "./element";
-import { getUri } from "../utils";
+import { weakMemo, SetValueMutation, createSetValueMutation, Mutation } from "aerial-common2";
+import { getSEnvElementClass, SEnvElementInterface, diffBaseElement, patchBaseElement, diffBaseNode } from "./element";
 
 export interface SEnvHTMLElementInterface extends HTMLElement, SEnvElementInterface {
   $$preconstruct();
   childNodes: SEnvNodeListInterface;
   addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;
   addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+}
+
+export interface SEnvHTMLStyledElementInterface extends SEnvHTMLElementInterface {
+  $$setSheet(sheet: CSSStyleSheet);
 }
 
 export const getSEnvHTMLElementClass = weakMemo((context: any) => {
@@ -217,33 +221,51 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
 export const getSEnvHTMLStyleElementClass = weakMemo((context: any) => {
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
   const SEnvCSSStyleSheet = getSEnvCSSStyleSheetClass(context);
+  const { SEnvEvent } = getSEnvEventClasses(context);
 
-  return class SEnvHTMLStyleElement extends SEnvHTMLElement implements HTMLStyleElement { 
-    sheet: StyleSheet;
+  return class SEnvHTMLStyleElement extends SEnvHTMLElement implements HTMLStyleElement, SEnvHTMLStyledElementInterface { 
+    sheet: CSSStyleSheet;
     disabled: boolean;
     media: string;
     type: string;
-    constructor() {
-      super();
-      this.sheet = new SEnvCSSStyleSheet();
-    }
 
     initialize() {
       this._load();
     }
 
     private _load() {
+      this.sheet = new SEnvCSSStyleSheet();
       const source = this.textContent;
+      this.sheet.cssText = source;
+      const e = new SEnvEvent();
+      e.initEvent("load", true, true);
+      this.dispatchEvent(e);
+    }
+
+    $$setSheet(sheet: CSSStyleSheet) {
+      this.sheet = sheet;
+    }
+
+    cloneShallow() {
+      const clone = super.cloneShallow();
+      const styleSheet = new SEnvCSSStyleSheet();
+      styleSheet.cssText = this.sheet.cssText;
+      (clone as SEnvHTMLStyledElementInterface).$$setSheet(styleSheet);
+      return clone;
     }
   };
 });
+
+export const diffHTMLStyleElement = (oldElement: HTMLStyledElement, newElement: HTMLStyledElement) => diffHTMLStyledElement(oldElement, newElement);
+
+export const patchHTMLStyleElement = (oldElement: HTMLStyledElement, mutation: Mutation<any>) => patchHTMLStyledElement(oldElement, mutation);
 
 export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
   const SEnvCSSStyleSheet = getSEnvCSSStyleSheetClass(context);
   const { SEnvEvent } = getSEnvEventClasses(context);
 
-  return class SEnvHTMLLinkElement extends SEnvHTMLElement implements HTMLLinkElement {
+  return class SEnvHTMLLinkElement extends SEnvHTMLElement implements HTMLLinkElement, SEnvHTMLStyledElementInterface {
 
     sheet: StyleSheet;
     disabled: boolean;
@@ -300,6 +322,24 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
 
       this._resolveLoaded();
     }
+
+    $$setSheet(sheet: CSSStyleSheet) {
+      this.sheet = sheet;
+    }
+
+    cloneShallow() {
+      const clone = super.cloneShallow() as any as HTMLLinkElement;
+      if (this.sheet) {
+
+        // TODO: clean this up -- clone stylesheet instead of using
+        // cssText which will run the parser again (we don't want that because it's sloowwwwwww). (CC)
+        const sheet = new SEnvCSSStyleSheet();
+        sheet.cssText = (this.sheet as CSSStyleSheet).cssText;
+        (clone as any as SEnvHTMLStyledElementInterface).$$setSheet(sheet);
+      }
+      return clone as any;
+    }
+    
     private async _loadStylesheet() {
       try {
         const { href } = this;
@@ -328,6 +368,46 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
     }
   };
 });
+
+export type HTMLStyledElement = HTMLLinkElement|HTMLStyleElement;
+
+export const SET_STYLED_ELEMENT_SHEET = "SET_STYLED_ELEMENT_SHEET";
+
+export const setStyledElementSheetMutation = (target: HTMLStyledElement, sheet: CSSStyleSheet) => createSetValueMutation(SET_STYLED_ELEMENT_SHEET, target, sheet);
+
+export const diffHTMLStyledElement = (oldElement: HTMLStyledElement, newElement: HTMLStyledElement) => {
+
+  const mutations = [];
+
+  // TODO - patch here instead
+  if ((oldElement.sheet as CSSStyleSheet).cssText !== (newElement.sheet as CSSStyleSheet).cssText) {
+    mutations.push(setStyledElementSheetMutation(oldElement, (newElement.sheet as CSSStyleSheet)));
+  }
+
+  return [
+    ...mutations,
+    ...diffBaseElement(oldElement, newElement)
+  ]
+}
+
+export const patchHTMLStyledElement = (oldElement: HTMLStyledElement, mutation: Mutation<any>) => {
+  switch(mutation.$type) {
+    case SET_STYLED_ELEMENT_SHEET: {
+
+    }
+  }
+}
+
+
+export const diffHTMLLinkElement = (oldElement: HTMLLinkElement, newElement: HTMLLinkElement) => {
+  if (oldElement.rel === "stylesheet") {
+    return diffHTMLStyledElement(oldElement, newElement);
+  } else {
+    return diffBaseElement(oldElement, newElement);
+  }
+}
+
+export const patchHTMLLinkElement = (oldElement: HTMLLinkElement, mutation: Mutation<any>) => patchHTMLStyledElement(oldElement, mutation);
 
 const _scriptCache = {};
 
@@ -1468,3 +1548,23 @@ export const getSEnvHTMLElementClasses = weakMemo((context: any) => {
     }
   };
 });
+
+export const diffHTMLNode = (oldElement: Node, newElement: Node) => {
+  if (oldElement.nodeName === "LINK") {
+    return diffHTMLLinkElement(oldElement as HTMLLinkElement, newElement as HTMLLinkElement);
+  } else if (oldElement.nodeName === "STYLE") {
+    return diffHTMLLinkElement(oldElement as HTMLLinkElement, newElement as HTMLLinkElement);
+  }
+
+  return diffBaseNode(oldElement, newElement, diffHTMLNode);
+}
+
+export const patchHTMLNode = (oldElement: HTMLElement, mutation: Mutation<any>) => {
+  if (oldElement.nodeName === "LINK") {
+    return patchHTMLLinkElement(oldElement as HTMLLinkElement, mutation);
+  } else if (oldElement.nodeName === "STYLE") {
+    return patchHTMLStyleElement(oldElement as HTMLStyleElement, mutation);
+  }
+
+  return patchBaseElement(oldElement, mutation);
+}

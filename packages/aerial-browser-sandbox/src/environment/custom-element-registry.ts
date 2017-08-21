@@ -31,7 +31,7 @@ export const getSEnvCustomElementRegistry = weakMemo((options) => {
     }
 
     get(name: string) {
-      return this._registry[name];
+      return this._registry[name.toLowerCase()];
     }
 
     whenDefined(name: string) {

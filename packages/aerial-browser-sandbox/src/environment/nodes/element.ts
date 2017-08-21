@@ -352,9 +352,9 @@ export const getSEnvElementClass = weakMemo((context: any) => {
   }
 });
 
-export const diffElementChild = (oldChild: Node, newChild: Node) => {
+export const diffBaseNode = (oldChild: Node, newChild: Node, diffChildNode = diffBaseNode) => {
   switch(oldChild.nodeType) {
-    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as Element, newChild as Element);
+    case SEnvNodeTypes.ELEMENT: return diffBaseElement(oldChild as Element, newChild as Element, diffChildNode);
     case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as Text, newChild as Text);
     case SEnvNodeTypes.COMMENT: return diffComment(oldChild as Comment, newChild as Comment);
   }
@@ -375,7 +375,7 @@ export const createSetElementAttributeMutation = (target: Element, name: string,
   return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, target, name, value, undefined, oldName, index);
 }
 
-export const diffElement = (oldElement: Element, newElement: Element) => {
+export const diffBaseElement = (oldElement: Element, newElement: Element, diffChildNode = diffBaseNode) => {
   const mutations = [];
 
   if (oldElement.nodeName !== newElement.nodeName) {
@@ -398,14 +398,13 @@ export const diffElement = (oldElement: Element, newElement: Element) => {
     }
   });
 
-  mutations.push(...diffParentNode(oldElement, newElement, diffElementChild));
+  mutations.push(...diffParentNode(oldElement, newElement, diffChildNode));
   return mutations;
 };
 
-export const patchElement = (oldElement: Element, mutation: Mutation<any>) => {
+export const patchBaseElement = (oldElement: Element, mutation: Mutation<any>) => {
   if (mutation.$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
     
-
     const { name, oldName, newValue } = <SetPropertyMutation<any>>mutation;
 
     // need to set the current value (property), and the default value (attribute)

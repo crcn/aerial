@@ -26,8 +26,7 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
     new<T>(...items: T[]): Collection<T>;
   }
 
-  const _Collection = function() {
-    const _this = [];
+  const _Collection = function(..._this) {
     _this["__proto__"] = this.constructor.prototype;
     return _this;
   } as any as CollectionClass;

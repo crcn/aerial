@@ -1,14 +1,28 @@
-import { weakMemo, Mutation, diffArray, eachArrayValueMutation, createPropertyMutation, SetPropertyMutation, SetValueMutation, createSetValueMutation } from "aerial-common2";
+import { 
+  weakMemo, 
+  Mutation, 
+  diffArray, 
+  SetValueMutation, 
+  SetPropertyMutation, 
+  createPropertyMutation, 
+  InsertChildMutation,
+  RemoveChildMutation,
+  eachArrayValueMutation, 
+  createSetValueMutation,
+  createInsertChildMutation,
+  createMoveChildChildMutation,
+  createRemoveChildChildMutation,
+} from "aerial-common2";
 import { SEnvWindowInterface } from "../window";
 import { getSEnvNodeClass, SEnvNodeInterface, patchValueNode } from "./node";
-import { getSEnvParentNodeClass, diffParentNode, patchParentNode, SEnvParentNodeInterface } from "./parent-node";
-import { diffElementChild } from "./element";
+import { getSEnvParentNodeClass, diffParentNode, patchParentNode, SEnvParentNodeInterface, SEnvParentNodeMutationTypes } from "./parent-node";
+import { diffBaseNode } from "./element";
 import { getL3EventClasses } from "../level3";
-import { getSEnvEventClasses } from "../events";
+import { getSEnvEventClasses, SEnvMutationEventInterface } from "../events";
 import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getSEnvTextClass, SEnvTextInterface } from "./text";
 import { getSEnvCommentClass, SEnvCommentInterface } from "./comment";
-import { SEnvHTMLElementInterface, getSEnvHTMLElementClass } from "./html-elements";
+import { SEnvHTMLElementInterface, getSEnvHTMLElementClass, diffHTMLNode, patchHTMLNode } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, whenLoaded, mapExpressionToNode } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
@@ -20,6 +34,7 @@ export interface SEnvDocumentInterface extends SEnvParentNodeInterface, Document
   defaultView: SEnvWindowInterface;
   childNodes: SEnvNodeListInterface;
   $load(content: string): void;
+  $$update();
   $$setReadyState(readyState: string): any;
   $createElementWithoutConstruct(tagName: string): SEnvHTMLElementInterface;
   createDocumentFragment(): DocumentFragment & SEnvNodeInterface;
@@ -109,15 +124,20 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     msCapsLockWarningOff: boolean;
     msCSSOMElementFloatMetrics: boolean;
 
-    readonly stylesheets: StyleSheetList;
-    readonly styleSheets: StyleSheetList;
+    private _stylesheets: StyleSheetList;
 
     constructor(readonly defaultView: SEnvWindowInterface) {
       super();
-      this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
-      this.addEventListener("load", this._onChildLoad.bind(this));
       defaultView.childObjects.set(this.$id, this);
+    }
+
+    get stylesheets(): StyleSheetList {
+      return this._stylesheets || (this._stylesheets = this._createStyleSheetList());
+    }
+
+    get styleSheets(): StyleSheetList {
+      return this.stylesheets;
     }
 
     get all() {
@@ -188,13 +208,8 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this.dispatchEvent(event);
     }
 
-    private _onChildLoad({ target }: Event) {
-      const sheet: CSSStyleSheet = target["sheet"];
-      if (sheet) {
-        (this.stylesheets as any as any[]).push(sheet);
-      }
+    $$update() {
     }
-
     elementsFromPoint(x: number, y: number) {
       return null;
     }
@@ -404,6 +419,19 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
         ...(super.createStruct() as any),
         title: this.title
       }
+    }
+
+    private _createStyleSheetList() {
+
+      const styleSheets = [];
+      
+      Array.prototype.forEach.call(this.querySelectorAll("*"), (element) => {
+        if (element.nodeType === SEnvNodeTypes.ELEMENT && element["sheet"]) {
+          styleSheets.push(element["sheet"]);
+        }
+      });
+
+      return new SEnvStyleSheetList(...styleSheets);
     }
 
     createAttributeNS(namespaceURI: string | null, qualifiedName: string): Attr {
@@ -728,23 +756,68 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     writeln(...content: string[]): void {
       this._throwUnsupportedMethod();
     }
+
+    protected _onMutation(event: SEnvMutationEventInterface) {
+      super._onMutation(event);
+      const { mutation } = event;
+
+      if (mutation.$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT || mutation.$type === SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT) {
+        this._stylesheets = null;
+      }
+    }
   };
 });
 
 export const READY_STATE_CHANGE = "READY_STATE_CHANGE";
+export const INSERT_STYLE_SHEET = "INSERT_STYLE_SHEET";
+export const REMOVE_STYLE_SHEET = "REMOVE_STYLE_SHEET";
+export const MOVE_STYLE_SHEET = "MOVE_STYLE_SHEET";
+
+// export const createInsertStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index?: number) => createInsertChildMutation(INSERT_STYLE_SHEET, target, sheet, index);
+// export const createRemoveStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index?: number) => createRemoveChildChildMutation(REMOVE_STYLE_SHEET, target, sheet, index);
+// export const createMoveStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index: number, oldIndex) => createMoveChildChildMutation(MOVE_STYLE_SHEET, target, sheet, index, oldIndex);
 
 const createReadyStateChangeMutation = (target: SEnvDocumentInterface, readyState: string): SetValueMutation<SEnvDocumentInterface> => createSetValueMutation(READY_STATE_CHANGE, target, readyState)
 
 export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SEnvDocumentInterface) => {
   const mutations = [];
+  const endMutations = [];
   if (oldDocument.readyState !== newDocument.readyState) {
-    mutations.push(createReadyStateChangeMutation(oldDocument, newDocument.readyState));
+    endMutations.push(createReadyStateChangeMutation(oldDocument, newDocument.readyState));
   }
+
+  // const cssDiffs = diffArray(
+  //   Array.from(oldDocument.stylesheets), 
+  //   Array.from(newDocument.stylesheets), 
+
+  //   // TODO - check ids. cssText is a very poor rep here
+  //   (a: CSSStyleSheet, b: CSSStyleSheet) => a.href === b.href ? 0 : a.cssText === b.cssText ? 0 : -1
+  // );
+
+  // eachArrayValueMutation(cssDiffs, {
+  //   insert({ value, index }) {
+  //     mutations.push(createRemoveStyleSheetMutation(oldDocument, value as CSSStyleSheet, index));
+  //   },
+  //   delete({ index }) {
+  //     mutations.push(createRemoveStyleSheetMutation(oldDocument, oldDocument.stylesheets.item(index) as CSSStyleSheet, index));
+  //   },
+  //   update({ originalOldIndex, patchedOldIndex, newValue, index }) {
+  //     if (patchedOldIndex !== index) {
+  //       mutations.push(createMoveStyleSheetMutation(oldDocument, oldDocument.stylesheets.item(originalOldIndex) as CSSStyleSheet, index, patchedOldIndex));
+  //     }
+
+  //     // TODO - diff & patch style sheet 
+  //     // const oldValue = originalOldIndex.childNodes[originalOldIndex];
+  //     // mutations.push(...diffChildNode(oldValue, newValue));
+  //   }
+  // })
+
   return [
-    ...diffParentNode(oldDocument, newDocument, diffElementChild),
+    ...mutations,
+    ...diffParentNode(oldDocument, newDocument, diffHTMLNode),
 
     // ready state mutation must come last
-    ...mutations
+    ...endMutations
   ];
 };
 
