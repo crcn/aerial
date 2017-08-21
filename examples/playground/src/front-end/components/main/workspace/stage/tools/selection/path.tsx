@@ -73,7 +73,7 @@ const enhancePath = compose<PathInnerProps, PathOuterProps>(
     onPointClick: ({ bounds, dispatch, zoom, workspace }: PathOuterProps) => (point: Point, event: React.MouseEvent<any>) => {
       event.stopPropagation();
       const sourceEvent = {...event};
-      startDOMDrag(event, (event2, info) => {
+      startDOMDrag(event, (() => {}), (event2, info) => {
         const delta = {
           left: info.delta.x / zoom,
           top: info.delta.y / zoom

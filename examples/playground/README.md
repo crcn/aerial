@@ -40,10 +40,9 @@ OPTIMIZATIONS:
 
 CLEANUP:
 
+- [ ] secondary selection (double click) should reselect item that was clicked
 - [ ] synthetic window timers
 - [ ] do not set relative position on double click
-- [ ] open text editor pane if hidden on alt click
-- [ ] cannot resize window from left pane 
 - [ ] HMR directly in window
 - [ ] resizing elements
 - [ ] keep measurements when resizing

@@ -38,8 +38,8 @@ export function mapImmutable<T>(target: T, map: ObjectMap<T>): T {
     return immutable(map(target));
   } else if (typeof map === 'object') {
     let result = immutable(target);
-    for (const key in map) {
-      result = result.set(key, mapImmutable(result[key], map[key]));
+    for (const key in (map as any)) {
+      result = result.set(key as any, mapImmutable(result[key], map[key]));
     }
     return result;
   } else {

@@ -16,6 +16,7 @@ export type SelectionOuterProps = {
 export type SelectionInnerProps = {
   setSelectionElement(element: HTMLDivElement);
   onKeyDown(event: React.KeyboardEvent<any>);
+  onDoubleClick(event: React.MouseEvent<any>);
 } & SelectionOuterProps;
 
 const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, browser: SyntheticBrowser }) => {
@@ -34,11 +35,11 @@ const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, brows
   return <div style={boundsStyle as any}></div>;
 };
 
-export const  SelectionStageToolBase = ({ setSelectionElement, workspace, browser, onKeyDown, dispatch }: SelectionInnerProps) => {
-  const selection = getBoundedWorkspaceSelection(browser, workspace);
+export const  SelectionStageToolBase = ({ setSelectionElement, workspace, browser, onKeyDown, dispatch, onDoubleClick }: SelectionInnerProps) => {
+  const selection = getBoundedWorkspaceSelection(browser, workspace);      
   if (!selection.length || workspace.secondarySelection) return null;
 
-  return <div ref={setSelectionElement} className="m-stage-selection-tool" tabIndex={-1} onDoubleClick={selection.length === 1 ? wrapEventToDispatch(dispatch, selectorDoubleClicked.bind(this, selection[0])) : null } onKeyDown={onKeyDown}>
+  return <div ref={setSelectionElement} className="m-stage-selection-tool" tabIndex={-1} onDoubleClick={onDoubleClick} onKeyDown={onKeyDown}>
     <SelectionBounds workspace={workspace} browser={browser} />
     <Resizer workspace={workspace} browser={browser} dispatch={dispatch} />
   </div>;
@@ -50,6 +51,12 @@ const enhanceSelectionStageTool = compose<SelectionInnerProps, SelectionOuterPro
     setSelectionElement: () => (element: HTMLDivElement) => {
       if (element) {
         element.focus();
+      }
+    },
+    onDoubleClick: ({ dispatch, workspace, browser }: SelectionInnerProps) => (event: React.MouseEvent<any>) => {
+      const selection = getBoundedWorkspaceSelection(browser, workspace);      
+      if (selection.length === 1) {
+        dispatch(selectorDoubleClicked(selection[0], event));
       }
     },
     onKeyDown: ({ workspace, dispatch }) => (event: React.KeyboardEvent<any>) => {

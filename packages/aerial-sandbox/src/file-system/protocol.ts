@@ -41,7 +41,7 @@ export class FileURIProtocol extends URIProtocol {
   async write(uri: string, content: any) {
     const filePath = this.removeProtocol(uri);
     return new Promise((resolve, reject) => {
-      fs.writeFile(filePath, content, (err, result) => {
+      (fs.writeFile as any)(filePath as any, content as any, (err, result) => {
         if (err) return reject(err);
         resolve();
       });
