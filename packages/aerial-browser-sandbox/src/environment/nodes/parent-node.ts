@@ -190,7 +190,7 @@ export const createParentNodeMoveChildMutation = (oldNode: BasicParentNode, chil
   return createMoveChildChildMutation(SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT, oldNode, child, patchedOldIndex || Array.from(oldNode.childNodes).indexOf(child), index);
 };
 
-export const diffParentNode = (oldNode: BasicParentNode, newNode: BasicNode, diffChildNode: (oldChild: BasicNode, newChild: BasicNode) => Mutation<any>[]) => {
+export const diffParentNode = (oldNode: ParentNode & Node, newNode: ParentNode & Node, diffChildNode: (oldChild: BasicNode, newChild: BasicNode) => Mutation<any>[]) => {
 
   const mutations = [...diffBaseNode(oldNode, newNode)];
 

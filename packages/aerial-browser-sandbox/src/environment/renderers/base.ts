@@ -53,16 +53,16 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
     return this._rects;
   }
 
-  get sourceWindow(): Window {
+  get sourceWindow(): SEnvWindowInterface {
     return this._sourceWindow;
   }
 
   getBoundingClientRect(element: SEnvElementInterface): ClientRect {
-    return this._rects && this._rects[element.uid];
+    return this._rects && this._rects[element.$id];
   }
 
   getComputedStyle(element: SEnvElementInterface, pseudoElement?: SEnvElementInterface): CSSStyleDeclaration {
-    return this._styles && this._styles[element.uid];
+    return this._styles && this._styles[element.$id];
   }
 
   protected _removeTargetListeners() {

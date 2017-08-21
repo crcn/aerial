@@ -24,6 +24,7 @@ import { SyntheticNode, SyntheticValueNode, BasicValueNode, BasicNode } from ".
 export interface SEnvNodeInterface extends Node {
   readonly constructed: boolean;
   uid: string;
+  cloned: boolean;
   $id: string;
   structType: string;
   struct: SyntheticNode;
@@ -38,6 +39,7 @@ export interface SEnvNodeInterface extends Node {
   $$addedToDocument(deep?: boolean);
   $$removedFromDocument();
   $$preconstruct();
+  $$setID(value: string);
 };
 
 export const getSEnvNodeClass = weakMemo((context: any) => {
@@ -50,6 +52,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
   return class SEnvNode extends SEnvEventTarget implements SEnvNodeInterface {
 
+    cloned: boolean;
     public $$parentNode: SEnvParentNodeInterface;
     public $$parentElement: HTMLElement;
     public $type: string;
@@ -104,6 +107,22 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       }
       this._constructed = true;
       this.addEventListener(SEnvMutationEvent.MUTATION, this._onMutation.bind(this));
+
+      if (!this.cloned) {
+        this.initialize();
+      }
+    }
+
+    initialize() {
+
+    }
+
+    $$setID(value: string) {
+      // quick fix. Don't this
+      const co = this._getDefaultView().childObjects;
+      co.delete(this.$id);
+      this.$id = value;
+      co.set(this.$id, this);
     }
 
     $$preconstruct() {
@@ -150,7 +169,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     setSource(source: ExpressionLocation) {
       this.source = source;
-      this.dispatchMutatonEvent(createSyntheticSourceChangeMutation(this, source));
+      this.dispatchMutationEvent(createSyntheticSourceChangeMutation(this, source));
     }
 
     protected updateStruct() {
@@ -164,7 +183,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
         nodeName: this.nodeName,
         source: this.source,
         $type: this.structType,
-        $id: this.uid
+        $id: this.$id
       };
     }
 
@@ -175,8 +194,9 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     cloneNode(deep?: boolean): Node {
       const clone = this.cloneShallow();
+      clone.cloned = true;
       clone.source = this.source;
-      clone.uid    = clone.$id = this.uid;
+      clone.$id    = this.$id;
 
       if (deep !== false) {
         for (let i = 0, n = this.childNodes.length; i < n; i++) {
@@ -267,7 +287,9 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     $$addedToDocument(deep?: boolean) {
       this.connectedToDocument = true;
       this.connectedCallback();
-      this._getDefaultView().childObjects.set(this.uid, this);
+
+      // TODO - don't mutate state here (CC)
+      this._getDefaultView().childObjects.set(this.$id, this);
       if (deep !== false) {
         for (const child of this.childNodes) {
           child.$$addedToDocument();
@@ -294,7 +316,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     $$removedFromDocument() {
       this.connectedToDocument = false;
-      this._getDefaultView().childObjects.delete(this.uid);
+      this._getDefaultView().childObjects.delete(this.$id);
     }
 
     dispatchEvent(event: Event): boolean {
@@ -307,7 +329,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       return true;
     }
 
-    dispatchMutatonEvent(mutation: Mutation<any>) {
+    dispatchMutationEvent(mutation: Mutation<any>) {
       const e = new SEnvMutationEvent();
       e.initMutationEvent(mutation);
       this.dispatchEvent(e);
@@ -338,7 +360,7 @@ export const getSEnvValueNode = weakMemo((context) => {
 
     set nodeValue(value: string) {
       this._nodeValue = value;
-      this.dispatchMutatonEvent(createPropertyMutation(UPDATE_VALUE_NODE, this, "nodeValue", value, undefined));
+      this.dispatchMutationEvent(createPropertyMutation(UPDATE_VALUE_NODE, this, "nodeValue", value, undefined));
     }
   }
 });
@@ -346,11 +368,12 @@ export const getSEnvValueNode = weakMemo((context) => {
 export const SET_SYNTHETIC_SOURCE_CHANGE = "SET_SYNTHETIC_SOURCE_CHANGE";
 export const createSyntheticSourceChangeMutation = (target: any, value: ExpressionLocation) => createPropertyMutation(SET_SYNTHETIC_SOURCE_CHANGE, target, "source", value);
 
-export const diffBaseNode = (oldNode: Partial<SyntheticNode>, newNode: Partial<SyntheticNode>) => {
+export const diffBaseNode = (oldNode: Partial<SEnvNodeInterface>, newNode: Partial<SEnvNodeInterface>) => {
   const mutations = [];
   if (!expressionLocationEquals(oldNode.source, newNode.source)) {
     mutations.push(createSyntheticSourceChangeMutation(oldNode, newNode.source));
   }
+
   return mutations;
 };
 

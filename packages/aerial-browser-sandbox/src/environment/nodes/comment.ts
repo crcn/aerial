@@ -37,6 +37,6 @@ export const getSEnvCommentClass = weakMemo((context) => {
   }
 });
 
-export const diffComment = (oldComment: BasicComment, newComment: BasicComment) => {
+export const diffComment = (oldComment: Comment, newComment: Comment) => {
   return diffValueNode(oldComment, newComment);
 };

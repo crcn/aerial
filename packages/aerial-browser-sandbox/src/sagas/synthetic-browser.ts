@@ -41,9 +41,11 @@ import {
   SYNTHETIC_WINDOW_SCROLLED,
   applyFileMutationsRequest,
   NODE_VALUE_STOPPED_EDITING,
+  SYNTHETIC_WINDOW_PROXY_OPENED,
   syntheticWindowMoved,
   SYNTHETIC_WINDOW_OPENED,
   SyntheticNodeValueStoppedEditing,
+  syntheticWindowProxyOpened,
   SyntheticNodeTextContentChanged,
   syntheticWindowOpened,
   SyntheticWindowSourceChanged,
@@ -73,6 +75,7 @@ import {
   diffArray,
   takeRequest, 
   Moved,
+  generateDefaultId,
   pointToBounds,
   MOVED,
   RESIZED,
@@ -106,17 +109,18 @@ import {
   diffDocument,
   patchWindow,
   SEnvNodeTypes,
+  mirrorWindow,
   SEnvNodeInterface,
   SEnvTextInterface,
   getSEnvEventClasses,
   SEnvWindowInterface,
   SEnvWindowContext,
+  getSEnvWindowClass,
   SEnvElementInterface,
   SEnvCommentInterface,
   SyntheticDOMRenderer,
   SEnvDocumentInterface,
   waitForDocumentComplete,
-  getSEnvWindowProxyClass,
   SEnvHTMLElementInterface,
   SyntheticWindowRendererEvent,
   createUpdateValueNodeMutation,
@@ -158,44 +162,44 @@ function* handleBrowserChanges() {
 function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
   yield fork(handleOpenSyntheticWindow, syntheticBrowserId);
   yield fork(handleOpenedSyntheticWindow, syntheticBrowserId);
+  yield fork(handleOpenedSyntheticProxyWindow, syntheticBrowserId);
 }
 
 function* handleOpenSyntheticWindow(browserId: string) {
   while(true) {
     const request = (yield take((action: OpenSyntheticBrowserWindow) => action.type === OPEN_SYNTHETIC_WINDOW && action.syntheticBrowserId === browserId)) as OpenSyntheticBrowserWindow;
-    const instance = (yield call(openSyntheticWindowEnvironment, request.uri)) as SEnvWindowInterface;
-    if (request.left || request.top) {
-      instance.moveTo(request.left, request.top);
-    }
-    yield put(syntheticWindowOpened(instance, browserId));
+    const instance = (yield call(openSyntheticWindowEnvironment, request.uri, browserId, request.left, request.top)) as SEnvWindowInterface;
   }
 }
 
-function* openSyntheticWindowEnvironment(location: string) {
+function* openSyntheticWindowEnvironment(location: string, browserId: string, left?: number, top?: number) {
 
-  const reload = async () => {
-    const newWindow = openSyntheticEnvironmentWindow(location, {...context, createRenderer: null});
-    await waitForDocumentComplete(newWindow);
-    proxy.target = newWindow;
+  let main: SEnvWindowInterface;
+  const windowId = generateDefaultId();
+  const documentId = generateDefaultId();
+  const fetch = yield getFetch();
+
+  function* reload () {
+
+    const SEnvWindow = getSEnvWindowClass({ console: getSEnvWindowConsole(), fetch });
+    const window = new SEnvWindow(location);
+
+    // ick. Better to use seed function instead to generate UIDs <- TODO.
+    window.$id = windowId;
+    window.document.$id = documentId;
+    window.resetChildObjects();
+    if (left || top) {
+      window.moveTo(left, top);
+    }
+
+    yield watchWindowExternalResourceUris(window, reload);
+    window.$load();
+
+    yield put(syntheticWindowOpened(window, browserId));
   };
 
-  const context = yield call(createSyntheticWindowEnvironmentContext, reload);
-  const SEnvWindowProxy = getSEnvWindowProxyClass(context);
-  const proxy = new SEnvWindowProxy(location);
-
-  reload();
-  
-  return proxy;
+  return yield call(reload);
 }
-
-function* createSyntheticWindowEnvironmentContext(reload: () => any) {
-  return {
-    reload,
-    console: getSEnvWindowConsole(),
-    fetch: yield call(getSEnvWindowFetch, reload),
-    createRenderer: createSyntheticDOMRendererFactory(document)
-  } as any;
-};
 
 const getSEnvWindowConsole = () => ({
   warn(...args) {
@@ -212,28 +216,29 @@ const getSEnvWindowConsole = () => ({
   }
 } as any as Console);
 
+function* watchWindowExternalResourceUris(instance: SEnvWindowInterface, reload: () => any) {
 
-function* getSEnvWindowFetch(reload) {
+  // watch for changes
+  yield spawn(function*() {
+    while(true) {
+      const { uri } = (yield take(URI_CACHE_BUSTED)) as UriCacheBusted;
+      if (instance.externalResourceUris.indexOf(uri) !== -1) {
+        yield call(reload);
+        break;
+      }
+    }
+  });
+}
+
+function* getFetch() {
+  const externalResources: string[] = [];
   const fetchQueue = createQueue();
-  let externalResources: string[] = [];
-
   yield spawn(function*() {
     while(true) {
       const { value: [info, resolve] } = yield call(fetchQueue.next);
       const body = (yield yield request(fetchRequest(info))).payload;
       externalResources.push(info);
       resolve(body);
-    }
-  });
-
-  // watch for changes
-  yield spawn(function*() {
-    while(true) {
-      const { uri } = (yield take(URI_CACHE_BUSTED)) as UriCacheBusted;
-      if (externalResources.indexOf(uri) !== -1) {
-        externalResources = [];
-        reload();
-      }
     }
   });
 
@@ -251,8 +256,35 @@ function* getSEnvWindowFetch(reload) {
 }
 
 function* handleOpenedSyntheticWindow(browserId: string) {
+  const proxies = new Map<string, [SEnvWindowInterface, () => any]>();
+  const createRenderer = createSyntheticDOMRendererFactory(document);
+
+  function* updateProxy(window: SEnvWindowInterface) {
+    const containsProxy = proxies.has(window.$id);
+    let proxy: SEnvWindowInterface;
+    let disposeMirror: () => any;
+    if (!containsProxy) {
+      proxy = window.clone();
+      proxy.renderer = createRenderer(proxy);
+      disposeMirror = () => {};
+      yield put(syntheticWindowProxyOpened(proxy, browserId));
+    } else {
+      [proxy, disposeMirror] = proxies.get(window.$id);
+    }
+
+    disposeMirror();
+    proxies.set(window.$id, [proxy, mirrorWindow(proxy, window)])
+  };
+
   while(true) {
     const { instance } = (yield take(SYNTHETIC_WINDOW_OPENED)) as SyntheticWindowOpened;
+    yield call(updateProxy, instance);
+  }
+}
+
+function* handleOpenedSyntheticProxyWindow(browserId: string) {
+  while(true) {
+    const { instance } = (yield take(SYNTHETIC_WINDOW_PROXY_OPENED)) as SyntheticWindowOpened;
     yield spawn(handleSyntheticWindowInstance, instance, browserId);
   }
 }
@@ -273,11 +305,11 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
 
   const chan = eventChannel(function(emit) {
     window.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects, styles }: SyntheticWindowRendererEvent) => {
-      emit(syntheticWindowRectsUpdated(window.uid, rects, styles));
+      emit(syntheticWindowRectsUpdated(window.$id, rects, styles));
     });
     
     const emitStructChange = debounce(() => {
-      emit(syntheticWindowLoaded(window.uid, window.document.struct, getAllWindowObjects(window)));
+      emit(syntheticWindowLoaded(window.$id, window.document.struct, getAllWindowObjects(window)));
     }, 0);
 
     window.addEventListener(SEnvMutationEvent.MUTATION, (event) => {
@@ -295,11 +327,11 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
     });
 
     window.addEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, (event: SEnvWindowOpenedEventInterface) => {
-      emit(syntheticWindowOpened(event.window, browserId, window.uid));
+      emit(syntheticWindowOpened(event.window, browserId, window.$id));
     })
 
     window.addEventListener("scroll", (event) => {
-      emit(syntheticWindowScrolled(window.uid, {
+      emit(syntheticWindowScrolled(window.$id, {
         left: window.scrollX,
         top: window.scrollY
       }));
@@ -307,7 +339,7 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
 
     const triggerLoaded = () => {
       if (window.document.readyState !== "complete") return;
-      emit(syntheticWindowLoaded(window.uid, window.document.struct, getAllWindowObjects(window)));
+      emit(syntheticWindowLoaded(window.$id, window.document.struct, getAllWindowObjects(window)));
     };
 
     window.document.addEventListener("readystatechange", triggerLoaded);
@@ -328,7 +360,7 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
 
 function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
 
-  const takeWindowAction = (type, test = (action) => action.syntheticWindowId === window.uid) => take((action) => action.type === type && test(action));
+  const takeWindowAction = (type, test = (action) => action.syntheticWindowId === window.$id) => take((action) => action.type === type && test(action));
 
   yield fork(function* handleRemoveNode() {
     while(true) {
@@ -348,7 +380,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
       const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
 
       // compute based on the data currently in the store
-      const syntheticWindow = getSyntheticWindow(yield select(), window.uid);
+      const syntheticWindow = getSyntheticWindow(yield select(), window.$id);
       const syntheticNode = getSyntheticNodeById(yield select(), itemId);
       
       const originalRect = syntheticWindow.allComputedBounds[syntheticNode.$id];
@@ -412,26 +444,19 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
     }
   });
 
-
-  // case RESIZED: {
-  //   const { itemId, itemType, bounds } = event as Resized;
-  //   if (itemType === SYNTHETIC_WINDOW) {
-  //     const window = getSyntheticWindow(root, itemId);
-  //     if (window) {
-  //       return updateSyntheticWindow(root, itemId, {
-  //         bounds
-  //       });
-  //     }
-  //     break;
-  //   }
-  // }
+  yield fork(function* handleResized() {
+    while(true) {
+      const { point } = (yield takeWindowAction(MOVED, (action: Resized) => action.itemId === window.$id)) as Moved;
+      window.moveTo(point.left, point.top);
+    }
+  });
 
   yield fork(function* handleResized() {
     while(true) {
-      const { bounds } = (yield takeWindowAction(RESIZED, (action: Resized) => action.itemId === window.uid)) as Resized;
+      const { bounds } = (yield takeWindowAction(RESIZED, (action: Resized) => action.itemId === window.$id)) as Resized;
       window.resizeTo(bounds.right - bounds.left, bounds.bottom - bounds.top);
     }
-  })
+  });
 }
 
 function* handleSytheticWindowSession(syntheticWindowId: string) {

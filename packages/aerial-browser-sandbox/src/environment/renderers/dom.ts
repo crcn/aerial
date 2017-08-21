@@ -6,6 +6,8 @@ import { SEnvParentNodeMutationTypes, createParentNodeInsertChildMutation, SEnvP
 import { SEnvMutationEventInterface } from "../events";
 import { BaseSyntheticWindowRenderer } from "./base";
 import { InsertChildMutation, RemoveChildMutation, MoveChildMutation, Mutation } from "aerial-common2";
+import { SET_SYNTHETIC_SOURCE_CHANGE } from "../nodes";
+import { getNodeByPath, getNodePath } from "../../utils";
 
 const NODE_NAME_MAP = {
   head: "span",
@@ -15,23 +17,6 @@ const NODE_NAME_MAP = {
   script: "span",
 };
 
-const getNodePath = (node: Node, root: Node) => {
-  const path = [];
-  let current = node;
-  while(current !== root) {
-    path.unshift(Array.prototype.indexOf.call(current.parentNode.childNodes, current));
-    current = current.parentNode;
-  }
-  return path;
-}
-
-const getNodeByPath = (path: string[], root: Node) => {
-  let current = root;
-  for (const part of path) {
-    current = current.childNodes[part];
-  }
-  return current;
-}
 
 const RECOMPUTE_TIMEOUT = 1;
 
@@ -60,7 +45,9 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   protected _onWindowMutation({ mutation }: SEnvMutationEventInterface) {
-    this._batchMutation(mutation);
+    if (mutation.$type !== SET_SYNTHETIC_SOURCE_CHANGE) {
+      this._batchMutation(mutation);
+    }
   }
 
   private _batchMutation(mutation: Mutation<any>) {
@@ -96,7 +83,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   private _applyMutation(mutation: Mutation<any>) {
-    const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.uid), this._sourceWindow.document), this.mount.lastElementChild);
+    const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.$id), this._sourceWindow.document), this.mount.lastElementChild);
 
     if (mutation.$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
     } else if (mutation.$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
@@ -124,10 +111,16 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
 
     const boundingClientRects = {};
     const allComputedStyles = {};
+    const childObjectsByUID = {};
+    
+    for (const child of Array.from(this.sourceWindow.childObjects.values())) {
+      childObjectsByUID[child.uid] = child;
+    }
     Array.prototype.forEach.call(this.mount.lastElementChild.querySelectorAll("*"), (element) => {
       const sourceUID = element.dataset.sourceUID;
-      boundingClientRects[sourceUID] = element.getBoundingClientRect();
-      allComputedStyles[sourceUID] = targetWindow.getComputedStyle(element);
+      const $id = childObjectsByUID[sourceUID].$id;
+      boundingClientRects[$id] = element.getBoundingClientRect();
+      allComputedStyles[$id] = targetWindow.getComputedStyle(element);
     });
 
     this.setPaintedInfo(boundingClientRects, allComputedStyles);
@@ -150,7 +143,7 @@ const mapNode = (a: SEnvNodeInterface, document: Document) => {
     case SEnvNodeTypes.ELEMENT: 
       const el = a as SEnvElementInterface;
       const bel = document.createElement(NODE_NAME_MAP[el.nodeName.toLowerCase()] || encodeURIComponent(el.nodeName)) as HTMLElement;
-      bel.dataset.sourceUID = a.uid;
+      bel.dataset.sourceUID = el.uid;
       if (el.nodeName.toLowerCase() === "script") {
         bel.style.display = "none";
       }

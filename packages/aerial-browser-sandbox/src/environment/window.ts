@@ -3,6 +3,7 @@ import { getSEnvLocationClass } from "./location";
 import { Dispatcher, weakMemo, Mutation, generateDefaultId } from "aerial-common2";
 import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "./events";
 import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
+import { getNodeByPath, getNodePath } from "../utils/node-utils"
 import { 
   SEnvElementInterface,
   getSEnvHTMLElementClasses, 
@@ -15,6 +16,7 @@ import {
   patchValueNode, 
   diffDocument, 
   diffComment, 
+  filterNodes,
   patchElement
 } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
@@ -25,55 +27,102 @@ type OpenTarget = "_self" | "_blank";
 
 export interface SEnvWindowInterface extends Window {
   uid: string;
+  $id: string;
+  fetch: Fetch;
   struct: SyntheticWindow;
+  externalResourceUris: string[];
   document: SEnvDocumentInterface;
-  childObjects: Map<string, any>;
+  readonly childObjects: Map<string, any>;
   renderer:  SyntheticWindowRenderer;
-  selector: any
+  selector: any;
+  clone(): SEnvWindowInterface;
 };
 
 export type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 
 export type SEnvWindowContext = {
-  fetch: Fetch;
-  reload: () => {};
+  fetch?: Fetch;
+  reload?: () => {};
   proxyHost?: string;
-  createRenderer?: SyntheticDOMRendererFactory;
+  getRenderer?: (window: SEnvWindowInterface) => SyntheticWindowRenderer;
   console?: Console;
 };
 
-export const getSEnvWindowProxyClass = weakMemo((context: SEnvWindowContext) => {
-  const SEnvWindow = getSEnvWindowClass(context);
-  const { SEnvMutationEvent } = getSEnvEventClasses(context);
 
-  class SEnvWindowProxy extends SEnvWindow {
-    private _target: SEnvWindowInterface;
-    constructor(location) {
-      super(location);
-      this._onTargetMutation = this._onTargetMutation.bind(this);
-    }
-    get target() {
-      return this._target;
-    }
-    set target(value: SEnvWindowInterface) {
-      if (this._target) {
-        this._target.removeEventListener(SEnvMutationEvent.MUTATION, this._onTargetMutation)
-      }
-      this._target = value;
-      this._target.addEventListener(SEnvMutationEvent.MUTATION, this._onTargetMutation);
-      patchWindow(this, diffWindow(this, value));
-    }
-    _onTargetMutation(event: SEnvMutationEventInterface) {
-      patchWindow(this, [event.mutation]);
-      this.dispatchEvent(event);
-    }
+export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInterface) => {
+  const { SEnvMutationEvent, SEnvWindowOpenedEvent } = getSEnvEventClasses();
+
+  if (target.$id !== source.$id) {
+    throw new Error(`target must be a previous clone of the source.`);
   }
 
-  return SEnvWindowProxy;
-});
+  const sync = () => {
+    patchWindow(target, diffWindow(target, source));
+  };
+  
+  // happens with dynamic content.
+  const onMutation = (event: SEnvMutationEventInterface) => {
+    // element IDS do not line up properly, so we need to sync on each mutation
+    sync();
+  };
+
+  const mirrorEvent = (event: Event) => {
+    target.dispatchEvent(event);
+  };
+
+  const tryPatching = () => {
+    if (source.document.readyState !== "complete") {
+      return;
+    }
+    sync();
+    source.addEventListener(SEnvMutationEvent.MUTATION, onMutation);
+  };
+  
+  const onResize = (event: Event) => {
+    target.resizeTo(source.innerWidth, source.innerHeight);
+  };
+
+  const onMove = (event: Event) => {
+    target.moveTo(source.screenLeft, source.screenTop);
+  };
+
+  const onTargetMove = (event: Event) => {
+    source.moveTo(target.screenLeft, target.screenTop);
+  };
+
+  const onTargetResize = (event: Event) => {
+    source.resizeTo(target.innerWidth, target.innerHeight);
+  };
+
+  source.resizeTo(target.innerWidth, target.innerHeight);
+  source.moveTo(target.screenLeft, target.screenTop);
+
+  source.addEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, mirrorEvent);
+  source.addEventListener("move", onMove);
+  source.addEventListener("resize", onResize);
+  target.addEventListener("move", onTargetMove);
+  target.addEventListener("resize", onTargetResize);
+  source.document.addEventListener("readystatechange", tryPatching);
+
+  tryPatching();
+
+  return () => {
+    source.removeEventListener(SEnvMutationEvent.MUTATION, onMutation);
+    source.removeEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, mirrorEvent);
+    source.removeEventListener("move", onMove);
+    source.removeEventListener("resize", onResize);
+    target.removeEventListener("move", onTargetMove);
+    target.removeEventListener("resize", onTargetResize);
+    target.removeEventListener("readystatechange", tryPatching);
+  };
+}
+const defaultFetch = ((info) => {
+  throw new Error(`Fetch not provided for ${info}`);
+}) as any;
 
 export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
-  const { createRenderer, fetch } = context;
+  const { getRenderer, fetch = defaultFetch } = context;
+
 
   const SEnvEventTarget = getSEnvEventTargetClass(context);
   const SEnvDocument = getSEnvDocumentClass(context);
@@ -93,7 +142,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
     readonly location: Location;
     private _selector: any;
-    readonly childObjects: Map<string, any>;
+    childObjects: Map<string, any>;
 
     readonly sessionStorage: Storage;
     readonly localStorage: Storage;
@@ -102,7 +151,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly applicationCache: ApplicationCache;
     readonly caches: CacheStorage;
     readonly clientInformation: Navigator;
-    readonly uid: string;
+    readonly externalResourceUris: string[];
+    uid: string;
     closed: boolean;
     readonly crypto: Crypto;
     defaultStatus: string;
@@ -262,20 +312,29 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly EventTarget: typeof EventTarget = SEnvEventTarget;
     readonly Element: typeof Element = SEnvElement;
     readonly HTMLElement: typeof HTMLElement = SEnvHTMLElement;
-    fetch: Fetch = fetch;
+    fetch: Fetch;
+    private _childWindowCount: number = 0;
+    public $id: string;
     
     constructor(origin: string) {
       super();
 
-      this.uid = generateDefaultId();
+      this.uid = this.$id = generateDefaultId();
       this.childObjects = new Map();
       this.location = new SEnvLocation(origin, context.reload);
       this.document = new SEnvDocument(this);
       this.window   = this;
-      this.renderer = (createRenderer || createNoopRenderer)(this);
+      this.renderer = (getRenderer || createNoopRenderer)(this);
       this.innerWidth = DEFAULT_WINDOW_WIDTH;
       this.innerHeight = DEFAULT_WINDOW_HEIGHT;
       this.moveTo(0, 0);
+      this.externalResourceUris = [];
+
+      this.fetch = async (info) => {
+        const ret = await fetch(info);
+        this.externalResourceUris.push(info as string);
+        return ret;
+      }
 
       const customElements = this.customElements = new SEnvCustomElementRegistry(this);
       for (const tagName in TAG_NAME_MAP) {
@@ -283,6 +342,15 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       }
 
       this.document.addEventListener(SEnvMutationEvent.MUTATION, this._onDocumentMutation.bind(this));
+    }
+
+    resetChildObjects() {
+      this.childObjects = new Map();
+      this.childObjects.set(this.document.$id, document);
+      filterNodes(this.document, (child: Node) => {
+        this.childObjects.set((child as any).$id, child);
+        return false;
+      });
     }
 
     get struct() {
@@ -362,6 +430,16 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       return setInterval(handler, ms, ...args);
     }
 
+    clone(deep?: boolean) {
+      const window = new SEnvWindow(this.location.toString());
+      window.$id = this.$id;
+      if (deep !== false) {
+        window.document.$$setID(this.document.$id);
+        patchWindow(window, diffWindow(window, this));
+      }
+      return window;
+    }
+
 
     setTimeout(...args): number {
       return 0;
@@ -379,7 +457,10 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
     }
 
-    moveTo(x?: number, y?: number): void {
+    moveTo(x: number = this.screenLeft, y: number = this.screenTop): void {
+      if (x === this.screenLeft && y === this.screenTop) {
+        return;
+      }
       this.screenLeft = this.screenY = x;
       this.screenTop  = this.screenX = y;
       const e = new SEnvEvent();
@@ -392,7 +473,11 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     open(url?: string, target?: string, features?: string, replace?: boolean): Window {
-      const window = openSyntheticEnvironmentWindow(url, context)
+      const SEnvWindow = getSEnvWindowClass({ console, fetch });
+      const window = new SEnvWindow(url);
+      window.$id = this.$id + "." + (++this._childWindowCount);
+      window.document.$id = window.$id + "-document";
+      window.$load();
       const event = new SEnvWindowOpenedEvent();
       event.initWindowOpenedEvent(window);
       this.dispatchEvent(event);
@@ -423,7 +508,10 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
     }
 
-    resizeTo(x?: number, y?: number): void {
+    resizeTo(x: number = this.innerWidth, y: number = this.innerHeight): void {
+      if (x === this.innerWidth && y === this.innerHeight) {
+        return;
+      }
       this.innerWidth = x;
       this.innerHeight = y;
       const event = new SEnvEvent();
@@ -524,7 +612,7 @@ export const diffWindow = (oldWindow: SEnvWindowInterface, newWindow: SEnvWindow
 export const patchWindow = (oldWindow: SEnvWindowInterface, mutations: Mutation<any>[]) => {
   const { childObjects } = oldWindow;
   for (const mutation of mutations) {
-    const target = childObjects.get(mutation.target.uid);
+    const target = childObjects.get(mutation.target.$id);
     if (target.nodeType != null) {
       patchNode(target, mutation);
     }
@@ -547,4 +635,8 @@ export const patchNode = (node: Node, mutation: Mutation<any>) => {
       break;
     }
   }
+}
+
+const traverseDOMTree = (node: ParentNode, each: (node: Node) => void) => {
+
 }

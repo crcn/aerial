@@ -15,8 +15,9 @@ export const EDIT_SOURCE_CONTENT                 = "EDIT_SOURCE_CONTENT";
 export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
 export const SYNTHETIC_WINDOW_SCROLLED           = "SYNTHETIC_WINDOW_SCROLLED";
 export const SYNTHETIC_WINDOW_OPENED             = "SYNTHETIC_WINDOW_OPENED";
+export const SYNTHETIC_WINDOW_PROXY_OPENED       = "SYNTHETIC_WINDOW_PROXY_OPENED";
 export const SYNTHETIC_WINDOW_MOVED              = "SYNTHETIC_WINDOW_MOVED";
-export const SYNTHETIC_WINDOW_RESIZED              = "SYNTHETIC_WINDOW_RESIZED";
+export const SYNTHETIC_WINDOW_RESIZED            = "SYNTHETIC_WINDOW_RESIZED";
 
 export type FetchRequest = {
   info: RequestInfo;
@@ -116,6 +117,13 @@ export const syntheticWindowOpened = (instance: SEnvWindowInterface, browserId: 
   browserId,
   instance,
   type: SYNTHETIC_WINDOW_OPENED
+});
+
+export const syntheticWindowProxyOpened = (instance: SEnvWindowInterface, browserId: string, parentWindowId?: string): SyntheticWindowOpened => ({
+  parentWindowId,
+  browserId,
+  instance,
+  type: SYNTHETIC_WINDOW_PROXY_OPENED
 });
 
 export const syntheticWindowMoved = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({

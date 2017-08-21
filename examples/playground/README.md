@@ -13,6 +13,8 @@ OBJECTIVE:
 
 - POLISH:
 
+- [ ] +/- to zoom
+- [ ] zoom indicator
 - [ ] show original position
 - [ ] measurement tooling
 - [ ] multi select

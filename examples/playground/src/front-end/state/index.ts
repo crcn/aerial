@@ -220,11 +220,11 @@ export const getStageToolMouseNodeTargetReference = (state: ApplicationState, ev
   const allComputedBounds = window.allComputedBounds;
   const intersectingBounds: Bounds[] = [];
   const intersectingBoundsMap = new Map<Bounds, string>();
-  for (const uid in allComputedBounds) {
-    const bounds = allComputedBounds[uid];
+  for (const $id in allComputedBounds) {
+    const bounds = allComputedBounds[$id];
     if (pointIntersectsBounds({ left: mouseX, top: mouseY }, zoomBounds(bounds, zoom))) {
       intersectingBounds.push(bounds);
-      intersectingBoundsMap.set(bounds, uid);
+      intersectingBoundsMap.set(bounds, $id);
     }
   }
   if (!intersectingBounds.length) return null;

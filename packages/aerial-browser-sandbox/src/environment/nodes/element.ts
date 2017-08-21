@@ -53,7 +53,6 @@ export const getSEnvElementClass = weakMemo((context: any) => {
     readonly structType: string = SYNTHETIC_ELEMENT;
     attributes: NamedNodeMap;
     nodeType: number = SEnvNodeTypes.ELEMENT;
-    id: string;
 
     msContentZoomFactor: number;
     readonly msRegionOverflow: string;
@@ -129,6 +128,10 @@ export const getSEnvElementClass = weakMemo((context: any) => {
           return true;
         }
       });
+    }
+
+    get id() {
+      return this.getAttribute("id");
     }
 
     getAttribute(name: string): string | null { 
@@ -349,11 +352,11 @@ export const getSEnvElementClass = weakMemo((context: any) => {
   }
 });
 
-export const diffElementChild = (oldChild: BasicNode, newChild: BasicNode) => {
+export const diffElementChild = (oldChild: Node, newChild: Node) => {
   switch(oldChild.nodeType) {
-    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as BasicElement, newChild as BasicElement);
-    case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as BasicTextNode, newChild as BasicTextNode);
-    case SEnvNodeTypes.COMMENT: return diffComment(oldChild as SyntheticComment, newChild as BasicTextNode);
+    case SEnvNodeTypes.ELEMENT: return diffElement(oldChild as Element, newChild as Element);
+    case SEnvNodeTypes.TEXT: return diffTextNode(oldChild as Text, newChild as Text);
+    case SEnvNodeTypes.COMMENT: return diffComment(oldChild as Comment, newChild as Comment);
   }
   return [];
 };
@@ -368,11 +371,11 @@ export const createSetElementTextContentMutation = (target: BasicElement, value:
   return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_TEXT_CONTENT, target, "textContent", value);
 }
 
-export const createSetElementAttributeMutation = (target: BasicElement, name: string, value: string, oldName?: string, index?: number) => {
+export const createSetElementAttributeMutation = (target: Element, name: string, value: string, oldName?: string, index?: number) => {
   return createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, target, name, value, undefined, oldName, index);
 }
 
-export const diffElement = (oldElement: BasicElement, newElement: BasicElement) => {
+export const diffElement = (oldElement: Element, newElement: Element) => {
   const mutations = [];
 
   if (oldElement.nodeName !== newElement.nodeName) {

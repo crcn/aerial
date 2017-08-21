@@ -24,7 +24,7 @@ describe(__filename + "#", () => {
   it("can render text to the dom renderer", async () => {
     const createSyntheticDOMRenderer = await createTestSyntheticDOMRendererFactory();
     const window = openTestWindow(wrapHTML(`hello world`), {
-      createRenderer: createSyntheticDOMRenderer
+      getRenderer: createSyntheticDOMRenderer
     });
     await waitForDocumentComplete(window);
     const domRenderer = window.renderer as SyntheticDOMRenderer;
@@ -47,7 +47,7 @@ describe(__filename + "#", () => {
 
       for (const variant of variants) {
         const newWindow = openTestWindow(wrapHTML(variant), {
-          createRenderer: createSyntheticDOMRenderer
+          getRenderer: createSyntheticDOMRenderer
         });
 
         await waitForDocumentComplete(newWindow);

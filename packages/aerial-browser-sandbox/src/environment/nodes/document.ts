@@ -118,7 +118,7 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
       this.stylesheets = this.styleSheets = new SEnvStyleSheetList();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
       this.addEventListener("load", this._onChildLoad.bind(this));
-      defaultView.childObjects.set(this.uid, this);
+      defaultView.childObjects.set(this.$id, this);
     }
 
     get all() {
@@ -176,13 +176,17 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
 
     $$setReadyState(state) {
+      if (this._readyState === state) {
+        return;
+      }
       this._readyState = state;
-      const event = new SEnvEvent();
-      event.initEvent("readystatechange", true, true);
-      this.dispatchEvent(event);
       const me = new SEnvMutationEvent2();
       me.initMutationEvent(createReadyStateChangeMutation(this, this.readyState));
       this.dispatchEvent(me);
+
+      const event = new SEnvEvent();
+      event.initEvent("readystatechange", true, true);
+      this.dispatchEvent(event);
     }
 
     private _onChildLoad({ target }: Event) {

@@ -45,6 +45,6 @@ export const getSEnvTextClass = weakMemo((context: any) => {
   }
 });
 
-export const diffTextNode = (oldNode: BasicTextNode, newNode: BasicTextNode) => {
+export const diffTextNode = (oldNode: Text, newNode: Text) => {
   return diffValueNode(oldNode, newNode);
 }

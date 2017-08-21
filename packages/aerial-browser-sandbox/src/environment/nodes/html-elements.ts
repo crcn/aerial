@@ -149,7 +149,7 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
     }
 
     set style(value: CSSStyleDeclaration) {
-      Object.assign(this._style, value);
+      Object.assign(this.style, value);
       this.onStyleChange();
     }
 
@@ -226,6 +226,9 @@ export const getSEnvHTMLStyleElementClass = weakMemo((context: any) => {
     constructor() {
       super();
       this.sheet = new SEnvCSSStyleSheet();
+    }
+
+    initialize() {
       this._load();
     }
 
@@ -254,8 +257,8 @@ export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
     private _resolveLoaded: (value?) => any;
     private _rejectLoaded: (value?) => any;
 
-    constructor() {
-      super();
+    initialize() {
+      super.initialize();
       this.interactiveLoaded = new Promise((resolve, reject) => {
         this._resolveLoaded = resolve;
         this._rejectLoaded  = reject;
@@ -351,8 +354,8 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
         return this.getAttribute("src");
       }
 
-      constructor() {
-        super();
+      initialize() {
+        super.initialize();
         this._load();
       }
 

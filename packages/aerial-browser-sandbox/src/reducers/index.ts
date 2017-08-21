@@ -27,7 +27,7 @@ import { 
   SyntheticWindowRectsUpdated,
   SyntheticWindowSourceChanged,
   OPEN_SYNTHETIC_WINDOW, 
-  SYNTHETIC_WINDOW_OPENED,
+  SYNTHETIC_WINDOW_PROXY_OPENED,
   SyntheticWindowOpened,
   OpenSyntheticBrowserWindow,
   NewSyntheticWindowEntryResolved,
@@ -68,7 +68,7 @@ const getBestWindowBounds = (browser: SyntheticBrowser, bounds: Bounds) => {
 export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootState>(root: TRootState = createSyntheticBrowserRootState() as TRootState, event: BaseEvent) => {
 
   switch(event.type) {
-    case SYNTHETIC_WINDOW_OPENED: {
+    case SYNTHETIC_WINDOW_PROXY_OPENED: {
       const { instance, parentWindowId, browserId } = event as SyntheticWindowOpened;
       let syntheticBrowser: SyntheticBrowser;
       syntheticBrowser = getSyntheticBrowser(root, browserId);
@@ -76,7 +76,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
         windows: [
           ...syntheticBrowser.windows,
           createSyntheticWindow({
-            $id: instance.uid,
+            $id: instance.$id,
             location: instance.location.toString(),
             mount: instance.renderer.mount,
             bounds: {
@@ -99,8 +99,8 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
 
     case SYNTHETIC_WINDOW_RESIZED: 
     case SYNTHETIC_WINDOW_MOVED: {
-      const { instance: { uid, screenLeft, screenTop, innerWidth, innerHeight } } = event as SyntheticWindowChanged;
-      return updateSyntheticWindow(root, uid, {
+      const { instance: { $id, screenLeft, screenTop, innerWidth, innerHeight } } = event as SyntheticWindowChanged;
+      return updateSyntheticWindow(root, $id, {
         bounds: {
           left: screenLeft,
           top: screenTop,
