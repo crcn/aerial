@@ -17,6 +17,11 @@ import {
 
 import { MutateSourceContentRequest, EDIT_SOURCE_CONTENT, testMutateContentRequest } from "../actions";
 
+const maintinWhitespaceTrimmings = (oldContent: string, newContent: string) => {
+  const wsParts = oldContent.match(/(^[\s\r\n\t]*|[\s\r\n\t]*$)/g);
+  return wsParts[0] + newContent.trim() + wsParts[1];
+};
+
 export function* htmlContentEditorSaga(contentType: string = "text/html") {
 
   yield fork(function* handleSetValueNode() {
@@ -42,7 +47,10 @@ export function* htmlContentEditorSaga(contentType: string = "text/html") {
     while(true) {
       yield takeRequest(testMutateContentRequest(contentType, SyntheticDOMElementMutationTypes.SET_TEXT_CONTENT), ({ mutation, content }: MutateSourceContentRequest<SetPropertyMutation<any>>) => {  
         const targetNode = findMutationTargetExpression(mutation.target, parseHTML(content)) as parse5.AST.Default.Element;
-        return createStringMutation(targetNode.__location.startTag.endOffset, targetNode.__location.endTag ? targetNode.__location.endTag.startOffset : targetNode.__location.endOffset, mutation.newValue);
+        const start = targetNode.__location.startTag.endOffset;
+        const end = targetNode.__location.endTag ? targetNode.__location.endTag.startOffset : targetNode.__location.endOffset;
+        const oldContent = content.substr(start, end - start);
+        return createStringMutation(start, end, maintinWhitespaceTrimmings(oldContent, mutation.newValue));
       });
     }
   });
