@@ -2,10 +2,14 @@ import "./grid.scss";
 
 import React =  require("react");
 import { Workspace, Stage } from "front-end/state";
-import { pure } from "recompose";
+import { pure, compose } from "recompose";
 
-export const GridStageTool = pure((({ settings }: { settings: Stage }) => {
-  if (settings.translate.zoom <= 12) return null;
+export type GridStageToolProps = {
+  stage: Stage;
+};
+
+export const GridStageToolBase = ({ stage: {translate } }: GridStageToolProps) => {
+  if (translate.zoom <= 12) return null;
 
   const size = 20000;
   const gridSize = 1;
@@ -26,7 +30,7 @@ export const GridStageTool = pure((({ settings }: { settings: Stage }) => {
           <g stroke="#d8d8d8">
             {
               paths.map(([[sx, sy], [ex, ey]], i) => {
-                return <path strokeWidth={1 / settings.translate.zoom} key={i} d={`M${sx},${sy} L${ex},${ey}`}></path>;
+                return <path strokeWidth={1 / translate.zoom} key={i} d={`M${sx},${sy} L${ex},${ey}`}></path>;
               })
             }
           </g>
@@ -35,4 +39,8 @@ export const GridStageTool = pure((({ settings }: { settings: Stage }) => {
       <rect fill="url(#grid)" width={size} height={size} />
     </svg>
   </div>;
-}) as any);
+};
+
+export const GridStageTool = compose<GridStageToolProps, GridStageToolProps>(
+  pure
+)(GridStageToolBase);

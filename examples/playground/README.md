@@ -6,6 +6,8 @@ TOMORROW:
 - [ ] preview server
   - [ ] auto layout windows
   - [ ] windows should be immovable
+  - [ ] reload main window when a file is added
+- [ ] fix CSS loading
 
 OBJECTIVE:
 
@@ -21,10 +23,6 @@ OBJECTIVE:
 - [ ] ability to move any item around
 - [ ] copy + paste elements
 - [ ] full screen window
-
-STAGE 2:
-
-- [ ] AST parser for inline styles. Enable dynamic content.
 
 HI PRIO:
 

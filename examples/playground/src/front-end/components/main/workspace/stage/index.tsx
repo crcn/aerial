@@ -7,7 +7,7 @@ import { ToolsLayer } from "./tools";
 import { Windows } from "./windows";
 import { Isolate } from "front-end/components/isolated";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
-import { lifecycle, compose, withState, withHandlers, pure, Component } from "recompose";
+import { lifecycle, compose, withState, withHandlers, pure } from "recompose";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { stageWheel, stageContainerMounted } from "front-end/actions";
 
@@ -33,7 +33,7 @@ export type StageInnerProps = {
   setCanvasOuter: (element: HTMLElement) => any;
 } & StageOuterProps;
 
-const enhanceStage = compose<StageOuterProps, StageInnerProps>(
+const enhanceStage = compose<StageInnerProps, StageOuterProps>(
   pure,
   withState('canvasOuter', 'setCanvasOuter', null),
   withState('mousePosition', 'setMousePosition', null),
@@ -115,6 +115,6 @@ export const StageBase = ({
 }
 
 
-export const Stage = enhanceStage(StageBase as any) as any as Component<StageOuterProps>;
+export const Stage = enhanceStage(StageBase);
 
 export * from "./tools";

@@ -26,9 +26,6 @@ export const WorkspaceBase = ({ state, workspace, browser, dispatch }: Workspace
     </div>
     { stage.showRightGutter ? <VisualGutter /> : null }
   </div>
-}
+};
 
 export const Workspace = pure(WorkspaceBase as any) as typeof WorkspaceBase;
-
-export * from "./element-gutter";
-export * from "./project-gutter";

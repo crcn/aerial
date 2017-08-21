@@ -35,6 +35,7 @@ import {
   updateWorkspace,
   getWorkspaceById,
   ShortcutServiceState,
+  updateWorkspaceStage,
   getSelectedWorkspace,
   addWorkspaceSelection,
   setWorkspaceSelection,
@@ -43,6 +44,7 @@ import {
   clearWorkspaceSelection,
   removeWorkspaceSelection,
   toggleWorkspaceSelection,
+  showWorkspaceTextEditor,
   getSelectedWorkspaceFile,
   getWorkspaceSelectionBounds,
   getSyntheticNodeWorkspace,
@@ -56,6 +58,7 @@ import {
   StageToolOverlayClicked,
   STAGE_MOUNTED,
   StageMounted,
+  TOGGLE_TEXT_EDITOR_PRESSED,
   StageToolEditTextChanged,
   STAGE_TOOL_EDIT_TEXT_CHANGED,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
@@ -135,31 +138,43 @@ export const applicationReducer = (state: ApplicationState = createApplicationSt
   state = windowPaneReducer(state, event);
   state = shortcutServiceReducer(state, event);
   state = fileCacheReducer(state, event);
+  state = shortcutReducer(state, event);
 
   return state;
 };
-
-// const canvasReducer = (state: ApplicationState, event: BaseEvent) => {
-//   switch(event.type) {
-//     case CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED: {
-//       const { allComputedStyles, allComputedBounds, syntheticWindowId } = event as CanvasElementsComputedPropsChanged;
-//       const window = getSyntheticBrowserWindow(state, syntheticWindowId);
-//       return updateStruct(state, window, {
-//         ...window,
-//         allComputedBounds,
-//         allComputedStyles
-//       });
-//     }
-//   }
-
-//   return state;
-// };
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
 const MIN_ZOOM = 0.02;
 const MAX_ZOOM = 6400 / 100;
 const INITIAL_ZOOM_PADDING = 50;
+
+const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
+  switch(event.type) {
+
+    case TOGGLE_LEFT_GUTTER_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      return updateWorkspaceStage(state, workspace.$id, {
+        showLeftGutter: !workspace.stage.showLeftGutter
+      });
+    }
+    
+    case TOGGLE_TEXT_EDITOR_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      return updateWorkspaceStage(state, workspace.$id, {
+        showTextEditor: !workspace.stage.showTextEditor
+      });
+    }
+
+    case TOGGLE_RIGHT_GUTTER_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      return updateWorkspaceStage(state, workspace.$id, {
+        showRightGutter: !workspace.stage.showRightGutter
+      });
+    }
+  }
+  return state;
+}
 
 const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
@@ -183,22 +198,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         };
       }
 
-      return updateWorkspace(state, workspace.$id, {
-        stage: {
-          ...workspace.stage,
-          translate
-        }
-      });
-    }
-
-    case TOGGLE_LEFT_GUTTER_PRESSED: {
-      const workspace = getSelectedWorkspace(state);
-      return updateWorkspace(state, workspace.$id, {
-        stage: {
-          ...workspace.stage,
-          showLeftGutter: !workspace.stage.showLeftGutter
-        }
-      });
+      return updateWorkspaceStage(state, workspace.$id, { translate });
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
@@ -259,37 +259,24 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         (height - INITIAL_ZOOM_PADDING) / innerSize.height
       );
 
-      return updateWorkspace(state, workspace.$id, {
-        stage: {
-          ...workspace.stage,
-          translate: centerTransformZoom({
-            ...centered,
-            zoom: 1
-          }, { left: 0, top: 0, right: width, bottom: height }, scale)
-        }
+      return updateWorkspaceStage(state, workspace.$id, {
+        translate: centerTransformZoom({
+          ...centered,
+          zoom: 1
+        }, { left: 0, top: 0, right: width, bottom: height }, scale)
       });
     };
 
     case STAGE_TOOL_OVERLAY_MOUSE_PAN_START: {
       const { windowId } = event as StageToolOverlayMousePanStart;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return updateWorkspace(state, workspace.$id, {
-        stage: {
-          ...workspace.stage,
-          panning: true
-        }
-      });
+      return updateWorkspaceStage(state, workspace.$id, { panning: true });
     }
     
     case STAGE_TOOL_OVERLAY_MOUSE_PAN_END: {
       const { windowId } = event as StageToolOverlayMousePanEnd;
       const workspace = getSyntheticWindowWorkspace(state, windowId)
-      return updateWorkspace(state, workspace.$id, {
-        stage: {
-          ...workspace.stage,
-          panning: false
-        }
-      });
+      return updateWorkspaceStage(state, workspace.$id, { panning: false });
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
@@ -343,17 +330,6 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       state = setWorkspaceSelection(state, workspace.$id, getStructReference(item));
       return state;
     }
-
-    case TOGGLE_RIGHT_GUTTER_PRESSED: {
-      const workspace = getSelectedWorkspace(state);
-      return updateWorkspace(state, workspace.$id, {
-        stage: {
-          ...workspace.stage,
-          showRightGutter: !workspace.stage.showRightGutter
-        }
-      });
-    }
-
     case WORKSPACE_DELETION_SELECTED: {
       const { workspaceId } = event as WorkspaceSelectionDeleted;
       return clearWorkspaceSelection(state, workspaceId);
@@ -392,10 +368,10 @@ const setSelectedFileFromNodeId = (state: ApplicationState, workspaceId: string,
   const { source: { uri, start } } = getSyntheticNodeById(state, nodeId) as SyntheticNode;
   const fileCacheItem = getFileCacheItemByUri(state, uri);
   if (fileCacheItem) {
-    return updateWorkspace(state, workspaceId, {
+    return showWorkspaceTextEditor(updateWorkspace(state, workspaceId, {
       textCursorPosition: start,
       selectedFileId: fileCacheItem.$id,
-    });
+    }), workspaceId);
   }
   return state;
 }

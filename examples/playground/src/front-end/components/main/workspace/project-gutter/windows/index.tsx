@@ -12,11 +12,20 @@ const WindowRow = ({ window, dispatch }: { window: SyntheticWindow, dispatch: Di
   {window.document && window.document.title || window.location} 
 </div>
 
-const WindowsPaneControlsBase = ({ workspace, dispatch, onAddWindow }: { workspace: Workspace, dispatch: Dispatcher<any>, onAddWindow: any }) => <span>
+export type WindowPaneControlsOuterProps = { 
+  workspace: Workspace; 
+  dispatch: Dispatcher<any>; 
+};
+
+export type WindowPaneControlsInnerProps = { 
+  onAddWindow: any 
+} & WindowPaneControlsOuterProps;
+
+const WindowsPaneControlsBase = ({ workspace, dispatch, onAddWindow }: WindowPaneControlsInnerProps) => <span>
     <i className="icon ion-plus" onClick={onAddWindow}></i>
 </span>;
 
-const enhanceControls = compose(
+const enhanceControls = compose<WindowPaneControlsInnerProps, WindowPaneControlsOuterProps>(
   withHandlers({
     onAddWindow: ({ workspace, dispatch }) => (event: React.MouseEvent<any>) => {
       const location = prompt("Type in a URL");
@@ -26,11 +35,22 @@ const enhanceControls = compose(
   })
 );
 
-const WindowsPaneControls = enhanceControls(WindowsPaneControlsBase as any) as any;
+const WindowsPaneControls = enhanceControls(WindowsPaneControlsBase);
 
 
-export const WindowsPane = pure((({ workspace, browser, dispatch }: { workspace: Workspace, browser: SyntheticBrowser, dispatch: Dispatcher<any> }) => <Pane title="Windows" className="m-windows-pane" controls={<WindowsPaneControls workspace={workspace} dispatch={dispatch} />}>
+export type WindowsPaneProps = { 
+  workspace: Workspace; 
+  browser: SyntheticBrowser;
+  dispatch: Dispatcher<any>; 
+};
+
+
+export const WindowsPaneBase = ({ workspace, browser, dispatch }: WindowsPaneProps) => <Pane title="Windows" className="m-windows-pane" controls={<WindowsPaneControls workspace={workspace} dispatch={dispatch} />}>
   {
     browser.windows.map((window) => <WindowRow key={window.$id} window={window} dispatch={dispatch} />)
   }
-</Pane>) as any);
+</Pane>;
+
+export const WindowsPane = compose<WindowsPaneProps, WindowsPaneProps>(
+  pure
+)(WindowsPaneBase);

@@ -31,7 +31,12 @@ import { createFileCacheStore, FileCacheRootState, FileCacheItem, getFileCacheIt
 
 import { StageToolOverlayMouseMoved, StageToolOverlayClicked } from "../actions";
 import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortcuts";
-import { toggleLeftGutterPressed, toggleRightGutterPressed, deleteShortcutPressed } from "front-end/actions";
+import { 
+  deleteShortcutPressed,
+  toggleTextEditorPressed,
+  toggleLeftGutterPressed, 
+  toggleRightGutterPressed, 
+} from "front-end/actions";
 
 import {
   SyntheticBrowser,
@@ -103,6 +108,23 @@ export const getSelectedWorkspaceFile = (state: ApplicationState, workspace: Wor
 }
 
 export const getSyntheticWindowWorkspace = (root: ApplicationState, windowId: string): Workspace => getSyntheticBrowserWorkspace(root, getSyntheticWindowBrowser(root, windowId).$id);
+
+export const showWorkspaceTextEditor = (root: ApplicationState, workspaceId: string): ApplicationState => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateWorkspaceStage(root, workspaceId, {
+    showTextEditor: true
+  });
+};
+
+export const updateWorkspaceStage = (root: ApplicationState, workspaceId: string, stageProperties: Partial<Stage>): ApplicationState => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateWorkspace(root, workspaceId, {
+    stage: {
+      ...workspace.stage,
+      ...stageProperties
+    }
+  });
+};
 
 export const getSyntheticBrowserWorkspace = weakMemo((root: ApplicationState, browserId: string) => {
   return root.workspaces.find(workspace => workspace.browserId === browserId);
@@ -194,7 +216,8 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
   shortcuts:[
     createKeyboardShortcut("backspace", deleteShortcutPressed()),
     createKeyboardShortcut("meta+b", toggleLeftGutterPressed()),
-    createKeyboardShortcut("meta+/", toggleRightGutterPressed())
+    createKeyboardShortcut("meta+/", toggleRightGutterPressed()),
+    createKeyboardShortcut("meta+e", toggleTextEditorPressed())
   ],
   fileCacheStore: createFileCacheStore(),
   browserStore: createSyntheticBrowserStore()

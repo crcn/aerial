@@ -56,7 +56,9 @@ export const TextEditor = compose<TextEditorInnerProps, TextEditorProps>(
             codeMirror.codeMirror.setCursor({ line: cursorPosition.line - 1, ch: cursorPosition.column - 1 });
           });
         }
-        if (file !== this.props.file && codeMirror.codeMirror.getValue() !== String(file.content)) {
+
+        if (file !== this["_file"] && codeMirror.codeMirror.getValue() !== String(file.content)) {
+          this["_file"] = file;
           const scrollInfo = codeMirror.codeMirror.getScrollInfo();
           codeMirror.codeMirror.setValue(String(file.content));
           codeMirror.codeMirror.scrollTo(scrollInfo.left, scrollInfo.top);
