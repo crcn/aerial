@@ -26,7 +26,6 @@ STAGE 2:
 
 - [ ] AST parser for inline styles. Enable dynamic content.
 
-
 HI PRIO:
 
 - [ ] saved workspaces
@@ -45,6 +44,7 @@ CLEANUP:
 
 - [ ] synthetic window timers
 - [ ] do not set relative position on double click
+- [ ] open text editor pane if hidden on alt click
 
 LOW PRIO:
 
