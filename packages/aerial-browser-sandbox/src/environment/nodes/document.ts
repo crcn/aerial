@@ -109,7 +109,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     msCapsLockWarningOff: boolean;
     msCSSOMElementFloatMetrics: boolean;
 
-
     readonly stylesheets: StyleSheetList;
     readonly styleSheets: StyleSheetList;
 

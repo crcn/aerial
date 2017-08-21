@@ -458,6 +458,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     moveTo(x: number = this.screenLeft, y: number = this.screenTop): void {
+      x = x && Math.round(x);
+      y = y && Math.round(y);
       if (x === this.screenLeft && y === this.screenTop) {
         return;
       }
@@ -509,6 +511,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     resizeTo(x: number = this.innerWidth, y: number = this.innerHeight): void {
+      x = x && Math.round(x);
+      y = y && Math.round(y);
       if (x === this.innerWidth && y === this.innerHeight) {
         return;
       }
