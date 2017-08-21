@@ -47,6 +47,8 @@ CLEANUP:
 - [ ] open text editor pane if hidden on alt click
 - [ ] cannot resize window from left pane 
 - [ ] HMR directly in window
+- [ ] resizing elements
+- [ ] keep measurements when resizing
 
 LOW PRIO:
 
