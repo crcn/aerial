@@ -45,6 +45,8 @@ CLEANUP:
 - [ ] synthetic window timers
 - [ ] do not set relative position on double click
 - [ ] open text editor pane if hidden on alt click
+- [ ] cannot resize window from left pane 
+- [ ] HMR directly in window
 
 LOW PRIO:
 

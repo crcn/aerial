@@ -454,6 +454,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
   yield fork(function* handleResized() {
     while(true) {
       const { bounds } = (yield takeWindowAction(RESIZED, (action: Resized) => action.itemId === window.$id)) as Resized;
+      window.moveTo(bounds.left, bounds.top);
       window.resizeTo(bounds.right - bounds.left, bounds.bottom - bounds.top);
     }
   });
