@@ -11,6 +11,7 @@ export type SelectionOuterProps = {
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
+  zoom: number;
 }
 
 export type SelectionInnerProps = {
@@ -19,11 +20,11 @@ export type SelectionInnerProps = {
   onDoubleClick(event: React.MouseEvent<any>);
 } & SelectionOuterProps;
 
-const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, browser: SyntheticBrowser }) => {
+const  SelectionBounds = ({ workspace, browser, zoom }: { workspace: Workspace, browser: SyntheticBrowser, zoom: number }) => {
   const selection = getBoundedWorkspaceSelection(browser, workspace);
   const entireBounds = mergeBounds(...selection.map(value => getSyntheticBrowserBounds(browser, value)));
   const style = {};
-  const borderWidth = 1 / workspace.stage.translate.zoom;
+  const borderWidth = 1 / zoom;
   const boundsStyle = {
     position: "absolute",
     top: entireBounds.top,
@@ -35,12 +36,12 @@ const  SelectionBounds = ({ workspace, browser }: { workspace: Workspace, brows
   return <div style={boundsStyle as any}></div>;
 };
 
-export const  SelectionStageToolBase = ({ setSelectionElement, workspace, browser, onKeyDown, dispatch, onDoubleClick }: SelectionInnerProps) => {
+export const  SelectionStageToolBase = ({ setSelectionElement, workspace, browser, onKeyDown, dispatch, onDoubleClick, zoom }: SelectionInnerProps) => {
   const selection = getBoundedWorkspaceSelection(browser, workspace);      
   if (!selection.length || workspace.secondarySelection) return null;
 
   return <div ref={setSelectionElement} className="m-stage-selection-tool" tabIndex={-1} onDoubleClick={onDoubleClick} onKeyDown={onKeyDown}>
-    <SelectionBounds workspace={workspace} browser={browser} />
+    <SelectionBounds workspace={workspace} browser={browser} zoom={zoom} />
     <Resizer workspace={workspace} browser={browser} dispatch={dispatch} />
   </div>;
 };

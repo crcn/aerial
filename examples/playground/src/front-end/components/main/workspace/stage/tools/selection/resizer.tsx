@@ -2,7 +2,7 @@ import "./resizer.scss";
 import React =  require("react");
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { pure, compose, withHandlers } from "recompose";
-import { Workspace, getBoundedWorkspaceSelection, getWorkspaceSelectionBounds } from "front-end/state";
+import { Workspace, getBoundedWorkspaceSelection, getStageZoom, getWorkspaceSelectionBounds, getStageTranslate } from "front-end/state";
 import { resizerMoved, resizerStoppedMoving, resizerMouseDown } from "front-end/actions";
 import { startDOMDrag, Dispatcher, mergeBounds, moveBounds } from "aerial-common2";
 import { Path } from "./path";
@@ -24,7 +24,7 @@ const POINT_RADIUS       = 4;
 export const ResizerBase = ({ workspace, browser, dispatch, onMouseDown }: ResizerInnerProps) => {
 
   const bounds = getWorkspaceSelectionBounds(browser, workspace);
-  const zoom = workspace.stage.translate.zoom;
+  const zoom = getStageZoom(workspace.stage);
 
   // offset stroke
   const resizerStyle = {
@@ -72,7 +72,7 @@ const enhanceResizer = compose<ResizerInnerProps, ResizerOuterProps>(
   withHandlers({
     onMouseDown: ({ dispatch, workspace, browser }: ResizerOuterProps) => (event: React.MouseEvent<any>) => {
       
-      const { translate } = workspace.stage;
+      const translate = getStageTranslate(workspace.stage);
       const bounds = getWorkspaceSelectionBounds(browser, workspace);
       const translateLeft = translate.left;
       const translateTop  = translate.top;

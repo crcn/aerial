@@ -36,6 +36,7 @@ import {
   toggleTextEditorPressed,
   toggleLeftGutterPressed, 
   toggleRightGutterPressed, 
+  fullScreenShortcutPressed,
 } from "front-end/actions";
 
 import {
@@ -70,7 +71,9 @@ export const WORKSPACE         = "WORKSPACE";
 export const APPLICATION_STATE = "APPLICATION_STATE";
 
 export type Stage = {
+  fullScreenWindowId?: string,
   panning: boolean;
+  container?: HTMLDivElement;
   backgroundColor?: string;
   translate: Translate;
   cursor?: string;
@@ -180,7 +183,7 @@ export const addWorkspace = (root: ApplicationState, workspace: Workspace) => {
   };
 }
 
-const getFrontEndItemByReference = (root: ApplicationState|SyntheticBrowser, ref: StructReference) => {
+export const getFrontEndItemByReference = (root: ApplicationState|SyntheticBrowser, ref: StructReference) => {
   return getSyntheticBrowserStoreItemByReference(root, ref);
 };
 
@@ -190,6 +193,10 @@ export const getSyntheticNodeWorkspace = weakMemo((root: ApplicationState, nodeI
 
 export const getBoundedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Bounded & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserBounds(state, item)));
 export const getWorkspaceSelectionBounds = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBounds(...getBoundedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserBounds(state, boxed))));
+
+export const getStageZoom = (stage: Stage) => getStageTranslate(stage).zoom;
+
+export const getStageTranslate = weakMemo((stage: Stage) => stage.fullScreenWindowId ? { left: 0, top: 0, zoom: 1 } : stage.translate);
 
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => state.workspaces.find((workspace) => workspace.$id === id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
@@ -217,7 +224,8 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("backspace", deleteShortcutPressed()),
     createKeyboardShortcut("meta+b", toggleLeftGutterPressed()),
     createKeyboardShortcut("meta+/", toggleRightGutterPressed()),
-    createKeyboardShortcut("meta+e", toggleTextEditorPressed())
+    createKeyboardShortcut("meta+e", toggleTextEditorPressed()),
+    createKeyboardShortcut("meta+f", fullScreenShortcutPressed())
   ],
   fileCacheStore: createFileCacheStore(),
   browserStore: createSyntheticBrowserStore()
@@ -232,7 +240,7 @@ export const getStageToolMouseNodeTargetReference = (state: ApplicationState, ev
   const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
   const window = getSyntheticWindow(state, windowId);
   const workspace = getSyntheticWindowWorkspace(state, windowId);
-  const zoom = workspace.stage.translate.zoom;
+  const zoom = getStageZoom(workspace.stage);
 
   // TODO - move to reducer
   const target = sourceEvent.nativeEvent.target as Element;

@@ -6,10 +6,11 @@ import { Workspace } from "front-end/state";
 import { ToolsLayer } from "./tools";
 import { Windows } from "./windows";
 import { Isolate } from "front-end/components/isolated";
+import { Motion } from "react-motion";
+import { SyntheticBrowser, getSyntheticWindow } from "aerial-browser-sandbox";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
-import { lifecycle, compose, withState, withHandlers, pure } from "recompose";
-import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { stageWheel, stageContainerMounted } from "front-end/actions";
+import { lifecycle, compose, withState, withHandlers, pure } from "recompose";
 
 const PANE_SENSITIVITY = process.platform === "win32" ? 0.1 : 1;
 const ZOOM_SENSITIVITY = process.platform === "win32" ? 2500 : 250;
@@ -24,6 +25,7 @@ export type StageInnerProps = {
   canvasOuter: HTMLElement;
   onWheel: (event: React.SyntheticEvent<MouseEvent>) => any;
   mousePosition: Point;
+  stageContainer: HTMLElement;
   setStageContainer(element: HTMLElement);
   onDrop: (event: React.SyntheticEvent<any>) => any;
   onMouseEvent: (event: React.SyntheticEvent<any>) => any;
@@ -37,11 +39,13 @@ const enhanceStage = compose<StageInnerProps, StageOuterProps>(
   pure,
   withState('canvasOuter', 'setCanvasOuter', null),
   withState('mousePosition', 'setMousePosition', null),
+  withState('stageContainer', 'setStageContainer', null),
   withHandlers({
     onMouseEvent: ({ setMousePosition }) => (event: React.MouseEvent<any>) => {
       setMousePosition({ left: event.pageX, top: event.pageY });
     },
-    setStageContainer: ({ dispatch }) => (element: HTMLDivElement) => {
+    setStageContainer: ({ dispatch, setStageContainer }) => (element: HTMLDivElement) => {
+      setStageContainer(element);
       dispatch(stageContainerMounted(element));
     },
     onWheel: ({ workspace, dispatch, canvasOuter, mousePosition }: StageInnerProps) => (event: React.WheelEvent<any>) => {
@@ -67,14 +71,18 @@ export const StageBase = ({
 }: StageInnerProps) => {
   if (!workspace) return null;
 
-  const { translate, cursor } = workspace.stage;
+  const { translate, cursor, fullScreenWindowId } = workspace.stage;
+
+  const fullScreenWindow = fullScreenWindowId ? getSyntheticWindow(browser, fullScreenWindowId) : null;
 
   const outerStyle = {
     cursor: cursor || "default"
   }
 
+  const zoom = fullScreenWindow ? 1 : workspace.stage.translate.zoom;
+
   const innerStyle = {
-    transform: `translate(${translate.left}px, ${translate.top}px) scale(${translate.zoom})`
+    transform: fullScreenWindow ? `translate(${-fullScreenWindow.bounds.left}px, ${-fullScreenWindow.bounds.top}px)` : `translate(${translate.left}px, ${translate.top}px) scale(${translate.zoom})`
   };
 
   return <div className="stage-component" ref={setStageContainer}>
@@ -105,8 +113,8 @@ export const StageBase = ({
           className="stage-inner"
           style={outerStyle}>
           <div style={innerStyle} className="stage-inner">
-            <Windows browser={browser} dispatch={dispatch} />
-            <ToolsLayer workspace={workspace} dispatch={dispatch} browser={browser} />
+            <Windows browser={browser} dispatch={dispatch} fullScreenWindowId={workspace.stage.fullScreenWindowId} />
+            <ToolsLayer zoom={zoom} workspace={workspace} dispatch={dispatch} browser={browser} />
           </div>
         </div>
       </span>

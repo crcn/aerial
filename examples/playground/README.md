@@ -6,7 +6,6 @@ TOMORROW:
   - [ ] auto layout windows
   - [ ] windows should be immovable
   - [ ] reload main window when a file is added
-- [ ] fix CSS loading
 - [ ] close child windows
 
 MVP:
@@ -16,6 +15,9 @@ MVP:
 
 - POLISH:
 
+- [ ] tab between windows (cmd+shift+{)
+- [ ] react motion for moving into full screen mode
+- [ ] ctrl+f for full screen window
 - [ ] +/- to zoom
 - [ ] zoom indicator
 - [ ] show original position
@@ -24,6 +26,10 @@ MVP:
 - [ ] ability to move any item around
 - [ ] copy + paste elements
 - [ ] full screen window
+- [ ] meta keywords for controlling UI
+  - [ ] `<meta name="no-tools" />`
+  - [ ] `<meta name="device=ios5" />`
+- [ ] AWS lambda for rendering
 
 HI PRIO:
 
@@ -33,10 +39,12 @@ HI PRIO:
 
 CLEANUP:
 
+- [ ] file cache namespaced to workspace
+- [ ] normalize urls - http://site.com/ -> http://site.com
+- [ ] cannot multi dnd windows
 - [ ] secondary selection (double click) should reselect item that was clicked
 - [ ] use old DOM rendering code
 - [ ] synthetic window timers
-- [ ] do not set relative position on double click
 - [ ] HMR directly in window
 - [ ] resizing elements
 - [ ] keep measurements when resizing

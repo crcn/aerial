@@ -18,6 +18,7 @@ import {
 } from "front-end/actions";
 
 export type VisualToolsProps = {
+  zoom: number;
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
@@ -123,11 +124,11 @@ const getHoveringSyntheticNodes = weakMemo((hoveringRefs: StructReference[], { a
   return hoveringRefs.map(([type, id]) => allNodes[id]).filter((id) => !!id);
 });
 
-export const  NodeOverlaysToolBase = ({ workspace, browser, dispatch }: VisualToolsProps) => {
+export const  NodeOverlaysToolBase = ({ workspace, browser, dispatch, zoom }: VisualToolsProps) => {
   return <div className="visual-tools-layer-component">
     {
       browser.windows.map((window) => {
-        return <WindowOverlayTools key={window.$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={workspace.stage.translate.zoom} />;
+        return <WindowOverlayTools key={window.$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={zoom} />;
       })
     }
   </div>

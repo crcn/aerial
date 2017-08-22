@@ -8,6 +8,7 @@ export const WINDOW_PANE_ROW_CLICKED     = "WINDOW_PANE_ROW_CLICKED";
 export const PROMPTED_NEW_WINDOW_URL     = "PROMPTED_NEW_WINDOW_URL";
 export const KEYBOARD_SHORTCUT_ADDED     = "KEYBOARD_SHORTCUT_ADDED";
 export const DELETE_SHORCUT_PRESSED      = "DELETE_SHORCUT_PRESSED";
+export const FULL_SCREEN_SHORTCUT_PRESSED = "FULL_SCREEN_SHORTCUT_PRESSED";
 export const TOGGLE_TEXT_EDITOR_PRESSED  = "TOGGLE_TEXT_EDITOR_PRESSED";
 export const TOGGLE_LEFT_GUTTER_PRESSED  = "TOGGLE_LEFT_GUTTER_PRESSED";
 export const TOGGLE_RIGHT_GUTTER_PRESSED = "TOGGLE_RIGHT_GUTTER_PRESSED";
@@ -316,6 +317,9 @@ export const deleteShortcutPressed = (): BaseEvent => ({
   type: DELETE_SHORCUT_PRESSED,
 });
 
+export const fullScreenShortcutPressed = (): BaseEvent => ({
+  type: FULL_SCREEN_SHORTCUT_PRESSED,
+});
 
 export const toggleTextEditorPressed = (): BaseEvent => ({
   type: TOGGLE_TEXT_EDITOR_PRESSED,

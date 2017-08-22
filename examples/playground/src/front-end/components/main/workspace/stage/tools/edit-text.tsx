@@ -16,6 +16,7 @@ import {
 } from "aerial-browser-sandbox";
 
 export type EditTextToolOuterProps = {
+  zoom: number;
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
@@ -26,9 +27,8 @@ export type EditTextToolInnerProps = {
   setTextarea: (v: any) => any;
 } & EditTextToolOuterProps;
 
-export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea }: EditTextToolInnerProps) => {
+export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zoom }: EditTextToolInnerProps) => {
   if (!workspace.secondarySelection) return null;
-  const zoom = workspace.stage.translate.zoom;
   const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
   if (!isSyntheticDOMNode(selectedNode)) return null;
   const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(browser, selectedNode.$id);

@@ -13,7 +13,6 @@ describe(__filename + "#", () => {
     let ds = createDataStore([{ name: "a" }, { name: "b" }]);
     ds = dsIndex(ds, "name");
     const items = dsFilter(ds, { name: "a" });
-    console.log(items);
     expect(items.length).to.eql(1);
     expect(items[0].name).to.eql("a");
   });

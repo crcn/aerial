@@ -55,7 +55,9 @@ export type WindowsStageToolInnerProps = {
 };
 
 export const WindowsStageToolBase = ({ workspace, browser, dispatch }: WindowsStageToolInnerProps) => {
-  const { translate, backgroundColor } = workspace.stage;
+  const { translate, backgroundColor, fullScreenWindowId } = workspace.stage;
+
+  if (fullScreenWindowId) return null;
   
   const backgroundStyle = {
     backgroundColor: backgroundColor || "rgba(0, 0, 0, 0.05)",

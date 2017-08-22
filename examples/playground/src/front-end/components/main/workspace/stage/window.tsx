@@ -22,6 +22,7 @@ export type WindowsOuterProps = {
 export type WindowsInnerProps = WindowsOuterProps;
 
 type WindowProps = {
+  fullScreenWindowId: string,
   window: SyntheticWindow,
   dispatch: Dispatcher<any>
 };
@@ -59,10 +60,10 @@ const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>
 
 const WindowMount = enhanceWindowMount(WindowMountBase);
 
-const WindowBase = ({ window, dispatch }: WindowProps) => {
+const WindowBase = ({ window, fullScreenWindowId, dispatch }: WindowProps) => {
   const { bounds, document } = window;
   
-  const style = {
+  const style = fullScreenWindowId && fullScreenWindowId !== window.$id ? { display: "none" } : {
     left: bounds.left,
     top: bounds.top,
     width: bounds.right - bounds.left,

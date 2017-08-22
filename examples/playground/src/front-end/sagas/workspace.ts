@@ -37,6 +37,7 @@ import {
 import { 
   Workspace,
   getSyntheticBrowserBounds,
+  getStageTranslate,
   getWorkspaceById,
   ApplicationState, 
   getSelectedWorkspace, 
@@ -115,7 +116,7 @@ function* handleSelectionMoved() {
     const { point, workspaceId, point: newPoint } = (yield take(RESIZER_MOVED)) as ResizerMoved;
     const state = (yield select()) as ApplicationState;
     const workspace = getWorkspaceById(state, workspaceId);
-    const translate = workspace.stage.translate;
+    const translate = getStageTranslate(workspace.stage);
 
     const bounds = getWorkspaceSelectionBounds(state, workspace);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {

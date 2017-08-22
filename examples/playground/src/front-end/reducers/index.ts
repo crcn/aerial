@@ -34,6 +34,7 @@ import {
   ApplicationState,
   updateWorkspace,
   getWorkspaceById,
+  getStageTranslate,
   ShortcutServiceState,
   updateWorkspaceStage,
   getSelectedWorkspace,
@@ -41,6 +42,7 @@ import {
   setWorkspaceSelection,
   getSyntheticBrowserBounds,
   createApplicationState,
+  getFrontEndItemByReference,
   clearWorkspaceSelection,
   removeWorkspaceSelection,
   toggleWorkspaceSelection,
@@ -102,6 +104,7 @@ import {
   TreeNodeLabelClicked,
   WindowPaneRowClicked,
   WINDOW_PANE_ROW_CLICKED,
+  FULL_SCREEN_SHORTCUT_PRESSED,
   PROMPTED_NEW_WINDOW_URL,
   KEYBOARD_SHORTCUT_ADDED,
   DELETE_SHORCUT_PRESSED,
@@ -114,6 +117,7 @@ import {
   SyntheticNode,
   getSyntheticWindow, 
   getSyntheticBrowser,
+  SYNTHETIC_WINDOW,
   syntheticBrowserReducer, 
   openSyntheticWindowRequest,
   getSyntheticNodeById
@@ -158,6 +162,22 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
         showLeftGutter: !workspace.stage.showLeftGutter
       });
     }
+
+    case FULL_SCREEN_SHORTCUT_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      const selection = workspace.selectionRefs[0];
+      if (selection && selection[0] === SYNTHETIC_WINDOW && !workspace.stage.fullScreenWindowId) {
+        return clearWorkspaceSelection(updateWorkspaceStage(state, workspace.$id, {
+          fullScreenWindowId: selection[1]
+        }), workspace.$id);
+      } else if (workspace.stage.fullScreenWindowId) {
+        return updateWorkspaceStage(state, workspace.$id, {
+          fullScreenWindowId: undefined
+        });
+      } else {
+        return state;
+      }
+    }
     
     case TOGGLE_TEXT_EDITOR_PRESSED: {
       const workspace = getSelectedWorkspace(state);
@@ -182,7 +202,12 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case VISUAL_EDITOR_WHEEL: {
       const { workspaceId, metaKey, ctrlKey, deltaX, deltaY, mouseX, mouseY, canvasHeight, canvasWidth } = event as StageWheel;
       const workspace = getWorkspaceById(state, workspaceId);
-      let translate = workspace.stage.translate;
+
+      if (workspace.stage.fullScreenWindowId) {
+        return state;
+      }
+      
+      let translate = getStageTranslate(workspace.stage);
 
       if (metaKey || ctrlKey) {
         translate = centerTransformZoom(translate, boundsFromRect({
@@ -260,6 +285,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       );
 
       return updateWorkspaceStage(state, workspace.$id, {
+        container: element,
         translate: centerTransformZoom({
           ...centered,
           zoom: 1

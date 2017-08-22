@@ -1,7 +1,9 @@
 import { delay } from "redux-saga";
-import { Point, shiftPoint } from "aerial-common2";
+import { createDeferredPromise } from "mesh";
 import { take, fork, select, put, call } from "redux-saga/effects";
+import { Point, shiftPoint, watch, resized, Bounds } from "aerial-common2";
 import { 
+  SYNTHETIC_WINDOW,
   getSyntheticNodeWindow, 
   syntheticWindowScrolled,
   syntheticNodeTextContentChanged, 
@@ -10,9 +12,11 @@ import {
 import { 
   ApplicationState,
   getWorkspaceById,
+  getStageTranslate,
   getSyntheticWindow,
   getSelectedWorkspace, 
   getSyntheticNodeWorkspace, 
+  getSyntheticWindowWorkspace,
 } from "front-end/state";
 import { 
   StageToolEditTextBlur,
@@ -32,6 +36,7 @@ export function* frontEndSyntheticBrowserSaga() {
   yield fork(handleTextEditChanges);
   yield fork(handleTextEditBlur);
   yield fork(handleWindowMousePanned);
+  yield fork(handleFullScreenWindow);
 }
 
 function* handleTextEditChanges() {
@@ -87,7 +92,7 @@ function* handleWindowMousePanned() {
       const event = lastPaneEvent = (yield take(STAGE_TOOL_OVERLAY_MOUSE_PANNING)) as StageToolOverlayMousePanning;
       const { windowId, deltaY, center, velocityY: newVelocityY } = event;
 
-      const zoom = getSelectedWorkspace(yield select()).stage.translate.zoom;
+      const zoom = getStageTranslate(getSelectedWorkspace(yield select()).stage).zoom;
 
       yield scrollDelta(windowId, deltaY / zoom);
     }
@@ -98,16 +103,54 @@ function* handleWindowMousePanned() {
       yield take(STAGE_TOOL_OVERLAY_MOUSE_PAN_END);
       const { windowId, deltaY, velocityY } = lastPaneEvent;
 
-      const zoom = getSelectedWorkspace(yield select()).stage.translate.zoom;
+      const zoom = getStageTranslate(getSelectedWorkspace(yield select()).stage).zoom;
       
       yield spring(deltaY, -velocityY * VELOCITY_MULTIPLIER, function*(deltaY) {
         yield scrollDelta(windowId, deltaY / zoom);
       });
     }
   });
-  
-
 }
+
+const WINDOW_SYNC_MS = 1000 / 30;
+
+function* handleFullScreenWindow() {
+
+  let currentFullScreenWindowId: string;
+  let previousWindowBounds: Bounds;
+  let waitForFullScreenMode = createDeferredPromise();
+
+  yield fork(function*() {
+    yield watch((root: ApplicationState) => getSelectedWorkspace(root).stage.fullScreenWindowId, function*(windowId, root) {
+      if (windowId) {
+        const window = getSyntheticWindow(root, windowId);
+        previousWindowBounds = window.bounds;
+        waitForFullScreenMode.resolve(true);
+      } else if (currentFullScreenWindowId) {
+        yield put(resized(currentFullScreenWindowId, SYNTHETIC_WINDOW, previousWindowBounds));
+        previousWindowBounds = undefined;
+        currentFullScreenWindowId = undefined;
+        // TODO - revert window size
+        waitForFullScreenMode = createDeferredPromise();
+      }
+      currentFullScreenWindowId = windowId;
+      return true;
+    }); 
+  });
+
+  yield fork(function* syncFullScreenWindowSize() {
+    while(true) {
+      yield call(() => waitForFullScreenMode.promise);
+      const state: ApplicationState = yield select();
+      const { container } = getSyntheticWindowWorkspace(state, currentFullScreenWindowId).stage;
+      const rect = container.getBoundingClientRect();
+      yield put(resized(currentFullScreenWindowId, SYNTHETIC_WINDOW, rect));
+      yield call(() => new Promise(resolve => setTimeout(resolve, WINDOW_SYNC_MS)));
+    }
+  });
+}
+
+
 
 function* spring(start: number, velocityY: number, iterate: Function, damp: number = DEFAULT_MOMENTUM_DAMP, complete: Function = () => {}) {
   let i = 0;
