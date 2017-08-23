@@ -176,7 +176,7 @@ export const addSyntheticWindow = <TState extends SyntheticBrowserRootState>(roo
   };
 }
 
-export const getSyntheticBrowserBounds = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, item: Partial<Struct & Bounded>) => {
+export const getSyntheticBrowserItemBounds = weakMemo((root: SyntheticBrowserRootState|SyntheticBrowser, item: Partial<Struct & Bounded>) => {
   if (!item) return null;
   if (item.bounds) return item.bounds;
   const window = getSyntheticNodeWindow(root, item.$id);
@@ -222,6 +222,13 @@ export const getSyntheticWindow = (root: SyntheticBrowserRootState|SyntheticBrow
   const filter = (window: SyntheticWindow) => window.$id === id;
   return (root as SyntheticBrowserRootState).browserStore ? eachSyntheticWindow(root as SyntheticBrowserRootState, filter) : (root as SyntheticBrowser).windows.find(filter);
 };
+
+export const getSyntheticBrowserBounds = (browser: SyntheticBrowser) => browser.windows.map(window => window.bounds).reduce((a, b) => ({
+    left: Math.min(a.left, b.left),
+    top: Math.min(a.top, b.top),
+    right: Math.max(a.right, b.right),
+    bottom: Math.max(a.bottom, b.bottom)
+  }), { left: 0, top: 0, right: 0, bottom: 0 });
 
 export const updateSyntheticBrowser = <TState extends SyntheticBrowserRootState>(root: TState, browserId: string, properties: Partial<SyntheticBrowser>): TState => {
   const browser = getSyntheticBrowser(root, browserId);

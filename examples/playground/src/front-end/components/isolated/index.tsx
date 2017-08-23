@@ -50,6 +50,7 @@ export class Isolate extends React.Component<{
     if (this.props.onKeyDown) {
       this.body.addEventListener("keydown", this.props.onKeyDown);
     }
+
     this._render();
 
     this._addListeners();

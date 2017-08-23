@@ -16,14 +16,15 @@ import { Isolate } from "front-end/components/isolated";
 export type WindowsOuterProps = {
   browser: SyntheticBrowser;
   fullScreenWindowId: string;
-  dispatch: Dispatcher<any>
+  dispatch: Dispatcher<any>;
+  smooth: boolean;
 };
 
 export type WindowsInnerProps = WindowsOuterProps;
 
-export const WindowsBase = ({ browser = null, fullScreenWindowId, dispatch }: WindowsInnerProps) => browser && <div className="preview-component">
+export const WindowsBase = ({ browser = null, fullScreenWindowId, dispatch, smooth }: WindowsInnerProps) => browser && <div className="preview-component">
   {
-    browser.windows.map((window) => <Window fullScreenWindowId={fullScreenWindowId} dispatch={dispatch} key={window.$id} window={window} />)
+    browser.windows.map((window) => <Window smooth={smooth} fullScreenWindowId={fullScreenWindowId} dispatch={dispatch} key={window.$id} window={window} />)
   }
 </div>;
 

@@ -10,13 +10,19 @@ type WindowItemInnerProps = {
   window: SyntheticWindow;
   dispatch: Dispatcher<any>;
   translate: Translate;
+  fullScreenWindowId: string;
 };
 
-const WindowItemBase = ({ window, translate, dispatch }: WindowItemInnerProps) => {
+const WindowItemBase = ({ window, translate, dispatch, fullScreenWindowId }: WindowItemInnerProps) => {
+
+  if (fullScreenWindowId && fullScreenWindowId !== window.$id) {
+    return null;
+  }
 
   const style = {
     left: window.bounds.left,
     top: window.bounds.top,
+    background: "transparent",
     ...getBoundsSize(window.bounds)
   };
 
@@ -24,11 +30,12 @@ const WindowItemBase = ({ window, translate, dispatch }: WindowItemInnerProps) =
 
   const titleStyle = {
     transform: `translateY(-${20 * titleScale}px) scale(${titleScale})`,
-    transformOrigin: "top left"
+    transformOrigin: "top left",
   };
 
   const contentStyle = {
-    boxShadow: `0 0 0 ${titleScale}px #DFDFDF`
+    // boxShadow: `0 0 0 ${titleScale}px #DFDFDF`
+    background: "transparent"
   };
   
   return <div className="m-windows-stage-tool-item" style={style}>
@@ -49,16 +56,15 @@ const WindowItemBase = ({ window, translate, dispatch }: WindowItemInnerProps) =
 const WindowItem = pure(WindowItemBase as any) as typeof WindowItemBase;
 
 export type WindowsStageToolInnerProps = {
+  translate: Translate;
   workspace: Workspace;
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
 };
 
-export const WindowsStageToolBase = ({ workspace, browser, dispatch }: WindowsStageToolInnerProps) => {
-  const { translate, backgroundColor, fullScreenWindowId } = workspace.stage;
+export const WindowsStageToolBase = ({ workspace, browser, translate, dispatch }: WindowsStageToolInnerProps) => {
+  const { backgroundColor, fullScreenWindowId } = workspace.stage;
 
-  if (fullScreenWindowId) return null;
-  
   const backgroundStyle = {
     backgroundColor: backgroundColor || "rgba(0, 0, 0, 0.05)",
     transform: `translate(${-translate.left / translate.zoom}px, ${-translate.top / translate.zoom}px) scale(${1 / translate.zoom}) translateZ(0)`,
@@ -67,7 +73,7 @@ export const WindowsStageToolBase = ({ workspace, browser, dispatch }: WindowsSt
   return <div className="m-windows-stage-tool">
     <div style={backgroundStyle} className="m-windows-stage-tool-background" onClick={wrapEventToDispatch(dispatch, stageToolWindowBackgroundClicked)} /> 
     {
-      browser.windows.map((window) => <WindowItem key={window.$id} window={window} dispatch={dispatch} translate={translate} />)
+      browser.windows.map((window) => <WindowItem key={window.$id} window={window} fullScreenWindowId={fullScreenWindowId} dispatch={dispatch} translate={translate} />)
     }
   </div>;
 }

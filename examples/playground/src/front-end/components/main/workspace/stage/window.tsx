@@ -2,6 +2,7 @@ import "./window.scss";
 const VOID_ELEMENTS = require("void-elements");
 import * as React from "react";
 import { findDOMNode } from "react-dom";
+import { Motion, spring } from "react-motion";
 import { weakMemo, Dispatcher, Bounds, BaseEvent, calculateAbsoluteBounds, shiftBounds} from "aerial-common2";
 import { lifecycle, compose, withState, pure, onlyUpdateForKeys, withHandlers } from "recompose";
 import { canvasElementsComputedPropsChanged } from "front-end/actions";
@@ -14,17 +15,20 @@ import {
 } from "aerial-browser-sandbox";
 import { Isolate } from "front-end/components/isolated";
 
+const stiffSpring = (amount: number) => spring(amount, { stiffness: 330, damping: 30 });
+
 export type WindowsOuterProps = {
   browser: SyntheticBrowser;
-  dispatch: Dispatcher<any>
+  dispatch: Dispatcher<any>;
 };
 
 export type WindowsInnerProps = WindowsOuterProps;
 
 type WindowProps = {
-  fullScreenWindowId: string,
-  window: SyntheticWindow,
-  dispatch: Dispatcher<any>
+  fullScreenWindowId: string;
+  window: SyntheticWindow;
+  dispatch: Dispatcher<any>;
+  smooth: boolean;
 };
 
 type WindowMountOuterProps = {
@@ -60,21 +64,41 @@ const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>
 
 const WindowMount = enhanceWindowMount(WindowMountBase);
 
-const WindowBase = ({ window, fullScreenWindowId, dispatch }: WindowProps) => {
+const WindowBase = ({ window, fullScreenWindowId, dispatch, smooth }: WindowProps) => {
   const { bounds, document } = window;
   
-  const style = fullScreenWindowId && fullScreenWindowId !== window.$id ? { display: "none" } : {
+  const style = {
     left: bounds.left,
     top: bounds.top,
     width: bounds.right - bounds.left,
-    height: bounds.bottom - bounds.top
+    height: bounds.bottom - bounds.top,
   };
 
-  return <div className="preview-window-component" style={style}>
-    <Isolate scrollPosition={window.scrollPosition}>
-      <WindowMount mount={window.mount} />
-    </Isolate>
-  </div>;
-}
+  const defaultStyle = {
+    // default to white since window background colors
+    // are white too (CC)
+    background: "white",
+    display: fullScreenWindowId && window.$id !== fullScreenWindowId ? "none" : undefined
+  };
+
+  const smoothStyle = smooth ? {
+    left: stiffSpring(style.left),
+    top: stiffSpring(style.top),
+    width: stiffSpring(style.width),
+    height: stiffSpring(style.height)
+  } : style;
+
+  return <Motion defaultStyle={style} style={smoothStyle}>
+    {
+      style => {
+        return <div className="preview-window-component" style={{...style, ...defaultStyle}}>
+          <Isolate scrollPosition={window.scrollPosition}>
+            <WindowMount mount={window.mount} />
+          </Isolate>
+        </div>;
+      }
+    }
+  </Motion>;
+};
 
 export const Window = pure(WindowBase as any) as typeof WindowBase;

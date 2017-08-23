@@ -11,6 +11,7 @@ import {
   updateIn, 
   Translate,
   BaseEvent, 
+  WrappedEvent,
   boundsFromRect,
   getBoundsSize,
   mergeBounds,
@@ -40,7 +41,7 @@ import {
   getSelectedWorkspace,
   addWorkspaceSelection,
   setWorkspaceSelection,
-  getSyntheticBrowserBounds,
+  getSyntheticBrowserItemBounds,
   createApplicationState,
   getFrontEndItemByReference,
   clearWorkspaceSelection,
@@ -50,6 +51,7 @@ import {
   getSelectedWorkspaceFile,
   getWorkspaceSelectionBounds,
   getSyntheticNodeWorkspace,
+  getSyntheticBrowserBounds,
   getBoundedWorkspaceSelection,
   getSyntheticWindowWorkspace,
   getStageToolMouseNodeTargetReference,
@@ -67,6 +69,7 @@ import {
   STAGE_TOOL_OVERLAY_MOUSE_LEAVE,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_START,
   StageToolOverlayMousePanStart,
+  STAGE_MOUSE_MOVED,
   StageToolOverlayMousePanEnd,
   SELECTOR_DOUBLE_CLICKED,
   SelectorDoubleClicked,
@@ -79,6 +82,8 @@ import {
   StageToolNodeOverlayHoverOver,
   StageToolNodeOverlayClicked,
   STAGE_TOOL_WINDOW_KEY_DOWN,
+  ZOOM_IN_SHORTCUT_PRESSED,
+  ZOOM_OUT_SHORTCUT_PRESSED,
   STAGE_TOOL_SELECTION_KEY_DOWN,
   StageToolSelectionKeyDown,
   RESIZER_MOUSE_DOWN,
@@ -120,7 +125,9 @@ import {
   SYNTHETIC_WINDOW,
   syntheticBrowserReducer, 
   openSyntheticWindowRequest,
-  getSyntheticNodeById
+  getSyntheticNodeById,
+  SYNTHETIC_WINDOW_PROXY_OPENED,
+  SyntheticWindowOpened,
 } from "aerial-browser-sandbox";
 
 import reduceReducers = require("reduce-reducers");
@@ -163,12 +170,25 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
       });
     }
 
+    case ZOOM_IN_SHORTCUT_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      if (workspace.stage.fullScreenWindowId) return state;
+      return setStageZoom(state, workspace.$id, normalizeZoom(workspace.stage.translate.zoom) * 2);
+    }
+
+    case ZOOM_OUT_SHORTCUT_PRESSED: {
+      const workspace = getSelectedWorkspace(state);
+      if (workspace.stage.fullScreenWindowId) return state;
+      return setStageZoom(state, workspace.$id, normalizeZoom(workspace.stage.translate.zoom) / 2);
+    }
+
     case FULL_SCREEN_SHORTCUT_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       const selection = workspace.selectionRefs[0];
       if (selection && selection[0] === SYNTHETIC_WINDOW && !workspace.stage.fullScreenWindowId) {
         return clearWorkspaceSelection(updateWorkspaceStage(state, workspace.$id, {
-          fullScreenWindowId: selection[1]
+          fullScreenWindowId: selection[1],
+          smooth: true
         }), workspace.$id);
       } else if (workspace.stage.fullScreenWindowId) {
         return updateWorkspaceStage(state, workspace.$id, {
@@ -200,7 +220,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
   switch(event.type) {
     case VISUAL_EDITOR_WHEEL: {
-      const { workspaceId, metaKey, ctrlKey, deltaX, deltaY, mouseX, mouseY, canvasHeight, canvasWidth } = event as StageWheel;
+      const { workspaceId, metaKey, ctrlKey, deltaX, deltaY, canvasHeight, canvasWidth } = event as StageWheel;
       const workspace = getWorkspaceById(state, workspaceId);
 
       if (workspace.stage.fullScreenWindowId) {
@@ -213,8 +233,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         translate = centerTransformZoom(translate, boundsFromRect({
           width: canvasWidth,
           height: canvasHeight
-        }), clamp(translate.zoom + translate.zoom * deltaY / ZOOM_SENSITIVITY, MIN_ZOOM, MAX_ZOOM), { left: mouseX, top: mouseY });
-
+        }), clamp(translate.zoom + translate.zoom * deltaY / ZOOM_SENSITIVITY, MIN_ZOOM, MAX_ZOOM), workspace.stage.mousePosition);
       } else {
         translate = {
           ...translate,
@@ -223,7 +242,22 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         };
       }
 
-      return updateWorkspaceStage(state, workspace.$id, { translate });
+      return updateWorkspaceStage(state, workspace.$id, { smooth: false, translate });
+    }
+
+    case SYNTHETIC_WINDOW_PROXY_OPENED: {
+      const { instance } = event as SyntheticWindowOpened;
+      const workspace = getSelectedWorkspace(state);
+      if (!workspace.stage.container) return state;
+
+      const { width, height } = workspace.stage.container.getBoundingClientRect();
+
+      return centerStage(state, state.selectedWorkspaceId, {
+        left: instance.screenLeft,
+        top: instance.screenTop,
+        right: instance.screenLeft + instance.innerWidth,
+        bottom: instance.screenTop + instance.innerHeight,
+      }, true);
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
@@ -263,34 +297,11 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case STAGE_MOUNTED: {
       const { element } = event as StageMounted;
       const { width, height } = element.getBoundingClientRect();
+      const workspaceId = state.selectedWorkspaceId;
       const workspace = getSelectedWorkspace(state);
-
-      const innerBounds = getSyntheticBrowser(state, workspace.browserId).windows.map(window => window.bounds).reduce((a, b) => ({
-        left: Math.min(a.left, b.left),
-        top: Math.min(a.top, b.top),
-        right: Math.max(a.right, b.right),
-        bottom: Math.max(a.bottom, b.bottom)
-      }), { left: 0, top: 0, right: 0, bottom: 0 });
-
-      const innerSize = getBoundsSize(innerBounds);
-
-      const centered = {
-        left: innerBounds.left + width / 2 - (innerBounds.right - innerBounds.left) / 2,
-        top: innerBounds.top + height / 2 - (innerBounds.bottom - innerBounds.top) / 2,
-      };
-
-      const scale = Math.min(
-        (width - INITIAL_ZOOM_PADDING) / innerSize.width,
-        (height - INITIAL_ZOOM_PADDING) / innerSize.height
-      );
-
-      return updateWorkspaceStage(state, workspace.$id, {
-        container: element,
-        translate: centerTransformZoom({
-          ...centered,
-          zoom: 1
-        }, { left: 0, top: 0, right: width, bottom: height }, scale)
-      });
+      state = updateWorkspaceStage(state, workspaceId, { container: element });
+      const innerBounds = getSyntheticBrowserBounds(getSyntheticBrowser(state, workspace.browserId));
+      return centerStage(state, workspaceId, innerBounds);
     };
 
     case STAGE_TOOL_OVERLAY_MOUSE_PAN_START: {
@@ -305,6 +316,16 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return updateWorkspaceStage(state, workspace.$id, { panning: false });
     }
 
+    case STAGE_MOUSE_MOVED: {
+      const { sourceEvent: { pageX, pageY }} = event as WrappedEvent<React.MouseEvent<any>>;
+      return updateWorkspaceStage(state, state.selectedWorkspaceId, {
+        mousePosition: {
+          left: pageX,
+          top: pageY
+        }
+      })
+    };
+
     case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
       const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
@@ -312,6 +333,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       // alt key opens up a new link
       const altKey = sourceEvent.altKey;
       const workspace = getSyntheticWindowWorkspace(state, windowId);
+      state = updateWorkspaceStageSmoothing(state, workspace);
       
       // do not allow selection while window is panning (scrolling)
       if (workspace.stage.panning) return state;
@@ -362,9 +384,9 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     }
 
     case STAGE_TOOL_WINDOW_TITLE_CLICKED: {
+      state = updateWorkspaceStageSmoothing(state);
       return handleWindowSelectionFromAction(state, getStructReference(getSyntheticWindow(state, (event as WindowPaneRowClicked).windowId)), event as WindowPaneRowClicked);
     }
-
 
     case STAGE_TOOL_WINDOW_BACKGROUND_CLICKED: {
       const workspace = getSelectedWorkspace(state);
@@ -375,11 +397,43 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
   return state;
 }
 
+const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: Bounds, smooth?: boolean) => {
+  const workspace = getWorkspaceById(state, workspaceId);
+  const { stage: { container }} = workspace;
+  if (!container) return state;
+
+  const { width, height } = container.getBoundingClientRect();
+
+  const innerSize = getBoundsSize(innerBounds);
+
+  const centered = {
+    left: -innerBounds.left + width / 2 - (innerSize.width) / 2,
+    top: -innerBounds.top + height / 2 - (innerSize.height) / 2,
+  };
+
+  const scale = Math.min(
+    (width - INITIAL_ZOOM_PADDING) / innerSize.width,
+    (height - INITIAL_ZOOM_PADDING) / innerSize.height
+  );
+
+  return updateWorkspaceStage(state, workspaceId, {
+    smooth,
+    translate: centerTransformZoom({
+      ...centered,
+      zoom: 1
+    }, { left: 0, top: 0, right: width, bottom: height }, scale)
+  });
+}
+
 const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, ref: StructReference, event: T) => {
   const { windowId, sourceEvent } = event;
   const workspace = getSyntheticWindowWorkspace(state, windowId);
   return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$id, ref) : toggleWorkspaceSelection(state, workspace.$id, ref);
 }
+
+const normalizeZoom = (zoom) => {
+  return (zoom < 1 ? 1 / Math.round(1 / zoom) : Math.round(zoom));
+};
 
 const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
   switch (event.type) {
@@ -388,6 +442,28 @@ const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
     }
   }
   return state;
+};
+
+const updateWorkspaceStageSmoothing = (state: ApplicationState, workspace?: Workspace) => {
+  if (!workspace) workspace = getSelectedWorkspace(state);
+  if (!workspace.stage.fullScreenWindowId && workspace.stage.smooth) {
+    return updateWorkspaceStage(state, workspace.$id, {
+      smooth: false
+    });
+  }
+  return state;
+};
+
+const setStageZoom = (state: ApplicationState, workspaceId: string, zoom: number, smooth: boolean = true) => {
+  const workspace = getWorkspaceById(state, workspaceId);
+  return updateWorkspaceStage(state, workspace.$id, {
+    smooth,
+    translate: centerTransformZoom(
+      workspace.stage.translate, workspace.stage.container.getBoundingClientRect(), 
+      clamp(zoom, MIN_ZOOM, MAX_ZOOM),
+      workspace.stage.mousePosition
+    )
+  });
 };
 
 const setSelectedFileFromNodeId = (state: ApplicationState, workspaceId: string, nodeId: string) => {

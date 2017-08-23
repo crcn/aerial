@@ -36,7 +36,7 @@ import {
 
 import { 
   Workspace,
-  getSyntheticBrowserBounds,
+  getSyntheticBrowserItemBounds,
   getStageTranslate,
   getWorkspaceById,
   ApplicationState, 
@@ -46,8 +46,6 @@ import {
   getSyntheticWindowWorkspace,
   getStageToolMouseNodeTargetReference,
 } from "../state";
-
-const WINDOW_PADDING = 20;
 
 export function* mainWorkspaceSaga() {
   yield fork(openDefaultWindow);
@@ -66,8 +64,8 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
-    // yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
+    // yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
+    yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
     return true;
   });
 }
@@ -95,7 +93,7 @@ function* handleAltClickElement() {
 
 function* openNewWindow(href: string, origin: SyntheticWindow, workspace: Workspace) {
   const uri = getUri(href, origin.location);
-  yield put(openSyntheticWindowRequest(uri, workspace.browserId, origin.bounds.right + WINDOW_PADDING, origin.bounds.top));
+  yield put(openSyntheticWindowRequest(uri, workspace.browserId));
 }
 
 function* handleDeleteKeyPressed() {
@@ -120,7 +118,7 @@ function* handleSelectionMoved() {
 
     const bounds = getWorkspaceSelectionBounds(state, workspace);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-      const bounds = getSyntheticBrowserBounds(state, item);
+      const bounds = getSyntheticBrowserItemBounds(state, item);
       yield put(moved(item.$id, item.$type, scaleInnerBounds(bounds, bounds, moveBounds(bounds, newPoint))));
     }
   }
@@ -150,7 +148,7 @@ function* handleSelectionResized() {
     }
 
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-      const bounds = getSyntheticBrowserBounds(state, item);
+      const bounds = getSyntheticBrowserItemBounds(state, item);
       const scaledBounds = scaleInnerBounds(bounds, bounds, newBounds);
       yield put(resized(item.$id, item.$type, scaleInnerBounds(bounds, bounds, newBounds)));
     }
@@ -198,7 +196,7 @@ function* handleSelectionStoppedMoving() {
     const state = (yield select()) as ApplicationState;
     const workspace = getWorkspaceById(state, workspaceId);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-      const bounds = getSyntheticBrowserBounds(state, item);
+      const bounds = getSyntheticBrowserItemBounds(state, item);
       yield put(stoppedMoving(item.$id, item.$type));
     }
   }

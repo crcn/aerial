@@ -4,7 +4,7 @@ import { compose, pure, lifecycle, withHandlers } from "recompose";
 import { Resizer } from "./resizer";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, mergeBounds, Bounded, wrapEventToDispatch } from "aerial-common2";
-import { Workspace, getBoundedWorkspaceSelection, getSyntheticBrowserBounds } from "front-end/state";
+import { Workspace, getBoundedWorkspaceSelection, getSyntheticBrowserItemBounds } from "front-end/state";
 import { selectorDoubleClicked, stageToolSelectionKeyDown } from "front-end/actions";
 
 export type SelectionOuterProps = {
@@ -22,7 +22,7 @@ export type SelectionInnerProps = {
 
 const  SelectionBounds = ({ workspace, browser, zoom }: { workspace: Workspace, browser: SyntheticBrowser, zoom: number }) => {
   const selection = getBoundedWorkspaceSelection(browser, workspace);
-  const entireBounds = mergeBounds(...selection.map(value => getSyntheticBrowserBounds(browser, value)));
+  const entireBounds = mergeBounds(...selection.map(value => getSyntheticBrowserItemBounds(browser, value)));
   const style = {};
   const borderWidth = 1 / zoom;
   const boundsStyle = {

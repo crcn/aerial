@@ -26,7 +26,10 @@ import {
   StageToolOverlayMousePanEnd,
   StageToolOverlayMousePanning,
   StageToolOverlayMousePanStart,
+  FULL_SCREEN_SHORTCUT_PRESSED,
   STAGE_TOOL_EDIT_TEXT_CHANGED, 
+  VISUAL_EDITOR_WHEEL,
+  StageWheel,
   STAGE_TOOL_OVERLAY_MOUSE_PANNING,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_START
@@ -37,6 +40,7 @@ export function* frontEndSyntheticBrowserSaga() {
   yield fork(handleTextEditBlur);
   yield fork(handleWindowMousePanned);
   yield fork(handleFullScreenWindow);
+  yield fork(handleScrollInFullScreenMode);
 }
 
 function* handleTextEditChanges() {
@@ -64,6 +68,24 @@ const DEFAULT_MOMENTUM_DAMP = 0.1;
 const MOMENTUM_DELAY = 50;
 const VELOCITY_MULTIPLIER = 100;
 
+function* handleScrollInFullScreenMode() {
+  while(true) {
+    const { deltaX, deltaY } = (yield take(VISUAL_EDITOR_WHEEL)) as StageWheel;
+    const state: ApplicationState = (yield select());
+    const workspace = getSelectedWorkspace(state);
+    if (!workspace.stage.fullScreenWindowId) {
+      continue;
+    }
+
+    const window = getSyntheticWindow(state, workspace.stage.fullScreenWindowId);
+
+    yield put(syntheticWindowScrolled(window.$id, shiftPoint(window.scrollPosition || { left: 0, top: 0 }, {
+      left: 0,
+      top: deltaY
+    })));
+  }
+}
+
 // fugly quick momentum scrolling implementation
 function* handleWindowMousePanned() {
 
@@ -71,7 +93,7 @@ function* handleWindowMousePanned() {
   let deltaLeft = 0;
   let currentWindowId: string;
   let panStartScrollPosition: Point;
-  let lastPaneEvent: StageToolOverlayMousePanning
+  let lastPaneEvent: StageToolOverlayMousePanning;
 
   yield fork(function*() {
     while(true) {
@@ -121,9 +143,12 @@ function* handleFullScreenWindow() {
   let waitForFullScreenMode = createDeferredPromise();
 
   yield fork(function*() {
-    yield watch((root: ApplicationState) => getSelectedWorkspace(root).stage.fullScreenWindowId, function*(windowId, root) {
+    while(true) {
+      yield take(FULL_SCREEN_SHORTCUT_PRESSED);
+      const state: ApplicationState = yield select();
+      const windowId = getSelectedWorkspace(state).stage.fullScreenWindowId;
       if (windowId) {
-        const window = getSyntheticWindow(root, windowId);
+        const window = getSyntheticWindow(state, windowId);
         previousWindowBounds = window.bounds;
         waitForFullScreenMode.resolve(true);
       } else if (currentFullScreenWindowId) {
@@ -134,8 +159,7 @@ function* handleFullScreenWindow() {
         waitForFullScreenMode = createDeferredPromise();
       }
       currentFullScreenWindowId = windowId;
-      return true;
-    }); 
+    }
   });
 
   yield fork(function* syncFullScreenWindowSize() {
@@ -144,7 +168,13 @@ function* handleFullScreenWindow() {
       const state: ApplicationState = yield select();
       const { container } = getSyntheticWindowWorkspace(state, currentFullScreenWindowId).stage;
       const rect = container.getBoundingClientRect();
-      yield put(resized(currentFullScreenWindowId, SYNTHETIC_WINDOW, rect));
+      const window = getSyntheticWindow(state, currentFullScreenWindowId);
+      yield put(resized(currentFullScreenWindowId, SYNTHETIC_WINDOW, {
+        left: window.bounds.left,
+        top: window.bounds.top,
+        right: window.bounds.left + rect.width,
+        bottom: window.bounds.top + rect.height,
+      }));
       yield call(() => new Promise(resolve => setTimeout(resolve, WINDOW_SYNC_MS)));
     }
   });

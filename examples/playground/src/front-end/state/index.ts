@@ -12,6 +12,7 @@ import {
   filterBounded,
   getSmallestBounds,
   ImmutableArray, 
+  Point,
   StructReference,
   arrayReplaceIndex,
   ImmutableObject,
@@ -37,6 +38,8 @@ import {
   toggleLeftGutterPressed, 
   toggleRightGutterPressed, 
   fullScreenShortcutPressed,
+  zoomInShortcutPressed,
+  zoomOutShortcutPressed
 } from "front-end/actions";
 
 import {
@@ -45,7 +48,7 @@ import {
   getSyntheticWindow,
   getSyntheticNodeById,
   getSyntheticNodeWindow,
-  getSyntheticBrowserBounds,
+  getSyntheticBrowserItemBounds,
   getSyntheticWindowBrowser,
   SyntheticBrowserRootState,
   createSyntheticBrowserStore,
@@ -73,7 +76,9 @@ export const APPLICATION_STATE = "APPLICATION_STATE";
 export type Stage = {
   fullScreenWindowId?: string,
   panning: boolean;
+  mousePosition?: Point;
   container?: HTMLDivElement;
+  smooth?: boolean;
   backgroundColor?: string;
   translate: Translate;
   cursor?: string;
@@ -191,8 +196,8 @@ export const getSyntheticNodeWorkspace = weakMemo((root: ApplicationState, nodeI
   return getSyntheticWindowWorkspace(root, getSyntheticNodeWindow(root, nodeId).$id);
 });
 
-export const getBoundedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Bounded & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserBounds(state, item)));
-export const getWorkspaceSelectionBounds = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBounds(...getBoundedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserBounds(state, boxed))));
+export const getBoundedWorkspaceSelection = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace): Array<Bounded & Struct> => workspace.selectionRefs.map((ref) => getFrontEndItemByReference(state, ref)).filter(item => getSyntheticBrowserItemBounds(state, item)));
+export const getWorkspaceSelectionBounds = weakMemo((state: ApplicationState|SyntheticBrowser, workspace: Workspace) => mergeBounds(...getBoundedWorkspaceSelection(state, workspace).map(boxed => getSyntheticBrowserItemBounds(state, boxed))));
 
 export const getStageZoom = (stage: Stage) => getStageTranslate(stage).zoom;
 
@@ -225,7 +230,9 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+b", toggleLeftGutterPressed()),
     createKeyboardShortcut("meta+/", toggleRightGutterPressed()),
     createKeyboardShortcut("meta+e", toggleTextEditorPressed()),
-    createKeyboardShortcut("meta+f", fullScreenShortcutPressed())
+    createKeyboardShortcut("meta+f", fullScreenShortcutPressed()),
+    createKeyboardShortcut("meta+=", zoomInShortcutPressed()),
+    createKeyboardShortcut("meta+-", zoomOutShortcutPressed())
   ],
   fileCacheStore: createFileCacheStore(),
   browserStore: createSyntheticBrowserStore()

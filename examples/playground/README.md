@@ -15,17 +15,19 @@ MVP:
 
 - POLISH:
 
+- [ ] alt+click of tabbed item should respect original window size
+- [ ] auto-layout windows
+- [ ] clean up edit text input so that it doesn't have dragger
+- [ ] renderer needs to use iframe so that it can listen for resize
+- [ ] scrollbars should work in fullscreen mode
 - [ ] tab between windows (cmd+shift+{)
 - [ ] react motion for moving into full screen mode
 - [ ] ctrl+f for full screen window
 - [ ] +/- to zoom
 - [ ] zoom indicator
-- [ ] show original position
 - [ ] measurement tooling
 - [ ] multi select
-- [ ] ability to move any item around
 - [ ] copy + paste elements
-- [ ] full screen window
 - [ ] meta keywords for controlling UI
   - [ ] `<meta name="no-tools" />`
   - [ ] `<meta name="device=ios5" />`

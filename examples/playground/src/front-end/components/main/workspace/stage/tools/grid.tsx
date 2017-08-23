@@ -1,14 +1,15 @@
 import "./grid.scss";
 
 import React =  require("react");
-import { Workspace, Stage } from "front-end/state";
+import { Translate } from "aerial-common2";
 import { pure, compose } from "recompose";
+import { Workspace, Stage } from "front-end/state";
 
 export type GridStageToolProps = {
-  stage: Stage;
+  translate: Translate;
 };
 
-export const GridStageToolBase = ({ stage: {translate } }: GridStageToolProps) => {
+export const GridStageToolBase = ({ translate }: GridStageToolProps) => {
   if (translate.zoom <= 12) return null;
 
   const size = 20000;
