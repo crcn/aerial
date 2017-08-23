@@ -39,7 +39,8 @@ import {
   toggleRightGutterPressed, 
   fullScreenShortcutPressed,
   zoomInShortcutPressed,
-  zoomOutShortcutPressed
+  zoomOutShortcutPressed,
+  escapeShortcutPressed
 } from "front-end/actions";
 
 import {
@@ -232,7 +233,8 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+e", toggleTextEditorPressed()),
     createKeyboardShortcut("meta+f", fullScreenShortcutPressed()),
     createKeyboardShortcut("meta+=", zoomInShortcutPressed()),
-    createKeyboardShortcut("meta+-", zoomOutShortcutPressed())
+    createKeyboardShortcut("meta+-", zoomOutShortcutPressed()),
+    createKeyboardShortcut("escape", escapeShortcutPressed())
   ],
   fileCacheStore: createFileCacheStore(),
   browserStore: createSyntheticBrowserStore()

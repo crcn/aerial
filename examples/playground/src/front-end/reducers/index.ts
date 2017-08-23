@@ -113,6 +113,7 @@ import {
   PROMPTED_NEW_WINDOW_URL,
   KEYBOARD_SHORTCUT_ADDED,
   DELETE_SHORCUT_PRESSED,
+  ESCAPE_SHORTCUT_PRESSED,
   DeleteShortcutPressed,
   VISUAL_EDITOR_WHEEL,
   StageWheel,
@@ -181,6 +182,10 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSelectedWorkspace(state);
       if (workspace.stage.fullScreenWindowId) return state;
       return setStageZoom(state, workspace.$id, normalizeZoom(workspace.stage.translate.zoom) / 2);
+    }
+
+    case ESCAPE_SHORTCUT_PRESSED: {
+      return clearWorkspaceSelection(state, state.selectedWorkspaceId);
     }
 
     case FULL_SCREEN_SHORTCUT_PRESSED: {
