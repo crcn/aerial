@@ -15,15 +15,21 @@ MVP:
 
 - POLISH:
 
+- [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
+   - [ ] ctrl+t to open new window
+   - [ ] ctrl+click to open link in new window
+   - [ ] ctrl+shift+{} to tab between windows
+   - [ ] double click title to open in full screen
+   - [ ] ctrl+enter to open page in new window (move down from previous)
+- [ ] load spinner for each window
+- [ ] full screen window if any child object is selected
+- [ ] scroll position should respect scroll height of entire document (compute with mounted iframe window height)
+- [ ] renderer needs to use iframe so that it can listen for resize
 - [ ] alt+click of tabbed item should respect original window size
 - [ ] auto-layout windows
 - [ ] clean up edit text input so that it doesn't have dragger
-- [ ] renderer needs to use iframe so that it can listen for resize
-- [ ] scrollbars should work in fullscreen mode
 - [ ] tab between windows (cmd+shift+{)
 - [ ] react motion for moving into full screen mode
-- [ ] ctrl+f for full screen window
-- [ ] +/- to zoom
 - [ ] zoom indicator
 - [ ] measurement tooling
 - [ ] multi select

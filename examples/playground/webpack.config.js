@@ -14,6 +14,7 @@ module.exports = {
   plugins: [
     new ExtractTextPlugin('entry.bundle.css'),
     new HtmlWebpackPlugin({
+      title: "Aerial Playground",
       template: './src/index.html'
     }),
   ],

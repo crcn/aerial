@@ -125,6 +125,7 @@ import {
   SYNTHETIC_WINDOW,
   syntheticBrowserReducer, 
   openSyntheticWindowRequest,
+  getSyntheticNodeWindow,
   getSyntheticNodeById,
   SYNTHETIC_WINDOW_PROXY_OPENED,
   SyntheticWindowOpened,
@@ -185,11 +186,17 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
     case FULL_SCREEN_SHORTCUT_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       const selection = workspace.selectionRefs[0];
-      if (selection && selection[0] === SYNTHETIC_WINDOW && !workspace.stage.fullScreenWindowId) {
-        return clearWorkspaceSelection(updateWorkspaceStage(state, workspace.$id, {
-          fullScreenWindowId: selection[1],
+
+      const windowId = selection ? selection[0] === SYNTHETIC_WINDOW ? selection[1] : getSyntheticNodeWindow(state, selection[1]).$id : null;
+
+      if (windowId && !workspace.stage.fullScreenWindowId) {
+        if (selection[0] === SYNTHETIC_WINDOW) {
+          state = clearWorkspaceSelection(state, workspace.$id);
+        }
+        return updateWorkspaceStage(state, workspace.$id, {
+          fullScreenWindowId: windowId,
           smooth: true
-        }), workspace.$id);
+        });
       } else if (workspace.stage.fullScreenWindowId) {
         return updateWorkspaceStage(state, workspace.$id, {
           fullScreenWindowId: undefined
