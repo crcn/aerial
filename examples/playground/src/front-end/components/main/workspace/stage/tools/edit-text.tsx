@@ -65,7 +65,7 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zo
   return <div style={style as any}>
     <textarea 
      ref={setTextarea}
-    style={{ width: "100%", height: "100%", padding: 0, ...textStyle }} 
+    style={{ width: "100%", resize: "none", height: "100%", padding: 0, ...textStyle }} 
     defaultValue={getSyntheticNodeTextContent(selectedNode).trim()}
     onChange={wrapEventToDispatch(dispatch, stageToolEditTextChanged.bind(this, selectedNode.$id))}
     onBlur={wrapEventToDispatch(dispatch, stageToolEditTextBlur.bind(this, selectedNode.$id))}
