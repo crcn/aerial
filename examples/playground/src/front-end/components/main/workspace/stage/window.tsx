@@ -32,12 +32,12 @@ type WindowProps = {
 };
 
 type WindowMountOuterProps = {
-  mount: HTMLElement;
+  renderContainer: HTMLElement;
 }
 
 type WindowMountInnerProps = {
   setContainer(element: HTMLElement);
-  mount: HTMLElement;
+  renderContainer: HTMLElement;
   container: HTMLElement;
 } & WindowMountOuterProps;
 
@@ -46,16 +46,16 @@ const WindowMountBase = ({ setContainer }: WindowMountInnerProps) => {
 }
 
 const enhanceWindowMount = compose<WindowMountInnerProps, WindowMountOuterProps>(
-  // pure,
+  pure,
   withState("container", "setContainer", null),
   lifecycle({
     componentDidUpdate() {
-      const { container, mount } = this.props as WindowMountInnerProps;
-      if (container && mount) {
+      const { container, renderContainer } = this.props as WindowMountInnerProps;
+      if (container && renderContainer) {
         if (container.firstChild) {
           container.removeChild(container.firstChild);
         }
-        container.appendChild(mount);
+        container.appendChild(renderContainer);
         // TODO - dispatch mounted here
       }
     }
@@ -92,9 +92,7 @@ const WindowBase = ({ window, fullScreenWindowId, dispatch, smooth }: WindowProp
     {
       style => {
         return <div className="preview-window-component" style={{...style, ...defaultStyle}}>
-          <Isolate scrollPosition={window.scrollPosition}>
-            <WindowMount mount={window.mount} />
-          </Isolate>
+          <WindowMount renderContainer={window.renderContainer} />
         </div>;
       }
     }

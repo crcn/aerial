@@ -1,8 +1,9 @@
 import { SyntheticWindow, createSyntheticWindow } from "../state";
 import { getSEnvLocationClass } from "./location";
-import { Dispatcher, weakMemo, Mutation, generateDefaultId } from "aerial-common2";
+import { Dispatcher, weakMemo, Mutation, generateDefaultId, mergeBounds, Rectangle } from "aerial-common2";
+import { clamp } from "lodash";
 import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "./events";
-import { SyntheticWindowRenderer, createNoopRenderer, SyntheticDOMRendererFactory } from "./renderers";
+import { SyntheticWindowRendererInterface, createNoopRenderer, SyntheticDOMRendererFactory, SyntheticWindowRendererEvent } from "./renderers";
 import { getNodeByPath, getNodePath } from "../utils/node-utils"
 import { 
   SEnvElementInterface,
@@ -35,7 +36,7 @@ export interface SEnvWindowInterface extends Window {
   externalResourceUris: string[];
   document: SEnvDocumentInterface;
   readonly childObjects: Map<string, any>;
-  renderer:  SyntheticWindowRenderer;
+  renderer:  SyntheticWindowRendererInterface;
   selector: any;
   clone(): SEnvWindowInterface;
 };
@@ -46,7 +47,7 @@ export type SEnvWindowContext = {
   fetch?: Fetch;
   reload?: () => {};
   proxyHost?: string;
-  getRenderer?: (window: SEnvWindowInterface) => SyntheticWindowRenderer;
+  getRenderer?: (window: SEnvWindowInterface) => SyntheticWindowRendererInterface;
   console?: Console;
 };
 
@@ -145,6 +146,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
     readonly location: Location;
     private _selector: any;
+    private _renderer: SyntheticWindowRendererInterface;
     childObjects: Map<string, any>;
 
     readonly sessionStorage: Storage;
@@ -301,15 +303,15 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly statusbar: BarProp;
     readonly styleMedia: StyleMedia;
     readonly toolbar: BarProp;
-    readonly renderer: SyntheticWindowRenderer;
     readonly top: Window;
-    readonly mount: HTMLElement;
     readonly window: Window;
     URL: typeof URL;
     URLSearchParams: typeof URLSearchParams;
     Blob: typeof Blob;
     readonly customElements: CustomElementRegistry;
     private _struct: SyntheticWindow;
+
+    private _scrollRect: Rectangle = { width: Infinity, height: Infinity };
 
     // classes
     readonly EventTarget: typeof EventTarget = SEnvEventTarget;
@@ -321,6 +323,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     
     constructor(origin: string) {
       super();
+
+      this._onRendererPainted = this._onRendererPainted.bind(this);
 
       this.uid = this.$id = generateDefaultId();
       this.childObjects = new Map();
@@ -354,6 +358,18 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
         this.childObjects.set((child as any).$id, child);
         return false;
       });
+    }
+
+    get renderer() {
+      return this._renderer;
+    }
+
+    set renderer(value: SyntheticWindowRendererInterface) {
+      if (this._renderer) {
+        this._renderer.removeEventListener(SyntheticWindowRendererEvent.PAINTED, this._onRendererPainted);
+      }
+      this._renderer = value;
+      this._renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, this._onRendererPainted);
     }
 
     get struct() {
@@ -527,7 +543,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     scroll(...args): void {
-
+      this.scrollTo(...args);
     }
 
     scrollBy(...args): void {
@@ -547,8 +563,8 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       }
 
       // TODO - use computed bounds here too
-      left = Math.max(0, left);
-      top  = Math.max(0, top);
+      left = clamp(left, 0, this._scrollRect.width);
+      top  = clamp(top, 0, this._scrollRect.height);
 
       const oldScrollX = this.scrollX;
       const oldScrollY = this.scrollY;
@@ -602,6 +618,14 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       eventClone.initMutationEvent(event.mutation);
       this.dispatchEvent(eventClone);
     }
+
+    protected _onRendererPainted(event: SyntheticWindowRendererEvent) {
+      this._scrollRect = event.scrollRect;
+
+      // sync scroll position that may have changed
+      // during window resize, otherwise 
+      this.scrollTo(event.scrollPosition.left, event.scrollPosition.top);
+    }
   }
 });
 
@@ -642,8 +666,4 @@ export const patchNode = (node: Node, mutation: Mutation<any>) => {
       break;
     }
   }
-}
-
-const traverseDOMTree = (node: ParentNode, each: (node: Node) => void) => {
-
 }

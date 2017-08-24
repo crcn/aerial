@@ -4,8 +4,8 @@ import { take, fork, select, put, call } from "redux-saga/effects";
 import { Point, shiftPoint, watch, resized, Bounds } from "aerial-common2";
 import { 
   SYNTHETIC_WINDOW,
+  syntheticWindowScroll,
   getSyntheticNodeWindow, 
-  syntheticWindowScrolled,
   syntheticNodeTextContentChanged, 
   syntheticNodeValueStoppedEditing,
 } from "aerial-browser-sandbox";
@@ -66,7 +66,7 @@ function* handleTextEditBlur() {
 const MOMENTUM_THRESHOLD = 100;
 const DEFAULT_MOMENTUM_DAMP = 0.1;
 const MOMENTUM_DELAY = 50;
-const VELOCITY_MULTIPLIER = 100;
+const VELOCITY_MULTIPLIER = 10;
 
 function* handleScrollInFullScreenMode() {
   while(true) {
@@ -76,10 +76,10 @@ function* handleScrollInFullScreenMode() {
     if (!workspace.stage.fullScreenWindowId) {
       continue;
     }
-
+    
     const window = getSyntheticWindow(state, workspace.stage.fullScreenWindowId);
 
-    yield put(syntheticWindowScrolled(window.$id, shiftPoint(window.scrollPosition || { left: 0, top: 0 }, {
+    yield put(syntheticWindowScroll(window.$id, shiftPoint(window.scrollPosition || { left: 0, top: 0 }, {
       left: 0,
       top: deltaY
     })));
@@ -103,7 +103,7 @@ function* handleWindowMousePanned() {
   });
 
   function* scrollDelta(windowId, deltaY) {
-    yield put(syntheticWindowScrolled(windowId, shiftPoint(panStartScrollPosition, {
+    yield put(syntheticWindowScroll(windowId, shiftPoint(panStartScrollPosition, {
       left: 0,
       top: -deltaY
     })));
@@ -127,7 +127,7 @@ function* handleWindowMousePanned() {
 
       const zoom = getStageTranslate(getSelectedWorkspace(yield select()).stage).zoom;
       
-      yield spring(deltaY, -velocityY * VELOCITY_MULTIPLIER, function*(deltaY) {
+      yield spring(deltaY, velocityY * VELOCITY_MULTIPLIER, function*(deltaY) {
         yield scrollDelta(windowId, deltaY / zoom);
       });
     }

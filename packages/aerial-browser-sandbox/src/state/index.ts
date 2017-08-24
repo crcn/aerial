@@ -117,7 +117,7 @@ export type SyntheticWindow = {
     [identifier: string]: SyntheticNode
   }
   scrollPosition: Point;
-  mount: HTMLElement;
+  renderContainer: HTMLElement;
   location: string;
   document: SyntheticDocument;
   bounds: Bounds;

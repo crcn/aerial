@@ -1,6 +1,6 @@
 // import { SEnvWindowInterface } from "../environment";
 import { SyntheticDocument, SyntheticNode } from "../state";
-import { Request, BaseEvent, generateDefaultId, Mutation, Point } from "aerial-common2";
+import { Request, BaseEvent, generateDefaultId, Mutation, Point, Action } from "aerial-common2";
 import { RenderedClientRects, RenderedComputedStyleDeclarations, SEnvWindowInterface } from "../environment";
 
 export const OPEN_SYNTHETIC_WINDOW               = "OPEN_SYNTHETIC_WINDOW";
@@ -14,6 +14,7 @@ export const NODE_VALUE_STOPPED_EDITING          = "NODE_VALUE_STOPPED_EDITING";
 export const EDIT_SOURCE_CONTENT                 = "EDIT_SOURCE_CONTENT";
 export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
 export const SYNTHETIC_WINDOW_SCROLLED           = "SYNTHETIC_WINDOW_SCROLLED";
+export const SYNTHETIC_WINDOW_SCROLL             = "SYNTHETIC_WINDOW_SCROLL";
 export const SYNTHETIC_WINDOW_OPENED             = "SYNTHETIC_WINDOW_OPENED";
 export const SYNTHETIC_WINDOW_PROXY_OPENED       = "SYNTHETIC_WINDOW_PROXY_OPENED";
 export const SYNTHETIC_WINDOW_MOVED              = "SYNTHETIC_WINDOW_MOVED";
@@ -73,6 +74,11 @@ export type SyntheticWindowScrolled = {
   scrollPosition: Point;
   syntheticWindowId: string;
 } & BaseEvent;
+
+export type SyntheticWindowScroll = {
+  scrollPosition: Point;
+  syntheticWindowId: string;
+} & Action;
 
 export type SyntheticWindowOpened = {
   instance: SEnvWindowInterface;
@@ -152,6 +158,13 @@ export const syntheticWindowScrolled = (syntheticWindowId: string, scrollPositio
   scrollPosition,
   syntheticWindowId,
   type: SYNTHETIC_WINDOW_SCROLLED
+});
+
+
+export const syntheticWindowScroll = (syntheticWindowId: string, scrollPosition: Point): SyntheticWindowScroll => ({
+  scrollPosition,
+  syntheticWindowId,
+  type: SYNTHETIC_WINDOW_SCROLL
 });
 
 export const syntheticNodeTextContentChanged = (syntheticWindowId: string, syntheticNodeId: string, textContent: string): SyntheticNodeTextContentChanged => ({

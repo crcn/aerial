@@ -1,18 +1,20 @@
 import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "../events";
 import { SEnvWindowInterface } from "../window";
 import { SEnvElementInterface } from "../nodes/element";
+import { Rectangle, Point } from "aerial-common2";
 
 const EventTarget = getSEnvEventTargetClass();
 const { SEnvEvent, SEnvMutationEvent } = getSEnvEventClasses();
 
-export interface SyntheticWindowRenderer extends EventTarget {
-  mount: HTMLElement;
+export interface SyntheticWindowRendererInterface extends EventTarget {
+  container: HTMLElement;
   sourceWindow: Window;
+  readonly allBoundingClientRects: RenderedClientRects;
   getBoundingClientRect(element: SEnvElementInterface): ClientRect;
   getComputedStyle(element: SEnvElementInterface, pseudoElement?: SEnvElementInterface): CSSStyleDeclaration;
 }
 
-export type SyntheticDOMRendererFactory = (window: Window) => SyntheticWindowRenderer;
+export type SyntheticDOMRendererFactory = (window: Window) => SyntheticWindowRendererInterface;
 
 export interface RenderedClientRects {
   [identifier: string]: ClientRect
@@ -24,19 +26,28 @@ export interface RenderedComputedStyleDeclarations {
 };
 
 export class SyntheticWindowRendererEvent extends SEnvEvent {
+
   static readonly PAINTED = "PAINTED";
+
   rects: RenderedClientRects;
   styles: RenderedComputedStyleDeclarations;
-  initRendererEvent(type: string, rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations) {
+  scrollPosition: Point;
+  scrollRect: Rectangle;
+
+  initRendererEvent(type: string, rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations, scrollRect: Rectangle, scrollPosition) {
     super.initEvent(type, true, true);
     this.rects = rects;
     this.styles = styles;
+    this.scrollRect = scrollRect;
+    this.scrollPosition = scrollPosition;
   }
 }
 
-export abstract class BaseSyntheticWindowRenderer extends EventTarget implements SyntheticWindowRenderer {
-  abstract readonly mount: HTMLElement;
+export abstract class BaseSyntheticWindowRenderer extends EventTarget implements SyntheticWindowRendererInterface {
+  abstract readonly container: HTMLElement;
   private _rects: RenderedClientRects;
+  private _scrollWidth: number;
+  private _scrollHeight: number;
   private _styles: RenderedComputedStyleDeclarations;
 
   constructor(protected _sourceWindow: SEnvWindowInterface) {
@@ -47,6 +58,10 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
     this._onWindowScroll = this._onWindowScroll.bind(this);
     this._onWindowMutation = this._onWindowMutation.bind(this);
     this._addTargetListeners();
+  }
+
+  get allBoundingClientRects() {
+    return this._rects;
   }
 
   get clientRects(): RenderedClientRects {
@@ -101,11 +116,11 @@ export abstract class BaseSyntheticWindowRenderer extends EventTarget implements
 
   }
 
-  protected setPaintedInfo(rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations) {
+  protected setPaintedInfo(rects: RenderedClientRects, styles: RenderedComputedStyleDeclarations, scrollRect: Rectangle, scrollPosition: Point) {
     this._rects = rects;
     this._styles = styles;
     const event = new SyntheticWindowRendererEvent();
-    event.initRendererEvent(SyntheticWindowRendererEvent.PAINTED, rects, styles);
+    event.initRendererEvent(SyntheticWindowRendererEvent.PAINTED, rects, styles, scrollRect, scrollPosition);
     this.dispatchEvent(event);
   }
 }

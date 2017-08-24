@@ -28,6 +28,8 @@ MVP:
 - [ ] tab between windows (cmd+shift+{)
 - [ ] zoom indicator
 - [ ] measurement tooling
+- [ ] select elements 
+- [ ] highlight elements based on text cursor position
 - [ ] multi select
 - [ ] copy + paste elements
 - [ ] meta keywords for controlling UI

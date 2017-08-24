@@ -2,7 +2,7 @@ import { BaseSyntheticWindowRenderer } from "./base";
 import { SEnvWindowInterface } from "../window";
 
 export class NoopRendererer extends BaseSyntheticWindowRenderer {
-  readonly mount: HTMLElement = null;
+  readonly container: HTMLElement = null;
 }
 
 export const createNoopRenderer = (window: SEnvWindowInterface) => {

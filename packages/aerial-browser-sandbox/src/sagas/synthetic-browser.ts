@@ -35,6 +35,9 @@ import {
   FetchRequest,
   FETCH_REQUEST,
   fetchRequest,
+  SYNTHETIC_WINDOW_SCROLL,
+  SyntheticWindowScroll,
+  syntheticWindowScroll,
   OPEN_SYNTHETIC_WINDOW,
   SyntheticWindowScrolled,
   syntheticWindowScrolled,
@@ -334,6 +337,13 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
       emit(syntheticWindowMoved(window));
     });
 
+    window.addEventListener("scroll", (event) => {
+      emit(syntheticWindowScrolled(window.$id, {
+        left: window.scrollX,
+        top: window.scrollY
+      }));
+    });
+
     window.addEventListener("resize", (event) => {
       emit(syntheticWindowResized(window));
     });
@@ -414,6 +424,10 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
       if (computedStyle.position === "static") {
         envElement.style.position = "relative";
       }
+
+      // transitions will foo with dragging, so temporarily
+      // disable them
+      envElement.style.transition = "none";
       envElement.style.left = `${relativeRect.left}px`;
       envElement.style.top  = `${relativeRect.top}px`;
     }
@@ -443,6 +457,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
       const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
       const target = window.childObjects.get(itemId) as HTMLElement;
 
+      target.style.transition = "";
       // TODO - prompt where to persist style
       const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
       yield yield request(applyFileMutationsRequest(mutation));
@@ -451,7 +466,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
 
   yield fork(function*() {
     while(true) {
-      const { scrollPosition: { left, top }} = (yield takeWindowAction(SYNTHETIC_WINDOW_SCROLLED)) as SyntheticWindowScrolled;
+      const { scrollPosition: { left, top }} = (yield takeWindowAction(SYNTHETIC_WINDOW_SCROLL)) as SyntheticWindowScroll;
       window.scrollTo(left, top);
     }
   });

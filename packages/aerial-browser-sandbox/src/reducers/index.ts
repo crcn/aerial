@@ -78,7 +78,7 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
           createSyntheticWindow({
             $id: instance.$id,
             location: instance.location.toString(),
-            mount: instance.renderer.mount,
+            renderContainer: instance.renderer.container,
             bounds: {
               left: instance.screenLeft,
               top: instance.screenTop,

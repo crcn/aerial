@@ -29,12 +29,25 @@ const RECOMPUTE_TIMEOUT = 1;
 
 // TODO - this should contain an iframe
 export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
-  readonly mount: HTMLElement;
+  readonly container: HTMLIFrameElement;
+  readonly mount: HTMLDivElement;
   private _rendering: boolean;
   private _mutations: Mutation<any>[];
   constructor(sourceWindow: SEnvWindowInterface, readonly targetDocument: Document) {
     super(sourceWindow);
+    this.container = targetDocument.createElement("iframe");
+    Object.assign(this.container.style, {
+      border: "none",
+      width: "100%",
+      height: "100%"
+    });
+
+    this._onContainerResize = this._onContainerResize.bind(this);
     this.mount = targetDocument.createElement("div");
+    this.container.onload = () => {
+      this.container.contentWindow.document.body.appendChild(this.mount);
+      this.container.contentWindow.addEventListener("resize", this._onContainerResize);
+    };
   }
 
   protected _onDocumentLoad(event: Event) {
@@ -45,7 +58,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     this.mount.innerHTML = `<style>${css}</style><span></span>`;
     this.mount.lastElementChild.appendChild(mapNode(this.sourceWindow.document.documentElement as any as SEnvElementInterface, this.targetDocument));
 
-    this._resetClientRects();
+    this._resetComputedInfo();
   }
 
   protected _onWindowMutation({ mutation }: SEnvMutationEventInterface) {
@@ -58,6 +71,10 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     return Array.prototype.map.call(this.sourceWindow.document.stylesheets, (ss: CSSStyleSheet) => (
       ss.cssText
     )).join("\n");
+  }
+
+  protected _onContainerResize(event) {
+    this._resetComputedInfo();
   }
 
   private _batchMutation(mutation: Mutation<any>) {
@@ -84,7 +101,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
             } else {
               this._mutations = undefined;
             }
-            this._resetClientRects();
+            this._resetComputedInfo();
           }, RECOMPUTE_TIMEOUT);
         });
 
@@ -94,7 +111,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
       this._mutations.push(mutation);
     } else {
       this._applyMutation(mutation);
-      this._resetClientRects();
+      this._resetComputedInfo();
     }
   }
 
@@ -114,15 +131,22 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   protected _onWindowResize(event: Event) {
-    this._resetClientRects();
+    this._deferResetComputedInfo();
   }
+
+  protected _deferResetComputedInfo = throttle(() => {
+    this._resetComputedInfo();
+  }, 10);
 
   protected _onWindowScroll(event: Event) {
-    this._resetClientRects();
+    this.container.contentWindow.scroll(this._sourceWindow.scrollX, this._sourceWindow.scrollY);
+    this._deferResetComputedInfo();
   }
 
-  private _resetClientRects() {
+  private _resetComputedInfo() {
     const targetWindow = this.targetDocument.defaultView;
+    const containerWindow = this.container.contentWindow;
+    const containerBody = containerWindow.document.body;
     const body = this.mount.lastChild;
 
     const boundingClientRects = {};
@@ -139,7 +163,13 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
       allComputedStyles[$id] = targetWindow.getComputedStyle(element);
     });
 
-    this.setPaintedInfo(boundingClientRects, allComputedStyles);
+    this.setPaintedInfo(boundingClientRects, allComputedStyles, {
+      width: containerBody.scrollWidth,
+      height: containerBody.scrollHeight
+    }, {
+      left: containerWindow.scrollX,
+      top: containerWindow.scrollY
+    });
   }
 }
 
