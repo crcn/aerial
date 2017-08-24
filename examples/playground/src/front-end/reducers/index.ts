@@ -264,12 +264,16 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
       const { width, height } = workspace.stage.container.getBoundingClientRect();
 
-      return centerStage(state, state.selectedWorkspaceId, {
+      state = centerStage(state, state.selectedWorkspaceId, {
         left: instance.screenLeft,
         top: instance.screenTop,
         right: instance.screenLeft + instance.innerWidth,
         bottom: instance.screenTop + instance.innerHeight,
       }, true);
+
+      state = setWorkspaceSelection(state, workspace.$id, getStructReference(instance.struct));
+
+      return state;
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {

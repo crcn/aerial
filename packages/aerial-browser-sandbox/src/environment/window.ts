@@ -375,6 +375,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     get struct() {
       if (!this._struct) {
         this._struct = createSyntheticWindow({
+          $id: this.$id,
           location: this.location.toString(),
           document: this.document.struct
         });

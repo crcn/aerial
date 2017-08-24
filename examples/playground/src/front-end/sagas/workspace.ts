@@ -15,6 +15,7 @@ import {
   RESIZER_PATH_MOUSE_MOVED,
   DeleteShortcutPressed, 
   OPEN_NEW_WINDOW_SHORTCUT_PRESSED,
+  CLONE_WINDOW_SHORTCUT_PRESSED,
   PROMPTED_NEW_WINDOW_URL,
   PromptedNewWindowUrl,
   DELETE_SHORCUT_PRESSED, 
@@ -24,14 +25,18 @@ import {
 } from "../actions";
 
 import { URI_CACHE_BUSTED, uriCacheBusted } from "aerial-sandbox2";
+const WINDOW_PADDING = 10;
 
 import { 
   getUri,
   SEnvNodeTypes, 
   SyntheticWindow, 
   SyntheticElement, 
+  SYNTHETIC_WINDOW,
+  getSyntheticWindow,
   getSyntheticNodeById, 
   getSyntheticNodeWindow,
+  getSyntheticWindowBrowser,
   openSyntheticWindowRequest, 
 } from "aerial-browser-sandbox";
 
@@ -59,6 +64,7 @@ export function* mainWorkspaceSaga() {
   yield fork(handleSelectionResized);
   yield fork(handleNewLocationPrompt);
   yield fork(handleOpenNewWindowShortcut);
+  yield fork(handleCloneSelectedWindowShortcut);
 }
 
 function* openDefaultWindow() {
@@ -165,7 +171,23 @@ function* handleOpenNewWindowShortcut() {
     const state: ApplicationState = yield select();
     const workspace = getSelectedWorkspace(state);
     yield put(openSyntheticWindowRequest(uri, workspace.browserId));
-    
+
+  }
+}
+
+function* handleCloneSelectedWindowShortcut() {
+  while(true) {
+    yield take(CLONE_WINDOW_SHORTCUT_PRESSED);
+    const state: ApplicationState = yield select();
+    const workspace = getSelectedWorkspace(state);
+    const itemRef = workspace.selectionRefs[0];
+    if (!itemRef) continue;
+    const window = itemRef[0] === SYNTHETIC_WINDOW ? getSyntheticWindow(state, itemRef[1]) : getSyntheticNodeWindow(state, itemRef[1]);
+
+    const clonedWindow = yield yield request(openSyntheticWindowRequest(window.location, getSyntheticWindowBrowser(state, window.$id).$id, {
+      left: window.bounds.left,
+      top: window.bounds.bottom + WINDOW_PADDING
+    }));
   }
 }
 

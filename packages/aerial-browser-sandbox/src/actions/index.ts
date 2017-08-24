@@ -32,6 +32,7 @@ export type SyntheticWindowSourceChanged = {
 
 export type OpenSyntheticBrowserWindow = {
   uri: string;
+  position: Point;
   syntheticBrowserId: string;
 } & Request;
 
@@ -180,8 +181,9 @@ export const fetchRequest = (info: RequestInfo): FetchRequest => ({
   $id: generateDefaultId()
 });
 
-export const openSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string): OpenSyntheticBrowserWindow => ({
+export const openSyntheticWindowRequest = (uri: string, syntheticBrowserId?: string, position?: Point): OpenSyntheticBrowserWindow => ({
   uri,
+  position,
   syntheticBrowserId,
   type: OPEN_SYNTHETIC_WINDOW,
   $id: generateDefaultId()

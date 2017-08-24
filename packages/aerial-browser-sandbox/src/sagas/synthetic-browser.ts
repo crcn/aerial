@@ -78,6 +78,7 @@ import {
   diffArray,
   takeRequest, 
   Moved,
+  Point,
   generateDefaultId,
   pointToBounds,
   MOVED,
@@ -172,18 +173,19 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
 function* handleOpenSyntheticWindow(browserId: string) {
   while(true) {
     const request = (yield take((action: OpenSyntheticBrowserWindow) => action.type === OPEN_SYNTHETIC_WINDOW && action.syntheticBrowserId === browserId)) as OpenSyntheticBrowserWindow;
-    const instance = (yield call(openSyntheticWindowEnvironment, request.uri, browserId)) as SEnvWindowInterface;
+    const instance = (yield call(openSyntheticWindowEnvironment, request.uri, browserId, request.position)) as SEnvWindowInterface;
+    yield put(createRequestResponse(request.$id, instance));
   }
 }
 
-function* openSyntheticWindowEnvironment(location: string, browserId: string) {
+function* openSyntheticWindowEnvironment(location: string, browserId: string, position?: Point) {
 
   let main: SEnvWindowInterface;
   const windowId = generateDefaultId();
   const documentId = generateDefaultId();
   const fetch = yield getFetch();
 
-  function* reload (left?: number, top?: number) {
+  function* reload (position?: Point) {
 
     const SEnvWindow = getSEnvWindowClass({ console: getSEnvWindowConsole(), fetch });
     const window = new SEnvWindow(location);
@@ -193,13 +195,17 @@ function* openSyntheticWindowEnvironment(location: string, browserId: string) {
     window.document.$id = documentId;
     window.resetChildObjects();
 
+    if (position) {
+      window.moveTo(position.left, position.top);
+    }
+
     yield watchWindowExternalResourceUris(window, reload);
     window.$load();
 
     yield put(syntheticWindowOpened(window, browserId));
   };
 
-  return yield call(reload);
+  return yield call(reload, position);
 }
 
 const PADDING = 10;
@@ -278,7 +284,7 @@ function* handleOpenedSyntheticWindow(browserId: string) {
     let disposeMirror: () => any;
     if (!containsProxy) {
       proxy = window.clone();
-      const position = (yield call(getBestWindowPosition, browserId));
+      const position = window.screenLeft || window.screenTop ? { left: window.screenLeft, top: window.screenTop } : (yield call(getBestWindowPosition, browserId));
       proxy.moveTo(position.left, position.top);
       proxy.renderer = createRenderer(proxy);
       disposeMirror = () => {};

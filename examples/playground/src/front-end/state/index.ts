@@ -33,15 +33,16 @@ import { createFileCacheStore, FileCacheRootState, FileCacheItem, getFileCacheIt
 import { StageToolOverlayMouseMoved, StageToolOverlayClicked } from "../actions";
 import { Shortcut, ShortcutServiceState, createKeyboardShortcut } from "./shortcuts";
 import { 
+  zoomInShortcutPressed,
+  escapeShortcutPressed,
   deleteShortcutPressed,
+  zoomOutShortcutPressed,
   toggleTextEditorPressed,
   toggleLeftGutterPressed, 
   toggleRightGutterPressed, 
   fullScreenShortcutPressed,
-  zoomInShortcutPressed,
-  zoomOutShortcutPressed,
+  cloneWindowShortcutPressed,
   openNewWindowShortcutPressed,
-  escapeShortcutPressed
 } from "front-end/actions";
 
 import {
@@ -236,6 +237,7 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+=", zoomInShortcutPressed()),
     createKeyboardShortcut("meta+-", zoomOutShortcutPressed()),
     createKeyboardShortcut("meta+t", openNewWindowShortcutPressed()),
+    createKeyboardShortcut("meta+enter", cloneWindowShortcutPressed()),
     createKeyboardShortcut("escape", escapeShortcutPressed())
   ],
   fileCacheStore: createFileCacheStore(),
