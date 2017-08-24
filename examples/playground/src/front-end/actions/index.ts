@@ -11,6 +11,7 @@ export const DELETE_SHORCUT_PRESSED      = "DELETE_SHORCUT_PRESSED";
 export const FULL_SCREEN_SHORTCUT_PRESSED = "FULL_SCREEN_SHORTCUT_PRESSED";
 export const ZOOM_IN_SHORTCUT_PRESSED = "ZOOM_IN_SHORTCUT_PRESSED";
 export const ZOOM_OUT_SHORTCUT_PRESSED = "ZOOM_OUT_SHORTCUT_PRESSED";
+export const OPEN_NEW_WINDOW_SHORTCUT_PRESSED = "OPEN_NEW_WINDOW_SHORTCUT_PRESSED";
 export const ESCAPE_SHORTCUT_PRESSED = "ESCAPE_SHORTCUT_PRESSED";
 export const TOGGLE_TEXT_EDITOR_PRESSED  = "TOGGLE_TEXT_EDITOR_PRESSED";
 export const TOGGLE_LEFT_GUTTER_PRESSED  = "TOGGLE_LEFT_GUTTER_PRESSED";
@@ -329,6 +330,10 @@ export const zoomInShortcutPressed = (): BaseEvent => ({
 
 export const zoomOutShortcutPressed = (): BaseEvent => ({
   type: ZOOM_OUT_SHORTCUT_PRESSED,
+});
+
+export const openNewWindowShortcutPressed = (): BaseEvent => ({
+  type: OPEN_NEW_WINDOW_SHORTCUT_PRESSED,
 });
 
 export const escapeShortcutPressed = (): BaseEvent => ({

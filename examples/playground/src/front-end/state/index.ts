@@ -40,6 +40,7 @@ import {
   fullScreenShortcutPressed,
   zoomInShortcutPressed,
   zoomOutShortcutPressed,
+  openNewWindowShortcutPressed,
   escapeShortcutPressed
 } from "front-end/actions";
 
@@ -234,6 +235,7 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+f", fullScreenShortcutPressed()),
     createKeyboardShortcut("meta+=", zoomInShortcutPressed()),
     createKeyboardShortcut("meta+-", zoomOutShortcutPressed()),
+    createKeyboardShortcut("meta+t", openNewWindowShortcutPressed()),
     createKeyboardShortcut("escape", escapeShortcutPressed())
   ],
   fileCacheStore: createFileCacheStore(),

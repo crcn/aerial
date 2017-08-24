@@ -1,4 +1,4 @@
-import { watch, removed, Struct, moved, stoppedMoving, moveBounds, scaleInnerBounds, resized, keepBoundsAspectRatio } from "aerial-common2";
+import { watch, removed, Struct, moved, stoppedMoving, moveBounds, scaleInnerBounds, resized, keepBoundsAspectRatio, request } from "aerial-common2";
 import { take, select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
 import { 
@@ -14,6 +14,7 @@ import {
   TextEditorChanged,
   RESIZER_PATH_MOUSE_MOVED,
   DeleteShortcutPressed, 
+  OPEN_NEW_WINDOW_SHORTCUT_PRESSED,
   PROMPTED_NEW_WINDOW_URL,
   PromptedNewWindowUrl,
   DELETE_SHORCUT_PRESSED, 
@@ -57,6 +58,7 @@ export function* mainWorkspaceSaga() {
   yield fork(handleTextEditorChange);
   yield fork(handleSelectionResized);
   yield fork(handleNewLocationPrompt);
+  yield fork(handleOpenNewWindowShortcut);
 }
 
 function* openDefaultWindow() {
@@ -152,6 +154,18 @@ function* handleSelectionResized() {
       const scaledBounds = scaleInnerBounds(bounds, bounds, newBounds);
       yield put(resized(item.$id, item.$type, scaleInnerBounds(bounds, bounds, newBounds)));
     }
+  }
+}
+
+function* handleOpenNewWindowShortcut() {
+  while(true) {
+    yield take(OPEN_NEW_WINDOW_SHORTCUT_PRESSED);
+    const uri = prompt("URL");
+    if (!uri) continue;
+    const state: ApplicationState = yield select();
+    const workspace = getSelectedWorkspace(state);
+    yield put(openSyntheticWindowRequest(uri, workspace.browserId));
+    
   }
 }
 
