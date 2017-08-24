@@ -1,17 +1,15 @@
 very simple online playground for visually creating web applications
 
-TOMORROW:
+GOALS:
 
-- [ ] preview server
-  - [ ] auto layout windows
-  - [ ] windows should be immovable
-  - [ ] reload main window when a file is added
-- [ ] close child windows
+- [ ] UX similar to regular browsers
+  - [ ] right click inspect element (source code though)
 
 MVP:
 
 - [ ] HMR support in windows
 - [ ] dev server for playground (window that manages all other windows)
+- [ ] DSL for dynamic templates
 
 - POLISH:
 

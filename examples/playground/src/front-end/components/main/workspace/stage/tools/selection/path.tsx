@@ -2,10 +2,8 @@ import "./path.scss";
 import * as  React from "react";
 import { compose, pure, withHandlers } from "recompose";
 import { getWorkspaceById, Workspace } from "front-end/state";
-import { resizerPathMoved } from "front-end/actions";
+import { resizerPathMoved, resizerPathStoppedMoving } from "front-end/actions";
 import { Dispatcher, startDOMDrag, Point, BaseEvent, WrappedEvent, Bounds } from "aerial-common2";
-
-export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
 
 
 export type PathOuterProps = {
@@ -85,7 +83,8 @@ const enhancePath = compose<PathInnerProps, PathOuterProps>(
           right: point.left === 1 ? bounds.right + delta.left : bounds.right,
           bottom: point.top === 1 ? bounds.bottom + delta.top : bounds.bottom,
         }, sourceEvent));
-      }, () => {
+      }, (event) => {
+        dispatch(resizerPathStoppedMoving(workspace.$id, event));
       });
     }
   })

@@ -18,6 +18,7 @@ export const TOGGLE_TEXT_EDITOR_PRESSED  = "TOGGLE_TEXT_EDITOR_PRESSED";
 export const TOGGLE_LEFT_GUTTER_PRESSED  = "TOGGLE_LEFT_GUTTER_PRESSED";
 export const TOGGLE_RIGHT_GUTTER_PRESSED = "TOGGLE_RIGHT_GUTTER_PRESSED";
 export const RESIZER_PATH_MOUSE_MOVED = "RESIZER_PATH_MOUSE_MOVED";
+export const RESIZER_PATH_MOUSE_STOPPED_MOVING = "RESIZER_PATH_MOUSE_STOPPED_MOVING";
 export const TEXT_EDITOR_CHANGED      = "TEXT_EDITOR_CHANGED";
 export const CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED = "CANVAS_ELEMENTS_COMPUTED_PROPS_CHANGED";
 export const TREE_NODE_LABEL_CLICKED = "TREE_NODE_LABE_CLICKED";
@@ -109,6 +110,10 @@ export type KeyboardShortcutAdded = {
 export type ResizerPathMoved = {
   bounds: Bounds;
   anchor: Point;
+  workspaceId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
+
+export type ResizerPathStoppedMoving = {
   workspaceId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
@@ -263,6 +268,13 @@ export const resizerPathMoved = (workspaceId: string, anchor: Point, bounds: Bou
   workspaceId,
   anchor,
   bounds,
+  sourceEvent: {...sourceEvent}
+});
+
+
+export const resizerPathStoppedMoving = (workspaceId: string, sourceEvent): ResizerPathStoppedMoving => ({
+  type: RESIZER_PATH_MOUSE_STOPPED_MOVING,
+  workspaceId,
   sourceEvent: {...sourceEvent}
 });
 

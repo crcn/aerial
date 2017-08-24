@@ -67,6 +67,7 @@ import {
   STAGE_TOOL_EDIT_TEXT_CHANGED,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
   STAGE_TOOL_OVERLAY_MOUSE_LEAVE,
+  RESIZER_PATH_MOUSE_STOPPED_MOVING,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_START,
   StageToolOverlayMousePanStart,
   STAGE_MOUSE_MOVED,
@@ -255,17 +256,21 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return updateWorkspaceStage(state, workspace.$id, { smooth: false, translate });
     }
 
+    case RESIZER_PATH_MOUSE_MOVED: 
     case RESIZER_MOVED: {
       const workspace = getSelectedWorkspace(state);
       state = updateWorkspaceStage(state, workspace.$id, {
+        smooth: false,
         movingOrResizing: true
       });
       return state;
     }
 
+    case RESIZER_PATH_MOUSE_STOPPED_MOVING: 
     case RESIZER_STOPPED_MOVING: {
       const workspace = getSelectedWorkspace(state);
       state = updateWorkspaceStage(state, workspace.$id, {
+        smooth: false,
         movingOrResizing: false
       });
       return state;
