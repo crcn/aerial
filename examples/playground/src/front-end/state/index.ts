@@ -237,6 +237,7 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+/", toggleRightGutterPressed()),
     createKeyboardShortcut("meta+e", toggleTextEditorPressed()),
     createKeyboardShortcut("meta+f", fullScreenShortcutPressed()),
+    createKeyboardShortcut("ctrl+f", fullScreenShortcutPressed()),
     createKeyboardShortcut("meta+=", zoomInShortcutPressed()),
     createKeyboardShortcut("meta+-", zoomOutShortcutPressed()),
     createKeyboardShortcut("meta+t", openNewWindowShortcutPressed()),
