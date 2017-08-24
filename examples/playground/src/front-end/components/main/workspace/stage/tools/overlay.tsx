@@ -9,7 +9,6 @@ import { compose, pure, withHandlers } from "recompose";
 import { SyntheticNode, SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, Bounds, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
 import { 
-  stageToolOverlayMouseClicked,
   stageToolOverlayMouseLeave,
   stageToolOverlayMousePanStart,
   stageToolOverlayMousePanning,
@@ -60,7 +59,6 @@ const NodeOverlayBase = ({ windowId, zoom, bounds, node, dispatch, hovering }: N
 
   return <div 
   className={cx("visual-tools-node-overlay", { hovering: hovering })}
-  onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, windowId))}
   style={style} />;
 }
 

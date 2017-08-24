@@ -15,11 +15,9 @@ MVP:
 
 - POLISH:
 
-- [ ] selection must be within overlay
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
    - [ ] ctrl+shift+{} to tab between windows
 - [ ] load spinner for each window
-- [ ] scroll position should respect scroll height of entire document (compute with mounted iframe window height)
 - [ ] alt+click of tabbed item in full screen mode should respect original window size
 - [ ] tab between windows (cmd+shift+{)
 - [ ] zoom indicator

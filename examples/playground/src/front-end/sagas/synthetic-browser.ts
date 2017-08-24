@@ -6,6 +6,7 @@ import {
   SYNTHETIC_WINDOW,
   syntheticWindowScroll,
   getSyntheticNodeWindow, 
+  SYNTHETIC_WINDOW_PROXY_OPENED,
   syntheticNodeTextContentChanged, 
   syntheticNodeValueStoppedEditing,
 } from "aerial-browser-sandbox";
@@ -144,7 +145,7 @@ function* handleFullScreenWindow() {
 
   yield fork(function*() {
     while(true) {
-      yield take(FULL_SCREEN_SHORTCUT_PRESSED);
+      yield take([FULL_SCREEN_SHORTCUT_PRESSED, SYNTHETIC_WINDOW_PROXY_OPENED]);
       const state: ApplicationState = yield select();
       const windowId = getSelectedWorkspace(state).stage.fullScreenWindowId;
       if (windowId) {
@@ -166,7 +167,8 @@ function* handleFullScreenWindow() {
     while(true) {
       yield call(() => waitForFullScreenMode.promise);
       const state: ApplicationState = yield select();
-      const { container } = getSyntheticWindowWorkspace(state, currentFullScreenWindowId).stage;
+      const workspace = getSelectedWorkspace(state);
+      const { container } = workspace.stage;
       const rect = container.getBoundingClientRect();
       const window = getSyntheticWindow(state, currentFullScreenWindowId);
       yield put(resized(currentFullScreenWindowId, SYNTHETIC_WINDOW, {

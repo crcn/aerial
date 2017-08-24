@@ -21,7 +21,7 @@ import {
   DELETE_SHORCUT_PRESSED, 
   StageToolOverlayClicked, 
   workspaceSelectionDeleted,
-  STAGE_TOOL_OVERLAY_MOUSE_CLICKED, 
+  STAGE_MOUSE_CLICKED, 
 } from "../actions";
 
 import { URI_CACHE_BUSTED, uriCacheBusted } from "aerial-sandbox2";
@@ -80,7 +80,7 @@ function* openDefaultWindow() {
 
 function* handleAltClickElement() {
   while(true) {
-    const event: StageToolOverlayClicked = yield take((action: StageToolOverlayClicked) => action.type === STAGE_TOOL_OVERLAY_MOUSE_CLICKED && action.sourceEvent.altKey);
+    const event: StageToolOverlayClicked = yield take((action: StageToolOverlayClicked) => action.type === STAGE_MOUSE_CLICKED && action.sourceEvent.altKey);
     const state = yield select();
     const targetRef = getStageToolMouseNodeTargetReference(state, event);
     if (!targetRef) continue;

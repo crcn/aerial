@@ -240,6 +240,7 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+=", zoomInShortcutPressed()),
     createKeyboardShortcut("meta+-", zoomOutShortcutPressed()),
     createKeyboardShortcut("meta+t", openNewWindowShortcutPressed()),
+    createKeyboardShortcut("ctrl+t", openNewWindowShortcutPressed()),
     createKeyboardShortcut("meta+enter", cloneWindowShortcutPressed()),
     createKeyboardShortcut("escape", escapeShortcutPressed())
   ],

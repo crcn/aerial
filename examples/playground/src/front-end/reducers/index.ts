@@ -77,7 +77,6 @@ import {
   WorkspaceSelectionDeleted,
   WORKSPACE_DELETION_SELECTED,
   STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED,
-  STAGE_TOOL_OVERLAY_MOUSE_CLICKED,
   STAGE_MOUSE_CLICKED,
   StageToolNodeOverlayHoverOut,
   StageToolNodeOverlayHoverOver,
@@ -285,7 +284,14 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         bottom: instance.screenTop + instance.innerHeight,
       }, true);
 
-      state = setWorkspaceSelection(state, workspace.$id, getStructReference(instance.struct));
+      if (workspace.stage.fullScreenWindowId) {
+        state = updateWorkspaceStage(state, workspace.$id, {
+          smooth: true,
+          fullScreenWindowId: instance.$id
+        });
+      } else {
+        state = setWorkspaceSelection(state, workspace.$id, getStructReference(instance.struct));
+      }
 
       return state;
     }

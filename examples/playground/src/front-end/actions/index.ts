@@ -36,7 +36,6 @@ export const STAGE_TOOL_OVERLAY_MOUSE_PAN_START = "STAGE_TOOL_OVERLAY_MOUSE_PAN_
 export const STAGE_TOOL_OVERLAY_MOUSE_PANNING = "STAGE_TOOL_OVERLAY_MOUSE_PANNING";
 export const STAGE_TOOL_OVERLAY_MOUSE_PAN_END = "STAGE_TOOL_OVERLAY_MOUSE_PAN_END";
 export const WORKSPACE_DELETION_SELECTED = "WORKSPACE_DELETION_SELECTED";
-export const STAGE_TOOL_OVERLAY_MOUSE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_CLICKED";
 export const STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED = "STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED";
 export const SELECTOR_DOUBLE_CLICKED = "SELECTOR_DOUBLE_CLICKED";
 export const STAGE_TOOL_EDIT_TEXT_CHANGED = "STAGE_TOOL_EDIT_TEXT_CHANGED";
@@ -245,12 +244,6 @@ export const stageToolOverlayMousePanning = (windowId: string, center: Point, de
 export const stageToolOverlayMousePanEnd = (windowId: string): StageToolOverlayMousePanEnd => ({
   windowId,
   type: STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
-});
-
-export const stageToolOverlayMouseClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayClicked => ({
-  windowId,
-  type: STAGE_TOOL_OVERLAY_MOUSE_CLICKED,
-  sourceEvent
 });
 
 export const stageToolOverlayMouseDoubleClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayClicked => ({

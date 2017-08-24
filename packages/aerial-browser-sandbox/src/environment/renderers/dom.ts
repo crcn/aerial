@@ -144,6 +144,9 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   private _resetComputedInfo() {
+    if (!this.mount.lastElementChild) {
+      return;
+    }
     const targetWindow = this.targetDocument.defaultView;
     const containerWindow = this.container.contentWindow;
     const containerBody = containerWindow.document.body;
