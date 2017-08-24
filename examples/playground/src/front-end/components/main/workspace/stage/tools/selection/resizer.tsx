@@ -1,5 +1,6 @@
 import "./resizer.scss";
 import React =  require("react");
+import { debounce } from "lodash";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
 import { pure, compose, withHandlers } from "recompose";
 import { Workspace, getBoundedWorkspaceSelection, getStageZoom, getWorkspaceSelectionBounds, getStageTranslate } from "front-end/state";
@@ -86,9 +87,11 @@ const enhanceResizer = compose<ResizerInnerProps, ResizerOuterProps>(
         }));
       };
 
-      const onStopDrag = () => {
+      // debounce stopped moving so that it beats the stage click event
+      // which checks for moving or resizing state.
+      const onStopDrag = debounce(() => {
         dispatch(resizerStoppedMoving(workspace.$id, null));
-      };
+      }, 0);
 
       startDOMDrag(event, onStartDrag, onDrag, onStopDrag);
     }

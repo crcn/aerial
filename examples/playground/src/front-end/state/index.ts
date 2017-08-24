@@ -51,6 +51,8 @@ import {
   getSyntheticWindow,
   getSyntheticNodeById,
   getSyntheticNodeWindow,
+  getSyntheticBrowser,
+  SyntheticWindow,
   getSyntheticBrowserItemBounds,
   getSyntheticWindowBrowser,
   SyntheticBrowserRootState,
@@ -79,6 +81,7 @@ export const APPLICATION_STATE = "APPLICATION_STATE";
 export type Stage = {
   fullScreenWindowId?: string,
   panning: boolean;
+  movingOrResizing?: boolean;
   mousePosition?: Point;
   container?: HTMLDivElement;
   smooth?: boolean;
@@ -247,26 +250,48 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
 export const selectWorkspace = (state: ApplicationState, selectedWorkspaceId: string) => ({
   ...state,
   selectedWorkspaceId,
-})
+});
 
 export const getStageToolMouseNodeTargetReference = (state: ApplicationState, event: StageToolOverlayMouseMoved|StageToolOverlayClicked) => {
-  const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
-  const window = getSyntheticWindow(state, windowId);
-  const workspace = getSyntheticWindowWorkspace(state, windowId);
-  const zoom = getStageZoom(workspace.stage);
+  const { sourceEvent: { pageX, pageY, nativeEvent } } = event as StageToolOverlayMouseMoved;
+  
+
+  const workspace = getSelectedWorkspace(state);
+  const stage     = workspace.stage;
+
+  let window: SyntheticWindow;
+  let scaledPageX: number;
+  let scaledPageY: number;
+
+  if (stage.fullScreenWindowId) {
+    window = getSyntheticWindow(state, stage.fullScreenWindowId);
+    scaledPageX = pageX + window.bounds.left;
+    scaledPageY = pageY + window.bounds.top;
+  } else {
+
+    const translate = getStageTranslate(stage);
+    
+    scaledPageX = ((pageX - translate.left) / translate.zoom);
+    scaledPageY = ((pageY - translate.top) / translate.zoom);
+
+    const browser  = getSyntheticBrowser(state, workspace.browserId);
+    window = browser.windows.find((window) => (
+      pointIntersectsBounds({ left: scaledPageX, top: scaledPageY }, window.bounds)
+    ));
+  }
+
+  if (!window) return null;
 
   // TODO - move to reducer
-  const target = sourceEvent.nativeEvent.target as Element;
-  const rect = target.getBoundingClientRect();
-  const mouseX = sourceEvent.pageX - rect.left;
-  const mouseY = sourceEvent.pageY - rect.top;
+  const mouseX = scaledPageX - window.bounds.left;
+  const mouseY = scaledPageY - window.bounds.top;
 
   const allComputedBounds = window.allComputedBounds;
   const intersectingBounds: Bounds[] = [];
   const intersectingBoundsMap = new Map<Bounds, string>();
   for (const $id in allComputedBounds) {
     const bounds = allComputedBounds[$id];
-    if (pointIntersectsBounds({ left: mouseX, top: mouseY }, zoomBounds(bounds, zoom))) {
+    if (pointIntersectsBounds({ left: mouseX, top: mouseY }, bounds)) {
       intersectingBounds.push(bounds);
       intersectingBoundsMap.set(bounds, $id);
     }

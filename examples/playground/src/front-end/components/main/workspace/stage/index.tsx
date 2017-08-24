@@ -10,7 +10,7 @@ import { Isolate } from "front-end/components/isolated";
 import { Motion, spring } from "react-motion";
 import { SyntheticBrowser, getSyntheticWindow } from "aerial-browser-sandbox";
 import { Dispatcher, BaseEvent, Point } from "aerial-common2";
-import { stageWheel, stageContainerMounted, stageMouseMoved } from "front-end/actions";
+import { stageWheel, stageContainerMounted, stageMouseMoved, stageMouseClicked } from "front-end/actions";
 import { lifecycle, compose, withState, withHandlers, pure, withProps } from "recompose";
 
 
@@ -33,7 +33,7 @@ export type StageInnerProps = {
   setStageContainer(element: HTMLElement);
   onDrop: (event: React.SyntheticEvent<any>) => any;
   onMouseEvent: (event: React.SyntheticEvent<any>) => any;
-  onMouseDown: (event: React.SyntheticEvent<any>) => any;
+  onMouseClick: (event: React.SyntheticEvent<any>) => any;
   onDragEnter: (event: React.SyntheticEvent<any>) => any;
   onDragExit: (event: React.SyntheticEvent<any>) => any;
   setCanvasOuter: (element: HTMLElement) => any;
@@ -44,8 +44,11 @@ const enhanceStage = compose<StageInnerProps, StageOuterProps>(
   withState('canvasOuter', 'setCanvasOuter', null),
   withState('stageContainer', 'setStageContainer', null),
   withHandlers({
-    onMouseEvent: ({ setMousePosition, dispatch }) => (event: React.MouseEvent<any>) => {
+    onMouseEvent: ({ dispatch }) => (event: React.MouseEvent<any>) => {
       dispatch(stageMouseMoved(event));
+    },
+    onMouseClick: ({ dispatch }) => (event: React.MouseEvent<any>) => {
+      dispatch(stageMouseClicked(event));
     },
     setStageContainer: ({ dispatch, setStageContainer }) => (element: HTMLDivElement) => {
       setStageContainer(element);
@@ -70,7 +73,7 @@ export const StageBase = ({
   onMouseEvent,
   shouldTransitionZoom,
   onDragEnter,
-  onMouseDown,
+  onMouseClick,
   onDragExit
 }: StageInnerProps) => {
   if (!workspace) return null;
@@ -82,6 +85,9 @@ export const StageBase = ({
   const outerStyle = {
     cursor: cursor || "default"
   }
+
+  // TODO - motionTranslate must come from fullScreen.translate
+  // instead of here so that other parts of the app can access this info
 
   const motionTranslate = fullScreenWindow ? { left: -fullScreenWindow.bounds.left, top: -fullScreenWindow.bounds.top, zoom: 1 } : translate;
   
@@ -110,7 +116,7 @@ export const StageBase = ({
           onMouseMove={onMouseEvent}
           onDragOver={onDragEnter}
           onDrop={onDrop}
-          onMouseDown={onMouseDown}
+          onClick={onMouseClick}
           tabIndex={-1}
           onDragExit={onDragExit}
           className="stage-inner"

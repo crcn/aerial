@@ -15,15 +15,12 @@ MVP:
 
 - POLISH:
 
+- [ ] selection must be within overlay
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
-   - [ ] ctrl+t to open new window
-   - [ ] ctrl+click to open link in new window
    - [ ] ctrl+shift+{} to tab between windows
 - [ ] load spinner for each window
 - [ ] scroll position should respect scroll height of entire document (compute with mounted iframe window height)
-- [ ] renderer needs to use iframe so that it can listen for resize
 - [ ] alt+click of tabbed item in full screen mode should respect original window size
-- [ ] clean up edit text input so that it doesn't have dragger
 - [ ] tab between windows (cmd+shift+{)
 - [ ] zoom indicator
 - [ ] measurement tooling

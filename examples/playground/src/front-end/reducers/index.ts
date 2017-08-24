@@ -70,6 +70,7 @@ import {
   STAGE_TOOL_OVERLAY_MOUSE_PAN_START,
   StageToolOverlayMousePanStart,
   STAGE_MOUSE_MOVED,
+  RESIZER_STOPPED_MOVING,
   StageToolOverlayMousePanEnd,
   SELECTOR_DOUBLE_CLICKED,
   SelectorDoubleClicked,
@@ -77,7 +78,7 @@ import {
   WORKSPACE_DELETION_SELECTED,
   STAGE_TOOL_OVERLAY_MOUSE_DOUBLE_CLICKED,
   STAGE_TOOL_OVERLAY_MOUSE_CLICKED,
-  STAGE_TOOL_OVERLAY_MOUSE_MOVED,
+  STAGE_MOUSE_CLICKED,
   StageToolNodeOverlayHoverOut,
   StageToolNodeOverlayHoverOver,
   StageToolNodeOverlayClicked,
@@ -195,9 +196,6 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
       const windowId = selection ? selection[0] === SYNTHETIC_WINDOW ? selection[1] : getSyntheticNodeWindow(state, selection[1]).$id : null;
 
       if (windowId && !workspace.stage.fullScreenWindowId) {
-        if (selection[0] === SYNTHETIC_WINDOW) {
-          state = clearWorkspaceSelection(state, workspace.$id);
-        }
         return updateWorkspaceStage(state, workspace.$id, {
           fullScreenWindowId: windowId,
           smooth: true
@@ -257,6 +255,22 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return updateWorkspaceStage(state, workspace.$id, { smooth: false, translate });
     }
 
+    case RESIZER_MOVED: {
+      const workspace = getSelectedWorkspace(state);
+      state = updateWorkspaceStage(state, workspace.$id, {
+        movingOrResizing: true
+      });
+      return state;
+    }
+
+    case RESIZER_STOPPED_MOVING: {
+      const workspace = getSelectedWorkspace(state);
+      state = updateWorkspaceStage(state, workspace.$id, {
+        movingOrResizing: false
+      });
+      return state;
+    }
+
     case SYNTHETIC_WINDOW_PROXY_OPENED: {
       const { instance } = event as SyntheticWindowOpened;
       const workspace = getSelectedWorkspace(state);
@@ -276,24 +290,9 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
-    case STAGE_TOOL_OVERLAY_MOUSE_MOVED: {
-      const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
-      const workspace = getSyntheticWindowWorkspace(state, windowId);
-
-      // disable hovering while panning (scrolling)
-      if (workspace.stage.panning) return updateWorkspace(state, workspace.$id, {
-        hoveringRefs: []
-      });
-      const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved);
-      return updateWorkspace(state, workspace.$id, {
-        hoveringRefs: targetRef ? [targetRef] : []
-      });
-    }
-
     case STAGE_TOOL_OVERLAY_MOUSE_LEAVE: {
-      const { sourceEvent, windowId } = event as StageToolOverlayMouseMoved;
-      const workspace = getSyntheticWindowWorkspace(state, windowId);
-      return updateWorkspace(state, workspace.$id, {
+      const { sourceEvent } = event as StageToolOverlayMouseMoved;
+      return updateWorkspace(state, state.selectedWorkspaceId, {
         hoveringRefs: []
       });
     }
@@ -304,11 +303,16 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getWorkspaceById(state, workspaceId);
 
       if (metaKey && workspace.selectionRefs.length === 1) {
-        return setSelectedFileFromNodeId(state, workspace.$id, workspace.selectionRefs[0][1]);
+        state = setSelectedFileFromNodeId(state, workspace.$id, workspace.selectionRefs[0][1]);
       }
+
+      state = updateWorkspaceStage(state, workspace.$id, {
+        smooth: false
+      });
 
       return state;
     }
+    
 
     case STAGE_MOUNTED: {
       const { element } = event as StageMounted;
@@ -334,29 +338,41 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case STAGE_MOUSE_MOVED: {
       const { sourceEvent: { pageX, pageY }} = event as WrappedEvent<React.MouseEvent<any>>;
-      return updateWorkspaceStage(state, state.selectedWorkspaceId, {
+      state = updateWorkspaceStage(state, state.selectedWorkspaceId, {
         mousePosition: {
           left: pageX,
           top: pageY
         }
-      })
+      });
+
+      const workspace = getSelectedWorkspace(state);
+
+      // TODO - in the future, we'll probably want to be able to highlight hovered nodes as the user is moving an element around to indicate where
+      // they can drop the element. 
+      const targetRef = workspace.stage.movingOrResizing ? null : getStageToolMouseNodeTargetReference(state, event as StageToolOverlayMouseMoved);
+
+      state = updateWorkspace(state, state.selectedWorkspaceId, {
+        hoveringRefs: targetRef ? [targetRef] : []
+      });
+
+      return state;
     };
 
-    case STAGE_TOOL_OVERLAY_MOUSE_CLICKED: {
-      const { sourceEvent, windowId } = event as StageToolNodeOverlayClicked;
+    case STAGE_MOUSE_CLICKED: {
+      const { sourceEvent } = event as StageToolNodeOverlayClicked;
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
 
       // alt key opens up a new link
       const altKey = sourceEvent.altKey;
-      const workspace = getSyntheticWindowWorkspace(state, windowId);
+      const workspace = getSelectedWorkspace(state);
       state = updateWorkspaceStageSmoothing(state, workspace);
       
       // do not allow selection while window is panning (scrolling)
-      if (workspace.stage.panning) return state;
+      if (workspace.stage.panning || workspace.stage.movingOrResizing) return state;
 
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (!targetRef) {
-        return clearWorkspaceSelection(state, workspace.$id);
+        return state;
       }
       if (metaKey) {
         return setSelectedFileFromNodeId(state, workspace.$id, targetRef[1]);
@@ -442,9 +458,9 @@ const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: 
 }
 
 const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, ref: StructReference, event: T) => {
-  const { windowId, sourceEvent } = event;
-  const workspace = getSyntheticWindowWorkspace(state, windowId);
-  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$id, ref) : toggleWorkspaceSelection(state, workspace.$id, ref);
+  const { sourceEvent } = event;
+  const workspace = getSelectedWorkspace(state);
+  return sourceEvent.metaKey || sourceEvent.ctrlKey ? toggleWorkspaceSelection(state, workspace.$id, ref) : setWorkspaceSelection(state, workspace.$id, ref);
 }
 
 const normalizeZoom = (zoom) => {

@@ -24,13 +24,13 @@ export const TREE_NODE_LABEL_CLICKED = "TREE_NODE_LABE_CLICKED";
 export const FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED   = "FILE_NAVIGATOR_ADD_FILE_BUTTON_CLICKED";
 export const FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED = "FILE_NAVIGATOR_ADD_FOLDER_BUTTON_CLICKED";
 export const STAGE_MOUSE_MOVED = "STAGE_MOUSE_MOVED";
+export const STAGE_MOUSE_CLICKED = "STAGE_MOUSE_CLICKED";
 export const VISUAL_EDITOR_WHEEL = "VISUAL_EDITOR_WHEEL";
 export const STAGE_TOOL_WINDOW_TITLE_CLICKED = "STAGE_TOOL_WINDOW_TITLE_CLICKED";
 export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
 export const STAGE_TOOL_SELECTION_KEY_DOWN = "STAGE_TOOL_SELECTION_KEY_DOWN";
 export const STAGE_TOOL_WINDOW_BACKGROUND_CLICKED = "STAGE_TOOL_WINDOW_BACKGROUND_CLICKED";
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
-export const STAGE_TOOL_OVERLAY_MOUSE_MOVED = "STAGE_TOOL_OVERLAY_MOUSE_MOVED";
 export const STAGE_TOOL_OVERLAY_MOUSE_LEAVE = "STAGE_TOOL_OVERLAY_MOUSE_LEAVE";
 export const STAGE_TOOL_OVERLAY_MOUSE_PAN_START = "STAGE_TOOL_OVERLAY_MOUSE_PAN_START";
 export const STAGE_TOOL_OVERLAY_MOUSE_PANNING = "STAGE_TOOL_OVERLAY_MOUSE_PANNING";
@@ -148,10 +148,6 @@ export type StageToolNodeOverlayHoverOut = {
   nodeId: string;
 } & WrappedEvent<React.MouseEvent<any>>;
 
-export type StageToolOverlayMouseMoved = {
-  windowId: string;
-} & WrappedEvent<React.MouseEvent<any>>;
-
 export type StageToolOverlayMousePanStart = {
   windowId: string;
 } & BaseEvent;
@@ -169,6 +165,9 @@ export type StageToolOverlayMousePanEnd = {
 
 export type StageToolOverlayClicked = {
   windowId: string;
+} & WrappedEvent<React.MouseEvent<any>>;
+
+export type StageToolOverlayMouseMoved = {
 } & WrappedEvent<React.MouseEvent<any>>;
 
 export type SelectorDoubleClicked = {
@@ -225,15 +224,7 @@ export const resizerMouseDown = (workspaceId: string, sourceEvent: React.MouseEv
 
 export const textEditorChanged = (file: FileCacheItem, value: string): TextEditorChanged => ({ type: TEXT_EDITOR_CHANGED, file, value });
 
-export const stageToolOverlayMouseMoved = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayMouseMoved => ({
-  windowId,
-  type: STAGE_TOOL_OVERLAY_MOUSE_MOVED,
-  sourceEvent
-});
-
-
-export const stageToolOverlayMouseLeave = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayMouseMoved => ({
-  windowId,
+export const stageToolOverlayMouseLeave = (sourceEvent: React.MouseEvent<any>): StageToolOverlayMouseMoved => ({
   type: STAGE_TOOL_OVERLAY_MOUSE_LEAVE,
   sourceEvent
 });
@@ -377,5 +368,12 @@ export const stageContainerMounted = (element: HTMLDivElement): StageMounted => 
 export const stageMouseMoved = (sourceEvent: React.MouseEvent<any>): WrappedEvent<React.MouseEvent<any>> => ({
   sourceEvent,
   type: STAGE_MOUSE_MOVED,
+});
+
+
+
+export const stageMouseClicked = (sourceEvent: React.MouseEvent<any>): WrappedEvent<React.MouseEvent<any>> => ({
+  sourceEvent,
+  type: STAGE_MOUSE_CLICKED,
 })
 

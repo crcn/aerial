@@ -21,8 +21,8 @@ export type ToolsProps = {
 
 export const ToolsLayerBase = (({ workspace, browser, dispatch, translate }: ToolsProps) => <div className="m-stage-tools">
   <GridStageTool translate={translate} />
-  <SelectionStageTool zoom={translate.zoom} workspace={workspace} browser={browser} dispatch={dispatch} />
   <NodeOverlaysTool zoom={translate.zoom} workspace={workspace} browser={browser} dispatch={dispatch} />
+  <SelectionStageTool zoom={translate.zoom} workspace={workspace} browser={browser} dispatch={dispatch} />
   <WindowsStageTool workspace={workspace} browser={browser} dispatch={dispatch} translate={translate} />
   <EditTextTool zoom={translate.zoom} workspace={workspace}  browser={browser} dispatch={dispatch} />
 </div>);

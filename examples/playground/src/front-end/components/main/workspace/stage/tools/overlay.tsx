@@ -3,13 +3,13 @@ const cx = require("classnames");
 import * as React from "react";
 import * as Hammer from "react-hammerjs";
 import { Workspace } from "front-end/state";
+import { difference } from "lodash";
 import { mapValues, values } from "lodash";
 import { compose, pure, withHandlers } from "recompose";
 import { SyntheticNode, SyntheticWindow, SyntheticBrowser } from "aerial-browser-sandbox";
 import { Dispatcher, Bounds, wrapEventToDispatch, weakMemo, StructReference } from "aerial-common2";
 import { 
   stageToolOverlayMouseClicked,
-  stageToolOverlayMouseMoved,
   stageToolOverlayMouseLeave,
   stageToolOverlayMousePanStart,
   stageToolOverlayMousePanning,
@@ -54,13 +54,13 @@ const NodeOverlayBase = ({ windowId, zoom, bounds, node, dispatch, hovering }: N
     left: bounds.left,
     top: bounds.top,
     width: bounds.right - bounds.left,
-    pointerEvents: "none",
     height: bounds.bottom - bounds.top,
-    boxShadow: `inset 0 0 0 ${borderWidth}px #00B5FF`,
+    boxShadow: `inset 0 0 0 ${borderWidth}px #00B5FF`
   };
 
   return <div 
   className={cx("visual-tools-node-overlay", { hovering: hovering })}
+  onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, windowId))}
   style={style} />;
 }
 
@@ -80,22 +80,19 @@ const WindowOverlayToolsBase = ({ dispatch, window, hoveringNodes, zoom, onPanSt
     <Hammer onPanStart={onPanStart} onPan={onPan} onPanEnd={onPanEnd} direction="DIRECTION_ALL">
       <div 
         style={{ width: "100%", height: "100%", position: "absolute" } as any} 
-        onMouseMove={wrapEventToDispatch(dispatch, stageToolOverlayMouseMoved.bind(this, window.$id))} 
-        onClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseClicked.bind(this, window.$id))} 
-        onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$id))} 
-        onMouseLeave={wrapEventToDispatch(dispatch, stageToolOverlayMouseLeave.bind(this, window.$id))}
-        />
+        onDoubleClick={wrapEventToDispatch(dispatch, stageToolOverlayMouseDoubleClicked.bind(this, window.$id))}>
+      {
+        hoveringNodes.map((node) => <NodeOverlay 
+          windowId={window.$id} 
+          zoom={zoom} 
+          key={node.$id} 
+          node={node} 
+          bounds={window.allComputedBounds[node.$id]} 
+          dispatch={dispatch} 
+          hovering={true} />)
+      }
+    </div>
     </Hammer>
-    {
-      hoveringNodes.map((node) => <NodeOverlay 
-        windowId={window.$id} 
-        zoom={zoom} 
-        key={node.$id} 
-        node={node} 
-        bounds={window.allComputedBounds[node.$id]} 
-        dispatch={dispatch} 
-        hovering={true} />)
-    }
   </div>
 };
 
@@ -120,15 +117,24 @@ const enhanceWindowOverlayTools = compose<WindowOverlayToolsInnerProps, WindowOv
 const WindowOverlayTools = enhanceWindowOverlayTools(WindowOverlayToolsBase);
 
 
-const getHoveringSyntheticNodes = weakMemo((hoveringRefs: StructReference[], { allNodes }: SyntheticWindow) => {
-  return hoveringRefs.map(([type, id]) => allNodes[id]).filter((id) => !!id);
+const getSyntheticNodes = weakMemo((refs: StructReference[], allNodes: any) => {
+  return refs.map(([type, id]) => allNodes[id]).filter((id) => !!id);
 });
+
+
+const getHoveringSyntheticNodes = weakMemo((workspace: Workspace, { allNodes }: SyntheticWindow) => {
+  return difference(
+    getSyntheticNodes(workspace.hoveringRefs, allNodes),
+    getSyntheticNodes(workspace.selectionRefs, allNodes)
+  );
+});
+
 
 export const  NodeOverlaysToolBase = ({ workspace, browser, dispatch, zoom }: VisualToolsProps) => {
   return <div className="visual-tools-layer-component">
     {
       browser.windows.map((window) => {
-        return <WindowOverlayTools key={window.$id} hoveringNodes={getHoveringSyntheticNodes(workspace.hoveringRefs, window)} window={window} dispatch={dispatch} zoom={zoom} />;
+        return <WindowOverlayTools key={window.$id} hoveringNodes={getHoveringSyntheticNodes(workspace, window)} window={window} dispatch={dispatch} zoom={zoom} />;
       })
     }
   </div>
