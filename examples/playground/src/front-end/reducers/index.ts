@@ -196,11 +196,12 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
 
       if (windowId && !workspace.stage.fullScreenWindowId) {
         return updateWorkspaceStage(state, workspace.$id, {
+          smooth: true,
           fullScreenWindowId: windowId,
-          smooth: true
         });
       } else if (workspace.stage.fullScreenWindowId) {
         return updateWorkspaceStage(state, workspace.$id, {
+          smooth: true,
           fullScreenWindowId: undefined
         });
       } else {
