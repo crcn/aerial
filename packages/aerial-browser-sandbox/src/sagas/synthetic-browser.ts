@@ -78,6 +78,7 @@ import {
   diffArray,
   takeRequest, 
   Moved,
+  Bounds,
   Point,
   generateDefaultId,
   pointToBounds,
@@ -173,19 +174,19 @@ function* handleSyntheticBrowserSession(syntheticBrowserId: string) {
 function* handleOpenSyntheticWindow(browserId: string) {
   while(true) {
     const request = (yield take((action: OpenSyntheticBrowserWindow) => action.type === OPEN_SYNTHETIC_WINDOW && action.syntheticBrowserId === browserId)) as OpenSyntheticBrowserWindow;
-    const instance = (yield call(openSyntheticWindowEnvironment, request.uri, browserId, request.position)) as SEnvWindowInterface;
+    const instance = (yield call(openSyntheticWindowEnvironment, request.uri, browserId, request.bounds)) as SEnvWindowInterface;
     yield put(createRequestResponse(request.$id, instance));
   }
 }
 
-function* openSyntheticWindowEnvironment(location: string, browserId: string, position?: Point) {
+function* openSyntheticWindowEnvironment(location: string, browserId: string, bounds?: Bounds) {
 
   let main: SEnvWindowInterface;
   const windowId = generateDefaultId();
   const documentId = generateDefaultId();
   const fetch = yield getFetch();
 
-  function* reload (position?: Point) {
+  function* reload (bound?: Bounds) {
 
     const SEnvWindow = getSEnvWindowClass({ console: getSEnvWindowConsole(), fetch });
     const window = new SEnvWindow(location);
@@ -195,8 +196,11 @@ function* openSyntheticWindowEnvironment(location: string, browserId: string, po
     window.document.$id = documentId;
     window.resetChildObjects();
 
-    if (position) {
-      window.moveTo(position.left, position.top);
+    if (bound) {
+      window.moveTo(bound.left, bound.top);
+      if (bounds.right) {
+        window.resizeTo(bounds.right - bounds.left, bounds.bottom - bounds.top);
+      }
     }
 
     yield watchWindowExternalResourceUris(window, reload);
@@ -205,7 +209,7 @@ function* openSyntheticWindowEnvironment(location: string, browserId: string, po
     yield put(syntheticWindowOpened(window, browserId));
   };
 
-  return yield call(reload, position);
+  return yield call(reload, bounds);
 }
 
 const PADDING = 10;
@@ -286,6 +290,7 @@ function* handleOpenedSyntheticWindow(browserId: string) {
       proxy = window.clone();
       const position = window.screenLeft || window.screenTop ? { left: window.screenLeft, top: window.screenTop } : (yield call(getBestWindowPosition, browserId));
       proxy.moveTo(position.left, position.top);
+      proxy.resizeTo(window.innerWidth, window.innerHeight);
       proxy.renderer = createRenderer(proxy);
       disposeMirror = () => {};
       yield put(syntheticWindowProxyOpened(proxy, browserId));

@@ -186,7 +186,9 @@ function* handleCloneSelectedWindowShortcut() {
 
     const clonedWindow = yield yield request(openSyntheticWindowRequest(window.location, getSyntheticWindowBrowser(state, window.$id).$id, {
       left: window.bounds.left,
-      top: window.bounds.bottom + WINDOW_PADDING
+      top: window.bounds.bottom + WINDOW_PADDING,
+      right: window.bounds.right,
+      bottom: window.bounds.bottom + WINDOW_PADDING + (window.bounds.bottom - window.bounds.top)
     }));
   }
 }
