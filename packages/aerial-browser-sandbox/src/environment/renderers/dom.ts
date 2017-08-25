@@ -149,7 +149,9 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     }
     const targetWindow = this.targetDocument.defaultView;
     const containerWindow = this.container.contentWindow;
-    const containerBody = containerWindow.document.body;
+
+    // won't exist for testing.
+    const containerBody = containerWindow && containerWindow.document.body;
     const body = this.mount.lastChild;
 
     const boundingClientRects = {};
@@ -161,18 +163,21 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     }
     Array.prototype.forEach.call(this.mount.lastElementChild.querySelectorAll("*"), (element) => {
       const sourceUID = element.dataset.sourceUID;
+      if (!sourceUID) return;
       const $id = childObjectsByUID[sourceUID].$id;
       boundingClientRects[$id] = element.getBoundingClientRect();
       allComputedStyles[$id] = targetWindow.getComputedStyle(element);
     });
 
-    this.setPaintedInfo(boundingClientRects, allComputedStyles, {
-      width: containerBody.scrollWidth,
-      height: containerBody.scrollHeight
-    }, {
-      left: containerWindow.scrollX,
-      top: containerWindow.scrollY
-    });
+    if (containerBody) {
+      this.setPaintedInfo(boundingClientRects, allComputedStyles, {
+        width: containerBody.scrollWidth,
+        height: containerBody.scrollHeight
+      }, {
+        left: containerWindow.scrollX,
+        top: containerWindow.scrollY
+      });
+    }
   }
 }
 
