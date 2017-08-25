@@ -4,6 +4,7 @@ GOALS:
 
 - [ ] UX similar to regular browsers
   - [ ] right click inspect element (source code though)
+- [ ] built extensions API for windows to hook into
 
 IMMEDIATE:
 
@@ -11,14 +12,25 @@ IMMEDIATE:
 
 MVP:
 
-- [ ] HMR support in windows
 - [ ] dev server for playground (window that manages all other windows)
 - [ ] DSL for dynamic templates
+- [ ] dev environment for playground
+  - [ ] CLI `paperclip-dev-server [ROOT]`
+  - [ ] master window which opens all `*.pc` files in directory
+  - [ ] pc files can be accessed via `/files/[relative file path from root]`
+  - [ ] `PATCH` to `/files/*` updates cache
+  - [ ] `POST` to `/persist` saves cache
+  - [ ] reload each window when assoc file changes
+  - [ ] each window uses SystemJS
+  - [ ] master window has window presets (radio buttons for desktop, tablets, etc)
+  - [ ] master window has `meta=no-tools` tag so that users can interact with page
+  - [ ] each window reloads itself (in case they're used outside of the app)
 
 - POLISH:
 
 - [ ] ability to zoom in from full screen mode
 
+- [ ] ability to to open window outside of Playground
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
    - [ ] ctrl+shift+{} to tab between windows
 - [ ] tab between windows (cmd+shift+{)
@@ -29,7 +41,8 @@ MVP:
 - [ ] copy + paste elements
 - [ ] meta keywords for controlling UI
   - [ ] `<meta name="no-tools" />`
-  - [ ] `<meta name="device=ios5" />`
+  - [ ] `<meta name="device=ios5" />` for ios tool overlay
+  - [ ] `<meta name="background-task" />` hides window from stage
 - [ ] AWS lambda for rendering
 
 HI PRIO:
