@@ -13,6 +13,7 @@ MVP:
 
 - POLISH:
 
+- [ ] window titles should not exceed window windth
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
    - [ ] ctrl+shift+{} to tab between windows
 - [ ] load spinner for each window

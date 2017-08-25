@@ -372,6 +372,9 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case STAGE_MOUSE_CLICKED: {
       const { sourceEvent } = event as StageToolNodeOverlayClicked;
+      if (/textarea|input/i.test((sourceEvent.target as Element).nodeName)) {
+        return state;
+      }
       const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
 
       // alt key opens up a new link

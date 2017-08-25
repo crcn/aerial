@@ -19,11 +19,14 @@ const WindowItemBase = ({ window, translate, dispatch, fullScreenWindowId }: Win
     return null;
   }
 
+  const { width, height } = getBoundsSize(window.bounds);
+
   const style = {
+    width,
+    height,
     left: window.bounds.left,
     top: window.bounds.top,
     background: "transparent",
-    ...getBoundsSize(window.bounds)
   };
 
   const titleScale = Math.max(1 / translate.zoom, 0.03);
@@ -31,6 +34,10 @@ const WindowItemBase = ({ window, translate, dispatch, fullScreenWindowId }: Win
   const titleStyle = {
     transform: `translateY(-${20 * titleScale}px) scale(${titleScale})`,
     transformOrigin: "top left",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    width: width * translate.zoom,
   };
 
   const contentStyle = {
@@ -42,7 +49,7 @@ const WindowItemBase = ({ window, translate, dispatch, fullScreenWindowId }: Win
     <div 
     className="m-windows-stage-tool-item-title" 
     tabIndex={-1} 
-    style={titleStyle} 
+    style={titleStyle as any} 
     onKeyDown={wrapEventToDispatch(dispatch, stageToolWindowKeyDown.bind(this, window.$id))} 
     onClick={wrapEventToDispatch(dispatch, stageToolWindowTitleClicked.bind(this, window.$id))}>
       { window.document && window.document.title || window.location }
