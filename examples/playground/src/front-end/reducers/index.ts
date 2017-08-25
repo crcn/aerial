@@ -333,7 +333,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSelectedWorkspace(state);
       state = updateWorkspaceStage(state, workspaceId, { container: element });
       const innerBounds = getSyntheticBrowserBounds(getSyntheticBrowser(state, workspace.browserId));
-      return centerStage(state, workspaceId, innerBounds);
+      return centerStage(state, workspaceId, innerBounds, false, true);
     };
 
     case STAGE_TOOL_OVERLAY_MOUSE_PAN_START: {
@@ -444,9 +444,9 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
   return state;
 }
 
-const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: Bounds, smooth?: boolean) => {
+const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: Bounds, smooth?: boolean, zoomToFit?: boolean) => {
   const workspace = getWorkspaceById(state, workspaceId);
-  const { stage: { container }} = workspace;
+  const { stage: { container, translate }} = workspace;
   if (!container) return state;
 
   const { width, height } = container.getBoundingClientRect();
@@ -458,10 +458,10 @@ const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: 
     top: -innerBounds.top + height / 2 - (innerSize.height) / 2,
   };
 
-  const scale = Math.min(
+  const scale = zoomToFit ? Math.min(
     (width - INITIAL_ZOOM_PADDING) / innerSize.width,
     (height - INITIAL_ZOOM_PADDING) / innerSize.height
-  );
+  ) : translate.zoom;
 
   return updateWorkspaceStage(state, workspaceId, {
     smooth,
