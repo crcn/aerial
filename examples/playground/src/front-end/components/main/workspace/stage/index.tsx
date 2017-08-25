@@ -91,8 +91,6 @@ export const StageBase = ({
 
   const motionTranslate = translate;
 
-  const zoom = workspace.stage.translate.zoom;
-
   return <div className="stage-component" ref={setStageContainer}>
     <Isolate 
     inheritCSS 

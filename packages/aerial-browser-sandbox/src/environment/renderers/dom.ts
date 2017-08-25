@@ -156,7 +156,7 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
 
     const boundingClientRects = {};
     const allComputedStyles = {};
-    const childObjectsByUID = {};
+    const childObjectsByUID = {}; 
     
     for (const child of Array.from(this.sourceWindow.childObjects.values())) {
       childObjectsByUID[child.uid] = child;

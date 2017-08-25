@@ -12,6 +12,7 @@ export type ResizerOuterProps = {
   browser: SyntheticBrowser;
   dispatch: Dispatcher<any>;
   workspace: Workspace;
+  zoom: number;
 }
 
 export type ResizerInnerProps = {
@@ -22,10 +23,9 @@ const POINT_STROKE_WIDTH = 1;
 const POINT_RADIUS       = 4;
 
 
-export const ResizerBase = ({ workspace, browser, dispatch, onMouseDown }: ResizerInnerProps) => {
+export const ResizerBase = ({ workspace, browser, dispatch, onMouseDown, zoom }: ResizerInnerProps) => {
 
   const bounds = getWorkspaceSelectionBounds(browser, workspace);
-  const zoom = getStageZoom(workspace.stage);
 
   // offset stroke
   const resizerStyle = {

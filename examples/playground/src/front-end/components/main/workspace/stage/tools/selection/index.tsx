@@ -42,7 +42,7 @@ export const  SelectionStageToolBase = ({ setSelectionElement, workspace, brows
 
   return <div ref={setSelectionElement} className="m-stage-selection-tool" tabIndex={-1} onDoubleClick={onDoubleClick} onKeyDown={onKeyDown}>
     <SelectionBounds workspace={workspace} browser={browser} zoom={zoom} />
-    <Resizer workspace={workspace} browser={browser} dispatch={dispatch} />
+    <Resizer workspace={workspace} browser={browser} dispatch={dispatch} zoom={zoom} />
   </div>;
 };
 
