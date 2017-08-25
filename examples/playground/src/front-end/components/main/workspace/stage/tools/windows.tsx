@@ -70,7 +70,7 @@ export type WindowsStageToolInnerProps = {
 };
 
 export const WindowsStageToolBase = ({ workspace, browser, translate, dispatch }: WindowsStageToolInnerProps) => {
-  const { backgroundColor, fullScreenWindowId } = workspace.stage;
+  const { backgroundColor, fullScreen } = workspace.stage;
 
   const backgroundStyle = {
     backgroundColor: backgroundColor || "rgba(0, 0, 0, 0.05)",
@@ -80,7 +80,7 @@ export const WindowsStageToolBase = ({ workspace, browser, translate, dispatch }
   return <div className="m-windows-stage-tool">
     <div style={backgroundStyle} className="m-windows-stage-tool-background" onClick={wrapEventToDispatch(dispatch, stageToolWindowBackgroundClicked)} /> 
     {
-      browser.windows.map((window) => <WindowItem key={window.$id} window={window} fullScreenWindowId={fullScreenWindowId} dispatch={dispatch} translate={translate} />)
+      browser.windows.map((window) => <WindowItem key={window.$id} window={window} fullScreenWindowId={fullScreen && fullScreen.windowId} dispatch={dispatch} translate={translate} />)
     }
   </div>;
 }

@@ -17,9 +17,10 @@ MVP:
 
 - POLISH:
 
+- [ ] ability to zoom in from full screen mode
+
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
    - [ ] ctrl+shift+{} to tab between windows
-- [ ] alt+click of tabbed item in full screen mode should respect original window size
 - [ ] tab between windows (cmd+shift+{)
 - [ ] zoom indicator
 - [ ] measurement tooling

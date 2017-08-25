@@ -78,9 +78,9 @@ export const StageBase = ({
 }: StageInnerProps) => {
   if (!workspace) return null;
 
-  const { translate, cursor, fullScreenWindowId, smooth } = workspace.stage;
+  const { translate, cursor, fullScreen, smooth } = workspace.stage;
 
-  const fullScreenWindow = fullScreenWindowId ? getSyntheticWindow(browser, fullScreenWindowId) : null;
+  const fullScreenWindow = fullScreen ? getSyntheticWindow(browser, fullScreen.windowId) : null;
 
   const outerStyle = {
     cursor: cursor || "default"
@@ -89,10 +89,9 @@ export const StageBase = ({
   // TODO - motionTranslate must come from fullScreen.translate
   // instead of here so that other parts of the app can access this info
 
-  const motionTranslate = fullScreenWindow ? { left: -fullScreenWindow.bounds.left, top: -fullScreenWindow.bounds.top, zoom: 1 } : translate;
-  
+  const motionTranslate = translate;
 
-  const zoom = fullScreenWindow ? 1 : workspace.stage.translate.zoom;
+  const zoom = workspace.stage.translate.zoom;
 
   return <div className="stage-component" ref={setStageContainer}>
     <Isolate 
@@ -125,7 +124,7 @@ export const StageBase = ({
               {(translate) => {
                   return <div style={{ transform: `translate(${translate.left}px, ${translate.top}px) scale(${translate.zoom})` }} className={cx({"stage-inner": true })}>
 
-                  <Windows browser={browser} smooth={smooth} dispatch={dispatch} fullScreenWindowId={workspace.stage.fullScreenWindowId} />
+                  <Windows browser={browser} smooth={smooth} dispatch={dispatch} fullScreenWindowId={workspace.stage.fullScreen && workspace.stage.fullScreen.windowId} />
                   <ToolsLayer workspace={workspace} translate={translate} dispatch={dispatch} browser={browser} />
                 </div>
               }}

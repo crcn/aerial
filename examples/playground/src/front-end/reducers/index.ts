@@ -180,13 +180,13 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case ZOOM_IN_SHORTCUT_PRESSED: {
       const workspace = getSelectedWorkspace(state);
-      if (workspace.stage.fullScreenWindowId) return state;
+      if (workspace.stage.fullScreen) return state;
       return setStageZoom(state, workspace.$id, normalizeZoom(workspace.stage.translate.zoom) * 2);
     }
 
     case ZOOM_OUT_SHORTCUT_PRESSED: {
       const workspace = getSelectedWorkspace(state);
-      if (workspace.stage.fullScreenWindowId) return state;
+      if (workspace.stage.fullScreen) return state;
       return setStageZoom(state, workspace.$id, normalizeZoom(workspace.stage.translate.zoom) / 2);
     }
 
@@ -200,16 +200,35 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
 
       const windowId = selection ? selection[0] === SYNTHETIC_WINDOW ? selection[1] : getSyntheticNodeWindow(state, selection[1]).$id : null;
 
-      if (windowId && !workspace.stage.fullScreenWindowId) {
-        return updateWorkspaceStage(state, workspace.$id, {
+      if (windowId && !workspace.stage.fullScreen) {
+        const window = getSyntheticWindow(state, windowId);
+        state = updateWorkspaceStage(state, workspace.$id, {
           smooth: true,
-          fullScreenWindowId: windowId,
+          fullScreen: {
+            windowId: windowId,
+            originalTranslate: workspace.stage.translate,
+            originalWindowBounds: window.bounds
+          },
+          translate: {
+            zoom: 1,
+            left: -window.bounds.left,
+            top: -window.bounds.top
+          }
         });
-      } else if (workspace.stage.fullScreenWindowId) {
-        return updateWorkspaceStage(state, workspace.$id, {
+        return state;
+      } else if (workspace.stage.fullScreen) {
+        const { originalWindowBounds } = workspace.stage.fullScreen;
+        state = updateWorkspaceStage(state, workspace.$id, {
           smooth: true,
-          fullScreenWindowId: undefined
+          fullScreen: undefined
         });
+        
+        state = updateWorkspaceStage(state, workspace.$id, {
+          translate: workspace.stage.fullScreen.originalTranslate,
+          smooth: true
+        });
+        
+        return state;
       } else {
         return state;
       }
@@ -239,7 +258,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const { workspaceId, metaKey, ctrlKey, deltaX, deltaY, canvasHeight, canvasWidth } = event as StageWheel;
       const workspace = getWorkspaceById(state, workspaceId);
 
-      if (workspace.stage.fullScreenWindowId) {
+      if (workspace.stage.fullScreen) {
         return state;
       }
       
@@ -283,26 +302,41 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case SYNTHETIC_WINDOW_PROXY_OPENED: {
       const { instance } = event as SyntheticWindowOpened;
-      const workspace = getSelectedWorkspace(state);
+      let workspace = getSelectedWorkspace(state);
       if (!workspace.stage.container) return state;
 
       const { width, height } = workspace.stage.container.getBoundingClientRect();
 
-      state = centerStage(state, state.selectedWorkspaceId, {
+      const windowBounds = {
         left: instance.screenLeft,
         top: instance.screenTop,
         right: instance.screenLeft + instance.innerWidth,
         bottom: instance.screenTop + instance.innerHeight,
-      }, true);
+      };
 
-      if (workspace.stage.fullScreenWindowId) {
+      state = centerStage(state, state.selectedWorkspaceId, windowBounds, true, workspace.stage.fullScreen && workspace.stage.fullScreen.originalTranslate.zoom);
+
+      // update translate
+      workspace = getSelectedWorkspace(state);
+
+      if (workspace.stage.fullScreen) {
+
         state = updateWorkspaceStage(state, workspace.$id, {
           smooth: true,
-          fullScreenWindowId: instance.$id
+          fullScreen: {
+            windowId: instance.$id,
+            originalTranslate: workspace.stage.translate,
+            originalWindowBounds: windowBounds
+          },
+          translate: {
+            zoom: 1,
+            left: -windowBounds.left,
+            top: -windowBounds.top
+          }
         });
-      } else {
-        state = setWorkspaceSelection(state, workspace.$id, getStructReference(instance.struct));
       }
+
+      state = setWorkspaceSelection(state, workspace.$id, getStructReference(instance.struct));
 
       return state;
     }
@@ -329,7 +363,6 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
       return state;
     }
-    
 
     case STAGE_MOUNTED: {
       const { element } = event as StageMounted;
@@ -449,7 +482,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
   return state;
 }
 
-const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: Bounds, smooth?: boolean, zoomToFit?: boolean) => {
+const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: Bounds, smooth?: boolean, zoomOrZoomToFit?: boolean|number) => {
   const workspace = getWorkspaceById(state, workspaceId);
   const { stage: { container, translate }} = workspace;
   if (!container) return state;
@@ -463,10 +496,10 @@ const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: 
     top: -innerBounds.top + height / 2 - (innerSize.height) / 2,
   };
 
-  const scale = zoomToFit ? Math.min(
+  const scale = typeof zoomOrZoomToFit === "boolean" ? Math.min(
     (width - INITIAL_ZOOM_PADDING) / innerSize.width,
     (height - INITIAL_ZOOM_PADDING) / innerSize.height
-  ) : translate.zoom;
+  ) : typeof zoomOrZoomToFit === "number" ? zoomOrZoomToFit : translate.zoom;
 
   return updateWorkspaceStage(state, workspaceId, {
     smooth,
@@ -498,7 +531,7 @@ const windowPaneReducer = (state: ApplicationState, event: BaseEvent) => {
 
 const updateWorkspaceStageSmoothing = (state: ApplicationState, workspace?: Workspace) => {
   if (!workspace) workspace = getSelectedWorkspace(state);
-  if (!workspace.stage.fullScreenWindowId && workspace.stage.smooth) {
+  if (!workspace.stage.fullScreen && workspace.stage.smooth) {
     return updateWorkspaceStage(state, workspace.$id, {
       smooth: false
     });

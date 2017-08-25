@@ -74,11 +74,11 @@ function* handleScrollInFullScreenMode() {
     const { deltaX, deltaY } = (yield take(VISUAL_EDITOR_WHEEL)) as StageWheel;
     const state: ApplicationState = (yield select());
     const workspace = getSelectedWorkspace(state);
-    if (!workspace.stage.fullScreenWindowId) {
+    if (!workspace.stage.fullScreen) {
       continue;
     }
     
-    const window = getSyntheticWindow(state, workspace.stage.fullScreenWindowId);
+    const window = getSyntheticWindow(state, workspace.stage.fullScreen.windowId);
 
     yield put(syntheticWindowScroll(window.$id, shiftPoint(window.scrollPosition || { left: 0, top: 0 }, {
       left: 0,
@@ -147,18 +147,23 @@ function* handleFullScreenWindow() {
     while(true) {
       yield take([FULL_SCREEN_SHORTCUT_PRESSED, SYNTHETIC_WINDOW_PROXY_OPENED]);
       const state: ApplicationState = yield select();
-      const windowId = getSelectedWorkspace(state).stage.fullScreenWindowId;
-      if (windowId) {
-        const window = getSyntheticWindow(state, windowId);
-        previousWindowBounds = window.bounds;
-        waitForFullScreenMode.resolve(true);
-      } else if (currentFullScreenWindowId) {
+      const workspace = getSelectedWorkspace(state);
+      const windowId = workspace.stage.fullScreen && workspace.stage.fullScreen.windowId;
+
+      if (currentFullScreenWindowId) {
         yield put(resized(currentFullScreenWindowId, SYNTHETIC_WINDOW, previousWindowBounds));
         previousWindowBounds = undefined;
         currentFullScreenWindowId = undefined;
         // TODO - revert window size
         waitForFullScreenMode = createDeferredPromise();
       }
+
+      if (windowId) {
+        const window = getSyntheticWindow(state, windowId);
+        previousWindowBounds = workspace.stage.fullScreen.originalWindowBounds;
+        waitForFullScreenMode.resolve(true);
+      }
+      
       currentFullScreenWindowId = windowId;
     }
   });

@@ -68,7 +68,6 @@ import {
 
 import { Kernel } from "aerial-common";
 
-
 /**
  * Types
  */
@@ -79,7 +78,11 @@ export const WORKSPACE         = "WORKSPACE";
 export const APPLICATION_STATE = "APPLICATION_STATE";
 
 export type Stage = {
-  fullScreenWindowId?: string,
+  fullScreen?: {
+    windowId: string,
+    originalTranslate: Translate;
+    originalWindowBounds: Bounds,
+  },
   panning: boolean;
   movingOrResizing?: boolean;
   mousePosition?: Point;
@@ -207,7 +210,7 @@ export const getWorkspaceSelectionBounds = weakMemo((state: ApplicationState|Syn
 
 export const getStageZoom = (stage: Stage) => getStageTranslate(stage).zoom;
 
-export const getStageTranslate = weakMemo((stage: Stage) => stage.fullScreenWindowId ? { left: 0, top: 0, zoom: 1 } : stage.translate);
+export const getStageTranslate = (stage: Stage) => stage.translate;
 
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => state.workspaces.find((workspace) => workspace.$id === id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
@@ -261,30 +264,18 @@ export const getStageToolMouseNodeTargetReference = (state: ApplicationState, ev
   const workspace = getSelectedWorkspace(state);
   const stage     = workspace.stage;
 
-  let window: SyntheticWindow;
-  let scaledPageX: number;
-  let scaledPageY: number;
+  const translate = getStageTranslate(stage);
+  
+  const scaledPageX = ((pageX - translate.left) / translate.zoom);
+  const scaledPageY = ((pageY - translate.top) / translate.zoom);
 
-  if (stage.fullScreenWindowId) {
-    window = getSyntheticWindow(state, stage.fullScreenWindowId);
-    scaledPageX = pageX + window.bounds.left;
-    scaledPageY = pageY + window.bounds.top;
-  } else {
-
-    const translate = getStageTranslate(stage);
-    
-    scaledPageX = ((pageX - translate.left) / translate.zoom);
-    scaledPageY = ((pageY - translate.top) / translate.zoom);
-
-    const browser  = getSyntheticBrowser(state, workspace.browserId);
-    window = browser.windows.find((window) => (
-      pointIntersectsBounds({ left: scaledPageX, top: scaledPageY }, window.bounds)
-    ));
-  }
+  const browser  = getSyntheticBrowser(state, workspace.browserId);
+  const window = stage.fullScreen ? getSyntheticWindow(state, stage.fullScreen.windowId) : browser.windows.find((window) => (
+    pointIntersectsBounds({ left: scaledPageX, top: scaledPageY }, window.bounds)
+  ));
 
   if (!window) return null;
 
-  // TODO - move to reducer
   const mouseX = scaledPageX - window.bounds.left;
   const mouseY = scaledPageY - window.bounds.top;
 

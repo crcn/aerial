@@ -1,4 +1,4 @@
-import { watch, removed, Struct, moved, stoppedMoving, moveBounds, scaleInnerBounds, resized, keepBoundsAspectRatio, request } from "aerial-common2";
+import { watch, removed, Struct, moved, stoppedMoving, moveBounds, scaleInnerBounds, resized, keepBoundsAspectRatio, request, shiftBounds } from "aerial-common2";
 import { take, select, call, put, fork } from "redux-saga/effects";
 import { delay } from "redux-saga";
 import { 
@@ -37,6 +37,7 @@ import {
   getSyntheticNodeById, 
   getSyntheticNodeWindow,
   getSyntheticWindowBrowser,
+  getSyntheticBrowserBounds,
   openSyntheticWindowRequest, 
 } from "aerial-browser-sandbox";
 
@@ -83,6 +84,7 @@ function* handleAltClickElement() {
     const event: StageToolOverlayClicked = yield take((action: StageToolOverlayClicked) => action.type === STAGE_MOUSE_CLICKED && action.sourceEvent.altKey);
     const state = yield select();
     const targetRef = getStageToolMouseNodeTargetReference(state, event);
+    const workspace = getSelectedWorkspace(state);
     if (!targetRef) continue;
     const node = getSyntheticNodeById(state, targetRef[1]);
     if (node.nodeType === SEnvNodeTypes.ELEMENT) {
@@ -91,17 +93,23 @@ function* handleAltClickElement() {
         const href = element.attributes.find((a) => a.name === "href");
         if (href) {
           const window = getSyntheticNodeWindow(state, node.$id);
+          const browserBounds = getSyntheticBrowserBounds(getSyntheticWindowBrowser(state, window.$id));
           const workspace = getSyntheticWindowWorkspace(state, window.$id);
-          yield openNewWindow(href.value, window, workspace);
+          yield openNewWindow(state, href.value, window, workspace);
         }
       }
     }
   }
 }
 
-function* openNewWindow(href: string, origin: SyntheticWindow, workspace: Workspace) {
+function* openNewWindow(state: ApplicationState, href: string, origin: SyntheticWindow, workspace: Workspace) {
   const uri = getUri(href, origin.location);
-  yield put(openSyntheticWindowRequest(uri, workspace.browserId));
+  const windowBounds = workspace.stage.fullScreen ? workspace.stage.fullScreen.originalWindowBounds : origin.bounds;
+  const browserBounds = getSyntheticBrowserBounds(getSyntheticWindowBrowser(state, origin.$id));
+  yield put(openSyntheticWindowRequest(uri, workspace.browserId, {
+    left: Math.max(browserBounds.right, windowBounds.right) + WINDOW_PADDING,
+    top: 0
+  }));
 }
 
 function* handleDeleteKeyPressed() {
@@ -184,12 +192,12 @@ function* handleCloneSelectedWindowShortcut() {
     if (!itemRef) continue;
     const window = itemRef[0] === SYNTHETIC_WINDOW ? getSyntheticWindow(state, itemRef[1]) : getSyntheticNodeWindow(state, itemRef[1]);
 
-    const clonedWindow = yield yield request(openSyntheticWindowRequest(window.location, getSyntheticWindowBrowser(state, window.$id).$id, {
-      left: window.bounds.left,
-      top: window.bounds.bottom + WINDOW_PADDING,
-      right: window.bounds.right,
-      bottom: window.bounds.bottom + WINDOW_PADDING + (window.bounds.bottom - window.bounds.top)
-    }));
+    const originalWindowBounds = workspace.stage.fullScreen ? workspace.stage.fullScreen.originalWindowBounds : window.bounds; 
+
+    const clonedWindow = yield yield request(openSyntheticWindowRequest(window.location, getSyntheticWindowBrowser(state, window.$id).$id, moveBounds(originalWindowBounds, {
+      left: originalWindowBounds.left,
+      top: originalWindowBounds.bottom + WINDOW_PADDING
+    })));
   }
 }
 
