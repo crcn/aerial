@@ -5,6 +5,10 @@ GOALS:
 - [ ] UX similar to regular browsers
   - [ ] right click inspect element (source code though)
 
+IMMEDIATE:
+
+- [ ] vscode extension
+
 MVP:
 
 - [ ] HMR support in windows
@@ -13,10 +17,8 @@ MVP:
 
 - POLISH:
 
-- [ ] window titles should not exceed window windth
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
    - [ ] ctrl+shift+{} to tab between windows
-- [ ] load spinner for each window
 - [ ] alt+click of tabbed item in full screen mode should respect original window size
 - [ ] tab between windows (cmd+shift+{)
 - [ ] zoom indicator
@@ -47,8 +49,6 @@ CLEANUP:
 - [ ] keep measurements when resizing
 
 Immediate TODOS:
-
-- [ ] files tab automatically populates from windows
 
 UIs:
 
