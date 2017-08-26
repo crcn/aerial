@@ -3,9 +3,9 @@ import { createQueue } from "mesh";
 import * as express from "express";
 const cors = require("cors");
 import { RootState } from "../state"
-import { logInfoAction , request } from "aerial-common2";
+import { logInfoAction, request } from "aerial-common2";
 import { APPLICATION_STARTED, httpRequest } from "../actions";
-import { put, take, call, fork, select } from "redux-saga/effects";
+import { put, take, call, fork, select, spawn } from "redux-saga/effects";
 
 export function* httpSaga() {
   yield take(APPLICATION_STARTED);
@@ -31,6 +31,8 @@ function* startHTTPServer() {
 
   while(true) {
     const { value: [req, res] } = yield call(q.next);
-    res.send((yield yield request(httpRequest(req))).payload);
+    yield spawn(function*() {
+      res.send((yield yield request(httpRequest(req))).payload);
+    });
   }
 }

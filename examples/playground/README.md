@@ -45,6 +45,7 @@ MVP:
   - [ ] `<meta name="device=ios5" />` for ios tool overlay
   - [ ] `<meta name="background-task" />` hides window from stage
 - [ ] AWS lambda for rendering
+- [ ] persisting to local storage needs to reload sibling windows
 
 HI PRIO:
 

@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "start": "node lib/back-end/entry.js",
+    "dev": "./node_modules/.bin/webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -18,23 +19,38 @@
     "gulp-util": "^3.0.8",
     "lodash": "^4.17.4",
     "mesh": "8.x.x",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.6",
+    "recompose": "^0.25.0",
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
-    "systemjs": "^0.20.18"
+    "systemjs": "^0.20.18",
+    "typescript": "^2.4.2"
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",
     "@types/express": "^4.0.37",
     "@types/lodash": "^4.14.74",
     "@types/mocha": "^2.2.42",
+    "@types/react": "^16.0.5",
+    "@types/react-dom": "^15.5.4",
+    "@types/recompose": "^0.24.0",
     "@types/redux-saga": "^0.10.5",
     "@types/socket.io": "^1.4.30",
     "@types/socket.io-client": "^1.4.30",
     "@types/systemjs": "^0.20.4",
     "@types/yargs": "^8.0.2",
     "chai": "^4.1.1",
-    "mocha": "^3.5.0"
+    "html-webpack-plugin": "^2.29.0",
+    "mocha": "^3.5.0",
+    "null-loader": "^0.1.1",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.18.2",
+    "ts-loader": "^2.1.0",
+    "webpack": "^3.0.0",
+    "webpack-dev-server": "^2.6.1"
   }
 }

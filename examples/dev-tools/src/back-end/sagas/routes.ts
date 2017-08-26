@@ -1,7 +1,7 @@
 import { fork, put } from "redux-saga/effects";
 import { createRequestResponse } from "aerial-common2";
-import { takeHTTPRequest } from "../utils";
 import { HTTP_REQUEST, HTTPRequest } from "../actions";
+import { takeHTTPRequest, serveStatic } from "../utils";
 
 export function* routesSaga() {
   yield fork(handleMainRoute);
@@ -12,12 +12,10 @@ function* handleMainRoute() {
   while(true) {
     
     // TODO - use static file helper here
-    yield takeHTTPRequest(/^\/$/, action => {
-      return "blah!";
-    });
+    yield takeHTTPRequest(/^\/$/, serveStatic(__dirname));
   }
 }
 
 function* handleFileRoute() {
-  
+  yield takeHTTPRequest(/^\/files\/.+/, serveStatic(__dirname));
 }
