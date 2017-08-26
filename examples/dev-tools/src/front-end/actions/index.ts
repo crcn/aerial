@@ -1,12 +1,17 @@
 import { BaseEvent } from "aerial-common2";
 
+export const REDIRECT = "REDIRECT";
 export const LOCATION_CHANGED = "LOCATION_CHANGE";
 export const APPLICATION_STARTED = "APPLICATION_STARTED";
-export const REDIRECT = "REDIRECT";
+export const PREVIEW_STARTED = "PREVIEW_STARTED";
+export const INDEX_STARTED = "INDEX_STARTED";
 
 export type LocationChanged = {
   location: string
 } & BaseEvent;
+
+export type PreviewStarted = BaseEvent;
+export type IndexStarted = BaseEvent;
 
 export type ApplicationStarted = {
   
@@ -23,4 +28,12 @@ export const applicationStarted = (): ApplicationStarted => ({
 export const locationChanged = (location: string): LocationChanged => ({
   location,
   type: LOCATION_CHANGED
-})
+});
+
+export const previewStarted = (): PreviewStarted => ({
+  type: PREVIEW_STARTED
+});
+
+export const indexStarted = (): IndexStarted => ({
+  type: INDEX_STARTED
+});

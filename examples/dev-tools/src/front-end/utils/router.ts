@@ -1,23 +1,24 @@
 import { RouterRootState } from "../state";
 import { LOCATION_CHANGED } from "../actions";
-import { select, fork, call, cancel } from "redux-saga/effects";
+import { select, fork, call, cancel, take } from "redux-saga/effects";
 
-export const getRouterLocation = (location: Location) => location.hash;
+export const getRouterLocation = (location: Location) => location.hash && location.hash.substr(1);
 
 export const whenLocation = (pattern: RegExp, fn: any, ...args: any[]) => fork(function*() {
-    const state: RouterRootState = yield select();
-    let task;
+  let task;
+  let location: string;
 
-    while(true) {
-      if (state.router && pattern.test(state.router.location)) {
-        if (!task) {
-          task = yield fork(fn, ...args);
-        }
-      } else if (task) {
-        yield cancel(task);
-        task = undefined;
+  while(true) {
+    const state: RouterRootState = yield select();
+    if (state.router && pattern.test(state.router.location)) {
+      if (!task || location !== state.router.location) {
+        location = state.router.location;
+        task = yield fork(fn, ...args);
       }
-      yield take(LOCATION_CHANGED);
+    } else if (task) {
+      yield cancel(task);
+      task = undefined;
     }
+    yield take(LOCATION_CHANGED);
   }
 });

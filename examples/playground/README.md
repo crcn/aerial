@@ -5,6 +5,8 @@ GOALS:
 - [ ] UX similar to regular browsers
   - [ ] right click inspect element (source code though)
 - [ ] built extensions API for windows to hook into
+- [ ] developing a language that is optimial for visual development, not hand writing.
+  - [ ] visual first, hand-writing second. 
 
 IMMEDIATE:
 
