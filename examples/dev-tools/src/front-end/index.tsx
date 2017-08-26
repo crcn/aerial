@@ -1,6 +1,5 @@
 import "./scss/index.scss";
 
-const reduceReducers = require("reduce-reducers");
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { circular, parallel } from "mesh";
