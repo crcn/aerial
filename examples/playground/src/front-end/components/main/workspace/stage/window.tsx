@@ -78,7 +78,7 @@ const WindowBase = ({ window, fullScreenWindowId, dispatch, smooth }: WindowProp
     // default to white since window background colors
     // are white too (CC)
     background: "white",
-    visibility: fullScreenWindowId && window.$id !== fullScreenWindowId ? "none" : undefined
+    display: fullScreenWindowId && window.$id !== fullScreenWindowId ? "none" : undefined
   };
 
   const smoothStyle = smooth ? {

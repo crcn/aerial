@@ -25,6 +25,7 @@ MVP:
   - [ ] master window has window presets (radio buttons for desktop, tablets, etc)
   - [ ] master window has `meta=no-tools` tag so that users can interact with page
   - [ ] each window reloads itself (in case they're used outside of the app)
+  - [ ] get to work with template based languages (vue, glimmer)
 
 - POLISH:
 
