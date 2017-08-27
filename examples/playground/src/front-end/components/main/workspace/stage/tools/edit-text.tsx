@@ -46,6 +46,10 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zo
     top: nodeWindow.bounds.top + bounds.top,
     width: width,
     height: height,
+
+    // slight opacity so that the white BG doesn't completely block an element
+    // that may be on a white background.
+    opacity: 0.7,
     zIndex: 99999999
   };
 
