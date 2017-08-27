@@ -257,7 +257,7 @@ export const getSyntheticNodeAncestors = weakMemo((node: SyntheticNode, window: 
   const ancestors: SyntheticNode[] = [];
   while(current) {
     ancestors.push(current);
-    current = window.allNodes[node.parentId];
+    current = window.allNodes[current.parentId];
   }
   return ancestors;
 });
@@ -313,6 +313,17 @@ export const getSyntheticNodeWindow = weakMemo((root: SyntheticBrowserRootState|
 
 export const syntheticWindowContainsNode = weakMemo((window: SyntheticWindow, nodeId: string): boolean => {
   return Boolean(window.allNodes[nodeId]);
+});
+
+export const syntheticNodeIsRelative = weakMemo((window: SyntheticWindow, nodeId: string, refNodeId: string): boolean => {
+  const node = window.allNodes[nodeId];
+  const refNode = window.allNodes[refNodeId];
+  if (!node || !refNode) {
+    return false;
+  }
+  const nodeAncestors = getSyntheticNodeAncestors(node, window);
+  const refNodeAncestors = getSyntheticNodeAncestors(refNode, window);
+  return refNodeAncestors.indexOf(node) !== -1 || nodeAncestors.indexOf(refNode) !== -1;
 });
 
 export const isSyntheticBrowserItemMovable = (root: SyntheticBrowserRootState, item: Struct) => {

@@ -47,16 +47,19 @@ import {
 
 import {
   SyntheticBrowser,
+  SYNTHETIC_WINDOW,
   SYNTHETIC_ELEMENT,
   getSyntheticWindow,
   getSyntheticNodeById,
   getSyntheticNodeWindow,
   getSyntheticBrowser,
   SyntheticWindow,
+  syntheticNodeIsRelative,
   getSyntheticBrowserItemBounds,
   getSyntheticWindowBrowser,
   SyntheticBrowserRootState,
   createSyntheticBrowserStore,
+  syntheticWindowContainsNode,
   getSyntheticBrowserStoreItemByReference,
 } from "aerial-browser-sandbox";
 
@@ -147,14 +150,77 @@ export const getSyntheticBrowserWorkspace = weakMemo((root: ApplicationState, br
   return root.workspaces.find(workspace => workspace.browserId === browserId);
 });
 
-export const addWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
+export const addWorkspaceSelection = (root: ApplicationState, workspaceId: string, ...selection: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
   return setWorkspaceSelection(root, workspaceId, ...workspace.selectionRefs, ...selection);
 };
 
-export const removeWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
+export const removeWorkspaceSelection = (root: ApplicationState, workspaceId: string, ...selection: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
   return setWorkspaceSelection(root, workspaceId, ...workspace.selectionRefs.filter((type, id) => !selection.find((type2, id2) => id === id2)));
+}
+
+/**
+ * Utility to ensure that workspace selection items are within the same window object. This prevents users from selecting
+ * the _same_ element across different window objects. 
+ */
+
+const deselectOutOfScopeWorkpaceSelection = (root: ApplicationState, workspaceId: string, ref: StructReference) => {
+  
+  if (ref && ref[0] === SYNTHETIC_WINDOW) {
+    return root;
+  }
+
+  const window = getSyntheticNodeWindow(root, ref[1]);
+
+  const workspace = getWorkspaceById(root, workspaceId);
+  const updatedSelection: StructReference[] = [];
+
+  for (const selection of workspace.selectionRefs)   {
+    if (syntheticWindowContainsNode(window, selection[1])) {
+      updatedSelection.push(selection);
+    }
+  }
+
+  return setWorkspaceSelection(root, workspaceId, ...updatedSelection);
+};
+
+/**
+ * Prevents nodes that have a parent/child relationship from being selected.
+ */
+
+const deselectRelatedWorkspaceSelection = (root: ApplicationState, workspaceId: string, ref: StructReference) => {
+  
+  if (ref && ref[0] === SYNTHETIC_WINDOW) {
+    return root;
+  }
+
+  const workspace = getWorkspaceById(root, workspaceId);
+  const window = getSyntheticNodeWindow(root, ref[1]);
+  const updatedSelection: StructReference[] = [];
+
+  for (const selection of workspace.selectionRefs)   {
+    if (!syntheticNodeIsRelative(window, ref[1], selection[1])) {
+      updatedSelection.push(selection);
+    }
+  }
+
+  return setWorkspaceSelection(root, workspaceId, ...updatedSelection);
+};
+
+// deselect unrelated refs, ensures that selection is not a child of existing one. etc.
+const cleanupWorkspaceSelection = (state: ApplicationState, workspaceId: string) => {
+  const workspace = getWorkspaceById(state, workspaceId);
+  
+  if (workspace.selectionRefs.length > 0) {
+
+    // use _last_ selected element since it's likely the one that was just clicked. Don't want to prevent the 
+    // user from doing so
+    state = deselectOutOfScopeWorkpaceSelection(state, workspaceId, workspace.selectionRefs[workspace.selectionRefs.length - 1]);
+    state = deselectRelatedWorkspaceSelection(state, workspaceId, workspace.selectionRefs[workspace.selectionRefs.length - 1]);
+  }
+
+  return state;
 }
 
 export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
@@ -173,7 +239,7 @@ export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...sele
     }
   }
 
-  return setWorkspaceSelection(root, workspaceId, ...newSelection);
+  return cleanupWorkspaceSelection(setWorkspaceSelection(root, workspaceId, ...newSelection), workspaceId);
 };
 
 export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
