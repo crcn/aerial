@@ -28,7 +28,7 @@ export type EditTextToolInnerProps = {
 } & EditTextToolOuterProps;
 
 export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zoom }: EditTextToolInnerProps) => {
-  if (!workspace.secondarySelection) return null;
+  if (!workspace.stage.secondarySelection) return null;
   const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
   if (!isSyntheticDOMNode(selectedNode)) return null;
   const nodeWindow: SyntheticWindow = getSyntheticNodeWindow(browser, selectedNode.$id);

@@ -38,7 +38,7 @@ const  SelectionBounds = ({ workspace, browser, zoom }: { workspace: Workspace,
 
 export const  SelectionStageToolBase = ({ setSelectionElement, workspace, browser, onKeyDown, dispatch, onDoubleClick, zoom }: SelectionInnerProps) => {
   const selection = getBoundedWorkspaceSelection(browser, workspace);      
-  if (!selection.length || workspace.secondarySelection) return null;
+  if (!selection.length || workspace.stage.secondarySelection) return null;
 
   return <div ref={setSelectionElement} className="m-stage-selection-tool" tabIndex={-1} onDoubleClick={onDoubleClick} onKeyDown={onKeyDown}>
     <SelectionBounds workspace={workspace} browser={browser} zoom={zoom} />

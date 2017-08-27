@@ -81,6 +81,7 @@ export const WORKSPACE         = "WORKSPACE";
 export const APPLICATION_STATE = "APPLICATION_STATE";
 
 export type Stage = {
+  secondarySelection?: boolean;
   fullScreen?: {
     windowId: string,
     originalTranslate: Translate;
@@ -99,14 +100,17 @@ export type Stage = {
   showRightGutter?: boolean;
 }
 
+export type TextEditor = {
+  cursorPosition?: ExpressionPosition;
+};
+
 export type Workspace = {
   selectionRefs: StructReference[]; // $type:$id;
   browserId: string;
   hoveringRefs: StructReference[];
   selectedFileId?: string;
   stage: Stage;
-  textCursorPosition: ExpressionPosition;
-  secondarySelection?: boolean;
+  textEditor: TextEditor;
 } & Struct;
 
 export type ApplicationState = {
@@ -142,6 +146,16 @@ export const updateWorkspaceStage = (root: ApplicationState, workspaceId: string
     stage: {
       ...workspace.stage,
       ...stageProperties
+    }
+  });
+};
+
+export const updateWorkspaceTextEditor = (root: ApplicationState, workspaceId: string, textEditorProperties: Partial<TextEditor>): ApplicationState => {
+  const workspace = getWorkspaceById(root, workspaceId);
+  return updateWorkspace(root, workspaceId, {
+    textEditor: {
+      ...workspace.textEditor,
+      ...textEditorProperties
     }
   });
 };
@@ -243,8 +257,9 @@ export const toggleWorkspaceSelection = (root: ApplicationState, workspaceId: st
 };
 
 export const clearWorkspaceSelection = (root: ApplicationState, workspaceId: string) => {
-  return updateWorkspace(root, workspaceId, {
-    selectionRefs: [],
+  return updateWorkspaceStage(updateWorkspace(root, workspaceId, {
+    selectionRefs: []
+  }), workspaceId, {
     secondarySelection: false
   });
 };
@@ -298,14 +313,15 @@ export const getSelectedWorkspace = (state: ApplicationState) => state.selectedW
 export const createWorkspace        = createStructFactory<Workspace>(WORKSPACE, {
   stage: {
     panning: false,
+    secondarySelection: false,
     translate: { left: 0, top: 0, zoom: 1 },
     showTextEditor: false,
     showLeftGutter: true,
     showRightGutter: true,
   },
+  textEditor: {},
   selectionRefs: [],
-  hoveringRefs: [],
-  secondarySelection: false
+  hoveringRefs: []
 });
 
 export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {

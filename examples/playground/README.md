@@ -44,8 +44,7 @@ CLEANUP:
 
 - [ ] file cache namespaced to workspace
 - [ ] normalize urls - http://site.com/ -> http://site.com
-- [ ] cannot multi dnd windows
-- [ ] secondary selection (double click) should reselect item that was clicked
+- [ ] cannot multi dnd windowsx
 - [ ] use old DOM rendering code
 - [ ] synthetic window timers
 - [ ] resizing elements

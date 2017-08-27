@@ -53,6 +53,7 @@ import {
   toggleWorkspaceSelection,
   getSelectedWorkspaceFile,
   getSyntheticNodeWorkspace,
+  updateWorkspaceTextEditor,
   getSyntheticBrowserBounds,
   getFrontEndItemByReference,
   getWorkspaceSelectionBounds,
@@ -287,7 +288,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       if (sourceEvent.key === "Escape") {
         const workspace = getSyntheticNodeWorkspace(state, nodeId);
         state = setWorkspaceSelection(state, workspace.$id, getStructReference(getSyntheticNodeById(state, nodeId)));
-        state = updateWorkspace(state, workspace.$id, {
+        state = updateWorkspaceStage(state, workspace.$id, {
           secondarySelection: false
         });
       }
@@ -449,7 +450,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
         return toggleWorkspaceSelection(state, workspace.$id, targetRef);
       } else if (!altKey) {
         state = handleWindowSelectionFromAction(state, targetRef, event as StageToolNodeOverlayClicked);
-        state = updateWorkspace(state, workspace.$id, {
+        state = updateWorkspaceStage(state, workspace.$id, {
           secondarySelection: false
         });
         return state;
@@ -463,7 +464,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const targetRef = getStageToolMouseNodeTargetReference(state, event as StageToolNodeOverlayClicked);
       if (!targetRef) return state;      
 
-      state = updateWorkspace(state, workspace.$id, {
+      state = updateWorkspaceStage(state, workspace.$id, {
         secondarySelection: true
       });
 
@@ -475,7 +476,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     case SELECTOR_DOUBLE_CLICKED: {
       const { sourceEvent, item } = event as SelectorDoubleClicked;
       const workspace = getSyntheticNodeWorkspace(state, item.$id);
-      state = updateWorkspace(state, workspace.$id, {
+      state = updateWorkspaceStage(state, workspace.$id, {
         secondarySelection: true
       });
       state = setWorkspaceSelection(state, workspace.$id, getStructReference(item));
@@ -573,10 +574,13 @@ const setSelectedFileFromNodeId = (state: ApplicationState, workspaceId: string,
   const { source: { uri, start } } = getSyntheticNodeById(state, nodeId) as SyntheticNode;
   const fileCacheItem = getFileCacheItemByUri(state, uri);
   if (fileCacheItem) {
-    return showWorkspaceTextEditor(updateWorkspace(state, workspaceId, {
-      textCursorPosition: start,
+    state = updateWorkspace(state, workspaceId, {
       selectedFileId: fileCacheItem.$id,
-    }), workspaceId);
+    });
+    state = updateWorkspaceTextEditor(state, workspaceId, {
+      cursorPosition: start
+    });
+    return showWorkspaceTextEditor(state, workspaceId);
   }
   return state;
 }
