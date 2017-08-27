@@ -8,6 +8,10 @@ GOALS:
 - [ ] developing a language that is optimial for visual development, not hand writing.
   - [ ] visual first, hand-writing second. 
 
+INSPIRATION:
+
+- [ ] what does the future of FE dev look like?
+
 NON-GOALS:
 
 - [ ] to cover 100% of UI design & development
