@@ -1,9 +1,12 @@
 import { Struct, BaseApplicationState } from "aerial-common2";
 
-export type RootState = {
+export type ApplicationState = {
   http: {
     port: number;
   };
-  cwd: string
+  watchingFilePaths: string[],
+  config: {
+    sourceFiles: string;
+  }
 } & BaseApplicationState;
 

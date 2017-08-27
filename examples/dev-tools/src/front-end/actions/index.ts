@@ -5,6 +5,7 @@ export const LOCATION_CHANGED = "LOCATION_CHANGE";
 export const APPLICATION_STARTED = "APPLICATION_STARTED";
 export const PREVIEW_STARTED = "PREVIEW_STARTED";
 export const INDEX_STARTED = "INDEX_STARTED";
+export const WATCHING_FILES = "WATCHING_FILES";
 
 export type LocationChanged = {
   location: string
@@ -15,6 +16,10 @@ export type IndexStarted = BaseEvent;
 
 export type ApplicationStarted = {
   
+} & BaseEvent;
+
+export type WatchingFiles = {
+  filePaths: string[]
 } & BaseEvent;
 
 export type Redirect = {
@@ -36,4 +41,9 @@ export const previewStarted = (): PreviewStarted => ({
 
 export const indexStarted = (): IndexStarted => ({
   type: INDEX_STARTED
+});
+
+export const watchingFiles = (filePaths: string[]): WatchingFiles => ({
+  filePaths,
+  type: WATCHING_FILES
 });

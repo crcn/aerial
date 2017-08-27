@@ -4,6 +4,7 @@ import { applicationStarted } from "./actions";
 import { getRouterLocation } from "./utils";
 
 const app = initApplication({
+  apiHost: "localhost:8083",
   element: document.getElementById("application"),
   router: {
     location: getRouterLocation(window.location)

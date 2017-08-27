@@ -271,6 +271,9 @@ function* getFetch() {
         resolve({
           text() {
             return Promise.resolve(String(content));
+          },
+          json() {
+            return Promise.resolve(JSON.parse(String(content)));
           }
         } as any);
       }]);

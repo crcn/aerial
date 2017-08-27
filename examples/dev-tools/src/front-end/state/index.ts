@@ -1,4 +1,5 @@
-import { BaseApplicationState, createStructFactory } from "aerial-common2";
+import { BaseApplicationState, createStructFactory, Bounds } from "aerial-common2";
+
 
 export const APPLICATION_STATE = "APPLICATION_STATE";
 
@@ -7,16 +8,32 @@ export enum MainPageType {
   PREVIEW = "PREVIEW"
 };
 
-export type RouterRootState = {
+export type ChildWindow = {
+  location: string;
+  bounds: Bounds;
+};
+
+export type RouterApplicationState = {
   router?: {
     location: string
-  },
-  mainPage?: MainPageType
+  }
+};
+
+export type IndexPageRootState = {
+  indexPage?: {
+    childWindows: ChildWindow[];
+  }
+}
+
+export type PreviewPageState = {
+  
 };
 
 export type ApplicationState = {
+  apiHost: string;
   element: HTMLElement;
-} & BaseApplicationState & RouterRootState;
+  mainPage?: MainPageType;
+} & BaseApplicationState & RouterApplicationState & IndexPageRootState;
 
 export const createApplicationState = createStructFactory<ApplicationState>(APPLICATION_STATE, {
   router: {

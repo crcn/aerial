@@ -50,6 +50,12 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
     }
 
     insertBefore<T extends Node>(newChild: T, refChild: Node | null): T {
+
+      // if null, then append -- this is to spec. See MSDN docs about this.
+      if (refChild == null) {
+        return this.appendChild(newChild);
+      }
+
       const index = Array.prototype.indexOf.call(this.childNodes, refChild);
 
       if (index === -1) {
@@ -102,7 +108,6 @@ export const getSEnvParentNodeClass = weakMemo((context: any) => {
       return child;
     }
 
-    querySelector<K extends keyof ElementTagNameMap>(selectors: K): ElementTagNameMap[K] | null;
     querySelector(selectors: string): Element | null {
       return querySelector(this, selectors);
     }

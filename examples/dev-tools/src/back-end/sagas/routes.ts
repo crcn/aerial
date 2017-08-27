@@ -1,21 +1,15 @@
-import { fork, put } from "redux-saga/effects";
+import { ApplicationState } from "../state";
+import { fork, put, select } from "redux-saga/effects";
 import { createRequestResponse } from "aerial-common2";
 import { HTTP_REQUEST, HTTPRequest } from "../actions";
 import { takeHTTPRequest, serveStatic } from "../utils";
 
 export function* routesSaga() {
-  yield fork(handleMainRoute);
-  yield fork(handleFileRoute);
+  // TODO - use static file helper here
+  yield takeHTTPRequest(/^\/files$/, handleFilesRequest);
 }
 
-function* handleMainRoute() {
-  while(true) {
-    
-    // TODO - use static file helper here
-    yield takeHTTPRequest(/^\/$/, serveStatic(__dirname));
-  }
-}
-
-function* handleFileRoute() {
-  yield takeHTTPRequest(/^\/files\/.+/, serveStatic(__dirname));
+function* handleFilesRequest() {
+  const state: ApplicationState = yield select();
+  return state.watchingFilePaths;
 }

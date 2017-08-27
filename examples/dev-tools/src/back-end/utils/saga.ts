@@ -1,15 +1,19 @@
-import { take, call, put } from "redux-saga/effects";
 import * as path from "path";
 import * as fs from "fs";
-import { eventChannel } from "redux-saga";
 import { Request } from "express";
+import { eventChannel } from "redux-saga";
+import { take, call, put, fork } from "redux-saga/effects";
 import { HTTPRequest, HTTP_REQUEST } from "../actions";
 import { BaseEvent, Request as BaseRequest, generateDefaultId, createRequestResponse } from "aerial-common2";
 
 export function* takeHTTPRequest(pattern: RegExp, handler: (action: HTTPRequest) => any) {
-  const action: HTTPRequest = yield take((action: HTTPRequest) => action.type === HTTP_REQUEST && pattern.test(action.request.path));
-  const response = yield call(handler, action);
-  yield put(createRequestResponse(action.$id, response));
+  yield fork(function*() {
+    while(true) {
+      const action: HTTPRequest = yield take((action: HTTPRequest) => action.type === HTTP_REQUEST && pattern.test(action.request.path));
+      const response = yield call(handler, action);
+      yield put(createRequestResponse(action.$id, response));
+    }
+  });
 };
 
 export function* takeCallback (call: (callback: (err, result) => any) => any) {

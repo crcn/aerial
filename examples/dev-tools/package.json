@@ -10,9 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/chokidar": "^1.7.2",
     "@types/node": "^8.0.25",
     "aerial-common2": "^0.0.1",
     "chalk": "^2.1.0",
+    "chokidar": "^1.7.0",
     "cors": "^2.8.4",
     "express": "^4.15.4",
     "gulp": "^3.9.1",
@@ -28,7 +30,8 @@
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
     "systemjs": "^0.20.18",
-    "typescript": "^2.4.2"
+    "typescript": "^2.4.2",
+    "watchpack": "^1.4.0"
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",

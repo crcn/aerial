@@ -10,7 +10,7 @@ const FRONT_END_ENTRY_PATH = resolve(__dirname, "..", "front-end", "entry.bundle
 
 initApplication({
   http: {
-    port: 8080
+    port: Number(process.env.PORT || 8080)
   },
   frontEnd: {
     entryPath: FRONT_END_ENTRY_PATH,

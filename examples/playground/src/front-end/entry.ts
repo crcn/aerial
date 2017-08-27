@@ -13,7 +13,7 @@ import {
 } from "./index";
 
 let state = createApplicationState({
-  apiHost: `localhost:8080`,
+  apiHost: `localhost:8084`,
   element: typeof document !== "undefined" ? document.getElementById("application") : undefined,
   log: {
     level: LogLevel.VERBOSE

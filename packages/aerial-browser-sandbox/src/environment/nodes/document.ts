@@ -671,9 +671,11 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
     
     getElementById(elementId: string): HTMLElement | null {
-      return null;
+      return this.querySelector(`#${elementId}`) as HTMLElement;
     }
+
     getElementsByClassName(classNames: string): HTMLCollectionOf<Element> {
+      // return this.querySelector(`*[class~=${className}]`) as HTMLElement;
       return null;
     }
     

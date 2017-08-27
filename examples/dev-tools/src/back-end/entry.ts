@@ -3,10 +3,14 @@ import { LogLevel } from "aerial-common2";
 import { initApplication } from "./index";
 import { applicationStarted } from "./actions";
 
-const [dir] = argv._;
+const [sourceFiles] = argv._;
+
 
 const app = initApplication({
-  cwd: process.cwd(),
+  config: {
+    sourceFiles: sourceFiles
+  },
+  watchingFilePaths: [],
   http: {
     port: Number(argv.port || 8083)
   },

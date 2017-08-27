@@ -2,7 +2,7 @@ import { delay } from "redux-saga";
 import { createQueue } from "mesh";
 import * as express from "express";
 const cors = require("cors");
-import { RootState } from "../state"
+import { ApplicationState } from "../state"
 import { logInfoAction, request } from "aerial-common2";
 import { APPLICATION_STARTED, httpRequest } from "../actions";
 import { put, take, call, fork, select, spawn } from "redux-saga/effects";
@@ -13,7 +13,7 @@ export function* httpSaga() {
 }
 
 function* startHTTPServer() {
-  const { http: { port }}: RootState = yield select();
+  const { http: { port }}: ApplicationState = yield select();
   yield put(logInfoAction(`starting HTTP server on port ${port}`));
   const server = express();
   server.listen(port);
