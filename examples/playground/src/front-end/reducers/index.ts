@@ -105,6 +105,7 @@ import {
   ZOOM_OUT_SHORTCUT_PRESSED,
   StageToolSelectionKeyDown,
   STAGE_TOOL_WINDOW_KEY_DOWN,
+  FULL_SCREEN_TARGET_DELETED,
   TOGGLE_LEFT_GUTTER_PRESSED,
   StageToolOverlayMouseMoved,
   TOGGLE_TEXT_EDITOR_PRESSED,
@@ -202,6 +203,10 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
+    case FULL_SCREEN_TARGET_DELETED: {
+      return unfullscreen(state);
+    }
+    
     case FULL_SCREEN_SHORTCUT_PRESSED: {
       const workspace = getSelectedWorkspace(state);
       const selection = workspace.selectionRefs[0];
@@ -225,18 +230,7 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
         });
         return state;
       } else if (workspace.stage.fullScreen) {
-        const { originalWindowBounds } = workspace.stage.fullScreen;
-        state = updateWorkspaceStage(state, workspace.$id, {
-          smooth: true,
-          fullScreen: undefined
-        });
-        
-        state = updateWorkspaceStage(state, workspace.$id, {
-          translate: workspace.stage.fullScreen.originalTranslate,
-          smooth: true
-        });
-        
-        return state;
+        return unfullscreen(state);
       } else {
         return state;
       }
@@ -456,9 +450,11 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       state = setWorkspaceSelection(state, workspace.$id, getStructReference(item));
       return state;
     }
+
     case WORKSPACE_DELETION_SELECTED: {
       const { workspaceId } = event as WorkspaceSelectionDeleted;
-      return clearWorkspaceSelection(state, workspaceId);
+      state = clearWorkspaceSelection(state, workspaceId);
+      return state;
     }
 
     case STAGE_TOOL_WINDOW_TITLE_CLICKED: {
@@ -472,6 +468,22 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     }
   }
 
+  return state;
+}
+
+const unfullscreen = (state: ApplicationState, workspaceId: string = state.selectedWorkspaceId) => {
+  const workspace = getWorkspaceById(state, workspaceId);
+  const { originalWindowBounds } = workspace.stage.fullScreen;
+  state = updateWorkspaceStage(state, workspace.$id, {
+    smooth: true,
+    fullScreen: undefined
+  });
+  
+  state = updateWorkspaceStage(state, workspace.$id, {
+    translate: workspace.stage.fullScreen.originalTranslate,
+    smooth: true
+  });
+  
   return state;
 }
 

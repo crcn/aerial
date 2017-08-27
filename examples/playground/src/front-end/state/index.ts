@@ -260,7 +260,8 @@ export const toggleWorkspaceSelection = (root: ApplicationState, workspaceId: st
 
 export const clearWorkspaceSelection = (root: ApplicationState, workspaceId: string) => {
   return updateWorkspaceStage(updateWorkspace(root, workspaceId, {
-    selectionRefs: []
+    selectionRefs: [],
+    hoveringRefs: []
   }), workspaceId, {
     secondarySelection: false
   });

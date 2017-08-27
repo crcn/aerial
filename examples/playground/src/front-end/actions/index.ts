@@ -17,6 +17,7 @@ export const CLONE_WINDOW_SHORTCUT_PRESSED = "CLONE_WINDOW_SHORTCUT_PRESSED";
 export const ESCAPE_SHORTCUT_PRESSED = "ESCAPE_SHORTCUT_PRESSED";
 export const NEXT_WINDOW_SHORTCUT_PRESSED = "NEXT_WINDOW_SHORTCUT_PRESSED";
 export const PREV_WINDOW_SHORTCUT_PRESSED = "PREV_WINDOW_SHORTCUT_PRESSED";
+export const FULL_SCREEN_TARGET_DELETED = "FULL_SCREEN_TARGET_DELETED";
 export const TOGGLE_TEXT_EDITOR_PRESSED  = "TOGGLE_TEXT_EDITOR_PRESSED";
 export const TOGGLE_LEFT_GUTTER_PRESSED  = "TOGGLE_LEFT_GUTTER_PRESSED";
 export const TOGGLE_RIGHT_GUTTER_PRESSED = "TOGGLE_RIGHT_GUTTER_PRESSED";
@@ -268,6 +269,10 @@ export const stageToolOverlayMousePanning = (windowId: string, center: Point, de
 export const stageToolOverlayMousePanEnd = (windowId: string): StageToolOverlayMousePanEnd => ({
   windowId,
   type: STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
+});
+
+export const fullScreenTargetDeleted = () => ({
+  type: FULL_SCREEN_TARGET_DELETED
 });
 
 export const stageToolOverlayMouseDoubleClicked = (windowId: string, sourceEvent: React.MouseEvent<any>): StageToolOverlayClicked => ({

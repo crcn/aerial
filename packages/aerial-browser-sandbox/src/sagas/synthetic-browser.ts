@@ -1,4 +1,4 @@
-import { fork, take, put, call, spawn, actionChannel, select } from "redux-saga/effects";
+import { cancel, fork, take, put, call, spawn, actionChannel, select } from "redux-saga/effects";
 import { eventChannel, delay } from "redux-saga";
 import { difference, debounce } from "lodash";
 import { createQueue } from "mesh";
@@ -314,7 +314,11 @@ function* handleOpenedSyntheticWindow(browserId: string) {
 function* handleOpenedSyntheticProxyWindow(browserId: string) {
   while(true) {
     const { instance } = (yield take(SYNTHETIC_WINDOW_PROXY_OPENED)) as SyntheticWindowOpened;
-    yield spawn(handleSyntheticWindowInstance, instance, browserId);
+    const thread = yield spawn(handleSyntheticWindowInstance, instance, browserId);
+    yield fork(function*() {
+      yield take((action: Removed) => action.type === REMOVED && action.itemId === instance.$id);
+      yield cancel(thread);
+    })
   }
 }
 

@@ -46,6 +46,10 @@ CLEANUP:
 - [ ] resizing elements
 - [ ] keep measurements when resizing
 
+BUGS:
+
+- [ ] cannot delete window in full screen mode then shift to another window
+
 UIs:
 
 - [ ] 

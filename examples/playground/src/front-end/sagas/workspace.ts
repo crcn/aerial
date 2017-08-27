@@ -23,6 +23,7 @@ import {
   PROMPTED_NEW_WINDOW_URL,
   PromptedNewWindowUrl,
   DELETE_SHORCUT_PRESSED, 
+  fullScreenTargetDeleted,
   StageToolOverlayClicked, 
   workspaceSelectionDeleted,
   STAGE_MOUSE_CLICKED, 
@@ -129,6 +130,10 @@ function* handleDeleteKeyPressed() {
     const workspace = getSelectedWorkspace(state);
     for (const [type, id] of workspace.selectionRefs) {
       yield put(removed(id, type));
+
+      if (workspace.stage.fullScreen && workspace.stage.fullScreen.windowId === id) {
+        yield put(fullScreenTargetDeleted());
+      }
     }
     yield put(workspaceSelectionDeleted(workspace.$id));
   }

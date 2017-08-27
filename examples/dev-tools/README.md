@@ -1,7 +1,14 @@
 IMMEDIATE:
 
-- [ ] socket.io sync watched files
+- [ ] socket.io sync watched files & reload windows that change
 - [ ] render preview of components
+- [ ] take change deltas & apply to internal cache
+- [ ] register loader information to synthetic window instance (link rel handlers)5 
+
+GOALS:
+
+- [ ] dev environment to demonstrate how you can use Tandem with projects 
+- [ ] demonstrate how to extend Tandem using WS3 browser extensions API
 
 ALL TODOS:
 

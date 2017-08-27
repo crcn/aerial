@@ -31,6 +31,7 @@ import {
   FULL_SCREEN_SHORTCUT_PRESSED,
   STAGE_TOOL_EDIT_TEXT_CHANGED, 
   STAGE_TOOL_EDIT_TEXT_KEY_DOWN,
+  FULL_SCREEN_TARGET_DELETED,
   VISUAL_EDITOR_WHEEL,
   StageWheel,
   WINDOW_SELECTION_SHIFTED,
@@ -174,7 +175,7 @@ function* handleFullScreenWindow() {
     while(true) {
 
       // TODO - possibly change to WINDOW_SCOPE_CHANGED
-      yield take([FULL_SCREEN_SHORTCUT_PRESSED, SYNTHETIC_WINDOW_PROXY_OPENED, WINDOW_SELECTION_SHIFTED]);
+      yield take([FULL_SCREEN_SHORTCUT_PRESSED, SYNTHETIC_WINDOW_PROXY_OPENED, WINDOW_SELECTION_SHIFTED, FULL_SCREEN_TARGET_DELETED]);
       const state: ApplicationState = yield select();
       const workspace = getSelectedWorkspace(state);
       const windowId = workspace.stage.fullScreen && workspace.stage.fullScreen.windowId;
