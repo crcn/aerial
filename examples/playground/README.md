@@ -40,15 +40,12 @@ CLEANUP:
 
 - [ ] file cache namespaced to workspace
 - [ ] normalize urls - http://site.com/ -> http://site.com
-- [ ] cannot multi dnd windowsx
 - [ ] use old DOM rendering code
 - [ ] synthetic window timers
 - [ ] resizing elements
 - [ ] keep measurements when resizing
 
 BUGS:
-
-- [ ] cannot delete window in full screen mode then shift to another window
 
 UIs:
 
