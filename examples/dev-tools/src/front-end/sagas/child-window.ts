@@ -2,6 +2,8 @@ import { fork, take, select } from "redux-saga/effects";
 import { ApplicationState, ChildWindow } from "../state";
 import { WATCHING_FILES, WatchingFiles } from "../actions";
 import { diffArray, eachArrayValueMutation } from "aerial-common2";
+import * as so from "socket.io";
+
 
 export function* childWindowSaga() {
   yield fork(syncWindowInstances);
@@ -49,5 +51,5 @@ const syncWindow = (window: Window, struct: ChildWindow) => {
     struct.bounds.right - struct.bounds.left, 
     struct.bounds.bottom - struct.bounds.top
   );
-}
+} 
   

@@ -513,7 +513,7 @@ const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: 
 const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, ref: StructReference, event: T) => {
   const { sourceEvent } = event;
   const workspace = getSelectedWorkspace(state);
-  return sourceEvent.metaKey || sourceEvent.ctrlKey ? toggleWorkspaceSelection(state, workspace.$id, ref) : setWorkspaceSelection(state, workspace.$id, ref);
+  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$id, ref) : setWorkspaceSelection(state, workspace.$id, ref);
 }
 
 const normalizeZoom = (zoom) => {

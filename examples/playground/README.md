@@ -8,31 +8,14 @@ GOALS:
 - [ ] developing a language that is optimial for visual development, not hand writing.
   - [ ] visual first, hand-writing second. 
 
-IMMEDIATE:
+NON-GOALS:
 
-- [ ] vscode extension
-
-MVP:
-
-- [ ] dev server for playground (window that manages all other windows)
-- [ ] DSL for dynamic templates
-- [ ] dev environment for playground
-  - [ ] CLI `paperclip-dev-server [ROOT]`
-  - [ ] master window which opens all `*.pc` files in directory
-  - [ ] pc files can be accessed via `/files/[relative file path from root]`
-  - [ ] `PATCH` to `/files/*` updates cache
-  - [ ] `POST` to `/persist` saves cache
-  - [ ] reload each window when assoc file changes
-  - [ ] each window uses SystemJS
-  - [ ] master window has window presets (radio buttons for desktop, tablets, etc)
-  - [ ] master window has `meta=no-tools` tag so that users can interact with page
-  - [ ] each window reloads itself (in case they're used outside of the app)
-  - [ ] get to work with template based languages (vue, glimmer)
+- [ ] to cover 100% of UI design & development
+- [ ] to attract people with _no_ knowledge of HTML & CSS.
 
 - POLISH:
 
-- [ ] ability to zoom in from full screen mode
-
+- [ ] shift key resize should be activated anytime the user is dragging a resizer
 - [ ] ability to to open window outside of Playground
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
    - [ ] ctrl+shift+{} to tab between windows

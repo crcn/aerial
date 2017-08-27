@@ -73,9 +73,9 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    // yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
+    yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
     // yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
-    yield put(openSyntheticWindowRequest("http://localhost:8080/#/", workspace.browserId));
+    // yield put(openSyntheticWindowRequest("http://localhost:8080/#/", workspace.browserId));
     return true;
   });
 }
@@ -133,24 +133,24 @@ function* handleSelectionMoved() {
     const workspace = getWorkspaceById(state, workspaceId);
     const translate = getStageTranslate(workspace.stage);
 
-    const bounds = getWorkspaceSelectionBounds(state, workspace);
+    const selectionBounds = getWorkspaceSelectionBounds(state, workspace);
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-      const bounds = getSyntheticBrowserItemBounds(state, item);
-      yield put(moved(item.$id, item.$type, scaleInnerBounds(bounds, bounds, moveBounds(bounds, newPoint))));
+      const itemBounds = getSyntheticBrowserItemBounds(state, item);
+      yield put(moved(item.$id, item.$type, scaleInnerBounds(itemBounds, selectionBounds, moveBounds(selectionBounds, newPoint))));
     }
   }
 }
 
 function* handleSelectionResized() {
   while(true) {
-    let { workspaceId, anchor, bounds: newBounds, sourceEvent } = (yield take(RESIZER_PATH_MOUSE_MOVED)) as ResizerPathMoved;
+    let { workspaceId, anchor, originalBounds, newBounds, sourceEvent } = (yield take(RESIZER_PATH_MOUSE_MOVED)) as ResizerPathMoved;
 
     const state: ApplicationState = yield select();
-
+ 
     const workspace = getWorkspaceById(state, workspaceId);
 
     // TODO - possibly use BoundsStruct instead of Bounds since there are cases where bounds prop doesn't exist
-    const bounds = getWorkspaceSelectionBounds(state, workspace);
+    const currentBounds = getWorkspaceSelectionBounds(state, workspace);
 
 
     const keepAspectRatio = sourceEvent.shiftKey;
@@ -161,13 +161,13 @@ function* handleSelectionResized() {
     }
 
     if (keepAspectRatio) {
-      newBounds = keepBoundsAspectRatio(newBounds, bounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
+      newBounds = keepBoundsAspectRatio(newBounds, originalBounds, anchor, keepCenter ? { left: 0.5, top: 0.5 } : anchor);
     }
 
     for (const item of getBoundedWorkspaceSelection(state, workspace)) {
-      const bounds = getSyntheticBrowserItemBounds(state, item);
-      const scaledBounds = scaleInnerBounds(bounds, bounds, newBounds);
-      yield put(resized(item.$id, item.$type, scaleInnerBounds(bounds, bounds, newBounds)));
+      const innerBounds = getSyntheticBrowserItemBounds(state, item);
+      const scaledBounds = scaleInnerBounds(currentBounds, currentBounds, newBounds);
+      yield put(resized(item.$id, item.$type, scaleInnerBounds(innerBounds, currentBounds, newBounds)));
     }
   }
 }

@@ -108,10 +108,11 @@ export type KeyboardShortcutAdded = {
 } & BaseEvent;
 
 export type ResizerPathMoved = {
-  bounds: Bounds;
+  originalBounds: Bounds;
+  newBounds: Bounds;
   anchor: Point;
   workspaceId: string;
-} & WrappedEvent<React.MouseEvent<any>>;
+} & WrappedEvent<MouseEvent>;
 
 export type ResizerPathStoppedMoving = {
   workspaceId: string;
@@ -263,12 +264,13 @@ export const selectorDoubleClicked = (item: Struct, sourceEvent: React.MouseEven
   sourceEvent
 });
 
-export const resizerPathMoved = (workspaceId: string, anchor: Point, bounds: Bounds, sourceEvent: React.MouseEvent<any>): ResizerPathMoved => ({
+export const resizerPathMoved = (workspaceId: string, anchor: Point, originalBounds: Bounds, newBounds: Bounds, sourceEvent: MouseEvent): ResizerPathMoved => ({
   type: RESIZER_PATH_MOUSE_MOVED,
   workspaceId,
   anchor,
-  bounds,
-  sourceEvent: {...sourceEvent}
+  originalBounds,
+  newBounds,
+  sourceEvent,
 });
 
 
