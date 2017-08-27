@@ -20,13 +20,9 @@ NON-GOALS:
 - POLISH:
 
 - [ ] ability to to open window outside of Playground
-- [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
-   - [ ] ctrl+shift+{} to tab between windows
-- [ ] tab between windows (cmd+shift+{)
 - [ ] zoom indicator
 - [ ] measurement tooling
 - [ ] highlight elements based on text cursor position
-- [ ] multi select
 - [ ] copy + paste elements
 - [ ] meta keywords for controlling UI
   - [ ] `<meta name="no-tools" />`

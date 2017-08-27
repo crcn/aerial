@@ -33,6 +33,7 @@ import {
   STAGE_TOOL_EDIT_TEXT_KEY_DOWN,
   VISUAL_EDITOR_WHEEL,
   StageWheel,
+  WINDOW_SELECTION_SHIFTED,
   STAGE_TOOL_OVERLAY_MOUSE_PANNING,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_END,
   STAGE_TOOL_OVERLAY_MOUSE_PAN_START
@@ -171,7 +172,9 @@ function* handleFullScreenWindow() {
 
   yield fork(function*() {
     while(true) {
-      yield take([FULL_SCREEN_SHORTCUT_PRESSED, SYNTHETIC_WINDOW_PROXY_OPENED]);
+
+      // TODO - possibly change to WINDOW_SCOPE_CHANGED
+      yield take([FULL_SCREEN_SHORTCUT_PRESSED, SYNTHETIC_WINDOW_PROXY_OPENED, WINDOW_SELECTION_SHIFTED]);
       const state: ApplicationState = yield select();
       const workspace = getSelectedWorkspace(state);
       const windowId = workspace.stage.fullScreen && workspace.stage.fullScreen.windowId;

@@ -377,7 +377,13 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
         this._struct = createSyntheticWindow({
           $id: this.$id,
           location: this.location.toString(),
-          document: this.document.struct
+          document: this.document.struct,
+          bounds: {
+            left: this.screenLeft,
+            top: this.screenTop,
+            right: this.screenLeft + this.innerWidth,
+            bottom: this.screenTop + this.innerHeight
+          }
         });
       }
       return this._struct;

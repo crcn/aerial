@@ -40,6 +40,7 @@ import {
   updateWorkspace,
   getWorkspaceById,
   ApplicationState,
+  SyntheticWindow,
   getStageTranslate,
   ShortcutServiceState,
   updateWorkspaceStage,
@@ -86,7 +87,11 @@ import {
   DELETE_SHORCUT_PRESSED,
   PROMPTED_NEW_WINDOW_URL,
   KEYBOARD_SHORTCUT_ADDED,
+  WindowSelectionShifted,
+  WINDOW_SELECTION_SHIFTED,
   ESCAPE_SHORTCUT_PRESSED,
+  NEXT_WINDOW_SHORTCUT_PRESSED,
+  PREV_WINDOW_SHORTCUT_PRESSED,
   RESIZER_STOPPED_MOVING,
   SELECTOR_DOUBLE_CLICKED,
   StageToolOverlayClicked,
@@ -193,8 +198,8 @@ const shortcutReducer = (state: ApplicationState, event: BaseEvent) => {
       return setStageZoom(state, workspace.$id, normalizeZoom(workspace.stage.translate.zoom) / 2);
     }
 
-    case ESCAPE_SHORTCUT_PRESSED: {
-      return clearWorkspaceSelection(state, state.selectedWorkspaceId);
+    case PREV_WINDOW_SHORTCUT_PRESSED: {
+      return state;
     }
 
     case FULL_SCREEN_SHORTCUT_PRESSED: {
@@ -317,43 +322,7 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
 
     case SYNTHETIC_WINDOW_PROXY_OPENED: {
       const { instance } = event as SyntheticWindowOpened;
-      let workspace = getSelectedWorkspace(state);
-      if (!workspace.stage.container) return state;
-
-      const { width, height } = workspace.stage.container.getBoundingClientRect();
-
-      const windowBounds = {
-        left: instance.screenLeft,
-        top: instance.screenTop,
-        right: instance.screenLeft + instance.innerWidth,
-        bottom: instance.screenTop + instance.innerHeight,
-      };
-
-      state = centerStage(state, state.selectedWorkspaceId, windowBounds, true, workspace.stage.fullScreen && workspace.stage.fullScreen.originalTranslate.zoom);
-
-      // update translate
-      workspace = getSelectedWorkspace(state);
-
-      if (workspace.stage.fullScreen) {
-
-        state = updateWorkspaceStage(state, workspace.$id, {
-          smooth: true,
-          fullScreen: {
-            windowId: instance.$id,
-            originalTranslate: workspace.stage.translate,
-            originalWindowBounds: windowBounds
-          },
-          translate: {
-            zoom: 1,
-            left: -windowBounds.left,
-            top: -windowBounds.top
-          }
-        });
-      }
-
-      state = setWorkspaceSelection(state, workspace.$id, getStructReference(instance.struct));
-
-      return state;
+      return selectAndCenterSyntheticWindow(state, instance.struct);
     }
 
     case STAGE_TOOL_OVERLAY_MOUSE_LEAVE: {
@@ -473,6 +442,11 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       return state;
     }
 
+    case WINDOW_SELECTION_SHIFTED: {
+      const { windowId } = event as WindowSelectionShifted;
+      return selectAndCenterSyntheticWindow(state, getSyntheticWindow(state, windowId));
+    }
+
     case SELECTOR_DOUBLE_CLICKED: {
       const { sourceEvent, item } = event as SelectorDoubleClicked;
       const workspace = getSyntheticNodeWorkspace(state, item.$id);
@@ -498,6 +472,39 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
     }
   }
 
+  return state;
+}
+
+const selectAndCenterSyntheticWindow = (state: ApplicationState, window: SyntheticWindow) => {
+
+  let workspace = getSelectedWorkspace(state);
+  if (!workspace.stage.container) return state;
+
+  const { width, height } = workspace.stage.container.getBoundingClientRect();
+
+  state = centerStage(state, state.selectedWorkspaceId, window.bounds, true, workspace.stage.fullScreen && workspace.stage.fullScreen.originalTranslate.zoom);
+
+  // update translate
+  workspace = getSelectedWorkspace(state);
+
+  if (workspace.stage.fullScreen) {
+
+    state = updateWorkspaceStage(state, workspace.$id, {
+      smooth: true,
+      fullScreen: {
+        windowId: window.$id,
+        originalTranslate: workspace.stage.translate,
+        originalWindowBounds: window.bounds
+      },
+      translate: {
+        zoom: 1,
+        left: -window.bounds.left,
+        top: -window.bounds.top
+      }
+    });
+  }
+
+  state = setWorkspaceSelection(state, workspace.$id, getStructReference(window));
   return state;
 }
 

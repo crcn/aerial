@@ -41,6 +41,8 @@ import {
   toggleLeftGutterPressed, 
   toggleRightGutterPressed, 
   fullScreenShortcutPressed,
+  nextWindowShortcutPressed,
+  prevWindowShortcutPressed,
   cloneWindowShortcutPressed,
   openNewWindowShortcutPressed,
 } from "front-end/actions";
@@ -306,6 +308,20 @@ export const getStageTranslate = (stage: Stage) => stage.translate;
 export const getWorkspaceById = (state: ApplicationState, id: string): Workspace => state.workspaces.find((workspace) => workspace.$id === id);
 export const getSelectedWorkspace = (state: ApplicationState) => state.selectedWorkspaceId && getWorkspaceById(state, state.selectedWorkspaceId);
 
+export const getWorkspaceLastSelectionOwnerWindow = (state: ApplicationState, workspaceId: string = state.selectedWorkspaceId) => {
+  const workspace = getWorkspaceById(state, workspaceId);
+  if (workspace.selectionRefs.length === 0) {
+    return null;
+  }
+  const lastSelectionRef = workspace.selectionRefs[workspace.selectionRefs.length - 1];
+  return lastSelectionRef[0] === SYNTHETIC_WINDOW ? getSyntheticWindow(state, lastSelectionRef[1]) : getSyntheticNodeWindow(state, lastSelectionRef[1]);
+};
+
+export const getWorkspaceWindow = (state: ApplicationState, workspaceId: string = state.selectedWorkspaceId, index: number = 0) => {
+  const browser = getSyntheticBrowser(state, workspaceId);
+  return browser.windows[index];
+};
+
 /**
  * Factories
  */
@@ -338,7 +354,9 @@ export const createApplicationState = createStructFactory<ApplicationState>(APPL
     createKeyboardShortcut("meta+t", openNewWindowShortcutPressed()),
     createKeyboardShortcut("ctrl+t", openNewWindowShortcutPressed()),
     createKeyboardShortcut("meta+enter", cloneWindowShortcutPressed()),
-    createKeyboardShortcut("escape", escapeShortcutPressed())
+    createKeyboardShortcut("escape", escapeShortcutPressed()),
+    createKeyboardShortcut("ctrl+shift+]", nextWindowShortcutPressed()),
+    createKeyboardShortcut("ctrl+shift+[", prevWindowShortcutPressed()),
   ],
   fileCacheStore: createFileCacheStore(),
   browserStore: createSyntheticBrowserStore()

@@ -11,10 +11,14 @@ import {
   ResizerPathMoved,
   resizerMoved,
   TEXT_EDITOR_CHANGED,
+  NEXT_WINDOW_SHORTCUT_PRESSED,
+  PREV_WINDOW_SHORTCUT_PRESSED,
   TextEditorChanged,
   RESIZER_PATH_MOUSE_MOVED,
   DeleteShortcutPressed, 
   OPEN_NEW_WINDOW_SHORTCUT_PRESSED,
+  windowSelectionShifted,
+  WINDOW_SELECTION_SHIFTED,
   CLONE_WINDOW_SHORTCUT_PRESSED,
   PROMPTED_NEW_WINDOW_URL,
   PromptedNewWindowUrl,
@@ -47,9 +51,11 @@ import {
   getStageTranslate,
   getWorkspaceById,
   ApplicationState, 
+  getWorkspaceWindow,
   getSelectedWorkspace, 
   getWorkspaceSelectionBounds,
   getBoundedWorkspaceSelection,
+  getWorkspaceLastSelectionOwnerWindow,
   getSyntheticWindowWorkspace,
   getStageToolMouseNodeTargetReference,
 } from "../state";
@@ -58,6 +64,8 @@ export function* mainWorkspaceSaga() {
   yield fork(openDefaultWindow);
   yield fork(handleAltClickElement);
   yield fork(handleDeleteKeyPressed);
+  yield fork(handleNextWindowPressed);
+  yield fork(handlePrevWindowPressed);
   yield fork(handleSelectionMoved);
   yield fork(handleSelectionStoppedMoving);
   yield fork(handleSelectionKeyDown);
@@ -254,4 +262,34 @@ function* handleTextEditorChange() {
     const { value, file } = (yield take(TEXT_EDITOR_CHANGED)) as TextEditorChanged;
     yield put(uriCacheBusted(file.sourceUri, value, file.contentType));
   }
+}
+
+function* handleNextWindowPressed() {
+  while(true) {
+    yield take(NEXT_WINDOW_SHORTCUT_PRESSED);
+    yield call(shiftSelectedWindow, 1);
+  }
+}
+
+function* handlePrevWindowPressed() {
+  while(true) {
+    yield take(PREV_WINDOW_SHORTCUT_PRESSED);
+    yield call(shiftSelectedWindow, -1);
+  }
+}
+
+function* shiftSelectedWindow(indexDelta: number) {
+  const state: ApplicationState = yield select();
+  const window = getWorkspaceLastSelectionOwnerWindow(state, state.selectedWorkspaceId) || getWorkspaceWindow(state, state.selectedWorkspaceId, 0);
+  if (!window) {
+    return;
+  }
+  const browser = getSyntheticWindowBrowser(state, window.$id);
+
+  const index = browser.windows.indexOf(window);
+  const change = index + indexDelta
+
+  // TODO - change index based on window location, not index
+  const newIndex = change < 0 ? browser.windows.length - 1 : change >= browser.windows.length ? 0 : change;
+  yield put(windowSelectionShifted(browser.windows[newIndex].$id))
 }

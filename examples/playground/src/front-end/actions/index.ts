@@ -12,8 +12,11 @@ export const FULL_SCREEN_SHORTCUT_PRESSED = "FULL_SCREEN_SHORTCUT_PRESSED";
 export const ZOOM_IN_SHORTCUT_PRESSED = "ZOOM_IN_SHORTCUT_PRESSED";
 export const ZOOM_OUT_SHORTCUT_PRESSED = "ZOOM_OUT_SHORTCUT_PRESSED";
 export const OPEN_NEW_WINDOW_SHORTCUT_PRESSED = "OPEN_NEW_WINDOW_SHORTCUT_PRESSED";
+export const WINDOW_SELECTION_SHIFTED = "WINDOW_SELECTION_SHIFTED";
 export const CLONE_WINDOW_SHORTCUT_PRESSED = "CLONE_WINDOW_SHORTCUT_PRESSED";
 export const ESCAPE_SHORTCUT_PRESSED = "ESCAPE_SHORTCUT_PRESSED";
+export const NEXT_WINDOW_SHORTCUT_PRESSED = "NEXT_WINDOW_SHORTCUT_PRESSED";
+export const PREV_WINDOW_SHORTCUT_PRESSED = "PREV_WINDOW_SHORTCUT_PRESSED";
 export const TOGGLE_TEXT_EDITOR_PRESSED  = "TOGGLE_TEXT_EDITOR_PRESSED";
 export const TOGGLE_LEFT_GUTTER_PRESSED  = "TOGGLE_LEFT_GUTTER_PRESSED";
 export const TOGGLE_RIGHT_GUTTER_PRESSED = "TOGGLE_RIGHT_GUTTER_PRESSED";
@@ -170,6 +173,10 @@ export type StageToolOverlayMousePanning = {
   center: Point;
 } & BaseEvent;
 
+export type WindowSelectionShifted = {
+  windowId: string;
+} & BaseEvent;
+
 export type StageToolOverlayMousePanEnd = {
   windowId: string;
 } & BaseEvent;
@@ -225,6 +232,11 @@ export const resizerStoppedMoving = (workspaceId: string, point: Point): Resizer
   workspaceId,
   point,
   type: RESIZER_STOPPED_MOVING,
+});
+
+export const windowSelectionShifted = (windowId: string): WindowSelectionShifted => ({
+  windowId,
+  type: WINDOW_SELECTION_SHIFTED,
 });
 
 export const resizerMouseDown = (workspaceId: string, sourceEvent: React.MouseEvent<any>): ResizerMouseDown => ({
@@ -353,6 +365,14 @@ export const cloneWindowShortcutPressed = (): BaseEvent => ({
 
 export const escapeShortcutPressed = (): BaseEvent => ({
   type: ESCAPE_SHORTCUT_PRESSED,
+});
+
+export const nextWindowShortcutPressed = (): BaseEvent => ({
+  type: NEXT_WINDOW_SHORTCUT_PRESSED,
+});
+
+export const prevWindowShortcutPressed = (): BaseEvent => ({
+  type: PREV_WINDOW_SHORTCUT_PRESSED,
 });
 
 export const toggleTextEditorPressed = (): BaseEvent => ({
