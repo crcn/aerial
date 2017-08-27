@@ -317,9 +317,9 @@ export const getWorkspaceLastSelectionOwnerWindow = (state: ApplicationState, wo
   return lastSelectionRef[0] === SYNTHETIC_WINDOW ? getSyntheticWindow(state, lastSelectionRef[1]) : getSyntheticNodeWindow(state, lastSelectionRef[1]);
 };
 
-export const getWorkspaceWindow = (state: ApplicationState, workspaceId: string = state.selectedWorkspaceId, index: number = 0) => {
-  const browser = getSyntheticBrowser(state, workspaceId);
-  return browser.windows[index];
+export const getWorkspaceWindow = (state: ApplicationState, workspaceId: string = state.selectedWorkspaceId, index?: number) => {
+  const browser = getSyntheticBrowser(state, getWorkspaceById(state, workspaceId).browserId);
+  return browser.windows[index == null ? browser.windows.length - 1 : 0];
 };
 
 /**

@@ -280,7 +280,7 @@ function* handlePrevWindowPressed() {
 
 function* shiftSelectedWindow(indexDelta: number) {
   const state: ApplicationState = yield select();
-  const window = getWorkspaceLastSelectionOwnerWindow(state, state.selectedWorkspaceId) || getWorkspaceWindow(state, state.selectedWorkspaceId, 0);
+  const window = getWorkspaceLastSelectionOwnerWindow(state, state.selectedWorkspaceId) || getWorkspaceWindow(state, state.selectedWorkspaceId);
   if (!window) {
     return;
   }
