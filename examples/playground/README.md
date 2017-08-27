@@ -15,7 +15,6 @@ NON-GOALS:
 
 - POLISH:
 
-- [ ] shift key resize should be activated anytime the user is dragging a resizer
 - [ ] ability to to open window outside of Playground
 - [ ] keyboard shortcuts by browser - http://dmcritchie.mvps.org/firefox/keyboard.htm
    - [ ] ctrl+shift+{} to tab between windows

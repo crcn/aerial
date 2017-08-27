@@ -42,7 +42,7 @@ import {
   SyntheticWindowScrolled,
   syntheticWindowScrolled,
   SYNTHETIC_WINDOW_SCROLLED,
-  applyFileMutationsRequest,
+  deferApplyFileMutationsRequest,
   NODE_VALUE_STOPPED_EDITING,
   SYNTHETIC_WINDOW_PROXY_OPENED,
   syntheticWindowMoved,
@@ -407,7 +407,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
 
       // remove immediately so that it's reflected in the canvas
       parent.removeChild(target);
-      yield yield request(applyFileMutationsRequest(removeMutation));
+      yield yield request(deferApplyFileMutationsRequest(removeMutation));
     }
   });
 
@@ -462,19 +462,22 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
       const { nodeId } = (yield takeWindowAction(NODE_VALUE_STOPPED_EDITING)) as SyntheticNodeValueStoppedEditing;
       const node = window.childObjects.get(nodeId) as HTMLElement;
       const mutation = createSetElementTextContentMutation(node, node.textContent);
-      yield yield request(applyFileMutationsRequest(mutation));
+      yield yield request(deferApplyFileMutationsRequest(mutation));
     }
   });
 
   yield fork(function* handleMoveNodeStopped() {
     while(true) {
       const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
-      const target = window.childObjects.get(itemId) as HTMLElement;
 
-      target.style.transition = "";
-      // TODO - prompt where to persist style
-      const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
-      yield yield request(applyFileMutationsRequest(mutation));
+      yield spawn(function*() {
+        const target = window.childObjects.get(itemId) as HTMLElement;
+
+        target.style.transition = "";
+        // TODO - prompt where to persist style
+        const mutation = createSetElementAttributeMutation(target, "style", target.getAttribute("style"));
+        yield yield request(deferApplyFileMutationsRequest(mutation));
+      });
     }
   });
 

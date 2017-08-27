@@ -413,7 +413,8 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       if (/textarea|input/i.test((sourceEvent.target as Element).nodeName)) {
         return state;
       }
-      const metaKey = sourceEvent.metaKey || sourceEvent.ctrlKey;
+      const metaKey = sourceEvent.ctrlKey;
+      const ctrlKey = sourceEvent.ctrlKey;
 
       // alt key opens up a new link
       const altKey = sourceEvent.altKey;
@@ -427,8 +428,11 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       if (!targetRef) {
         return state;
       }
-      if (metaKey) {
+
+      if (altKey) {
         return setSelectedFileFromNodeId(state, workspace.$id, targetRef[1]);
+      } else if (metaKey) {
+        return toggleWorkspaceSelection(state, workspace.$id, targetRef);
       } else if (!altKey) {
         state = handleWindowSelectionFromAction(state, targetRef, event as StageToolNodeOverlayClicked);
         state = updateWorkspace(state, workspace.$id, {
@@ -513,7 +517,7 @@ const centerStage = (state: ApplicationState, workspaceId: string, innerBounds: 
 const handleWindowSelectionFromAction = <T extends { sourceEvent: React.MouseEvent<any>, windowId }>(state: ApplicationState, ref: StructReference, event: T) => {
   const { sourceEvent } = event;
   const workspace = getSelectedWorkspace(state);
-  return sourceEvent.metaKey || sourceEvent.ctrlKey ? addWorkspaceSelection(state, workspace.$id, ref) : setWorkspaceSelection(state, workspace.$id, ref);
+  return sourceEvent.metaKey || sourceEvent.ctrlKey ? toggleWorkspaceSelection(state, workspace.$id, ref) : setWorkspaceSelection(state, workspace.$id, ref);
 }
 
 const normalizeZoom = (zoom) => {

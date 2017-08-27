@@ -146,7 +146,7 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
     protected attributeChangedCallback(propertyName: string, oldValue: string, newValue: string) {
       super.attributeChangedCallback(propertyName, oldValue, newValue);
       if (propertyName === "style" && newValue !== this._getStyleString()) {
-        this.style.cssText = newValue;
+        this.style.cssText = newValue || "";
       } else if (propertyName.substr(0, 5) === "data-") {
         this.dataset[propertyName.substr(5).toLowerCase()] = newValue;
       } 

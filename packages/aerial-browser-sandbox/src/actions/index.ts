@@ -13,6 +13,7 @@ export const SYNTHETIC_NODE_TEXT_CONTENT_CHANGED = "SYNTHETIC_NODE_TEXT_CONTENT_
 export const NODE_VALUE_STOPPED_EDITING          = "NODE_VALUE_STOPPED_EDITING";
 export const EDIT_SOURCE_CONTENT                 = "EDIT_SOURCE_CONTENT";
 export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
+export const DEFER_APPLY_FILE_MUTATIONS          = "DEFER_APPLY_FILE_MUTATIONS";
 export const SYNTHETIC_WINDOW_SCROLLED           = "SYNTHETIC_WINDOW_SCROLLED";
 export const SYNTHETIC_WINDOW_SCROLL             = "SYNTHETIC_WINDOW_SCROLL";
 export const SYNTHETIC_WINDOW_OPENED             = "SYNTHETIC_WINDOW_OPENED";
@@ -145,6 +146,13 @@ export const applyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyF
   mutations,
   $id: generateDefaultId(),
   type: APPLY_FILE_MUTATIONS,
+});
+
+
+export const deferApplyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutations => ({
+  mutations,
+  $id: generateDefaultId(),
+  type: DEFER_APPLY_FILE_MUTATIONS,
 });
 
 export const testMutateContentRequest = (contentType: string, mutationType?: string) => ((action: MutateSourceContentRequest<any>) => action.type === EDIT_SOURCE_CONTENT && action.contentType === contentType && (!mutationType || action.mutation.$type === mutationType));

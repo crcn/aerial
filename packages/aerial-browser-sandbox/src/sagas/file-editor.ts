@@ -1,13 +1,46 @@
-import { Mutation, editString, StringMutation, request, createRequestResponse } from "aerial-common2";
 import { SEnvNodeInterface } from "../environment";
-import { fork, take, select, put } from "redux-saga/effects";
-import { APPLY_FILE_MUTATIONS, ApplyFileMutations, mutateSourceContentRequest } from "../actions";
+import { delay } from "redux-saga";
+import { fork, spawn, take, select, put, call } from "redux-saga/effects";
 import { getFileCacheItemByUri, uriCacheBusted } from "aerial-sandbox2";
+import { Mutation, editString, StringMutation, request, createRequestResponse } from "aerial-common2";
+import { 
+  ApplyFileMutations, 
+  APPLY_FILE_MUTATIONS, 
+  applyFileMutationsRequest,
+  mutateSourceContentRequest,
+  DEFER_APPLY_FILE_MUTATIONS, 
+} from "../actions";
+
+const DEFER_APPLY_EDIT_TIMEOUT = 10;
 
 export function* fileEditorSaga() {
+
+  let _deferring: boolean;
+  let _batchMutations: Mutation<any>[];
+
+  yield fork(function* handleDeferFileEditRequest() {
+    while(true) {
+      const req: ApplyFileMutations = yield take(DEFER_APPLY_FILE_MUTATIONS);
+      if (!_batchMutations) {
+        _batchMutations = [];
+      }
+      _batchMutations.push(...req.mutations);
+      if (_deferring) {
+        continue;
+      }
+      yield spawn(function*() {
+        yield call(delay, DEFER_APPLY_EDIT_TIMEOUT);
+        _deferring = false;
+        const mutations = [..._batchMutations];
+        _batchMutations = [];
+        yield put(applyFileMutationsRequest(...mutations));
+      });
+    }
+  });
+  
   yield fork(function* handleFileEditRequest() {
     while(true) {
-      const req = (yield take(action => action.type === APPLY_FILE_MUTATIONS)) as ApplyFileMutations;
+      const req: ApplyFileMutations = yield take(APPLY_FILE_MUTATIONS);
       const { mutations } = req;
       const state = yield select();
       const mutationsByUri: {

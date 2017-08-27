@@ -157,13 +157,23 @@ export const removeWorkspaceSelection = (root: any, workspaceId: string, ...sele
   return setWorkspaceSelection(root, workspaceId, ...workspace.selectionRefs.filter((type, id) => !selection.find((type2, id2) => id === id2)));
 }
 
-const diffStructReferences = (a: StructReference[], b: StructReference[]) => {
-  return differenceWith(a, b, (a, b) => a[1] === b[1]);
-}
-
 export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
-  return setWorkspaceSelection(root, workspaceId, ...diffStructReferences(selection, workspace.selectionRefs));
+  const newSelection = [];
+  const oldSelectionIds = workspace.selectionRefs.map(([type, id]) => id)
+  const toggleSelectionIds = selection.map(([type, id]) => id);
+  for (const ref of workspace.selectionRefs) {
+    if (toggleSelectionIds.indexOf(ref[1]) === -1) {
+      newSelection.push(ref);
+    }
+  }
+  for (const ref of selection) {
+    if (oldSelectionIds.indexOf(ref[1]) === -1) {
+      newSelection.push(ref);
+    }
+  }
+
+  return setWorkspaceSelection(root, workspaceId, ...newSelection);
 };
 
 export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
