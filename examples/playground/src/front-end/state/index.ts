@@ -223,7 +223,7 @@ const cleanupWorkspaceSelection = (state: ApplicationState, workspaceId: string)
   return state;
 }
 
-export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...selection: StructReference[]) => {
+export const toggleWorkspaceSelection = (root: ApplicationState, workspaceId: string, ...selection: StructReference[]) => {
   const workspace = getWorkspaceById(root, workspaceId);
   const newSelection = [];
   const oldSelectionIds = workspace.selectionRefs.map(([type, id]) => id)
@@ -242,14 +242,14 @@ export const toggleWorkspaceSelection = (root: any, workspaceId: string, ...sele
   return cleanupWorkspaceSelection(setWorkspaceSelection(root, workspaceId, ...newSelection), workspaceId);
 };
 
-export const clearWorkspaceSelection = (root: any, workspaceId: string) => {
+export const clearWorkspaceSelection = (root: ApplicationState, workspaceId: string) => {
   return updateWorkspace(root, workspaceId, {
     selectionRefs: [],
     secondarySelection: false
   });
 };
 
-export const setWorkspaceSelection = (root: any, workspaceId: string, ...selectionIds: StructReference[]) => {
+export const setWorkspaceSelection = (root: ApplicationState, workspaceId: string, ...selectionIds: StructReference[]) => {
   return updateWorkspace(root, workspaceId, {
     selectionRefs: uniq([...selectionIds])
   });

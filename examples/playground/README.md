@@ -42,19 +42,14 @@ HI PRIO:
 
 CLEANUP:
 
-- [ ] remove root: any
 - [ ] file cache namespaced to workspace
 - [ ] normalize urls - http://site.com/ -> http://site.com
 - [ ] cannot multi dnd windows
 - [ ] secondary selection (double click) should reselect item that was clicked
 - [ ] use old DOM rendering code
 - [ ] synthetic window timers
-- [ ] HMR directly in window
 - [ ] resizing elements
 - [ ] keep measurements when resizing
-- [ ] resolve issue around multi selection that is child of another selection
-
-Immediate TODOS:
 
 UIs:
 
