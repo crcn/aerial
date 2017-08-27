@@ -4,7 +4,7 @@ import {findDOMNode} from "react-dom";
 import { Workspace } from "front-end/state";
 import { compose, pure, lifecycle, withState } from "recompose";
 import { Dispatcher, getBoundsSize ,wrapEventToDispatch } from "aerial-common2";
-import { stageToolEditTextChanged, stageToolEditTextBlur } from "front-end/actions";
+import { stageToolEditTextChanged, stageToolEditTextBlur, stageToolEditTextKeyDown } from "front-end/actions";
 import { 
   SyntheticNode, 
   SyntheticWindow,
@@ -68,6 +68,7 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zo
     style={{ width: "100%", resize: "none", height: "100%", padding: 0, ...textStyle }} 
     defaultValue={getSyntheticNodeTextContent(selectedNode).trim()}
     onChange={wrapEventToDispatch(dispatch, stageToolEditTextChanged.bind(this, selectedNode.$id))}
+    onKeyDown={wrapEventToDispatch(dispatch, stageToolEditTextKeyDown.bind(this, selectedNode.$id))}
     onBlur={wrapEventToDispatch(dispatch, stageToolEditTextBlur.bind(this, selectedNode.$id))}
     ></textarea>
   </div>;

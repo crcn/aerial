@@ -25,10 +25,12 @@ import {
   StageToolEditTextChanged, 
   STAGE_TOOL_EDIT_TEXT_BLUR, 
   StageToolOverlayMousePanEnd,
+  StageToolEditTextKeyDown,
   StageToolOverlayMousePanning,
   StageToolOverlayMousePanStart,
   FULL_SCREEN_SHORTCUT_PRESSED,
   STAGE_TOOL_EDIT_TEXT_CHANGED, 
+  STAGE_TOOL_EDIT_TEXT_KEY_DOWN,
   VISUAL_EDITOR_WHEEL,
   StageWheel,
   STAGE_TOOL_OVERLAY_MOUSE_PANNING,
@@ -42,26 +44,50 @@ export function* frontEndSyntheticBrowserSaga() {
   yield fork(handleWindowMousePanned);
   yield fork(handleFullScreenWindow);
   yield fork(handleScrollInFullScreenMode);
+  yield fork(handleTextEditorEscaped);
+}
+
+
+function* handleTextEditorEscaped() {
+  while(true) {
+    const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_KEY_DOWN)) as StageToolEditTextKeyDown;
+    if (sourceEvent.key !== "Escape") {
+      continue;
+    }
+    yield call(applyTextEditChanges, sourceEvent, nodeId);
+
+    // blur does _not_ get fired on escape.
+    yield call(nodeValueStoppedEditing, nodeId);
+  }
 }
 
 function* handleTextEditChanges() {
   while(true) {
     const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_CHANGED)) as StageToolEditTextChanged;
-    const state = yield select();
-    const window = getSyntheticNodeWindow(state, nodeId);
-    const text = String(sourceEvent.target.value || "").trim();
-    const workspace = getSyntheticNodeWorkspace(state, nodeId);
-    yield put(syntheticNodeTextContentChanged(window.$id, nodeId, text));
+    yield call(applyTextEditChanges, sourceEvent, nodeId);
   }
+}
+
+function* applyTextEditChanges(sourceEvent: React.SyntheticEvent<any>, nodeId: string) {
+  const state = yield select();
+  const window = getSyntheticNodeWindow(state, nodeId);
+  const text = String((sourceEvent.target as any).value || "").trim();
+  const workspace = getSyntheticNodeWorkspace(state, nodeId);
+  yield put(syntheticNodeTextContentChanged(window.$id, nodeId, text));
 }
 
 function* handleTextEditBlur() {
   while(true) {
     const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_BLUR)) as StageToolEditTextBlur;
-    const state = yield select();
-    const window = getSyntheticNodeWindow(state, nodeId);
-    yield put(syntheticNodeValueStoppedEditing(window.$id, nodeId));
+    yield call(nodeValueStoppedEditing, nodeId);
   }
+}
+
+
+function* nodeValueStoppedEditing(nodeId: string) {
+  const state = yield select();
+  const window = getSyntheticNodeWindow(state, nodeId);
+  yield put(syntheticNodeValueStoppedEditing(window.$id, nodeId));
 }
 
 const MOMENTUM_THRESHOLD = 100;

@@ -92,6 +92,7 @@ import {
   TREE_NODE_LABEL_CLICKED,
   WINDOW_PANE_ROW_CLICKED,
   RESIZER_PATH_MOUSE_MOVED,
+  StageToolEditTextKeyDown,
   StageToolEditTextChanged,
   ZOOM_IN_SHORTCUT_PRESSED,
   WorkspaceSelectionDeleted,
@@ -110,6 +111,7 @@ import {
   StageToolNodeOverlayHoverOut,
   STAGE_TOOL_EDIT_TEXT_CHANGED,
   StageToolNodeOverlayHoverOver,
+  STAGE_TOOL_EDIT_TEXT_KEY_DOWN,
   STAGE_TOOL_SELECTION_KEY_DOWN,
   StageToolOverlayMousePanStart,
   STAGE_TOOL_OVERLAY_MOUSE_LEAVE,
@@ -278,6 +280,18 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       }
 
       return updateWorkspaceStage(state, workspace.$id, { smooth: false, translate });
+    }
+
+    case STAGE_TOOL_EDIT_TEXT_KEY_DOWN: {
+      const { sourceEvent, nodeId } = event as StageToolEditTextKeyDown;
+      if (sourceEvent.key === "Escape") {
+        const workspace = getSyntheticNodeWorkspace(state, nodeId);
+        state = setWorkspaceSelection(state, workspace.$id, getStructReference(getSyntheticNodeById(state, nodeId)));
+        state = updateWorkspace(state, workspace.$id, {
+          secondarySelection: false
+        });
+      }
+      return state;
     }
 
     case RESIZER_PATH_MOUSE_MOVED: 
