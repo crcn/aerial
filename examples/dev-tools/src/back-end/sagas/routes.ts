@@ -7,9 +7,14 @@ import { takeHTTPRequest, serveStatic } from "../utils";
 export function* routesSaga() {
   // TODO - use static file helper here
   yield takeHTTPRequest(/^\/files$/, handleFilesRequest);
+  yield takeHTTPRequest(/^\/transpile$/, handleTranspileRequest);
 }
 
 function* handleFilesRequest() {
   const state: ApplicationState = yield select();
   return state.watchingFilePaths;
+}
+
+function* handleTranspileRequest() {
+  // TOO
 }

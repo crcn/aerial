@@ -61,6 +61,7 @@ export const routesReducer = (state: ApplicationState, event: BaseEvent) => {
 }
 
 export const indexPageReducer = (state: ApplicationState, event: BaseEvent) => {
+  console.log(event);
   switch(event.type) {
     case INDEX_STARTED: {
       state = {

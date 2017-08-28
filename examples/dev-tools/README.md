@@ -4,6 +4,7 @@ IMMEDIATE:
 - [ ] render preview of components
 - [ ] take change deltas & apply to internal cache
 - [ ] register loader information to synthetic window instance (link rel handlers)5 
+- [ ] /bundle/:filepath route
 
 GOALS:
 

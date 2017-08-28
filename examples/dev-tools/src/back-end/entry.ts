@@ -5,7 +5,6 @@ import { applicationStarted } from "./actions";
 
 const [sourceFiles] = argv._;
 
-
 const app = initApplication({
   config: {
     sourceFiles: sourceFiles

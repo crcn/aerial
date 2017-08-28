@@ -1,4 +1,5 @@
 import { BaseEvent } from "aerial-common2";
+import { publicActionFactory } from "../../common";
 
 export const REDIRECT = "REDIRECT";
 export const LOCATION_CHANGED = "LOCATION_CHANGE";

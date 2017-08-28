@@ -13,6 +13,9 @@ module.exports = {
       title: "Paperclip Dev server",
       template: './src/index.html'
     }),
+    new webpack.ProvidePlugin({
+      "systemjs": "systemjs"
+    })
   ],
   resolve: {
     extensions: ['.ts', '.js', '.tsx'],
@@ -20,7 +23,8 @@ module.exports = {
       cluster: 'null-loader?cluster',
       net: 'null-loader?net',
       tls: 'null-loader?tls',
-      fs: 'null-loader?fs'
+      fs: 'null-loader?fs',
+      systemjs: require.resolve("systemjs"),
     },
     modules: [
       resolve(__dirname, 'src'),

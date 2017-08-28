@@ -12,7 +12,6 @@ export function* configSaga() {
 function* handleFileChanges() {
   const state: ApplicationState = yield select();
   const chan = eventChannel((emit) => {
-    
     const watcher = chokidar.watch(state.config.sourceFiles);
     watcher.on("change", (path) => {
       emit(logDebugAction(`changed: ${path}`));

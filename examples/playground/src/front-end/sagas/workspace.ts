@@ -82,8 +82,8 @@ function* openDefaultWindow() {
     if (!selectedWorkspaceId) return true;
     const workspace = getSelectedWorkspace(state);
     
-    yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
-    // yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
+    // yield put(openSyntheticWindowRequest(`http://localhost:8082/`, workspace.browserId));
+    yield put(openSyntheticWindowRequest("https://wordpress.com/", workspace.browserId));
     // yield put(openSyntheticWindowRequest("http://localhost:8080/#/", workspace.browserId));
     return true;
   });
