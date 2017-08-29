@@ -47,8 +47,8 @@ This library was designed for developers that want to create tooling for catchin
 #### App examples
 
 - [Tandem](http://tandemcode.com) - visually create web applications. 
-- [Code Playground](./examples/tandem-playground) - small visual editor. 
-- [Crawler](./examples/tandem-crawler) - crawls a website (up to 20 pages), and displays editable pages. 
+- [Code Playground](https://github.com/crcn/aerial/tree/master/examples/playground) - small visual editor. 
+- [Crawler](https://github.com/crcn/aerial/tree/master/examples/crawler) - crawls a website (up to 20 pages), and displays editable pages. 
 
 #### Code examples
 
