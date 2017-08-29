@@ -4,6 +4,7 @@ import { initApplication } from "./index";
 import { applicationStarted } from "./actions";
 
 const [sourceFiles] = argv._;
+console.log("OK");
 
 const app = initApplication({
   config: {

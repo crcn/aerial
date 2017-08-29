@@ -18,7 +18,6 @@ function* handleIndex() {
 }
 
 function* handleFilePreview() {
-  console.log("SP");
   const { router: { location }}: ApplicationState = yield select();
   const relativePath = location.substr(`/files/`.length);
   yield put(previewStarted());

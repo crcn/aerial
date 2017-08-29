@@ -4,7 +4,6 @@ import { WATCHING_FILES, WatchingFiles } from "../actions";
 import { diffArray, eachArrayValueMutation } from "aerial-common2";
 import * as so from "socket.io";
 
-
 export function* childWindowSaga() {
   yield fork(syncWindowInstances);
 }

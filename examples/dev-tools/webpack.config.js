@@ -2,11 +2,26 @@ const {resolve} = require('path');
 const webpack   = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const glob = require("glob");
+
+const files = glob.sync(__dirname + "/../playground/src/**/*.tsx");
+
+console.log(files.length);
+
+
+const entries = {};
+
+files.forEach((fileName, i) => {
+  entries[i] = fileName;
+});
+
+console.log(entries);
+
 module.exports = {
-  entry: './src/front-end/entry.ts',
+  entry: entries,
   output: {
     path: resolve(__dirname, 'lib', 'front-end'),
-    filename: 'entry.bundle.js'
+    filename: '[name].bundle.js'
   },
   plugins: [
     new HtmlWebpackPlugin({
