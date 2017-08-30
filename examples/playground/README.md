@@ -30,6 +30,12 @@ NON-GOALS:
   - [ ] `<meta name="background-task" />` hides window from stage
 - [ ] AWS lambda for rendering
 - [ ] persisting to local storage needs to reload sibling windows
+- [ ] POST needs to reload sibling windows (not self)
+
+- UX
+
+- [ ] notify user when window doesn't have source maps
+  - [ ] possibly dim or overlay elements that are not editable
 
 HI PRIO:
 

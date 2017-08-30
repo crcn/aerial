@@ -1,11 +1,11 @@
 TODOS:
 
 - [ ] paperclip language transpiles -- no engine included.
-- [ ] HMR reload when file changes (socket.io)
 - [ ] entry execution template
 - [ ] reload webpack bundler when source changes
 - [ ] *.pc component files transpiled to react
 - [ ] read PC files for default window sizes
+- [ ] submit PATCH updates to dev-tools server
 
 POLISH:
 
