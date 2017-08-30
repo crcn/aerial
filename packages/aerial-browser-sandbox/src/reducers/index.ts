@@ -11,12 +11,15 @@ import {
   BaseEvent, 
 } from "aerial-common2";
 import { uniq } from "lodash";
+import { removeFileCacheItemByUri, getFileCacheItemByUri } from "aerial-sandbox2";
 import { 
   SyntheticWindowLoaded,
   windowPatched,
   SYNTHETIC_WINDOW_RESOURCE_LOADED,
   SyntheticWindowResourceLoaded,
   SYNTHETIC_WINDOW_LOADED,
+  SYNTHETIC_WINDOW_RESOURCE_CHANGED,
+  SyntheticWindowResourceChanged,
   SYNTHETIC_WINDOW_RECTS_UPDATED,
   SyntheticWindowChanged,
   SYNTHETIC_WINDOW_SCROLLED,
@@ -95,6 +98,11 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
       return updateSyntheticWindow(root, syntheticWindowId, {
         scrollPosition,
       });
+    }
+
+    case SYNTHETIC_WINDOW_RESOURCE_CHANGED: {
+      const { uri } = event as SyntheticWindowResourceChanged;
+      return removeFileCacheItemByUri(root, uri);
     }
 
     case SYNTHETIC_WINDOW_RESIZED: 

@@ -17,7 +17,6 @@ export const getSEnvLocationClass = weakMemo((context: any) => {
     public host: string = "";
 
     constructor(private _urlStr: string, private _reload?: () => any) {
-      // super();
       const parts = Url.parse(_urlStr);
       for (const key in parts) {
         this[key] = parts[key] || "";

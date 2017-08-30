@@ -44,6 +44,11 @@ CLEANUP:
 - [ ] synthetic window timers
 - [ ] resizing elements
 - [ ] keep measurements when resizing
+- [ ] XHR handler for server
+
+SPEED:
+
+- [ ] move vendor dependencies to another bundle
 
 BUGS:
 

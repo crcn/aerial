@@ -2,7 +2,7 @@ const WINDOW_WIDTH  = 1366;
 const WINDOW_HEIGHT = 768;
 const WINDOW_PADDING = 10;
 
-const startMaster = (entryHashes: string[]) => {
+const startMaster = window["startMaster"] = (entryHashes: string[]) => {
   openEntryWindows(entryHashes);
 }
 
@@ -10,7 +10,7 @@ const openEntryWindows = (entryHashes: string[]) => {
   const urls = entryHashes.map(getHashIndexUrl);
   const windows = [];
 
-  let previousWindowLeft = 0;
+  let previousWindowLeft = WINDOW_WIDTH + WINDOW_PADDING;
 
   for (const url of urls) {
     const window = open(url);

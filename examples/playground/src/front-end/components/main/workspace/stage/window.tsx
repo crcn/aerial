@@ -100,3 +100,6 @@ const WindowBase = ({ window, fullScreenWindowId, dispatch, smooth }: WindowProp
 };
 
 export const Window = pure(WindowBase as any) as typeof WindowBase;
+
+
+export const Preview = () => <div>PREVIEW!</div>;

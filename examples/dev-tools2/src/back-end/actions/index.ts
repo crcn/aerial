@@ -1,8 +1,22 @@
 import { BaseEvent } from "aerial-common2";
 import { Express } from "express";
+import { BundleInfo } from "../state";
+import { publicActionFactory } from "../../common"
 
 export const APPLICATION_STARTED = "APPLICATION_STARTED";
 export const EXPRESS_SERVER_STARTED = "EXPRESS_SERVER_STARTED";
+export const FILE_ADDED = "FILE_ADDED";
+export const FILE_REMOVED = "FILE_REMOVED";
+export const FILE_CHANGED = "FILE_CHANGED";
+export const BUNDLED = "BUNDLED";
+
+export type FileEvent = {
+  path: string;
+} & BaseEvent;
+
+export type Bundled = {
+  stats: any;
+} & BaseEvent;
 
 export type ExpressServerStarted = {
   expressServer: Express
@@ -15,4 +29,26 @@ export const applicationStarted = () => ({
 export const expressServerStarted = (expressServer: Express) => ({
   expressServer,
   type: EXPRESS_SERVER_STARTED
-})
+});
+
+export const fileChanged = (path: string) => ({
+  path,
+  type: FILE_CHANGED
+});
+
+export const fileAdded = (path: string) => ({
+  path,
+  type: FILE_ADDED
+});
+
+export const fileRemoved = (path: string) => ({
+  path,
+  type: FILE_REMOVED
+});
+
+export const bundled = (stats): Bundled => ({
+  stats,
+  type: BUNDLED
+});
+
+export * from "../../common/actions";

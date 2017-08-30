@@ -22,6 +22,8 @@ import {
   createStructFactory, 
 } from "aerial-common2";
 
+import { FileCacheRootState, createFileCacheStore } from "aerial-sandbox2";
+
 import {
   SEnvNodeTypes
 } from "../environment/constants";
@@ -137,7 +139,7 @@ export type SyntheticBrowser = {
 export type SyntheticBrowserRootState = {
   browserStore: DataStore<SyntheticBrowser>;
   windowStore?: DataStore<SyntheticWindow>;
-};
+} & FileCacheRootState;
 
 export const createSyntheticBrowserStore = (syntheticBrowsers?: SyntheticBrowser[]) => dsIndex(createDataStore(syntheticBrowsers), "$id");
 
@@ -152,7 +154,8 @@ export const createSyntheticBrowser = createStructFactory<SyntheticBrowser>(SYNT
 
 export const createSyntheticBrowserRootState = (syntheticBrowsers?: SyntheticBrowser[]): SyntheticBrowserRootState => {
   return {
-    browserStore: createSyntheticBrowserStore(syntheticBrowsers)
+    browserStore: createSyntheticBrowserStore(syntheticBrowsers),
+    fileCacheStore: createFileCacheStore(),
   };
 }
 

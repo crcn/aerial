@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "@types/request": "^2.0.0",
+    "@types/socket.io-client": "^1.4.30",
     "abab": "^1.0.3",
     "aerial-common": "0.0.x",
     "aerial-common2": "0.0.x",
@@ -90,10 +91,13 @@
     "reduce-reducers": "^0.1.2",
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6",
+    "redux-socket.io": "^1.4.0",
     "redux-undo": "1.0.0-beta9-9-6",
     "request": "^2.81.0",
     "reselect": "^3.0.1",
     "sift": "3.3.x",
+    "socket.io": "^2.0.3",
+    "socket.io-client": "^2.0.3",
     "systemjs": "^0.20.14",
     "tinycolor2": "^1.4.1",
     "void-elements": "^3.1.0"

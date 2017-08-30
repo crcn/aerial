@@ -20,6 +20,7 @@ export const SYNTHETIC_WINDOW_OPENED             = "SYNTHETIC_WINDOW_OPENED";
 export const SYNTHETIC_WINDOW_PROXY_OPENED       = "SYNTHETIC_WINDOW_PROXY_OPENED";
 export const SYNTHETIC_WINDOW_MOVED              = "SYNTHETIC_WINDOW_MOVED";
 export const SYNTHETIC_WINDOW_RESIZED            = "SYNTHETIC_WINDOW_RESIZED";
+export const SYNTHETIC_WINDOW_RESOURCE_CHANGED   = "SYNTHETIC_WINDOW_RESOURCE_CHANGED";
 
 export type FetchRequest = {
   info: RequestInfo;
@@ -92,6 +93,10 @@ export type SyntheticWindowChanged = {
   instance: SEnvWindowInterface;
 } & BaseEvent;
 
+export type SyntheticWindowResourceChanged = {
+  uri: string;
+} & BaseEvent;
+
 export type MutateSourceContentRequest<T extends Mutation<any>> = {
   type: string;
   mutation: T;
@@ -140,6 +145,11 @@ export const syntheticWindowMoved = (instance: SEnvWindowInterface): SyntheticWi
 export const syntheticWindowResized = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({
   instance,
   type: SYNTHETIC_WINDOW_RESIZED
+});
+
+export const syntheticWindowResourceChanged = (uri: string): SyntheticWindowResourceChanged => ({
+  uri,
+  type: SYNTHETIC_WINDOW_RESOURCE_CHANGED
 });
 
 export const applyFileMutationsRequest = (...mutations: Mutation<any>[]): ApplyFileMutations => ({

@@ -57,6 +57,7 @@ import {
   OpenSyntheticBrowserWindow,
   SyntheticWindowOpened,
   syntheticWindowResized,
+  syntheticWindowResourceChanged,
   SYNTHETIC_NODE_TEXT_CONTENT_CHANGED,
   NEW_SYNTHETIC_WINDOW_ENTRY_RESOLVED,
   syntheticWindowResourceLoaded,
@@ -188,7 +189,7 @@ function* openSyntheticWindowEnvironment(location: string, browserId: string, bo
 
   function* reload (bound?: Bounds) {
 
-    const SEnvWindow = getSEnvWindowClass({ console: getSEnvWindowConsole(), fetch });
+    const SEnvWindow = getSEnvWindowClass({ console: getSEnvWindowConsole(), fetch, reload: () => reload() });
     const window = new SEnvWindow(location);
 
     // ick. Better to use seed function instead to generate UIDs <- TODO.
@@ -334,7 +335,7 @@ const getAllWindowObjects = (window: SEnvWindowInterface) => {
 }
 
 function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: string) {
-  const { SEnvMutationEvent, SEnvWindowOpenedEvent } = getSEnvEventClasses(window);
+  const { SEnvMutationEvent, SEnvWindowOpenedEvent, SEnvURIChangedEvent } = getSEnvEventClasses(window);
 
   const chan = eventChannel(function(emit) {
     window.renderer.addEventListener(SyntheticWindowRendererEvent.PAINTED, ({ rects, styles }: SyntheticWindowRendererEvent) => {
@@ -360,6 +361,10 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
         left: window.scrollX,
         top: window.scrollY
       }));
+    });
+    
+    window.addEventListener(SEnvURIChangedEvent.URI_CHANGED, ({ uri }: any) => {
+      emit(syntheticWindowResourceChanged(uri));
     });
 
     window.addEventListener("resize", (event) => {

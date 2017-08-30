@@ -414,10 +414,8 @@ const _scriptCache = {};
 const compileScript = (source) => _scriptCache[source] || (_scriptCache[source] = new Function("__context", `with(__context) {\n${source}\n}`));
 
 const declarePropertiesFromScript = <T extends any>(context: T, script): T => {
-  (script.match(/(const|let|var|function)\s+(\w+)/g) || []).forEach((declaration) => {
-    const name = declaration.match(/(\w+$)/)[1];
-    context[name] = null;
-  });
+
+  // TODO - need to use acorn to figure out where all global vars are
   return context;
 }
 
@@ -475,7 +473,7 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
         try {
           const run = compileScript(this._scriptSource);
 
-          run(declarePropertiesFromScript(this.ownerDocument.defaultView, this._scriptSource));
+          run.call(this.ownerDocument.defaultView, (declarePropertiesFromScript(this.ownerDocument.defaultView, this._scriptSource)));
           // TODO - need to grab existing VM object
           // script.runInNewContext(vm.createContext({ __context: this.ownerDocument.defaultView }));
           

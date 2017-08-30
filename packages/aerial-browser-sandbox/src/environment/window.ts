@@ -37,7 +37,7 @@ export interface SEnvWindowInterface extends Window {
   document: SEnvDocumentInterface;
   readonly childObjects: Map<string, any>;
   renderer:  SyntheticWindowRendererInterface;
-  selector: any;
+  $selector: any;
   clone(): SEnvWindowInterface;
 };
 
@@ -53,7 +53,7 @@ export type SEnvWindowContext = {
 
 
 export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInterface) => {
-  const { SEnvMutationEvent, SEnvWindowOpenedEvent } = getSEnvEventClasses();
+  const { SEnvMutationEvent, SEnvWindowOpenedEvent, SEnvURIChangedEvent } = getSEnvEventClasses();
 
   if (target.$id !== source.$id) {
     throw new Error(`target must be a previous clone of the source.`);
@@ -98,12 +98,15 @@ export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInte
     source.resizeTo(target.innerWidth, target.innerHeight);
   };
 
+  const onUriChanged = (event) => target.dispatchEvent(event);
+
   source.resizeTo(target.innerWidth, target.innerHeight);
   source.moveTo(target.screenLeft, target.screenTop);
 
   source.addEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, mirrorEvent);
   source.addEventListener("move", onMove);
   source.addEventListener("resize", onResize);
+  source.addEventListener(SEnvURIChangedEvent.URI_CHANGED, onUriChanged);
   target.addEventListener("move", onTargetMove);
   target.addEventListener("resize", onTargetResize);
   source.document.addEventListener("readystatechange", tryPatching);
@@ -113,6 +116,7 @@ export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInte
   return () => {
     source.removeEventListener(SEnvMutationEvent.MUTATION, onMutation);
     source.removeEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, mirrorEvent);
+    source.removeEventListener(SEnvURIChangedEvent.URI_CHANGED, onUriChanged);
     source.removeEventListener("move", onMove);
     source.removeEventListener("resize", onResize);
     target.removeEventListener("move", onTargetMove);
@@ -134,7 +138,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
   const SEnvCustomElementRegistry = getSEnvCustomElementRegistry(context);
   const SEnvElement     = getSEnvElementClass(context);
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
-  const { SEnvEvent, SEnvMutationEvent, SEnvWindowOpenedEvent } = getSEnvEventClasses(context);
+  const { SEnvEvent, SEnvMutationEvent, SEnvWindowOpenedEvent, SEnvURIChangedEvent } = getSEnvEventClasses(context);
 
   // register default HTML tag names
   const TAG_NAME_MAP = getSEnvHTMLElementClasses(context);
@@ -165,6 +169,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly document: SEnvDocumentInterface;
     readonly doNotTrack: string;
     event: Event | undefined;
+    readonly URIChangedEvent: any;
     readonly external: External;
     readonly frameElement: Element;
     readonly frames: Window;
@@ -301,6 +306,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly speechSynthesis: SpeechSynthesis;
     status: string;
     readonly statusbar: BarProp;
+    readonly CustomEvent: typeof Event = SEnvEvent as any as typeof Event;
     readonly styleMedia: StyleMedia;
     readonly toolbar: BarProp;
     readonly top: Window;
@@ -326,6 +332,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
 
       this._onRendererPainted = this._onRendererPainted.bind(this);
 
+      this.URIChangedEvent = SEnvURIChangedEvent;
       this.uid = this.$id = generateDefaultId();
       this.childObjects = new Map();
       this.location = new SEnvLocation(origin, context.reload);
@@ -336,6 +343,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       this.innerHeight = DEFAULT_WINDOW_HEIGHT;
       this.moveTo(0, 0);
       this.externalResourceUris = [];
+      
 
       this.fetch = async (info) => {
         const ret = await fetch(info);
@@ -389,7 +397,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       return this._struct;
     }
 
-    get selector(): any {
+    get $selector(): any {
       if (this._selector) return this._selector;
       
       this._selector = nwmatcher(this);
@@ -501,15 +509,25 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     }
 
     open(url?: string, target?: string, features?: string, replace?: boolean): Window {
-      const SEnvWindow = getSEnvWindowClass({ console, fetch });
-      const window = new SEnvWindow(url);
-      window.$id = this.$id + "." + (++this._childWindowCount);
-      window.document.$id = window.$id + "-document";
-      window.$load();
-      const event = new SEnvWindowOpenedEvent();
-      event.initWindowOpenedEvent(window);
-      this.dispatchEvent(event);
-      return window;
+
+      const windowId = this.$id + "." + (++this._childWindowCount);
+
+      const open = () => {
+
+        const SEnvWindow = getSEnvWindowClass({ console, fetch, reload: open });
+        
+        const window = new SEnvWindow(url);
+        window.$id = windowId;
+        window.document.$id = window.$id + "-document";
+        window.$load();
+        const event = new SEnvWindowOpenedEvent();
+        event.initWindowOpenedEvent(window);
+        this.dispatchEvent(event);
+
+        return window;
+      };
+
+      return open();
     }
 
     postMessage(message: any, targetOrigin: string, transfer?: any[]): void {

@@ -1,7 +1,7 @@
 module.exports = {
 
   // TODO - point to PC
-  sourceFilePattern: __dirname + "/src/**/*.tsx",
+  sourceFilePattern: __dirname + "/src/**/*.preview.tsx",
   webpackConfigPath: __dirname + "/webpack-base.config.js",
   getEntryIndexHTML: ({ entryName, filePath }) => `
     <html>

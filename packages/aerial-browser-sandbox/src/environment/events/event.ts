@@ -90,8 +90,17 @@ export const getSEnvEventClasses = weakMemo((context: any = {}) => {
     }
   }
 
+  class SEnvURIChangedEvent extends SEnvEvent {
+    static readonly URI_CHANGED = "URI_CHANGED";
+    constructor(readonly uri: string) {
+      super();
+      this.initEvent(SEnvURIChangedEvent.URI_CHANGED, true, true);
+    }
+  }
+
   return {
     SEnvEvent,
+    SEnvURIChangedEvent,
     SEnvMutationEvent,
     SEnvWindowOpenedEvent
   };
