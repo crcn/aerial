@@ -25,7 +25,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new ExtractTextPlugin('entry.bundle.css')
+    new ExtractTextPlugin('[name].bundle.css')
   ],
   module: {
     rules: [

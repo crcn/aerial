@@ -6,8 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 
-module.exports = merge({
+module.exports = merge({}, require("./webpack-base.config.js"), {
   plugins: [
+    new ExtractTextPlugin('[name].bundle.css'),
     new HtmlWebpackPlugin({
       title: "Aerial Playground",
       template: __dirname + '/src/index.html'

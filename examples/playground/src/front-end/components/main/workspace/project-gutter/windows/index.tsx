@@ -1,6 +1,6 @@
 import "./index.scss";
 import * as React from "react";
-import { Workspace } from "front-end/state";
+import { Workspace, createWorkspace, createSyntheticBrowser, createSyntheticWindow, createSyntheticDocument } from "front-end/state";
 import { Pane } from "front-end/components/pane";
 import { SyntheticWindow } from "aerial-browser-sandbox";
 import { SyntheticBrowser } from "aerial-browser-sandbox";
@@ -54,3 +54,23 @@ export const WindowsPaneBase = ({ workspace, browser, dispatch }: WindowsPanePro
 export const WindowsPane = compose<WindowsPaneProps, WindowsPaneProps>(
   pure
 )(WindowsPaneBase);
+
+
+export const Preview = () => <WindowsPane 
+  workspace={createWorkspace({})} 
+  browser={createSyntheticBrowser({
+    windows: [
+      createSyntheticWindow({
+        document: createSyntheticDocument({
+          title: "Window 1"
+        })
+      }),
+      createSyntheticWindow({
+        document: createSyntheticDocument({
+          title: "Window 2"
+        })
+      })
+    ]
+  })}
+  dispatch={() => {}}
+/>

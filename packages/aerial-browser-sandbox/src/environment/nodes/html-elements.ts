@@ -411,7 +411,15 @@ export const patchHTMLLinkElement = (oldElement: HTMLLinkElement, mutation: Muta
 
 const _scriptCache = {};
 
-const compileScript = (source) => _scriptCache[source] || (_scriptCache[source] = new Function("__context", `with(__context) {${source}}`));
+const compileScript = (source) => _scriptCache[source] || (_scriptCache[source] = new Function("__context", `with(__context) {\n${source}\n}`));
+
+const declarePropertiesFromScript = <T extends any>(context: T, script): T => {
+  (script.match(/(const|let|var|function)\s+(\w+)/g) || []).forEach((declaration) => {
+    const name = declaration.match(/(\w+$)/)[1];
+    context[name] = null;
+  });
+  return context;
+}
 
 export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
@@ -467,7 +475,7 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
         try {
           const run = compileScript(this._scriptSource);
 
-          run(this.ownerDocument.defaultView);
+          run(declarePropertiesFromScript(this.ownerDocument.defaultView, this._scriptSource));
           // TODO - need to grab existing VM object
           // script.runInNewContext(vm.createContext({ __context: this.ownerDocument.defaultView }));
           
