@@ -32,7 +32,7 @@ function* handleEntryBundleChanged() {
   const { entryHash }: ApplicationState = yield select();
 
   // in synthetic environment
-  if (typeof URIChangedEvent) {
+  if (typeof URIChangedEvent !== "undefined") {
     const event = new URIChangedEvent(`${location.protocol}//${location.host}/${entryHash}.js`);
     window.dispatchEvent(event);
   }
