@@ -8,6 +8,12 @@ GOALS:
 - [ ] developing a language that is optimial for visual development, not hand writing.
   - [ ] visual first, hand-writing second. 
 
+ARIEL IN ARIEL COMPONENT PRIORITIES:
+
+- [ ] components panel (fetch from browser extensions API - possibly registered components)
+- [ ] file navigator
+- [ ] raw CSS inspector
+
 INSPIRATION:
 
 - [ ] what does the future of FE dev look like?

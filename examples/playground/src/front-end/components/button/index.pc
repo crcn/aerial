@@ -1,7 +1,0 @@
-<component id="test">
-  <a href="#">{{text}}</a>
-</component>
-
-<component id="preview">
-  <test text="blarg"></test>
-</component>

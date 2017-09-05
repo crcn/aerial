@@ -68,7 +68,7 @@ const getBestWindowBounds = (browser: SyntheticBrowser, bounds: Bounds) => {
 };
 
 
-export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootState>(root: TRootState = createSyntheticBrowserRootState() as TRootState, event: BaseEvent) => {
+export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootState>(root: TRootState = createSyntheticBrowserRootState() as TRootState, event: BaseEvent): TRootState => {
 
   switch(event.type) {
     case SYNTHETIC_WINDOW_PROXY_OPENED: {

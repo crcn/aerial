@@ -343,8 +343,11 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       this.innerHeight = DEFAULT_WINDOW_HEIGHT;
       this.moveTo(0, 0);
       this.externalResourceUris = [];
-      
 
+      this.navigator = {
+        userAgent: "Aerial"
+      } as Navigator;
+      
       this.fetch = async (info) => {
         const ret = await fetch(info);
         this.externalResourceUris.push(info as string);
