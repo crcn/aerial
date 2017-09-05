@@ -36,6 +36,7 @@ const BASE_WEBPACK_CONFIG: webpack.Configuration = {
   name: "dev tools",
   watch: true,
   cache: true,
+  devtool: "inline-source-map",
   stats: {
     colors: true,
     hash: false,

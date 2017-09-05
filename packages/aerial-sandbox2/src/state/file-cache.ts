@@ -53,9 +53,9 @@ export const getFileCacheItemById = (root: FileCacheRootState, id: string) => {
   return dsFind(root.fileCacheStore, createDSQuery("$id", id));
 };
 
-export const removeFileCacheItemByUri = (root: FileCacheRootState, uri: string) => {
+export const removeFileCacheItemByUri = <TRoot extends FileCacheRootState>(root: TRoot, uri: string): TRoot => {
   return {
-    ...root,
+    ...(root as any),
     fileCacheStore: dsRemoveOne(root.fileCacheStore, createDSQuery("sourceUri", uri))
   };
 };

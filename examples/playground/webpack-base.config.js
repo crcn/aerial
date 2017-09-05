@@ -29,7 +29,6 @@ module.exports = {
   ],
   module: {
     rules: [
-      { test: /\.tsx?$/, use: 'ts-loader' },
       {
         test: /\.(png|jpg|gif|eot|ttf|woff|woff2|svg)$/,
         loader: 'url-loader?limit=1000'

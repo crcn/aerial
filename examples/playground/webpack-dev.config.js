@@ -7,7 +7,17 @@ module.exports = merge({}, base, {
   module: merge({}, base.module, {
     rules: [
       ...base.module.rules,
-      { test: /\.vue$/, use: 'vue-loader' },
+      { 
+        test: /\.tsx$/, 
+        use: [
+          { 
+            loader: `${__dirname}/lib/webpack/jsx-source-transformer`,
+          },
+          { 
+            loader: 'ts-loader'
+          }
+        ]
+      },
     ]
   })
 });

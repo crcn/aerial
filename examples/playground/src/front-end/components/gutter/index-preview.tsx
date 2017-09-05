@@ -3,7 +3,7 @@ import * as React from "react";
 import { Gutter } from "./index";
 
 const GutterPreview = (props) => <Gutter>
-  GUTTER
+  <span>GUTTER!</span>
 </Gutter>;
 
 export default GutterPreview;
