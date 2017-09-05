@@ -7,6 +7,7 @@ import {
   ResizerMoved,
   resizerStoppedMoving,
   STAGE_TOOL_SELECTION_KEY_DOWN,
+  STAGE_TOOL_SELECTION_KEY_UP,
   StageToolSelectionKeyDown,
   ResizerPathMoved,
   resizerMoved,
@@ -70,6 +71,7 @@ export function* mainWorkspaceSaga() {
   yield fork(handleSelectionMoved);
   yield fork(handleSelectionStoppedMoving);
   yield fork(handleSelectionKeyDown);
+  yield fork(handleSelectionKeyUp);
   yield fork(handleTextEditorChange);
   yield fork(handleSelectionResized);
   yield fork(handleNewLocationPrompt);
@@ -246,6 +248,16 @@ function* handleSelectionKeyDown() {
         yield put(resizerMoved(workspaceId, { left: bounds.left + 1, top: bounds.top }));
         break;
       }
+    }
+  }
+}
+
+function* handleSelectionKeyUp() {
+  while(true) {
+    const { workspaceId, sourceEvent } = (yield take(STAGE_TOOL_SELECTION_KEY_UP)) as StageToolSelectionKeyDown;
+    const isArrowKey = /Arrow(Down|Up|Left|Right)/.test(sourceEvent.key);
+    if (isArrowKey) {
+      yield put(resizerStoppedMoving(workspaceId, null));
     }
   }
 }

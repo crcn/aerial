@@ -34,6 +34,7 @@ export const VISUAL_EDITOR_WHEEL = "VISUAL_EDITOR_WHEEL";
 export const STAGE_TOOL_WINDOW_TITLE_CLICKED = "STAGE_TOOL_WINDOW_TITLE_CLICKED";
 export const STAGE_TOOL_WINDOW_KEY_DOWN = "STAGE_TOOL_WINDOW_KEY_DOWN";
 export const STAGE_TOOL_SELECTION_KEY_DOWN = "STAGE_TOOL_SELECTION_KEY_DOWN";
+export const STAGE_TOOL_SELECTION_KEY_UP = "STAGE_TOOL_SELECTION_KEY_UP";
 export const STAGE_TOOL_WINDOW_BACKGROUND_CLICKED = "STAGE_TOOL_WINDOW_BACKGROUND_CLICKED";
 export const DISPLAY_SOURCE_CODE_REQUESTED = "DISPLAY_SOURCE_CODE_REQUESTED";
 export const STAGE_TOOL_OVERLAY_MOUSE_LEAVE = "STAGE_TOOL_OVERLAY_MOUSE_LEAVE";
@@ -220,6 +221,7 @@ export const stageToolWindowTitleClicked = (windowId: string, sourceEvent: React
 export const stageToolWindowKeyDown = (windowId: string, sourceEvent: React.KeyboardEvent<any>): StageWillWindowKeyDown => ({ type: STAGE_TOOL_WINDOW_KEY_DOWN, windowId, sourceEvent });
 
 export const stageToolSelectionKeyDown = (workspaceId, sourceEvent: React.KeyboardEvent<any>): StageToolSelectionKeyDown => ({ type: STAGE_TOOL_SELECTION_KEY_DOWN, workspaceId, sourceEvent });
+export const stageToolSelectionKeyUp = (workspaceId, sourceEvent: React.KeyboardEvent<any>): StageToolSelectionKeyDown => ({ type: STAGE_TOOL_SELECTION_KEY_UP, workspaceId, sourceEvent });
 
 export const stageToolWindowBackgroundClicked = (sourceEvent: React.KeyboardEvent<any>): WrappedEvent<React.KeyboardEvent<any>> => ({ type: STAGE_TOOL_WINDOW_BACKGROUND_CLICKED, sourceEvent });
 
