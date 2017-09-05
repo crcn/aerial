@@ -134,10 +134,8 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
         },
         set: (target, key: string, value: string, handler) => {
           const attrName = key.toLowerCase();
-          if (!this.hasAttribute(key)) {
-
-          }
-          target[key] = value;
+          this.dataChangedCallback(attrName, target[attrName], value);
+          target[attrName] = value;
           return true;
         }
       }))
@@ -150,6 +148,12 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
       } else if (propertyName.substr(0, 5) === "data-") {
         this.dataset[propertyName.substr(5).toLowerCase()] = newValue;
       } 
+    }
+
+    protected dataChangedCallback(propertyName: string, oldValue: string, newValue: string) {
+      if (propertyName === "_source") {
+        this.source = JSON.parse(newValue);
+      }
     }
 
     set style(value: CSSStyleDeclaration) {
