@@ -1,6 +1,9 @@
+
+
 module.exports = {
 
   // TODO - point to PC
+  editSourceContent: require("./lib/webpack/edit-ts-content"),
   sourceFilePattern: __dirname + "/src/**/*-preview.tsx",
   webpackConfigPath: __dirname + "/webpack-dev.config.js",
   getEntryIndexHTML: ({ entryName, filePath }) => `
@@ -15,6 +18,7 @@ module.exports = {
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js"></script>
         <script>
+          window.getSourceUri = (uri) => \`\${location.protocol}\/\/\${location.host}/file/\${encodeURIComponent(uri)}\`;
           ReactDOM.render(
             React.createElement(entry.default || entry.Preview),
             document.getElementById("mount")

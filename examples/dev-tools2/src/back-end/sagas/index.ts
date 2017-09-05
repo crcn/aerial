@@ -3,11 +3,15 @@ import { eventChannel } from "redux-saga";
 import { merge, extend } from "lodash";
 import * as md5 from "md5";
 import * as io from "socket.io";
+import * as cors from "cors";
+import * as fs from "fs";
 import { logDebugAction, logInfoAction } from "aerial-common2";
 import * as chokidar from "chokidar";
 import * as glob from "glob";
 import * as path from "path";
 import * as webpack from "webpack";
+import * as multipart from "connect-multiparty";
+import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as getPort from "get-port";
 import * as webpackDevMiddleware from "webpack-dev-middleware";
@@ -15,6 +19,7 @@ import * as WebpackDevServer from "webpack-dev-server";
 import * as HtmlWebpackPlugin from "html-webpack-plugin";
 import { ApplicationState, DevConfig, BundleEntryInfo } from "../state";
 import { bubbleEventChannel, createSocketIOSaga } from "../../common";
+import { fileEditorSaga } from "./file-editor";
 import { 
   FILE_CHANGED,
   FILE_ADDED,
@@ -25,6 +30,7 @@ import {
   bundled,
   expressServerStarted, 
   EXPRESS_SERVER_STARTED,
+  fileAction,
   fileAdded,
   fileRemoved,
   fileChanged,
@@ -61,7 +67,10 @@ const BASE_WEBPACK_CONFIG: webpack.Configuration = {
 };  
 
 export function* mainSaga() {
+
+  // TODO - move all this stuff to new saga
   yield fork(handleApplicationStarted);
+  yield fork(fileEditorSaga);
 }
 
 function* handleApplicationStarted() {
@@ -86,10 +95,14 @@ function* startExpressServer() {
 
   const server = express();
 
+  server.use(multipart());
+  server.use(cors());
   server.use(webpackDevMiddleware(compiler, {
     publicPath: "/",
     stats: webpackConfig.stats
   }));
+
+  yield fork(handleFileCache, server, state.config, webpackConfig);
 
   yield fork(addEntryIndexRoutes, server, state.config, webpackConfig);
   addMainIndexRoute(server, webpackConfig);
@@ -112,27 +125,67 @@ function* watchCompilation(compiler: webpack.Compiler) {
   });
 }
 
+const takeAllRequests = (route: Function, handler: (req: express.Request, res: express.Response) => any) => fork(function*() {
+  const chan = eventChannel((emit) => {
+    route((req, res) => emit([req, res]));
+    return () => {};
+  });
+
+  while(true) {
+    const [req, res] = yield take(chan);
+    yield spawn(handler, req, res);
+  }
+});
+
 function* addEntryIndexRoutes(server: express.Express, { getEntryIndexHTML }: DevConfig, webpackConfig: webpack.Configuration) {
   for (const hash of Object.keys(webpackConfig.entry)) {
-    yield fork(function*() {
-      const filePath = webpackConfig.entry[hash];
-      const chan = eventChannel((emit) => {
-        server.use(`/${hash}.html`, (req, res) => emit([req, res]));
-        return () => {};
-      });
-
-      while(true) {
-        const [req, res] = yield take(chan);
-        yield spawn(function*() {
-          const state: ApplicationState = yield select();
-          const info = state.bundleInfo && state.bundleInfo[hash];
-          const html = injectPreviewBundle(hash, info, getEntryIndexHTML({ entryName: hash, filePath }));
-          res.send(html);
-        });
-      }
+    const filePath = webpackConfig.entry[hash];
+    yield takeAllRequests(server.use.bind(server, `/${hash}.html`), function*(req, res) {
+      const state: ApplicationState = yield select();
+      const info = state.bundleInfo && state.bundleInfo[hash];
+      const html = injectPreviewBundle(hash, info, getEntryIndexHTML({ entryName: hash, filePath }));
+      res.send(html);
     });
   }
 };
+
+function* handleFileCache(server: express.Express, { getEntryIndexHTML }: DevConfig, webpackConfig: webpack.Configuration) {
+  yield takeAllRequests(server.get.bind(server, `/file/:uri`), contrainToCWD(function*(req, res) {
+    const { uri } = req.params;
+    res.sendFile(getUriFilePath(uri));
+  }));
+
+  yield takeAllRequests(server.post.bind(server, `/file/:uri`), contrainToCWD(function*(req, res) {
+    const { uri } = req.params;    
+    const { json } = req.body;
+    const action = JSON.parse(json);
+    yield put(fileAction(getUriFilePath(uri), action));
+
+    res.send("OK");
+  }));
+}
+
+const getUriFilePath = (uri: string) => require.resolve(uri.replace(/file:\/\//, ""));
+
+const contrainToCWD = (handler: (req: express.Request, res: express.Response) => any) => function*(req: express.Request, res: express.Response) {
+  const { uri } = req.params;
+  if (!uriIsInCWD(uri)) {
+    res.statusCode = 401;
+    return res.send("Not authorized");
+  }
+
+  yield call(handler, req, res);
+};
+
+const uriIsInCWD = (uri: string) => {
+  try {
+    const cwd      = process.cwd();
+    const filePath = getUriFilePath(uri);
+    return filePath.indexOf(cwd) === 0;
+  } catch(e) {
+    return false;
+  }
+}
 
 const injectPreviewBundle = (hash: string, info: BundleEntryInfo, html) => {
   return html.replace('<head>', `<head>

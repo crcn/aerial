@@ -1,13 +1,20 @@
 import { SEnvNodeInterface } from "../environment";
 import { delay } from "redux-saga";
 import { fork, spawn, take, select, put, call } from "redux-saga/effects";
-import { getFileCacheItemByUri, uriCacheBusted } from "aerial-sandbox2";
+import {
+  getFileCacheItemByUri, 
+  uriCacheBusted, 
+  createReadCacheableUriRequest,
+  createReadUriRequest,
+  createWriteUriRequest
+} from "aerial-sandbox2";
 import { Mutation, editString, StringMutation, request, createRequestResponse } from "aerial-common2";
 import { 
   ApplyFileMutations, 
   APPLY_FILE_MUTATIONS, 
   applyFileMutationsRequest,
   mutateSourceContentRequest,
+  mutateSourceContentRequest2,
   DEFER_APPLY_FILE_MUTATIONS, 
 } from "../actions";
 
@@ -60,20 +67,29 @@ export function* fileEditorSaga() {
 
       for (const uri in mutationsByUri) {
         const mutations = mutationsByUri[uri];
-        const fileCacheItem = getFileCacheItemByUri(state, uri);
-        for (const mutation of mutations) {
-          const stringMutation = (yield yield request(mutateSourceContentRequest(fileCacheItem.content.toString(), fileCacheItem.contentType, mutation))).payload;
 
-          stringMutations.push(
-            ...(Array.isArray(stringMutation) ? stringMutation : [stringMutation])
-          );
-        }
+        var data = new FormData();
+        data.append( "json", JSON.stringify(mutateSourceContentRequest2(mutations)));
 
-        const newContent = editString(String(fileCacheItem.content), stringMutations);
-        yield put(uriCacheBusted(uri, newContent, fileCacheItem.contentType));
+        yield call(fetch, uri, {
+          method: "POST",
+          body: data
+        });
+        
+        // for (const mutation of mutations) {
+        //   const stringMutation = (yield yield request(mutateSourceContentRequest(content.toString(), type, mutation))).payload;
+
+        //   stringMutations.push(
+        //     ...(Array.isArray(stringMutation) ? stringMutation : [stringMutation])
+        //   );
+        // }
+
+        // const newContent = editString(String(content), stringMutations);
+        // // yield put(uriCacheBusted(uri, newContent, type));
+        // yield yield request(createWriteUriRequest(uri, content, type));
       }
 
-      yield put(createRequestResponse(req.$id, true));
+      // yield put(createRequestResponse(req.$id, true));
     }
   }); 
 }

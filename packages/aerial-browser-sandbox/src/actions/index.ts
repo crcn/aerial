@@ -12,6 +12,7 @@ export const SYNTHETIC_WINDOW_LOADED             = "SYNTHETIC_WINDOW_LOADED";
 export const SYNTHETIC_NODE_TEXT_CONTENT_CHANGED = "SYNTHETIC_NODE_TEXT_CONTENT_CHANGED";
 export const NODE_VALUE_STOPPED_EDITING          = "NODE_VALUE_STOPPED_EDITING";
 export const EDIT_SOURCE_CONTENT                 = "EDIT_SOURCE_CONTENT";
+export const MUTATE_SOURCE_CONTENT               = "MUTATE_SOURCE_CONTENT";
 export const APPLY_FILE_MUTATIONS                = "APPLY_FILE_MUTATIONS";
 export const DEFER_APPLY_FILE_MUTATIONS          = "DEFER_APPLY_FILE_MUTATIONS";
 export const SYNTHETIC_WINDOW_SCROLLED           = "SYNTHETIC_WINDOW_SCROLLED";
@@ -104,6 +105,10 @@ export type MutateSourceContentRequest<T extends Mutation<any>> = {
   contentType: string;
 } & Request;
 
+export type MutateSourceContentRequest2<T extends Mutation<any>> = {
+  mutations: T[];
+} & Request;
+
 export type ApplyFileMutations = {
   type: string;
   mutations: Mutation<any>[];
@@ -121,6 +126,12 @@ export const mutateSourceContentRequest = (content: string, contentType: string,
   contentType,
   $id: generateDefaultId(),
   type: EDIT_SOURCE_CONTENT,
+});
+
+export const mutateSourceContentRequest2 = (mutations: Mutation<any>[]): MutateSourceContentRequest2<any> => ({
+  mutations: mutations.map((mutation => ({...mutation, target: { source: mutation.target.source }, child: (mutation as any).child && { source: (mutation as any).child.source } }))),
+  $id: generateDefaultId(),
+  type: MUTATE_SOURCE_CONTENT,
 });
 
 export const syntheticWindowOpened = (instance: SEnvWindowInterface, browserId: string, parentWindowId?: string): SyntheticWindowOpened => ({

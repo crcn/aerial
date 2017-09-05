@@ -3,6 +3,7 @@ import { hasURIProtocol } from "aerial-sandbox2";
 import { getSEnvEventClasses } from "../events";
 import path = require("path");
 import { getUri } from "../utils";
+import { SEnvWindowInterface } from "../window";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { SEnvNodeListInterface, getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvCSSStyleSheetClass, getSEnvCSSStyleDeclarationClass } from "../css";
@@ -152,7 +153,12 @@ export const getSEnvHTMLElementClass = weakMemo((context: any) => {
 
     protected dataChangedCallback(propertyName: string, oldValue: string, newValue: string) {
       if (propertyName === "_source") {
-        this.source = JSON.parse(newValue);
+        const source = JSON.parse(newValue);
+
+        // transform uri in case it needs to go through a proxy
+        source.uri = (this.ownerDocument.defaultView as SEnvWindowInterface).getSourceUri(source.uri);
+
+        this.source = source;
       }
     }
 

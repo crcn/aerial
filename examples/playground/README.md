@@ -14,9 +14,9 @@ ARIEL IN ARIEL COMPONENT PRIORITIES:
 - [ ] file navigator
 - [ ] raw CSS inspector
 
-INSPIRATION:
+IMMEDIATE:
 
-- [ ] what does the future of FE dev look like?
+- [ ] webpack cache buster -- use this as ref: https://github.com/rmarscher/virtual-module-webpack-plugin/blob/master/index.js
 
 NON-GOALS:
 
@@ -25,7 +25,7 @@ NON-GOALS:
 
 - POLISH:
 
-- [ ] ability to to open window outside of Playground
+- [ ] preview mode for windows (opens window in iframe)
 - [ ] zoom indicator
 - [ ] measurement tooling
 - [ ] highlight elements based on text cursor position
@@ -37,6 +37,7 @@ NON-GOALS:
 - [ ] AWS lambda for rendering
 - [ ] persisting to local storage needs to reload sibling windows
 - [ ] POST needs to reload sibling windows (not self)
+- [ ] 
 
 - UX
 
@@ -50,6 +51,7 @@ HI PRIO:
 
 CLEANUP:
 
+- [ ] remove file caching. Source of truth needs to be a dev server
 - [ ] file cache namespaced to workspace
 - [ ] normalize urls - http://site.com/ -> http://site.com
 - [ ] use old DOM rendering code

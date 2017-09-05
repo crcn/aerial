@@ -48,8 +48,9 @@ export const getHTMLASTNodeLocation = (expression: parse5.AST.Default.CommentNod
 
 const addNodeSource = <T extends SEnvNodeInterface>(node: T, expressionOrLocation) => {
   const start = expressionOrLocation.__location ? getHTMLASTNodeLocation(expressionOrLocation) : { line: expressionOrLocation.line, column: expressionOrLocation.col };
+  const window: SEnvWindowInterface = node.ownerDocument.defaultView as SEnvWindowInterface;
   node.source = {
-    uri: node.ownerDocument && node.ownerDocument.defaultView.location.toString(),
+    uri: window.getSourceUri(node.ownerDocument && node.ownerDocument.defaultView.location.toString()),
     start: start
   };
   return node;

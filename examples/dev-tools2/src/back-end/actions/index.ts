@@ -1,4 +1,4 @@
-import { BaseEvent } from "aerial-common2";
+import { BaseEvent, Mutation, Action } from "aerial-common2";
 import { Express } from "express";
 import { BundleInfo } from "../state";
 import { publicActionFactory } from "../../common"
@@ -9,6 +9,16 @@ export const FILE_ADDED = "FILE_ADDED";
 export const FILE_REMOVED = "FILE_REMOVED";
 export const FILE_CHANGED = "FILE_CHANGED";
 export const BUNDLED = "BUNDLED";
+
+export const MUTATE_SOURCE_CONTENT = "MUTATE_SOURCE_CONTENT";
+
+export type FileAction = {
+  filePath: string;
+} & Action;
+
+export type MutateSourceContentRequest = {
+  mutations: Mutation<any>[];
+} & FileAction;
 
 export type FileEvent = {
   path: string;
@@ -50,5 +60,7 @@ export const bundled = (stats): Bundled => ({
   stats,
   type: BUNDLED
 });
+
+export const fileAction = (filePath: string, action: any) => ({ ...action, filePath });
 
 export * from "../../common/actions";

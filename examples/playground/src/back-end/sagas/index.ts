@@ -32,7 +32,7 @@ function* frontEndService() {
     const { uri } = req.params;
     request({
       method: req.method,
-      uri: decodeURIComponent(uri),
+      uri: uri,
       gzip: true
     }, (err, response, body) => {
 

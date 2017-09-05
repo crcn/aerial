@@ -59,7 +59,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     public $id: string;
     public contentLoaded: Promise<any>;
     public interactiveLoaded: Promise<any>;
-    public source: any;
+    public source: ExpressionLocation;
     private _struct: SyntheticNode;
     private _constructed: boolean;
     readonly constructClone: boolean;

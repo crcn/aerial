@@ -35,6 +35,11 @@ export interface SEnvWindowInterface extends Window {
   struct: SyntheticWindow;
   externalResourceUris: string[];
   document: SEnvDocumentInterface;
+
+  // overridable by loaded window. Used
+  // particularly to point generated source map URIs to 
+  // proxies to handle any file mutations
+  getSourceUri(uri: string);
   readonly childObjects: Map<string, any>;
   renderer:  SyntheticWindowRendererInterface;
   $selector: any;
@@ -360,6 +365,10 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       }
 
       this.document.addEventListener(SEnvMutationEvent.MUTATION, this._onDocumentMutation.bind(this));
+    }
+
+    getSourceUri(uri: string) {
+      return uri;
     }
 
     resetChildObjects() {
