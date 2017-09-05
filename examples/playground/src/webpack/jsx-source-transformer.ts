@@ -65,7 +65,7 @@ module.exports = function(content, contentMap) {
       if (disableAttributes.length) {
         objExpression.properties.push(
           objectProperty(
-            stringLiteral("data-$readonly"),
+            stringLiteral("data-_readonly"),
             stringLiteral(JSON.stringify(disableAttributes))
           )
         );
@@ -73,7 +73,7 @@ module.exports = function(content, contentMap) {
 
       objExpression.properties.push(
         objectProperty(
-          stringLiteral("data-$source"),
+          stringLiteral("data-_source"),
           stringLiteral(JSON.stringify(source))
         )
       );
