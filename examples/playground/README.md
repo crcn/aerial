@@ -11,12 +11,16 @@ GOALS:
 ARIEL IN ARIEL COMPONENT PRIORITIES:
 
 - [ ] components panel (fetch from browser extensions API - possibly registered components)
-- [ ] file navigator
 - [ ] raw CSS inspector
 
 IMMEDIATE:
 
-- [ ] webpack cache buster -- use this as ref: https://github.com/rmarscher/virtual-module-webpack-plugin/blob/master/index.js
+- [ ] VSCode extension
+  - [ ] auto watch for dev config
+  - [ ] restart dev server when dev config changes
+  - [ ] vscode dev server updates current file content when POST mutation is received
+  - [ ] open file when POST is received
+  - [ ] needs to proxy socket.io connection
 
 NON-GOALS:
 
