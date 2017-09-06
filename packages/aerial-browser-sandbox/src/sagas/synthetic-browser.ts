@@ -150,7 +150,7 @@ export function* syntheticBrowserSaga() {
 function* handleFetchRequests() {
   while(true) {
     const req = (yield take(FETCH_REQUEST)) as FetchRequest;
-    yield put(createRequestResponse(req.$id, (yield yield request(createReadCacheableUriRequest(String(req.info)))).payload));
+    yield put(createRequestResponse(req.$id, (yield yield request(createReadUriRequest(String(req.info)))).payload));
   }
 }
 
