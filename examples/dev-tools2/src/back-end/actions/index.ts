@@ -4,6 +4,7 @@ import { BundleInfo } from "../state";
 import { publicActionFactory } from "../../common"
 
 export const APPLICATION_STARTED = "APPLICATION_STARTED";
+export const FILE_CONTENT_MUTATED = "FILE_CONTENT_MUTATED";
 export const EXPRESS_SERVER_STARTED = "EXPRESS_SERVER_STARTED";
 export const FILE_ADDED = "FILE_ADDED";
 export const FILE_REMOVED = "FILE_REMOVED";
@@ -32,8 +33,19 @@ export type ExpressServerStarted = {
   expressServer: Express
 } & BaseEvent;
 
+export type FileContentMutated = {
+  filePath: string;
+  content: string;
+} & BaseEvent;
+
 export const applicationStarted = () => ({ 
   type: APPLICATION_STARTED
+});
+
+export const fileContentMutated = (filePath: string, content: string) => ({
+  filePath,
+  content,
+  type: FILE_CONTENT_MUTATED
 });
 
 export const expressServerStarted = (expressServer: Express) => ({

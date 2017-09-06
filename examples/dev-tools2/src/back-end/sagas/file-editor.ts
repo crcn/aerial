@@ -2,7 +2,7 @@ import { take, fork, takeEvery, select, put } from "redux-saga/effects";
 import { editString, logWarningAction, StringMutation } from "aerial-common2";
 import { ApplicationState } from "../state";
 import * as fs from "fs";
-import { MutateSourceContentRequest, MUTATE_SOURCE_CONTENT } from "../actions";
+import { MutateSourceContentRequest, MUTATE_SOURCE_CONTENT, fileContentMutated } from "../actions";
 
 export function* fileEditorSaga() {
   yield fork(handleMutateSourceContentRequest);
@@ -30,6 +30,6 @@ function* handleMutateSourceContentRequest() {
 
     content = editString(content, stringMutations);
 
-    console.log(content);
+    yield put(fileContentMutated(filePath, content));
   }
 }

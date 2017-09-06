@@ -1,4 +1,5 @@
 import ts =  require("typescript");
+import { camelCase } from "lodash";
 
 import { 
   Mutation, 
@@ -37,15 +38,24 @@ const transformAttrValue = (name: string, value: string) => {
   if (name === "style") {
     const style = {};
     value.split(";").forEach((property) => {
-      const [name, value] = property.split(/\s*:\s*/);
-      style[name] = value;
+      let [name, value] = property.split(/\s*:\s*/);
+
+      style[camelCase(name)] = getAttrValue(value);
     });
 
     return `{${JSON.stringify(style)}}`;
   }
 
   return `"${value}"`;
-}
+};
+
+const getAttrValue = (value: string) => {
+  if (/px$/.test(value)) {
+    return Number(value.replace("px", ""));
+  }
+  return value;
+};
+
 
 const editElementAttribute = (target: ts.Node, mutation: SetPropertyMutation<any>) => {
 

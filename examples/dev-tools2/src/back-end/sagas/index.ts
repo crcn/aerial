@@ -1,4 +1,5 @@
 import { take, fork, spawn, takeEvery, call, put, select } from "redux-saga/effects";
+import { FileCacheUpdaterPlugin } from "../webpack";
 import { eventChannel } from "redux-saga";
 import { merge, extend } from "lodash";
 import * as md5 from "md5";
@@ -84,7 +85,7 @@ function* startExpressServer() {
   const state: ApplicationState = yield select();
   const port = yield call(getPort, { port: DEFAULT_PORT });
   
-  const webpackConfig = generateWebpackConfig(state.config);
+  const webpackConfig = yield call(generateWebpackConfig, state.config);
 
   yield put(logInfoAction(`Added ${Object.keys(webpackConfig.entry).length} entries`));
   
@@ -214,12 +215,20 @@ const addMainIndexRoute = (server: express.Express, webpackConfig: webpack.Confi
   });
 };
 
-const generateWebpackConfig = (config: DevConfig): webpack.Configuration => {
+function* generateWebpackConfig(config: DevConfig) {
 
   const componentFilePaths = glob.sync(config.sourceFilePattern);
+
+  const externWebpackConfig = config.webpackConfigPath ? require(config.webpackConfigPath) : {};
+
   const webpackConfig = merge({
     plugins: [],
-  }, config.webpackConfigPath ? require(config.webpackConfigPath) : {}, BASE_WEBPACK_CONFIG);
+  }, externWebpackConfig, {
+    plugins: [
+      ...(externWebpackConfig.plugins || []),
+      yield call(createFileCacheUpdaterPlugin)
+    ]
+  }, BASE_WEBPACK_CONFIG);
 
   extend(webpackConfig, {
     entry: {},
@@ -239,6 +248,17 @@ const generateWebpackConfig = (config: DevConfig): webpack.Configuration => {
 }
 
 const getFilePathHash = filePath => `${md5(filePath)}`;
+
+function* createFileCacheUpdaterPlugin() {
+  const fileCacheUpdater = new FileCacheUpdaterPlugin();
+  yield spawn(function*() {
+    while(true) {
+      fileCacheUpdater.dispatch(yield take());
+    }
+  });
+
+  return fileCacheUpdater;
+}
 
 
 function* watchFiles() {
