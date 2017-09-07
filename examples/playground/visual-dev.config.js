@@ -2,7 +2,13 @@
 
 module.exports = {
 
-  // TODO - point to PC
+  port: Number(process.env.PORT || 8080),
+
+  vscode: {
+    devServerScript: ["node", "../dev-tools2/lib/back-end/entry.js"] 
+  },
+
+  // TODO - possible
   editSourceContent: require("./lib/webpack/edit-ts-content"),
   sourceFilePattern: __dirname + "/src/**/*-preview.tsx",
   webpackConfigPath: __dirname + "/webpack-dev.config.js",

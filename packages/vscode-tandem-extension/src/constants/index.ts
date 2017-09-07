@@ -1,0 +1,1 @@
+export const VISUAL_TOOLS_CONFIG_FILE_NAME = "visual-dev.config.js";

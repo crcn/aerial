@@ -68,12 +68,20 @@ export function* fileEditorSaga() {
       for (const uri in mutationsByUri) {
         const mutations = mutationsByUri[uri];
 
-        var data = new FormData();
-        data.append( "json", JSON.stringify(mutateSourceContentRequest2(mutations)));
+        // var data = new FormData();
+        // data.append( "json", JSON.stringify(mutateSourceContentRequest2(mutations)));
 
-        yield call(fetch, uri, {
-          method: "POST",
-          body: data
+        const data = JSON.stringify(mutateSourceContentRequest2(mutations));
+
+        yield spawn(function*() {
+          yield call(fetch, uri, {
+            method: "POST",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: data
+          });
         });
         
         // for (const mutation of mutations) {

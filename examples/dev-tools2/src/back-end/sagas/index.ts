@@ -14,7 +14,6 @@ import * as webpack from "webpack";
 import * as multipart from "connect-multiparty";
 import * as bodyParser from "body-parser";
 import * as express from "express";
-import * as getPort from "get-port";
 import * as webpackDevMiddleware from "webpack-dev-middleware";
 import * as WebpackDevServer from "webpack-dev-server";
 import * as HtmlWebpackPlugin from "html-webpack-plugin";
@@ -83,7 +82,7 @@ function* handleApplicationStarted() {
 
 function* startExpressServer() {
   const state: ApplicationState = yield select();
-  const port = yield call(getPort, { port: DEFAULT_PORT });
+  const port = state.config.port;
   
   const webpackConfig = yield call(generateWebpackConfig, state.config);
 
@@ -96,7 +95,8 @@ function* startExpressServer() {
 
   const server = express();
 
-  server.use(multipart());
+  // server.use(multipart());
+  server.use(bodyParser.json());
   server.use(cors());
   server.use(webpackDevMiddleware(compiler, {
     publicPath: "/",
@@ -158,11 +158,9 @@ function* handleFileCache(server: express.Express, { getEntryIndexHTML }: DevCon
 
   yield takeAllRequests(server.post.bind(server, `/file/:uri`), contrainToCWD(function*(req, res) {
     const { uri } = req.params;    
-    const { json } = req.body;
-    const action = JSON.parse(json);
+    const json = req.body;
+    const action = json;
     yield put(fileAction(getUriFilePath(uri), action));
-
-    res.send("OK");
   }));
 }
 

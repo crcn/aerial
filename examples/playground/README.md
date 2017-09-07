@@ -15,13 +15,7 @@ ARIEL IN ARIEL COMPONENT PRIORITIES:
 
 IMMEDIATE:
 
-- [ ] VSCode extension
-  - [ ] auto watch for dev config
-  - [ ] restart dev server when dev config changes
-  - [ ] vscode dev server updates current file content when POST mutation is received
-  - [ ] open file when POST is received
-  - [ ] needs to proxy socket.io connection
-
+- [ ] 
 NON-GOALS:
 
 - [ ] to cover 100% of UI design & development

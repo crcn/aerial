@@ -7,8 +7,9 @@ export type GetEntryIndexHTMLOptions = {
 };
 
 export type DevConfig = {
-  sourceFilePattern: string,
-  webpackConfigPath?: string,
+  port: number;
+  sourceFilePattern: string;
+  webpackConfigPath?: string;
   getEntryIndexHTML: (options: GetEntryIndexHTMLOptions) => string;
   editSourceContent?(content: string, mutation: Mutation<any>, filePath?: string): StringMutation|StringMutation[];
 };

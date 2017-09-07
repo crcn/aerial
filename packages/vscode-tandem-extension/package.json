@@ -1,0 +1,55 @@
+{
+  "name": "tandem-vscode-extension",
+  "displayName": "Tandem sync",
+  "description": "Synchronizes realtime changes between Tandem and VSCode",
+  "version": "0.0.21",
+  "icon": "assets/logo.png",
+  "publisher": "tandemcode",
+  "engines": {
+    "vscode": "^1.15.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.openNewWindow",
+        "title": "Open current file in new Tandem window"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "build-watch": "echo 'cannot build watch'"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.16.5",
+    "@types/chokidar": "^1.7.2",
+    "@types/express": "^4.0.37",
+    "@types/get-port": "^0.0.4",
+    "@types/http-proxy": "^1.12.1",
+    "@types/request": "^2.0.3",
+    "typescript": "^2.1.4"
+  },
+  "dependencies": {
+    "aerial-common2": "^0.0.1",
+    "body-parser": "^1.17.2",
+    "chokidar": "^1.7.0",
+    "connect-multiparty": "^2.0.0",
+    "express": "^4.15.4",
+    "get-port": "^3.2.0",
+    "http-proxy": "^1.16.2",
+    "redux": "^3.7.2",
+    "redux-saga": "^0.15.6",
+    "request": "^2.81.0",
+    "vscode": "^1.1.5"
+  },
+  "author": "",
+  "license": "ISC"
+}
