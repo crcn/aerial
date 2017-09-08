@@ -15,7 +15,10 @@ ARIEL IN ARIEL COMPONENT PRIORITIES:
 
 IMMEDIATE:
 
-- [ ] 
+- [ ] edit tsx text
+- [ ] change name to Tandem
+- [ ] maintain app state using local session
+
 NON-GOALS:
 
 - [ ] to cover 100% of UI design & development

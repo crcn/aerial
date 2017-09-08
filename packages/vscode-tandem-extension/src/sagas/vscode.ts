@@ -1,14 +1,18 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import { editString, StringMutation } from "aerial-common2";
-import { select, take, put, fork } from "redux-saga/effects";
-import { Alert, ALERT, AlertLevel, MUTATE_SOURCE_CONTENT, FILE_CONTENT_CHANGED, MutateSourceContentRequest, fileContentChanged, FileContentChanged } from "../actions";
+import { eventChannel } from "redux-saga";
+import { select, take, put, fork, call } from "redux-saga/effects";
+import { Alert, ALERT, AlertLevel, MUTATE_SOURCE_CONTENT, FILE_CONTENT_CHANGED, MutateSourceContentRequest, fileContentChanged, FileContentChanged, startDevServerExecuted, START_DEV_SERVER_EXECUTED, CHILD_DEV_SERVER_STARTED } from "../actions";
 import { ExtensionState, getFileCacheContent } from "../state";
+import { getEntryHTML } from "playground";
 
 export function* vscodeSaga() {
   yield fork(handleAlerts);
   yield fork(handleMutateSourceContent);
   yield fork(handleFileContentChanged);
+  yield fork(handleCommands);
+  yield fork(handleStarted);
 }
 
 function* handleAlerts() {
@@ -80,5 +84,50 @@ function* handleFileContentChanged() {
         )
       });
     });
+  }
+}
+
+function* handleCommands() {
+  const chan = eventChannel((emit) => {
+    vscode.commands.registerCommand("extension.startVisualDevServer", () => {
+      emit(startDevServerExecuted());
+    });
+    return () => {};
+  });
+
+  while(true) {
+    yield put(yield take(chan));
+  }
+}
+
+const AERIAL_PREVIEW_NAME = `aerial-preview`;
+
+const PREVIEW_URI = vscode.Uri.parse(`${AERIAL_PREVIEW_NAME}://authority/${AERIAL_PREVIEW_NAME}`);
+
+function* handleStarted() {
+
+  const state: ExtensionState = yield select();
+
+  var textDocumentContentProvider = {
+    provideTextDocumentContent(uri/*: vscode.Uri*/)/*: string*/ {
+      return getEntryHTML({});
+    },
+  };
+
+  
+  state.context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider(
+      AERIAL_PREVIEW_NAME,
+      textDocumentContentProvider)
+  );
+  while(true) {
+    yield take(CHILD_DEV_SERVER_STARTED);
+
+    yield call(vscode.commands.executeCommand,
+      "vscode.previewHtml",
+      PREVIEW_URI,
+      vscode.ViewColumn.Two,
+      "Aerial view"
+    );
   }
 }

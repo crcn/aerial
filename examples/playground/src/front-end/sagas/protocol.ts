@@ -16,7 +16,7 @@ export function* createUrlProxyProtocolSaga() {
 
   const adapterBase = {
     async read(uri: string): Promise<IURIProtocolReadResult> {
-      const res = await fetch(getAPIProxyUrl(uri, state));
+      const res = await fetch(uri);
       let contentType = res.headers.get("content-type");
       if (contentType) contentType = contentType.split(";").shift();
       const blob = await res.blob();

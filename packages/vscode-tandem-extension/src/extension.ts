@@ -10,6 +10,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const store = createStore(
     mainReducer,
     {
+      context: context,
       rootPath: vscode.workspace.rootPath,
       fileCache: {}
     },

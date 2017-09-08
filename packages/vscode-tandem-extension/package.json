@@ -18,8 +18,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.openNewWindow",
-        "title": "Open current file in new Tandem window"
+        "command": "extension.startVisualDevServer",
+        "title": "Open current project in Aerial"
       }
     ]
   },

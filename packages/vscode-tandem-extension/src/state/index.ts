@@ -19,6 +19,7 @@ export type FileCache = {
 }
 
 export type ExtensionState = {
+  context: any;
 
   visualDevConfig?: VisualDevConfig;
 

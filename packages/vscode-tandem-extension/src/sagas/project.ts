@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as getPort from "get-port";
 import { spawn, ChildProcess } from "child_process";
 import { take, fork, select, put, call } from "redux-saga/effects";
+import { delay } from "redux-saga";
 import { VISUAL_TOOLS_CONFIG_FILE_NAME } from "../constants";
 import { alert, AlertLevel, visualDevConfigLoaded, VISUAL_DEV_CONFIG_LOADED, childDevServerStarted } from "../actions";
 
@@ -58,6 +59,9 @@ function* handleDevConfigLoaded() {
         PORT: childServerPort
       }
     });
+
+    // slight timeout to allow child server to start
+    yield call(delay, 3000);
 
     yield put(childDevServerStarted(childServerPort));
 

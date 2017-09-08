@@ -30,6 +30,5 @@ function* handleWatchProjectFiles() {
     while(true) {
       yield put(yield take(chan));
     }
-
   }
 }

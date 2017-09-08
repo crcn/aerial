@@ -9,6 +9,8 @@ export const VISUAL_DEV_CONFIG_LOADED = "VISUAL_DEV_CONFIG_LOADED";
 export const CHILD_DEV_SERVER_STARTED = "CHILD_DEV_SERVER_STARTED";
 export const MUTATE_SOURCE_CONTENT = "MUTATE_SOURCE_CONTENT";
 export const FILE_CONTENT_CHANGED = "FILE_CONTENT_CHANGED";
+export const START_DEV_SERVER_EXECUTED = "START_DEV_SERVER_EXECUTED";
+export const STOP_DEV_SERVER_EXECUTED = "STOP_DEV_SERVER_EXECUTED";
 export const FILE_CHANGED = "FILE_CHANGED";
 
 export type HTTPRequest = {
@@ -79,6 +81,10 @@ export const httpRequest = (request: Request, response: Response): HTTPRequest =
   type: HTTP_REQUEST,
   request,
   response,
+});
+
+export const startDevServerExecuted = () => ({ 
+  type: START_DEV_SERVER_EXECUTED
 });
 
 export const visualDevConfigLoaded = (config: VisualDevConfig) => ({
