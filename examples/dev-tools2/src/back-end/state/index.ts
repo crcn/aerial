@@ -6,6 +6,13 @@ export type GetEntryIndexHTMLOptions = {
   filePath: string;
 };
 
+export type FileCache = {
+  [identifier: string]: {
+    content: string;
+    mtime: Date;
+  }
+}
+
 export type DevConfig = {
   port: number;
   sourceFilePattern: string;
@@ -17,6 +24,7 @@ export type DevConfig = {
 export type ApplicationState = {
   config: DevConfig;
   bundleInfo?: BundleInfo;
+  fileCache: FileCache;
 } & BaseApplicationState;
 
 export const updateApplicationState = (state: ApplicationState, properties: Partial<ApplicationState>) => ({
@@ -25,5 +33,26 @@ export const updateApplicationState = (state: ApplicationState, properties: Part
 });
 
 export const setBundleInfo = (state: ApplicationState, bundleInfo: BundleInfo) => updateApplicationState(state, { bundleInfo })
+
+export const getFileCacheContent = (path: string, state: ApplicationState) => state.fileCache[path] && state.fileCache[path].content;
+
+export const getFileCacheItem = (path: string, state: ApplicationState) => state.fileCache[path] && state.fileCache[path];
+
+export const setFileCacheContent = (state: ApplicationState, path: string, content: string, mtime: Date = new Date()) => updateApplicationState(state, {
+  fileCache: {
+    ...state.fileCache,
+    [path]: {
+      content,
+      mtime,
+    }
+  }
+});
+
+export const removeFileCache = (state: ApplicationState, path: string): ApplicationState => updateApplicationState(state, {
+  fileCache: {
+    ...state.fileCache,
+    [path]: undefined
+  }
+});
 
 export * from "../../common/state";

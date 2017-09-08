@@ -68,12 +68,11 @@ export function* fileEditorSaga() {
       for (const uri in mutationsByUri) {
         const mutations = mutationsByUri[uri];
 
-        // var data = new FormData();
-        // data.append( "json", JSON.stringify(mutateSourceContentRequest2(mutations)));
-
         const data = JSON.stringify(mutateSourceContentRequest2(mutations));
 
         yield spawn(function*() {
+
+          // post edit back to the source of truth
           yield call(fetch, uri, {
             method: "POST",
             headers: {
@@ -83,21 +82,7 @@ export function* fileEditorSaga() {
             body: data
           });
         });
-        
-        // for (const mutation of mutations) {
-        //   const stringMutation = (yield yield request(mutateSourceContentRequest(content.toString(), type, mutation))).payload;
-
-        //   stringMutations.push(
-        //     ...(Array.isArray(stringMutation) ? stringMutation : [stringMutation])
-        //   );
-        // }
-
-        // const newContent = editString(String(content), stringMutations);
-        // // yield put(uriCacheBusted(uri, newContent, type));
-        // yield yield request(createWriteUriRequest(uri, content, type));
       }
-
-      // yield put(createRequestResponse(req.$id, true));
     }
   }); 
 }

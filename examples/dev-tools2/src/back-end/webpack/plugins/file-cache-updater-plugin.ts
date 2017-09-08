@@ -2,29 +2,19 @@ import { Action } from "aerial-common2";
 import { EventEmitter } from "events";
 import { Plugin, Compiler } from "webpack";
 import * as path from "path";
-import * as fs from "fs";
 import { FILE_CONTENT_MUTATED, FileContentMutated } from "../../actions";
+import { ApplicationState, getFileCacheItem } from "../../state";
 import { VirtualStats } from "./virtual-stats";
 
 export class FileCacheUpdaterPlugin implements Plugin {
+  private _appState: ApplicationState;
   private _compiler: any;
-  private _fileCache: {
-    [identifier: string]: {
-      mtime: Date,
-      content: Buffer
-    }
-  }
 
   constructor() {
-    this._fileCache = {};
   }
 
-  dispatch(action: Action) {
-    switch(action.type) {
-      case FILE_CONTENT_MUTATED: {
-        return this._handleFileContentMutated(action as FileContentMutated);
-      }
-    }
+  setRootState(state: ApplicationState) {
+    this._appState = state;
   }
 
   apply(compiler: any) {
@@ -46,10 +36,9 @@ export class FileCacheUpdaterPlugin implements Plugin {
 
       // check file cache AND make sure that it is not older than the file system
       // copy. 
-      if (self._fileCache[filePath] && getFileMTime(filePath).getTime() < self._fileCache[filePath].mtime.getTime()) {
-        fs._readFileStorage.data.set(filePath, [null, self._fileCache[filePath].content]);
-      } else {
-        self._fileCache[filePath] = undefined;
+      const fileCache = getFileCacheItem(filePath, self._appState);
+      if (fileCache) {
+        fs._readFileStorage.data.set(filePath, [null, fileCache[filePath].content]);
       }
       cb();
     }
@@ -62,25 +51,4 @@ export class FileCacheUpdaterPlugin implements Plugin {
       compiler.resolvers.normal.plugin("before-resolve", resolverPlugin);
     }
   }
-
-  private _handleFileContentMutated({ filePath, content }: FileContentMutated) {
-
-    this._fileCache[filePath] = {
-      
-      // add some padded time so that the cache doesn't bust on
-      // the next recompile.
-      mtime: new Date(Date.now() + 100),
-      content: new Buffer(content),
-    };
-
-    
-    // fool the watcher into emitting a file change event -- this will trigger
-    // a recompile.
-    fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8"));
-  }
-}
-
-
-const getFileMTime = (filePath: string) => {
-  return fs.lstatSync(filePath).mtime;
 }

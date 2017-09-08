@@ -471,7 +471,8 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
       const { nodeId } = (yield takeWindowAction(NODE_VALUE_STOPPED_EDITING)) as SyntheticNodeValueStoppedEditing;
       const node = window.childObjects.get(nodeId) as HTMLElement;
       const mutation = createSetElementTextContentMutation(node, node.textContent);
-      yield yield request(deferApplyFileMutationsRequest(mutation));
+
+      yield request(deferApplyFileMutationsRequest(mutation));
     }
   });
 

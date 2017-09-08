@@ -251,7 +251,8 @@ function* createFileCacheUpdaterPlugin() {
   const fileCacheUpdater = new FileCacheUpdaterPlugin();
   yield spawn(function*() {
     while(true) {
-      fileCacheUpdater.dispatch(yield take());
+      yield take();
+      fileCacheUpdater.setRootState(yield select());
     }
   });
 
@@ -270,7 +271,7 @@ function* watchFiles() {
     });
     watcher.on("change", (path) => {
       emit(logDebugAction(`changed: ${path}`));
-      emit(fileChanged(path));
+      emit(fileChanged(path, fs.lstatSync(path).mtime));
     });
     watcher.on("removed", (path) => {
       emit(logDebugAction(`removed: ${path}`));

@@ -15,9 +15,12 @@ ARIEL IN ARIEL COMPONENT PRIORITIES:
 
 IMMEDIATE:
 
+- [ ] meta click to show source in VSCode
+- [ ] open any HTML file in VSCode
 - [ ] edit tsx text
 - [ ] change name to Tandem
 - [ ] maintain app state using local session
+- [ ] save vscode workspace state 
 
 NON-GOALS:
 

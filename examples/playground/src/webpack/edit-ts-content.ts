@@ -17,10 +17,14 @@ module.exports = (content: string, mutation: Mutation<any>, filePath: string) =>
   const source = mutation.target.source;
   const ast = ts.createSourceFile(filePath, content, ts.ScriptTarget.ES2016, true);
   const targetNode = findTargetASTNode(ast, mutation);
+  console.log(mutation.$type);
 
   switch(mutation.$type) {
     case SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT: {
       return editElementAttribute(targetNode, mutation as SetPropertyMutation<any>);
+    }
+    case SyntheticDOMElementMutationTypes.SET_TEXT_CONTENT: {
+      return setElementTextContent(targetNode, mutation as SetPropertyMutation<any>)
     }
   }
 
@@ -56,6 +60,25 @@ const getAttrValue = (value: string) => {
   return value;
 };
 
+const setElementTextContent = (target: ts.Node, mutation: SetPropertyMutation<any>) => {
+
+  
+  if (target.kind === ts.SyntaxKind.JsxSelfClosingElement) {
+    const element = <ts.JsxSelfClosingElement>target;
+    // TODO
+  } else if (target.kind === ts.SyntaxKind.JsxElement) {
+    const element = target as ts.JsxElement;
+    
+    return createStringMutation(
+      element.openingElement.getEnd(),
+      element.closingElement.getStart(),
+      mutation.newValue
+    );
+  }
+  
+  
+  return createStringMutation(0, 0, "");
+};
 
 const editElementAttribute = (target: ts.Node, mutation: SetPropertyMutation<any>) => {
 
@@ -96,7 +119,7 @@ const editElementAttribute = (target: ts.Node, mutation: SetPropertyMutation<any
 };
 
 const isElementMutation = (mutation: Mutation<any>) => {
-  return [SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT].indexOf(mutation.$type) !== -1;
+  return [SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, SyntheticDOMElementMutationTypes.SET_TEXT_CONTENT].indexOf(mutation.$type) !== -1;
 }
 
 const findTargetASTNode = (root: ts.Node, mutation: Mutation<any>) => {

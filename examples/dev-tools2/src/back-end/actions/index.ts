@@ -17,13 +17,13 @@ export type FileAction = {
   filePath: string;
 } & Action;
 
+export type FileChanged = {
+  mtime: Date;
+} & FileAction;
+
 export type MutateSourceContentRequest = {
   mutations: Mutation<any>[];
 } & FileAction;
-
-export type FileEvent = {
-  path: string;
-} & BaseEvent;
 
 export type Bundled = {
   stats: any;
@@ -35,6 +35,7 @@ export type ExpressServerStarted = {
 
 export type FileContentMutated = {
   filePath: string;
+  mtime: Date;
   content: string;
 } & BaseEvent;
 
@@ -42,9 +43,10 @@ export const applicationStarted = () => ({
   type: APPLICATION_STARTED
 });
 
-export const fileContentMutated = (filePath: string, content: string) => ({
+export const fileContentMutated = (filePath: string, content: string, mtime: Date): FileContentMutated => ({
   filePath,
   content,
+  mtime,
   type: FILE_CONTENT_MUTATED
 });
 
@@ -53,18 +55,19 @@ export const expressServerStarted = (expressServer: Express) => ({
   type: EXPRESS_SERVER_STARTED
 });
 
-export const fileChanged = (path: string) => ({
-  path,
+export const fileChanged = (filePath: string, mtime: Date): FileChanged => ({
+  filePath,
+  mtime,
   type: FILE_CHANGED
 });
 
-export const fileAdded = (path: string) => ({
-  path,
+export const fileAdded = (filePath: string) => ({
+  filePath,
   type: FILE_ADDED
 });
 
-export const fileRemoved = (path: string) => ({
-  path,
+export const fileRemoved = (filePath: string) => ({
+  filePath,
   type: FILE_REMOVED
 });
 

@@ -11,6 +11,7 @@ const configPath = path.join(process.cwd(), VISUAL_TOOLS_CONFIG_FILE_NAME);
 
 initApplication({
   config: require(configPath),
+  fileCache: {},
   log: {
     level: LogLevel.ALL
   }
