@@ -1,0 +1,143 @@
+{
+  "name": "crcn/aerial",
+  "version": "0.1.4",
+  "libraries": {
+    "xv": "^1.1.25"
+  },
+  "title": "",
+  "branch": "",
+  "style": {
+    "name": "Default",
+    "componentSet": {
+      "nav": "nav/BasicNav",
+      "header": "header/BannerHeader",
+      "article": "article/BasicArticle",
+      "footer": "footer/BasicFooter"
+    },
+    "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+    "fontWeight": 400,
+    "bold": 600,
+    "lineHeight": 1.5,
+    "typeScale": [
+      72,
+      48,
+      24,
+      20,
+      16,
+      14,
+      12
+    ],
+    "monospace": "Menlo, monospace",
+    "heading": {
+      "fontFamily": null,
+      "fontStyle": null,
+      "fontWeight": 600,
+      "lineHeight": 1.25,
+      "textTransform": null,
+      "letterSpacing": null
+    },
+    "h0": {},
+    "h1": {},
+    "h2": {},
+    "h3": {},
+    "h4": {},
+    "h5": {},
+    "h6": {},
+    "alternativeText": {},
+    "space": [
+      0,
+      8,
+      16,
+      32,
+      48,
+      64,
+      96
+    ],
+    "layout": {
+      "maxWidth": 1024,
+      "centered": false
+    },
+    "colors": {
+      "text": "#111",
+      "background": "#fff",
+      "primary": "#08e",
+      "secondary": "#059",
+      "highlight": "#e08",
+      "border": "#ddd",
+      "muted": "#eee"
+    },
+    "border": {
+      "width": 1,
+      "radius": 2
+    },
+    "link": {},
+    "button": {
+      "hover": {
+        "boxShadow": "inset 0 0 0 999px rgba(0, 0, 0, .125)"
+      }
+    },
+    "input": {},
+    "body": {
+      "margin": 0
+    },
+    "breakpoints": {
+      "xs": "@media screen and (max-width:40em)",
+      "sm": "@media screen and (min-width:40em)",
+      "md": "@media screen and (min-width:52em)",
+      "lg": "@media screen and (min-width:64em)"
+    }
+  },
+  "content": [
+    {
+      "component": "nav",
+      "links": [
+        {
+          "href": "https://github.com/crcn/aerial",
+          "text": "GitHub"
+        },
+        {
+          "href": "https://npmjs.com/package/aerial",
+          "text": "npm"
+        }
+      ]
+    },
+    {
+      "component": "header",
+      "heading": "aerial",
+      "subhead": "Realtime visual programming engine for web applications.",
+      "children": [
+        {
+          "component": "ui/TweetButton",
+          "text": "aerial: Realtime visual programming engine for web applications.",
+          "url": ""
+        },
+        {
+          "component": "ui/GithubButton",
+          "user": "crcn",
+          "repo": "aerial"
+        }
+      ],
+      "text": "v1.0.0"
+    },
+    {
+      "component": "article",
+      "metadata": {
+        "source": "github.readme"
+      },
+      "html": "<p><a href=\"https://secure.travis-ci.org/crcn/aerial\"><img src=\"https://secure.travis-ci.org/crcn/aerial.png\"></a></p>\n<p>Aerial is a visual programming engine for testing, debugging, and developing <em>all</em> web applications (JavaScript, React, PHP, CSS). </p>\n<h4>Motivation</h4>\n<p>Aerial was originally created for <a href=\"http://tandemcode.com\">Tandem</a> to aid in the realtime development of web applications. With Tandem, users can write code, and immediately see visual elements appear in an editable interface. Users also have the ability to use Sketch-like UI tools for editing visual elements that produces code in any language that supports source maps (HTML, CSS, SASS, SCSS, React). All of this is powered by Aerial. </p>\n<p><img src=\"https://user-images.githubusercontent.com/757408/26987589-215d52ca-4d1a-11e7-828e-6db361086a83.gif\"></p>\n<p>The library takes inspiration from many ideas, more notabily Bret Victor&apos;s presentation on <a href=\"https://vimeo.com/36579366\">the future of programming</a>. Aerial is an attempt to provide\nthe APIs necessary for creating realtime programming environments (like Sketch + coding). </p>\n<h4>How does Aerial work?</h4>\n<p>Aerial runs your application code in a sandboxed environment that emulates native JavaScript APIs -- currently just for the browser (DOM, navigator, history). All emulated APIs can be inspected so you can test how your application interacts with them. You can also define environment parameters such as browser type, network information (offline, throttled), and even the rendering engine to see how your application looks &amp; behaves in different environments. </p>\n<p>The browser VM supports <em>native</em> rendering, meaning that the HTML &amp; CSS that your application produces can be rendered out to the actual DOM. Native DOM APIs such as <code>element.getBoundingClientRect</code>, and <code>window.getComputedStyle(element)</code> work the same. The rendering engine is interchangable, and will eventually support <em>remote</em> browsers so that you can run your application code in one local environment (Node for instance), and have its HTML &amp; CSS rendered out to as many native browsers as you want via <a href=\"browsertap.com\">Browsertap</a>.</p>\n\n<p>The renderer can also be customized to target other platforms such as Canvas, WebGL, or just plain strings if you plan on running synthetic browser instances in a headless environment (Server-side rendering via node, or unit testing for instance). This enables you to use Aerial in other ways -- perhaps integrating it with Sketch so that you can code &amp; design your application in realtime (similar to <a href=\"https://github.com/airbnb/react-sketchapp\">Airbnb&apos;s React-sketchapp</a>, but with Aerial it may be possible for Sketch to write code, and not limited to React). </p>\n<p>Many of the emulated APIs are enhanced. The DOM &amp; CSSOM for instance both support diffing &amp; patching (just like React). This means that as your application produces new HTML &amp; CSS, only the DOM / CSSOM objects that change get updated. This hot-swapping was originally introduced to allow users to visually edit applications regardless of their technical stack (Ruby, Java, PHP, Angular, anything that produces HTML &amp; CSS).</p>\n<p>Aerial uses a dependency graph that can be adapted to any bundling library including SystemJS, CommonJS, Webpack, and Rollup. The environment that uses the dependency graph can be set to re-execute whenever a source file changes. This paired with hot-swapping capabilities allows developers to write code, and see how their application visualy changes in realtime. Manipulating the emulated DOM / CSSOM (programatically, or visually) will write code back to the dependency graph (this mainly leverages source maps). The dependency graph can also be shared across <em>multiple</em> browser instances which <em>automatically</em> reload whenever a shared file changes. Here&apos;s an example of that:</p>\n<p><img src=\"https://user-images.githubusercontent.com/757408/27011517-0c27d188-4e8b-11e7-8bf1-811b07bce87d.gif\"></p>\n<p>Aerial can also defer application execution to remote processes using the <code>RemoteBrowser</code> object that pairs with the diffing &amp; patching algorithms. This enables you to offload some of the heavy work - possibly to a NodeJS thread, or even remotely (AWS, lamda), for a smooth user experience if you&apos;re building a visual editor. </p>\n<h4>Who is Aerial for?</h4>\n\n<p>This library was designed for developers that want to create tooling for catching visual bugs in web applications. Here are some examples of what you can do with Aeiral:</p>\n<ul>\n<li>Unit testing CSS (this is probably the most general use case) across any browser (Safari, Firefox, Chrome, Mobile) via browsertap.com, and across any application state. </li>\n<li>Visually QA test every state of your application. Ability to manipulate file resources and see how those changes manifest across all visual states.</li>\n<li>Hook Aerial up to a code editor &amp; build applications visually in realtime (basically Tandem).</li>\n</ul>\n<h4>App examples</h4>\n<ul>\n<li><a href=\"http://tandemcode.com\">Tandem</a> - visually create web applications. </li>\n<li><a href=\"https://github.com/crcn/aerial/tree/master/examples/playground\">Code Playground</a> - small visual editor. </li>\n<li><a href=\"https://github.com/crcn/aerial/tree/master/examples/crawler\">Crawler</a> - crawls a website (up to 20 pages), and displays editable pages. </li>\n</ul>\n<h4>Code examples</h4>\n<ul>\n<li><a href=\"./examples/unit-testing\">Unit testing</a> - example of how you can use Tandem for unit testing.</li>\n<li>Custom dependency graph - TODO</li>\n<li>Custom rendering engine - TODO</li>\n</ul>\n"
+    },
+    {
+      "component": "footer",
+      "links": [
+        {
+          "href": "https://github.com/crcn/aerial",
+          "text": "GitHub"
+        },
+        {
+          "href": "https://github.com/crcn",
+          "text": "crcn"
+        }
+      ]
+    }
+  ]
+}
