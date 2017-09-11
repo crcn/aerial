@@ -5,7 +5,7 @@ import { eventChannel } from "redux-saga";
 import { select, take, put, fork, call } from "redux-saga/effects";
 import { Alert, ALERT, AlertLevel, MUTATE_SOURCE_CONTENT, FILE_CONTENT_CHANGED, MutateSourceContentRequest, fileContentChanged, FileContentChanged, startDevServerExecuted, START_DEV_SERVER_EXECUTED, CHILD_DEV_SERVER_STARTED } from "../actions";
 import { ExtensionState, getFileCacheContent } from "../state";
-import { getEntryHTML } from "playground";
+import { getEntryHTML } from "aerial-playground";
 
 export function* vscodeSaga() {
   yield fork(handleAlerts);

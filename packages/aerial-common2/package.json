@@ -19,7 +19,6 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.20",
     "@types/reflect-metadata": "0.0.5",
-    "@types/reselect": "^2.2.0",
     "chai": "^4.0.2",
     "mocha": "^3.4.2"
   },

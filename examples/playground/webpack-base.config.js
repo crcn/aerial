@@ -6,7 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 module.exports = {
-  entry: __dirname + '/src/front-end/entry.ts',
+  entry: {
+    entry: __dirname + '/src/front-end/entry.ts'
+  },
   output: {
     path: resolve(__dirname, 'lib', 'front-end'),
     filename: 'entry.bundle.js'

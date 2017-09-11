@@ -1,7 +1,6 @@
 {
-  "name": "playground",
+  "name": "aerial-playground",
   "version": "1.0.0",
-  "private": true,
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -30,7 +29,6 @@
     "@types/react-redux": "^4.4.47",
     "@types/recompose": "^0.23.0",
     "@types/reduce-reducers": "^0.1.0",
-    "@types/redux-saga": "^0.10.5",
     "@types/socket.io": "^1.4.29",
     "@types/source-map": "^0.5.0",
     "babel-core": "^6.26.0",
@@ -66,6 +64,7 @@
     "@types/request": "^2.0.0",
     "@types/socket.io-client": "^1.4.30",
     "abab": "^1.0.3",
+    "aerial-browser-sandbox": "^0.0.3",
     "aerial-common": "0.0.x",
     "aerial-common2": "0.0.x",
     "aerial-sandbox": "0.0.x",

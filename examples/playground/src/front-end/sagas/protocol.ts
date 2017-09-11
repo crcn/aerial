@@ -4,7 +4,6 @@ const blobToBuffer = require("blob-to-buffer");
 import { call, fork, select } from "redux-saga/effects";
 import { ApplicationState } from "front-end/state";
 import { getAPIProxyUrl } from "../utils";
-import { URIProtocol, IURIProtocolReadResult, URIProtocolProvider } from "aerial-sandbox";
 import { createURIProtocolSaga, fileCacheSaga } from "aerial-sandbox2";
 
 // copy / pasta code since it's throw away. This will be removed once the synthetic browser
@@ -15,13 +14,13 @@ export function* createUrlProxyProtocolSaga() {
   const state: ApplicationState = yield select();
 
   const adapterBase = {
-    async read(uri: string): Promise<IURIProtocolReadResult> {
+    async read(uri: string): Promise<any> {
       const res = await fetch(uri);
       let contentType = res.headers.get("content-type");
       if (contentType) contentType = contentType.split(";").shift();
       const blob = await res.blob();
 
-      return new Promise<IURIProtocolReadResult>((resolve, reject) => {
+      return new Promise<any>((resolve, reject) => {
         blobToBuffer(blob, (err, buffer) => {
           if (err) return reject(err);
           resolve({

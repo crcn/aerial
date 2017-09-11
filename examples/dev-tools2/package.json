@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./lib/entry.js",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -42,7 +43,6 @@
     "@types/md5": "^2.1.32",
     "@types/multiparty": "^0.0.31",
     "@types/redux": "^3.6.0",
-    "@types/redux-saga": "^0.10.5",
     "@types/webpack": "^3.0.10",
     "@types/webpack-dev-middleware": "^1.9.3",
     "@types/webpack-dev-server": "^2.4.1",
