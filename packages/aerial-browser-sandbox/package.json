@@ -34,7 +34,6 @@
     "mocha-istanbul": "^0.3.0"
   },
   "dependencies": {
-    "@types/parse5": "^3.0.0",
     "abab": "^1.0.3",
     "aerial-common": "0.0.x",
     "aerial-common2": "^0.0.1",

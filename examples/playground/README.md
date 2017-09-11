@@ -15,12 +15,17 @@ ARIEL IN ARIEL COMPONENT PRIORITIES:
 
 IMMEDIATE:
 
+- [ ] fix socket hangup
 - [ ] meta click to show source in VSCode
+- [ ] store record of previously edited files so that lagging edits
+can still be applied (during loads). 
 - [ ] open any HTML file in VSCode
-- [ ] edit tsx text
+- [ ] open/close windows based on changed files in sourceFilesPattern. 
+  - [ ] need to rebundle webpack
 - [ ] change name to Tandem
 - [ ] maintain app state using local session
 - [ ] save vscode workspace state 
+
 
 NON-GOALS:
 

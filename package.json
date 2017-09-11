@@ -23,7 +23,7 @@
     "gulp-watch": "^4.3.11",
     "highland": "^2.10.5",
     "lodash": "^4.17.4",
-    "typescript": "2.3.4",
+    "typescript": "2.4.1",
     "yargs": "^8.0.1",
     "yarn": "^0.24.5"
   }
