@@ -9,13 +9,31 @@ import { createURIProtocolSaga, fileCacheSaga } from "aerial-sandbox2";
 // copy / pasta code since it's throw away. This will be removed once the synthetic browser
 // uses sagas & reducers. (CC)
 
+const RETRY_COUNT = 3;
+const RETRY_TIMEOUT = 1000 * 2;
 
 export function* createUrlProxyProtocolSaga() {
   const state: ApplicationState = yield select();
 
+
   const adapterBase = {
     async read(uri: string): Promise<any> {
-      const res = await fetch(uri);
+      let retries = RETRY_COUNT;
+
+      let res: Response;
+
+      // cover cases where fetch fails in text editor extension -- probably
+      // because the dev server hasn't started yet.
+      while(retries) {
+        res = await fetch(uri);
+        if (res.status === 500) {
+          retries--;
+          await new Promise(resolve => setTimeout(resolve, RETRY_TIMEOUT));
+        } else {
+          break;
+        }
+      }
+
       let contentType = res.headers.get("content-type");
       if (contentType) contentType = contentType.split(";").shift();
       const blob = await res.blob();

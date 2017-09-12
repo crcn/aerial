@@ -72,9 +72,13 @@ function* handleFileContentChanged() {
 
     const activeTextEditor = vscode.window.activeTextEditor;
 
-    vscode.workspace.openTextDocument(filePath).then(async (doc) => {
-      await vscode.window.showTextDocument(doc);
-      await vscode.window.activeTextEditor.edit((edit) => {
+    const textEditor = vscode.window.visibleTextEditors.find((textEditor) => {
+      return textEditor.document.uri.path === filePath;
+    });
+
+    const onOpenTextEditor = async (editor: vscode.TextEditor) => {
+      const doc = editor.document;
+      await editor.edit((edit) => {
         edit.replace(
           new vscode.Range(
             doc.positionAt(0),
@@ -83,7 +87,17 @@ function* handleFileContentChanged() {
           content
         )
       });
-    });
+    }
+
+    if (textEditor) {
+      onOpenTextEditor(textEditor);
+    } else {
+      vscode.workspace.openTextDocument(filePath).then(async (doc) => {
+        await vscode.window.showTextDocument(doc);
+        onOpenTextEditor(vscode.window.activeTextEditor);
+      });
+    }
+
   }
 }
 
