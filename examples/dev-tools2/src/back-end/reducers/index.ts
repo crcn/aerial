@@ -19,7 +19,8 @@ export function mainReducer(state: ApplicationState, event: BaseEvent) {
         const entryHash = entryPathHashMap.get(module.resource);
         if (entryHash) {
           bundleInfo[entryHash] = {
-            buildTimestamp: module.buildTimestamp
+            buildTimestamp: module.buildTimestamp,
+            filePath: module.resource
           }
         }
       });

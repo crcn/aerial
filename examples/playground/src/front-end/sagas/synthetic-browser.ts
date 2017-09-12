@@ -41,7 +41,6 @@ import {
 } from "front-end/actions";
 
 export function* frontEndSyntheticBrowserSaga() {
-  yield fork(handleTextEditChanges);
   yield fork(handleTextEditBlur);
   yield fork(handleWindowMousePanned);
   yield fork(handleFullScreenWindow);
@@ -63,17 +62,10 @@ function* handleTextEditorEscaped() {
   }
 }
 
-function* handleTextEditChanges() {
-  while(true) {
-    const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_CHANGED)) as StageToolEditTextChanged;
-    yield call(applyTextEditChanges, sourceEvent, nodeId);
-  }
-}
-
 function* applyTextEditChanges(sourceEvent: React.SyntheticEvent<any>, nodeId: string) {
   const state = yield select();
   const window = getSyntheticNodeWindow(state, nodeId);
-  const text = String((sourceEvent.target as any).value || "").trim();
+  const text = String((sourceEvent.target as any).textContent || "").trim();
   const workspace = getSyntheticNodeWorkspace(state, nodeId);
   yield put(syntheticNodeTextContentChanged(window.$id, nodeId, text));
 }
@@ -81,6 +73,7 @@ function* applyTextEditChanges(sourceEvent: React.SyntheticEvent<any>, nodeId: s
 function* handleTextEditBlur() {
   while(true) {
     const { sourceEvent, nodeId } = (yield take(STAGE_TOOL_EDIT_TEXT_BLUR)) as StageToolEditTextBlur;
+    yield call(applyTextEditChanges, sourceEvent, nodeId);    
     yield call(nodeValueStoppedEditing, nodeId);
   }
 }

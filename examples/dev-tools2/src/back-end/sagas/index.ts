@@ -9,11 +9,13 @@ import * as fs from "fs";
 import { logDebugAction, logInfoAction } from "aerial-common2";
 import * as chokidar from "chokidar";
 import * as glob from "glob";
+import * as http from "http";
 import * as path from "path";
 import * as webpack from "webpack";
 import * as multipart from "connect-multiparty";
 import * as bodyParser from "body-parser";
 import * as express from "express";
+import * as ExpressRouter from "express/lib/router";
 import * as webpackDevMiddleware from "webpack-dev-middleware";
 import * as WebpackDevServer from "webpack-dev-server";
 import * as HtmlWebpackPlugin from "html-webpack-plugin";
@@ -25,6 +27,7 @@ import {
   FILE_ADDED,
   FILE_REMOVED,
   BUNDLED,
+  FileAction,
   APPLICATION_STARTED, 
   bundleInfoChanged,
   bundled,
@@ -75,46 +78,63 @@ export function* mainSaga() {
 
 function* handleApplicationStarted() {
   yield take(APPLICATION_STARTED);
-  yield fork(watchFiles);
   yield fork(startExpressServer);
+  yield fork(watchFiles);
   yield fork(handleBundled);
 }
 
 function* startExpressServer() {
+
   const state: ApplicationState = yield select();
   const port = state.config.port;
-  
-  const webpackConfig = yield call(generateWebpackConfig, state.config);
-
-  yield put(logInfoAction(`Added ${Object.keys(webpackConfig.entry).length} entries`));
-  
-  const compiler = webpack(webpackConfig);
-  yield watchCompilation(compiler);
-
-  yield put(logInfoAction(`dev server is now available at *http://localhost:${port}*`));
 
   const server = express();
-
-  // server.use(multipart());
-  server.use(bodyParser.json());
-  server.use(cors());
-  server.use(webpackDevMiddleware(compiler, {
-    publicPath: "/",
-    stats: webpackConfig.stats
-  }));
-
-  yield fork(handleFileCache, server, state.config, webpackConfig);
-
-  yield fork(addEntryIndexRoutes, server, state.config, webpackConfig);
-  addMainIndexRoute(server, webpackConfig);
-
-  server.use(express.static(__dirname + "/../../front-end"));
-
   const httpServer = server.listen(port);
-
   yield fork(createSocketIOSaga(io(httpServer)));
 
-  return server;
+  let router: express.Router;
+
+  server.use((req, res, next) => {
+    router(req, res, next);
+  });
+
+  yield put(logInfoAction(`dev server is now available at *http://localhost:${port}*`));
+  
+  let compiler: webpack.Compiler;
+  
+  while(true) {
+    if (compiler) {
+      compiler["watchFileSystem"].watcher.close();
+    }
+
+    router = express.Router();
+
+    const state: ApplicationState = yield select();
+    const port = state.config.port;
+    
+    const webpackConfig = yield call(generateWebpackConfig, state.config);
+
+    yield put(logInfoAction(`Bundling ${Object.keys(webpackConfig.entry).length} entries`));
+    
+    compiler = webpack(webpackConfig);
+    yield watchCompilation(compiler);
+
+    router.use(bodyParser.json());
+    router.use(cors());
+    router.use(webpackDevMiddleware(compiler, {
+      publicPath: "/",
+      stats: webpackConfig.stats
+    }));
+
+    addMainIndexRoute(router, webpackConfig);
+    yield fork(handleFileCache, router, state.config, webpackConfig);
+    yield fork(addEntryIndexRoutes, router, state.config, webpackConfig);
+
+    server.use(express.static(__dirname + "/../../front-end"));
+    
+    yield take([FILE_ADDED, FILE_REMOVED]);
+  }
+
 }
 
 function* watchCompilation(compiler: webpack.Compiler) {
@@ -138,19 +158,18 @@ const takeAllRequests = (route: Function, handler: (req: express.Request, res: e
   }
 });
 
-function* addEntryIndexRoutes(server: express.Express, { getEntryIndexHTML }: DevConfig, webpackConfig: webpack.Configuration) {
-  for (const hash of Object.keys(webpackConfig.entry)) {
-    const filePath = webpackConfig.entry[hash];
-    yield takeAllRequests(server.use.bind(server, `/${hash}.html`), function*(req, res) {
-      const state: ApplicationState = yield select();
-      const info = state.bundleInfo && state.bundleInfo[hash];
-      const html = injectPreviewBundle(hash, info, getEntryIndexHTML({ entryName: hash, filePath }));
-      res.send(html);
-    });
-  }
+function* addEntryIndexRoutes(server: express.Router, { getEntryIndexHTML }: DevConfig, webpackConfig: webpack.Configuration) {
+  yield takeAllRequests(server.use.bind(server, `/:hash.html`), function*(req, res) {
+    const { hash } = req.params;
+    const state: ApplicationState = yield select();
+    const filePathMap = yield call(getPreviewFilePathMap);
+    const info = state.bundleInfo && state.bundleInfo[hash];
+    const html = injectPreviewBundle(hash, info, getEntryIndexHTML({ entryName: hash, filePath: filePathMap[hash] }));
+    res.send(html);
+  });
 };
 
-function* handleFileCache(server: express.Express, { getEntryIndexHTML }: DevConfig, webpackConfig: webpack.Configuration) {
+function* handleFileCache(server: express.Router, { getEntryIndexHTML }: DevConfig, webpackConfig: webpack.Configuration) {
   yield takeAllRequests(server.get.bind(server, `/file/:uri`), contrainToCWD(function*(req, res) {
     const { uri } = req.params;
     res.sendFile(getUriFilePath(uri));
@@ -188,14 +207,14 @@ const uriIsInCWD = (uri: string) => {
 
 const injectPreviewBundle = (hash: string, info: BundleEntryInfo, html) => {
   return html.replace('<head>', `<head>
-    <script type="text/javascript" src="preview.bundle.js"></script>
+    <script type="text/javascript" src="/preview.bundle.js"></script>
     <script>
       startPreview("${hash}", ${JSON.stringify(info)});
     </script>
   `);
 };
 
-const addMainIndexRoute = (server: express.Express, webpackConfig: webpack.Configuration) => {
+const addMainIndexRoute = (server: express.Router, webpackConfig: webpack.Configuration) => {
   const entryHashes = Object.keys(webpackConfig.entry);
   server.all(/^(\/|\/index.html)$/, (req, res) => {
     res.send(`
@@ -213,9 +232,22 @@ const addMainIndexRoute = (server: express.Express, webpackConfig: webpack.Confi
   });
 };
 
-function* generateWebpackConfig(config: DevConfig) {
+function* getPreviewFilePaths() {
+  const state: ApplicationState = yield select();
+  return glob.sync(state.config.sourceFilePattern);
+};
 
-  const componentFilePaths = glob.sync(config.sourceFilePattern);
+function* getPreviewFilePathMap() {
+  const paths = yield call(getPreviewFilePaths);
+  const map = {};
+  for (const filePath of paths) {
+    map[getFilePathHash(filePath)] = filePath;
+  }
+  return map;
+}
+
+function* generateWebpackConfig(config: DevConfig) {
+  const componentFilePaths = yield call(getPreviewFilePaths);
 
   const externWebpackConfig = config.webpackConfigPath ? require(config.webpackConfigPath) : {};
 
@@ -265,17 +297,19 @@ function* watchFiles() {
   const state: ApplicationState = yield select();
   yield bubbleEventChannel((emit) => {
     const watcher = chokidar.watch(state.config.sourceFilePattern);
-    watcher.on("add", (path) => {
-      emit(logDebugAction(`added: ${path}`));
-      emit(fileAdded(path));
-    });
-    watcher.on("change", (path) => {
-      emit(logDebugAction(`changed: ${path}`));
-      emit(fileChanged(path, fs.lstatSync(path).mtime));
-    });
-    watcher.on("removed", (path) => {
-      emit(logDebugAction(`removed: ${path}`));
-      emit(fileRemoved(path));
+    watcher.on("ready", () => {
+      watcher.on("add", (path) => {
+        emit(logDebugAction(`added: ${path}`));
+        emit(fileAdded(path));
+      });
+      watcher.on("change", (path) => {
+        emit(logDebugAction(`changed: ${path}`));
+        emit(fileChanged(path, fs.lstatSync(path).mtime));
+      });
+      watcher.on("unlink", (path) => {
+        emit(logDebugAction(`removed: ${path}`));
+        emit(fileRemoved(path));
+      });
     });
     return () => {};
   });

@@ -27,6 +27,8 @@ export type EditTextToolInnerProps = {
   setTextarea: (v: any) => any;
 } & EditTextToolOuterProps;
 
+const TEXT_PADDING = 10
+
 export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zoom }: EditTextToolInnerProps) => {
   if (!workspace.stage.secondarySelection) return null;
   const selectedNode: SyntheticNode = workspace.selectionRefs.map(([type, id]) => getSyntheticNodeById(browser, id)).shift();
@@ -44,12 +46,12 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zo
     position: "absolute",
     left: nodeWindow.bounds.left + bounds.left,
     top: nodeWindow.bounds.top + bounds.top,
-    width: width,
-    height: height,
+    overflow: "visible",
+    background: "white",
+    minWidth: width,
+    minHeight: height,
 
-    // slight opacity so that the white BG doesn't completely block an element
     // that may be on a white background.
-    opacity: 0.7,
     zIndex: 99999999
   };
 
@@ -61,20 +63,18 @@ export const EditTextToolBase = ({ workspace, browser, dispatch, setTextarea, zo
     letterSpacing: computedStyle.letterSpacing,
     textAlign: computedStyle.textAlign,
     padding: computedStyle.padding,
-    background: "white",
     border: "none",
-    // webkitTextFillColor: `transparent`
   };
 
   return <div style={style as any}>
-    <textarea 
+    <span 
      ref={setTextarea}
-    style={{ width: "100%", resize: "none", height: "100%", padding: 0, ...textStyle }} 
-    defaultValue={getSyntheticNodeTextContent(selectedNode).trim()}
+    style={{ resize: "none", overflow: "visible", padding: 0, ...textStyle } as any} 
+    contentEditable
     onChange={wrapEventToDispatch(dispatch, stageToolEditTextChanged.bind(this, selectedNode.$id))}
     onKeyDown={wrapEventToDispatch(dispatch, stageToolEditTextKeyDown.bind(this, selectedNode.$id))}
     onBlur={wrapEventToDispatch(dispatch, stageToolEditTextBlur.bind(this, selectedNode.$id))}
-    ></textarea>
+    >{getSyntheticNodeTextContent(selectedNode).trim()}</span>
   </div>;
 }
 
@@ -84,7 +84,7 @@ const enhanceEditTextTool = compose<EditTextToolInnerProps, EditTextToolOuterPro
   lifecycle<EditTextToolInnerProps, any>({
     componentWillUpdate({ textarea }) {
       if (textarea && this.props.textarea !== textarea) {
-        textarea.select();
+        textarea.focus();
       }
     }
   })
