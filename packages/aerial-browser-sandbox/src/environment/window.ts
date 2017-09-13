@@ -103,6 +103,10 @@ export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInte
     source.resizeTo(target.innerWidth, target.innerHeight);
   };
 
+  const onClose = (event: Event) => {
+    target.close();
+  };
+
   const onUriChanged = (event) => target.dispatchEvent(event);
 
   source.resizeTo(target.innerWidth, target.innerHeight);
@@ -111,6 +115,7 @@ export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInte
   source.addEventListener(SEnvWindowOpenedEvent.WINDOW_OPENED, mirrorEvent);
   source.addEventListener("move", onMove);
   source.addEventListener("resize", onResize);
+  source.addEventListener("close", onClose);
   source.addEventListener(SEnvURIChangedEvent.URI_CHANGED, onUriChanged);
   target.addEventListener("move", onTargetMove);
   target.addEventListener("resize", onTargetResize);
@@ -124,6 +129,7 @@ export const mirrorWindow = (target: SEnvWindowInterface, source: SEnvWindowInte
     source.removeEventListener(SEnvURIChangedEvent.URI_CHANGED, onUriChanged);
     source.removeEventListener("move", onMove);
     source.removeEventListener("resize", onResize);
+    source.removeEventListener("close", onClose);
     target.removeEventListener("move", onTargetMove);
     target.removeEventListener("resize", onTargetResize);
     target.removeEventListener("readystatechange", tryPatching);
@@ -426,6 +432,9 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     captureEvents(): void { }
     close(): void {
       this.closed = true;
+      const event = new SEnvEvent();
+      event.initEvent("close", true, true);
+      this.dispatchEvent(event);
     }
 
     confirm(message?: string): boolean {

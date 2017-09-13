@@ -20,7 +20,7 @@ import * as webpackDevMiddleware from "webpack-dev-middleware";
 import * as WebpackDevServer from "webpack-dev-server";
 import * as HtmlWebpackPlugin from "html-webpack-plugin";
 import { ApplicationState, DevConfig, BundleEntryInfo } from "../state";
-import { bubbleEventChannel, createSocketIOSaga } from "../../common";
+import { bubbleEventChannel, createSocketIOSaga, getFilePathHash } from "../../common";
 import { fileEditorSaga } from "./file-editor";
 import { 
   FILE_CHANGED,
@@ -276,8 +276,6 @@ function* generateWebpackConfig(config: DevConfig) {
 
   return webpackConfig;
 }
-
-const getFilePathHash = filePath => `${md5(filePath)}`;
 
 function* createFileCacheUpdaterPlugin() {
   const fileCacheUpdater = new FileCacheUpdaterPlugin();

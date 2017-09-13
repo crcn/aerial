@@ -20,6 +20,7 @@ export const SYNTHETIC_WINDOW_SCROLL             = "SYNTHETIC_WINDOW_SCROLL";
 export const SYNTHETIC_WINDOW_OPENED             = "SYNTHETIC_WINDOW_OPENED";
 export const SYNTHETIC_WINDOW_PROXY_OPENED       = "SYNTHETIC_WINDOW_PROXY_OPENED";
 export const SYNTHETIC_WINDOW_MOVED              = "SYNTHETIC_WINDOW_MOVED";
+export const SYNTHETIC_WINDOW_CLOSED             = "SYNTHETIC_WINDOW_CLOSED";
 export const SYNTHETIC_WINDOW_RESIZED            = "SYNTHETIC_WINDOW_RESIZED";
 export const SYNTHETIC_WINDOW_RESOURCE_CHANGED   = "SYNTHETIC_WINDOW_RESOURCE_CHANGED";
 
@@ -151,6 +152,11 @@ export const syntheticWindowProxyOpened = (instance: SEnvWindowInterface, browse
 export const syntheticWindowMoved = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({
   instance,
   type: SYNTHETIC_WINDOW_MOVED
+});
+
+export const syntheticWindowClosed = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({
+  instance,
+  type: SYNTHETIC_WINDOW_CLOSED
 });
 
 export const syntheticWindowResized = (instance: SEnvWindowInterface): SyntheticWindowChanged => ({

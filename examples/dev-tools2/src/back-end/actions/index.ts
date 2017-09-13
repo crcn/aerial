@@ -1,25 +1,14 @@
 import { BaseEvent, Mutation, Action } from "aerial-common2";
 import { Express } from "express";
 import { BundleInfo } from "../state";
-import { publicActionFactory } from "../../common"
+import { publicActionFactory, FileAction } from "../../common"
 
 export const APPLICATION_STARTED = "APPLICATION_STARTED";
 export const FILE_CONTENT_MUTATED = "FILE_CONTENT_MUTATED";
 export const EXPRESS_SERVER_STARTED = "EXPRESS_SERVER_STARTED";
-export const FILE_ADDED = "FILE_ADDED";
-export const FILE_REMOVED = "FILE_REMOVED";
-export const FILE_CHANGED = "FILE_CHANGED";
 export const BUNDLED = "BUNDLED";
 
 export const MUTATE_SOURCE_CONTENT = "MUTATE_SOURCE_CONTENT";
-
-export type FileAction = {
-  filePath: string;
-} & Action;
-
-export type FileChanged = {
-  mtime: Date;
-} & FileAction;
 
 export type MutateSourceContentRequest = {
   mutations: Mutation<any>[];
@@ -55,21 +44,6 @@ export const expressServerStarted = (expressServer: Express) => ({
   type: EXPRESS_SERVER_STARTED
 });
 
-export const fileChanged = (filePath: string, mtime: Date): FileChanged => ({
-  filePath,
-  mtime,
-  type: FILE_CHANGED
-});
-
-export const fileAdded = (filePath: string) => ({
-  filePath,
-  type: FILE_ADDED
-});
-
-export const fileRemoved = (filePath: string) => ({
-  filePath,
-  type: FILE_REMOVED
-});
 
 export const bundled = (stats): Bundled => ({
   stats,

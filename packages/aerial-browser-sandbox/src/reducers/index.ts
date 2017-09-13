@@ -26,6 +26,7 @@ import { 
   SyntheticWindowScrolled,
   syntheticWindowOpened,
   SYNTHETIC_WINDOW_MOVED,
+  SYNTHETIC_WINDOW_CLOSED,
   SYNTHETIC_WINDOW_RESIZED,
   SyntheticWindowRectsUpdated,
   SyntheticWindowSourceChanged,
@@ -116,6 +117,11 @@ export const syntheticBrowserReducer = <TRootState extends SyntheticBrowserRootS
           bottom: screenTop + innerHeight,
         }
       });
+    }
+
+    case SYNTHETIC_WINDOW_CLOSED: {
+      const { instance: { $id } } = event as SyntheticWindowChanged;
+      return removeSyntheticWindow(root, $id);
     }
 
     case MOVED: {

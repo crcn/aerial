@@ -46,6 +46,7 @@ import {
   NODE_VALUE_STOPPED_EDITING,
   SYNTHETIC_WINDOW_PROXY_OPENED,
   syntheticWindowMoved,
+  syntheticWindowClosed,
   SYNTHETIC_WINDOW_OPENED,
   SyntheticNodeValueStoppedEditing,
   syntheticWindowProxyOpened,
@@ -354,6 +355,12 @@ function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: st
 
     window.addEventListener("move", (event) => {
       emit(syntheticWindowMoved(window));
+    });
+
+    window.addEventListener("close", (event) => {
+
+      // TODO - need to properly clean up event listeners here
+      emit(syntheticWindowClosed(window));
     });
 
     window.addEventListener("scroll", (event) => {

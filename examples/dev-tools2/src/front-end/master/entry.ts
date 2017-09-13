@@ -1,25 +1,11 @@
-const WINDOW_WIDTH  = 1366;
-const WINDOW_HEIGHT = 768;
-const WINDOW_PADDING = 10;
+import { initApplication } from "./index";
+import { LogLevel } from "aerial-common2";
 
-const startMaster = window["startMaster"] = (entryHashes: string[]) => {
-  openEntryWindows(entryHashes);
+window["startMaster"] = (entryHashes: string[]) => {
+  initApplication({
+    entryHashes,
+    log: {
+      level: LogLevel.ALL
+    }
+  });
 }
-
-const openEntryWindows = (entryHashes: string[]) => {
-  const urls = entryHashes.map(getHashIndexUrl);
-  const windows = [];
-
-  let previousWindowLeft = WINDOW_WIDTH + WINDOW_PADDING;
-
-  for (const url of urls) {
-    const window = open(url);
-    window.moveTo(previousWindowLeft, 0);
-    window.resizeTo(WINDOW_WIDTH, WINDOW_HEIGHT);
-    previousWindowLeft += WINDOW_WIDTH + WINDOW_PADDING;
-  } 
-
-  return windows;
-}
-
-const getHashIndexUrl = (hash: string) => `${location.protocol}//${location.host}/${hash}.html`;
