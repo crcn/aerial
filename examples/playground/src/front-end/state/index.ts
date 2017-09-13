@@ -100,7 +100,7 @@ export type Stage = {
   showTextEditor?: boolean;
   showLeftGutter?: boolean;
   showRightGutter?: boolean;
-}
+};
 
 export type TextEditor = {
   cursorPosition?: ExpressionPosition;

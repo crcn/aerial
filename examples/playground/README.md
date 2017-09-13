@@ -15,16 +15,7 @@ ARIEL IN ARIEL COMPONENT PRIORITIES:
 
 IMMEDIATE:
 
-- [ ] save vscode workspace state 
-- [ ] maintain app state using local session
-- [ ] remove initial window open
-- [ ] meta click to show source in VSCode
-- [ ] store record of previously edited files so that lagging edits
-can still be applied (during loads). 
-- [ ] open any HTML file in VSCode
-- [ ] open/close windows based on changed files in sourceFilesPattern. 
-  - [ ] need to rebundle webpack
-- [ ] change name to Tandem
+- [ ] properly reload CSS
 
 
 NON-GOALS:

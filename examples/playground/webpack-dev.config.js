@@ -8,10 +8,10 @@ module.exports = merge({}, base, {
     rules: [
       ...base.module.rules,
       { 
-        test: /\.tsx$/, 
+        test: /\.ts|\.tsx$/, 
         use: [
           { 
-            loader: `${__dirname}/lib/webpack/jsx-source-transformer`,
+            loader: `${__dirname}/lib/webpack/jsx-source-transformer`
           },
           { 
             loader: 'ts-loader'

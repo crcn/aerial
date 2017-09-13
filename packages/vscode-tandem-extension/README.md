@@ -1,5 +1,6 @@
 TODOS: 
 
+- [ ] meta click to show source in VSCode
 - [ ] open dev server command
 - [ ] open current file in Aerial (whitelisted by dev config, or HTML by default)
 - [ ] send commands to preview HTML server

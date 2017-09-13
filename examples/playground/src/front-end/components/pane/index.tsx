@@ -19,7 +19,7 @@ export const PaneBase = ({ title, controls, children, className }: PaneProps) =
   <div className="header">
     { title } <span className="controls">{ controls }</span>
   </div>
-  <div className="pane-body">
+  <div className="body">
     { children }
   </div>
 </div>;

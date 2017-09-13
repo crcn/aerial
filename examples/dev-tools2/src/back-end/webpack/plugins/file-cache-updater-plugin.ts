@@ -37,6 +37,7 @@ export class FileCacheUpdaterPlugin implements Plugin {
       // check file cache AND make sure that it is not older than the file system
       // copy. 
       const fileCache = getFileCacheItem(filePath, self._appState);
+
       if (fileCache) {
         fs._readFileStorage.data.set(filePath, [null, fileCache[filePath].content]);
       }

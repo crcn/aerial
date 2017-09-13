@@ -3,14 +3,15 @@
 .pane-component {
   min-width: 200px;
 
-  .pane-header {
+  .header {
     padding: $padding-base * 4 $padding-base * 8;
-    .pane-header-controls {
+    text-transform: uppercase;
+    .controls {
       float: right;
     }
-    background: #E5E5E5;
+    background: #F0F0F0;
   }
-  .pane-body {
+  .body {
     padding: $padding-base * 4 $padding-base * 8;
   } 
 }
