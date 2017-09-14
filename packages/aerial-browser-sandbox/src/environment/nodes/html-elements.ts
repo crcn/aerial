@@ -7,6 +7,7 @@ import { SEnvWindowInterface } from "../window";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { SEnvNodeListInterface, getSEnvHTMLCollectionClasses } from "./collections";
 import { getSEnvCSSStyleSheetClass, getSEnvCSSStyleDeclarationClass } from "../css";
+import { SEnvDocumentInterface } from "./document";
 import { weakMemo, SetValueMutation, createSetValueMutation, Mutation } from "aerial-common2";
 import { getSEnvElementClass, SEnvElementInterface, diffBaseElement, patchBaseElement, diffBaseNode } from "./element";
 
@@ -445,17 +446,30 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
       private _filename: string;
       private _resolveContentLoaded: () => any;
       private _rejectContentLoaded: () => any;
+      private _loadCalled: boolean;
 
       get src() {
         return this.getAttribute("src");
       }
 
-      initialize() {
-        super.initialize();
+      set src(value: string) {
+        this.setAttribute("src", value);
+      }
+
+      $setOwnerDocument(document: SEnvDocumentInterface) {
+        super.$setOwnerDocument(document);
+
+        // load the script once it's been added to a parent
+        // element
         this._load();
       }
 
       private async _load() {
+        if (this._loadCalled) {
+          return;
+        }
+        
+        this._loadCalled = true;
         const { src } = this;
         if (src) {
           const window = this.ownerDocument.defaultView;

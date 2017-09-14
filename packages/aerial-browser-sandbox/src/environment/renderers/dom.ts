@@ -164,6 +164,9 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     Array.prototype.forEach.call(this.mount.lastElementChild.querySelectorAll("*"), (element) => {
       const sourceUID = element.dataset.sourceUID;
       if (!sourceUID) return;
+
+      // FIXME: this is a bandaid.
+      if (!childObjectsByUID[sourceUID]) return;
       const $id = childObjectsByUID[sourceUID].$id;
       boundingClientRects[$id] = element.getBoundingClientRect();
       allComputedStyles[$id] = targetWindow.getComputedStyle(element);

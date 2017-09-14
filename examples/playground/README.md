@@ -13,10 +13,17 @@ ARIEL IN ARIEL COMPONENT PRIORITIES:
 - [ ] components panel (fetch from browser extensions API - possibly registered components)
 - [ ] raw CSS inspector
 
+COMPONENTS TO START VISUAL DEV QUICKLY:
+
+- [ ] CSS Inspector
+- [ ] Move style properties to CSS declaration
+- [ ] fix all syncing bugs
+
 IMMEDIATE:
 
+- [ ] connect with browser sync
 - [ ] properly reload CSS
-
+- [ ] cleanup socket.io connections
 
 NON-GOALS:
 
@@ -38,6 +45,11 @@ NON-GOALS:
 - [ ] persisting to local storage needs to reload sibling windows
 - [ ] POST needs to reload sibling windows (not self)
 - [ ] 
+
+- COMPATIBILITY CHECKLIST:
+
+- [ ] works with browser sync
+- [ ] works with webpack HMR
 
 - UX
 

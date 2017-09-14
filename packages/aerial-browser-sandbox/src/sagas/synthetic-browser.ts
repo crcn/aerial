@@ -188,30 +188,44 @@ function* openSyntheticWindowEnvironment(location: string, browserId: string, bo
   const documentId = generateDefaultId();
   const fetch = yield getFetch();
 
-  function* reload (bound?: Bounds) {
+  let currentWindow: SEnvWindowInterface;
 
-    const SEnvWindow = getSEnvWindowClass({ console: getSEnvWindowConsole(), fetch, reload: () => reload() });
-    const window = new SEnvWindow(location);
+  const reloadChan = yield eventChannel((emit) => {
 
-    // ick. Better to use seed function instead to generate UIDs <- TODO.
-    window.$id = windowId;
-    window.document.$id = documentId;
-    window.resetChildObjects();
-
-    if (bound) {
-      window.moveTo(bound.left, bound.top);
-      if (bounds.right) {
-        window.resizeTo(bounds.right - bounds.left, bounds.bottom - bounds.top);
+    const reload = (bounds?: Bounds) => {
+      const SEnvWindow = getSEnvWindowClass({ console: getSEnvWindowConsole(), fetch, reload: () => {
+        return reload();
+      }});
+      const window = currentWindow = new SEnvWindow(location);
+  
+      // ick. Better to use seed function instead to generate UIDs <- TODO.
+      window.$id = windowId;
+      window.document.$id = documentId;
+      window.resetChildObjects();
+  
+      if (bounds) {
+        window.moveTo(bounds.left, bounds.top);
+        if (bounds.right) {
+          window.resizeTo(bounds.right - bounds.left, bounds.bottom - bounds.top);
+        }
       }
-    }
 
-    yield watchWindowExternalResourceUris(window, reload);
-    window.$load();
+      emit(window);
 
-    yield put(syntheticWindowOpened(window, browserId));
-  };
+      return window;
+    };
 
-  return yield call(reload, bounds);
+    reload(bounds);
+
+    return () => { };
+  });
+
+  while(true) {
+    yield watchWindowExternalResourceUris(currentWindow, () => currentWindow.location.reload());
+    currentWindow.$load();
+    yield put(syntheticWindowOpened(currentWindow, browserId));
+    yield take(reloadChan);
+  }
 }
 
 const PADDING = 10;

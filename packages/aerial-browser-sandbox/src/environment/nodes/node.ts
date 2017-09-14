@@ -93,6 +93,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     readonly NOTATION_NODE: number;
     readonly PROCESSING_INSTRUCTION_NODE: number;
     readonly TEXT_NODE: number;
+
     uid: string;
     childNodesArray: Node[];
 

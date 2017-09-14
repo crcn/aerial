@@ -14,10 +14,15 @@ const RETRY_TIMEOUT = 1000 * 2;
 
 export function* createUrlProxyProtocolSaga() {
   const state: ApplicationState = yield select();
-
+  const { proxy } = state;
 
   const adapterBase = {
     async read(uri: string): Promise<any> {
+
+      if (proxy) {
+        uri = `${proxy}${encodeURIComponent(uri)}`;
+      }
+
       let retries = RETRY_COUNT;
 
       let res: Response;

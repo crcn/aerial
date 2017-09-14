@@ -116,6 +116,7 @@ export type Workspace = {
 } & Struct;
 
 export type ApplicationState = {
+  proxy?: string;
   kernel: Kernel;
   workspaces: Workspace[];
   selectedWorkspaceId?: string;

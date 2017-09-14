@@ -349,6 +349,13 @@ const stageReducer = (state: ApplicationState, event: BaseEvent) => {
       const workspace = getSelectedWorkspace(state);
       state = updateWorkspaceStage(state, workspaceId, { container: element });
       const innerBounds = getSyntheticBrowserBounds(getSyntheticBrowser(state, workspace.browserId));
+
+      // no windows loaded
+      if (innerBounds.left + innerBounds.right + innerBounds.top + innerBounds.bottom === 0) {
+        console.warn(`Stage mounted before windows have been loaded`);
+        return state;
+      }
+
       return centerStage(state, workspaceId, innerBounds, false, true);
     };
 

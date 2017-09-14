@@ -134,6 +134,10 @@ export const getSEnvElementClass = weakMemo((context: any) => {
       return this.getAttribute("id");
     }
 
+    set id(value) {
+      this.setAttribute("id", value);
+    }
+
     getAttribute(name: string): string | null { 
       return this.hasAttribute(name) ? this.attributes[name].value : null;
     }

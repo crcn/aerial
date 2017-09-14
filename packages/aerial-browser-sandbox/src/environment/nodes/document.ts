@@ -675,35 +675,41 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     }
 
     getElementsByClassName(classNames: string): HTMLCollectionOf<Element> {
-      // return this.querySelector(`*[class~=${className}]`) as HTMLElement;
+      this._throwUnsupportedMethod();
       return null;
     }
     
     getElementsByName(elementName: string): NodeListOf<HTMLElement> {
+      this._throwUnsupportedMethod();
       return null;
     }
     
     getElementsByTagName<K extends keyof ElementListTagNameMap>(tagname: K): ElementListTagNameMap[K];
-    getElementsByTagName(tagname: string): NodeListOf<Element> {
-      return null;
+    getElementsByTagName(tagName: string): NodeListOf<Element> {
+      return this.querySelectorAll(tagName);
     }
     getElementsByTagNameNS(namespaceURI: "http://www.w3.org/1999/xhtml", localName: string): HTMLCollectionOf<HTMLElement>;
     getElementsByTagNameNS(namespaceURI: "http://www.w3.org/2000/svg", localName: string): HTMLCollectionOf<SVGElement>;
     getElementsByTagNameNS(namespaceURI: string, localName: string): HTMLCollectionOf<Element> {
+      this._throwUnsupportedMethod();
       return null;
     }
     
     getSelection(): Selection {
+      this._throwUnsupportedMethod();
       return null;
     }
     
     hasFocus(): boolean {
+      this._throwUnsupportedMethod();
       return false;
     }
     importNode<T extends Node>(importedNode: T, deep: boolean): T {
+      this._throwUnsupportedMethod();
       return null;
     }
     msElementsFromPoint(x: number, y: number): NodeListOf<Element> {
+      this._throwUnsupportedMethod();
       return null;
     }
     msElementsFromRect(left: number, top: number, width: number, height: number): NodeListOf<Element> {

@@ -31,6 +31,7 @@ type OpenTarget = "_self" | "_blank";
 export interface SEnvWindowInterface extends Window {
   uid: string;
   $id: string;
+  $load();
   fetch: Fetch;
   struct: SyntheticWindow;
   externalResourceUris: string[];
@@ -193,7 +194,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
     readonly menubar: BarProp;
     readonly msContentScript: ExtensionScriptApis;
     readonly msCredentials: MSCredentials;
-    name: string;
+    name: string = "";
     readonly navigator: Navigator;
     offscreenBuffering: string | boolean;
     onabort: (this: Window, ev: UIEvent) => any;

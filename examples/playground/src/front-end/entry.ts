@@ -14,6 +14,7 @@ import {
 
 let state = createApplicationState({
   apiHost: `localhost:8084`,
+  proxy: `http://localhost:8084/proxy/`,
   element: typeof document !== "undefined" ? document.getElementById("application") : undefined,
   log: {
     level: LogLevel.VERBOSE
