@@ -3,3 +3,18 @@ html, body {
   padding: 0;
   font-family: Helvetica;
 }
+
+@keyframes test-keyframes {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media screen {
+  .items {
+    color: red;
+  }
+}
