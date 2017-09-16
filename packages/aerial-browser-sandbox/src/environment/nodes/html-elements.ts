@@ -446,7 +446,7 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
       private _filename: string;
       private _resolveContentLoaded: () => any;
       private _rejectContentLoaded: () => any;
-      private _loadCalled: boolean;
+      private _loaded: boolean;
 
       get src() {
         return this.getAttribute("src");
@@ -454,6 +454,12 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
 
       set src(value: string) {
         this.setAttribute("src", value);
+      }
+
+      initialize() {
+        super.initialize();
+        
+        this._load();
       }
 
       $setOwnerDocument(document: SEnvDocumentInterface) {
@@ -465,11 +471,16 @@ export const getSenvHTMLScriptElementClass = weakMemo((context: any) => {
       }
 
       private async _load() {
-        if (this._loadCalled) {
+        if (this._loaded) {
+          return;
+        }
+
+        // do not load if there is no script
+        if (!this.src && !this.textContent) {
           return;
         }
         
-        this._loadCalled = true;
+        this._loaded = true;
         const { src } = this;
         if (src) {
           const window = this.ownerDocument.defaultView;

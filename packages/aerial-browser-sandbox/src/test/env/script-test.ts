@@ -99,4 +99,18 @@ describe(__filename + "#", () => {
     window.close();
     expect(stripWhitespace(window.document.body.innerHTML)).to.eql(`<span><script src="local://index.js"></script>b<span>a</span></span>`);
   });
+
+  it(`can execute a script in a script via createElement`, async () => {
+    const logs = [];
+    const window = openTestWindow(wrapHTML(`<script>const script = document.createElement("script"); script.textContent = "console.log('hello');"; document.body.appendChild(script); </script>`), {
+      console: {
+        log(text) {
+          logs.push(text);
+        } 
+      } as any
+    });
+    await waitForDocumentComplete(window);
+    expect(logs).to.eql(["hello"]);
+    window.close();
+  });
 }); 

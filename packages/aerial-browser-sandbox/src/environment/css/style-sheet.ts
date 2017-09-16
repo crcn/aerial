@@ -1,4 +1,4 @@
-import { parseCSS } from "./utils";
+import { parseCSS, evaluateCSS } from "./utils";
 import { weakMemo } from "aerial-common2";
 
 export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
@@ -22,14 +22,19 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
     readonly readOnly: boolean;
     readonly rules: CSSRuleList;
 
+    constructor(rules: any = []) {
+      console.log(rules)
+    }
+    
+
     get cssText() {
       return this._cssText;
     }
 
     set cssText(value: string) {
       this._cssText = value;
-      // const expression = parseCSS(value);
-      // console.log(expression);
+      const styleSheet = evaluateCSS(value, this.href);
+      console.log(styleSheet);
     }
     
     addImport(bstrURL: string, lIndex?: number): number {
