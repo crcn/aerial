@@ -9,6 +9,7 @@ GOALS:
   - [ ] visual first, hand-writing second. 
 - [ ] appeal to developers first
   - [ ] similar to chrome inspector for now - evolve later on
+- [ ] low barrier to entry. Install text editor dev tools, start using with project
 
 COMPONENTS TO START VISUAL DEV QUICKLY:
 
@@ -32,6 +33,7 @@ COOL TO HAVE:
 
 IMMEDIATE:
 
+- [ ] finish synthetic browser
 - [ ] synthetic browser tests
 - [ ] connect with browser sync
 - [ ] properly reload CSS

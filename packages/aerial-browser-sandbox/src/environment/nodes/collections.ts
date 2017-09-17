@@ -4,6 +4,7 @@ import { SyntheticNode } from "../../state";
 import { SEnvParentNodeMutationTypes } from "./parent-node";
 import { getSEnvEventClasses, SEnvMutationEventInterface } from "../events";
 import { weakMemo, RemoveChildMutation, InsertChildMutation, diffArray, eachArrayValueMutation } from "aerial-common2";
+import {getSEnvCollection } from "../base";
 
 export interface SEnvNodeListInterface extends Array<SEnvNodeInterface>, NodeList {
   length: number;
@@ -20,18 +21,7 @@ export const getSEnvHTMLCollectionClasses = weakMemo((context: any) => {
   
   const { SEnvMutationEvent } = getSEnvEventClasses(context);
 
-  interface Collection<T> extends Array<T> { } 
-
-  interface CollectionClass {
-    new<T>(...items: T[]): Collection<T>;
-  }
-
-  const _Collection = function(..._this) {
-    _this["__proto__"] = this.constructor.prototype;
-    return _this;
-  } as any as CollectionClass;
-
-  _Collection.prototype = [];
+  const _Collection = getSEnvCollection(context);
 
   class SEnvStyleSheetList extends _Collection<CSSStyleSheet> implements StyleSheetList {
     item(index?: number): StyleSheet {

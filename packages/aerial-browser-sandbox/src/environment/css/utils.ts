@@ -1,7 +1,10 @@
 import * as postcss from "postcss";
 import * as sm from "source-map";
-import { camelCase } from "lodash";
+import { camelCase, without } from "lodash";
 import { getSEnvCSSStyleSheetClass } from "./style-sheet";
+import { getSEnvCSSRuleClasses } from "./rules";
+import { SEnvCSSObjectInterface } from "./base";
+
 
 // TODO - memoize this
 export const parseCSS = (source: string) => {
@@ -9,14 +12,14 @@ export const parseCSS = (source: string) => {
   return expression;
 }
 
-const SEnvCSSStyleSheet = getSEnvCSSStyleSheetClass(null);
-
 // TODO - memoize this
-export const evaluateCSS = (source: string, sourceURI: string, map?: sm.RawSourceMap) => {
+export const evaluateCSS = (source: string, sourceURI: string, context: any, map?: sm.RawSourceMap) => {
 
   const expression = parseCSS(source);
   const sourceMapConsumer = map && new sm.SourceMapConsumer(map);
   const sourceRoot = map && map.sourceRoot || "";
+  const SEnvCSSStyleSheet = getSEnvCSSStyleSheetClass(context);
+  const { SEnvCSSStyleRule, SEnvUnknownGroupingRule, SEnvCSSMediaRule } = getSEnvCSSRuleClasses(context);
 
   function getStyleDeclaration(rules: postcss.Declaration[]) {
 
@@ -33,10 +36,10 @@ export const evaluateCSS = (source: string, sourceURI: string, map?: sm.RawSourc
     }
 
     // return SyntheticCSSStyle.fromObject(obj);
-    return obj;
+    return obj as CSSStyleDeclaration;
   }
 
-  function link<T extends SyntheticCSSObject>(expression: postcss.Node, synthetic: T): T {
+  function link<T extends SEnvCSSObjectInterface>(expression: postcss.Node, synthetic: T): T {
     
     let uri   = sourceURI;
     let start =  expression.source.start;
@@ -82,14 +85,14 @@ export const evaluateCSS = (source: string, sourceURI: string, map?: sm.RawSourc
   const mapAtRule = (atRule: postcss.AtRule): any => {
 
     if (atRule.name === "keyframes") {
-      return link(atRule, new SyntheticCSSKeyframesRule(atRule.params, acceptAll(atRule.nodes)));
+      // return link(atRule, new SyntheticCSSKeyframesRule(atRule.params, acceptAll(atRule.nodes)));
     } else if (atRule.name === "media") {
-      return link(atRule, new SyntheticCSSMediaRule([atRule.params], acceptAll(atRule.nodes)));
+      // return link(atRule, new SyntheticCSSMediaRule([atRule.params], acceptAll(atRule.nodes)));
     } else if (atRule.name === "font-face") {
-      return link(atRule, new SyntheticCSSFontFace(getStyleDeclaration(atRule.nodes as postcss.Declaration[])));
+      // return link(atRule, new SyntheticCSSFontFace(getStyleDeclaration(atRule.nodes as postcss.Declaration[])));
     }
 
-    return link(atRule, new SyntheticCSSUnknownGroupAtRule(atRule.name, atRule.params, acceptAll(atRule.nodes)));
+    return link(atRule, new SEnvUnknownGroupingRule(acceptAll(atRule.nodes)));
   };
 
   const mapComment = (comment: postcss.Comment) => {
@@ -101,7 +104,7 @@ export const evaluateCSS = (source: string, sourceURI: string, map?: sm.RawSourc
   };
 
   const mapRule = (rule: postcss.Rule) => {
-    return link(rule, new SyntheticCSSElementStyleRule(rule.selector, getStyleDeclaration(rule.nodes as postcss.Declaration[])));
+    return link(rule, new SEnvCSSStyleRule(rule.selector, getStyleDeclaration(rule.nodes as postcss.Declaration[])));
   };
 
   const acceptAll = (nodes: postcss.Node[]) => {

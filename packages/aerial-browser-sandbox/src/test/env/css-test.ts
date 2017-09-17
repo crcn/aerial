@@ -12,10 +12,9 @@ describe(__filename + "#", () => {
         }
       </style>`));
       await waitForDocumentComplete(window);
-      const style = window.document.querySelector("style");
+      const style = window.document.querySelector("style") as HTMLStyleElement;
       expect(style).not.to.be.undefined;
-
-      console.log(style.sheet);
+      expect((style.sheet as CSSStyleSheet).cssRules.length).to.eql(1); 
     });
   });
   describe("diff/patch#", () => {
