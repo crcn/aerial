@@ -52,13 +52,13 @@ export const createInsertChildMutation = <T, U>(type: string, target: T, child: 
   index
 });
 
-export const createRemoveChildChildMutation = <T, U>(type: string, target: T, child: U, index: number = Number.MAX_SAFE_INTEGER): RemoveChildMutation<T, U> => struct(type, {
+export const createRemoveChildMutation = <T, U>(type: string, target: T, child: U, index?: number): RemoveChildMutation<T, U> => struct(type, {
   target,
   child,
   index
 });
 
-export const createMoveChildChildMutation = <T, U>(type: string, target: T, child: U, index: number, oldIndex: number): MoveChildMutation<T, U> => struct(type, {
+export const createMoveChildMutation = <T, U>(type: string, target: T, child: U, index: number, oldIndex: number): MoveChildMutation<T, U> => struct(type, {
   target,
   child,
   index,

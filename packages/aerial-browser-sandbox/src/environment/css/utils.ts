@@ -4,6 +4,7 @@ import { camelCase, without } from "lodash";
 import { getSEnvCSSStyleSheetClass } from "./style-sheet";
 import { getSEnvCSSRuleClasses } from "./rules";
 import { SEnvCSSObjectInterface } from "./base";
+import { getSEnvCSSStyleDeclarationClass } from "./declaration";
 
 
 // TODO - memoize this
@@ -19,7 +20,14 @@ export const evaluateCSS = (source: string, sourceURI: string, context: any, map
   const sourceMapConsumer = map && new sm.SourceMapConsumer(map);
   const sourceRoot = map && map.sourceRoot || "";
   const SEnvCSSStyleSheet = getSEnvCSSStyleSheetClass(context);
-  const { SEnvCSSStyleRule, SEnvUnknownGroupingRule, SEnvCSSMediaRule } = getSEnvCSSRuleClasses(context);
+  const SEnvCSSStyleDeclaration = getSEnvCSSStyleDeclarationClass(context);
+  const { 
+    SEnvCSSFontFace, 
+    SEnvCSSStyleRule, 
+    SEnvCSSMediaRule, 
+    SEnvCSSKeyframesRule,
+    SEnvUnknownGroupingRule, 
+  } = getSEnvCSSRuleClasses(context);
 
   function getStyleDeclaration(rules: postcss.Declaration[]) {
 
@@ -35,8 +43,7 @@ export const evaluateCSS = (source: string, sourceURI: string, context: any, map
       obj[camelCase(decl.prop)] = decl.value + (decl.important ? " !important" : "");
     }
 
-    // return SyntheticCSSStyle.fromObject(obj);
-    return obj as CSSStyleDeclaration;
+    return SEnvCSSStyleDeclaration.fromObject(obj);
   }
 
   function link<T extends SEnvCSSObjectInterface>(expression: postcss.Node, synthetic: T): T {
@@ -85,11 +92,11 @@ export const evaluateCSS = (source: string, sourceURI: string, context: any, map
   const mapAtRule = (atRule: postcss.AtRule): any => {
 
     if (atRule.name === "keyframes") {
-      // return link(atRule, new SyntheticCSSKeyframesRule(atRule.params, acceptAll(atRule.nodes)));
+      return link(atRule, new SEnvCSSKeyframesRule(atRule.params, acceptAll(atRule.nodes)));
     } else if (atRule.name === "media") {
-      // return link(atRule, new SyntheticCSSMediaRule([atRule.params], acceptAll(atRule.nodes)));
+      return link(atRule, new SEnvCSSMediaRule(acceptAll(atRule.nodes)));
     } else if (atRule.name === "font-face") {
-      // return link(atRule, new SyntheticCSSFontFace(getStyleDeclaration(atRule.nodes as postcss.Declaration[])));
+      return link(atRule, new SEnvCSSFontFace(getStyleDeclaration(atRule.nodes as postcss.Declaration[])));
     }
 
     return link(atRule, new SEnvUnknownGroupingRule(acceptAll(atRule.nodes)));

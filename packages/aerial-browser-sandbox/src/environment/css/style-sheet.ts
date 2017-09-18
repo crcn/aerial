@@ -1,5 +1,16 @@
 import { parseCSS, evaluateCSS } from "./utils";
-import { weakMemo } from "aerial-common2";
+import { compareCSSRule, diffCSSRule, patchCSSRule } from "./rules";
+import { 
+  weakMemo, 
+  Mutation, 
+  diffArray, 
+  patchArray, 
+  eachArrayValueMutation,
+  createSetValueMutation,
+  createRemoveChildMutation,
+  createMoveChildMutation,
+  createInsertChildMutation,
+} from "aerial-common2";
 import {  getSEnvCSSCollectionClasses } from "./collections";
 import { SEnvCSSObjectInterface } from "./base";
 
@@ -28,7 +39,7 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
     constructor(rules: CSSRule[] = []) {
       this._reset(rules);
     }
-    
+
     get cssText() {
       return this._cssText;
     }
@@ -74,3 +85,41 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
     }
   }
 });
+
+export const STYLE_SHEET_INSERT_RULE = "STYLE_SHEET_INSERT_RULE";
+export const STYLE_SHEET_DELETE_RULE = "STYLE_SHEET_DELETE_RULE";
+export const STYLE_SHEET_MOVE_RULE   = "STYLE_SHEET_MOVE_RULE";
+
+export const styleSheetInsertRule = (styleSheet: CSSStyleSheet, rule: CSSRule, newIndex: number) => createInsertChildMutation(STYLE_SHEET_MOVE_RULE, styleSheet, rule, newIndex);
+
+export const styleSheetDeleteRule = (styleSheet: CSSStyleSheet, rule: CSSRule, newIndex: number, index?: number) => createRemoveChildMutation(STYLE_SHEET_MOVE_RULE, styleSheet, rule, index);
+
+export const styleSheetMoveRule = (styleSheet: CSSStyleSheet, rule: CSSRule, newIndex: number, oldIndex: number) => createMoveChildMutation(STYLE_SHEET_MOVE_RULE, styleSheet, rule, newIndex, oldIndex);
+
+export const diffCSSStyleSheet = (oldSheet: CSSStyleSheet, newSheet: CSSStyleSheet) => {
+  const oldSheetRules = Array.prototype.slice.call(oldSheet.cssRules) as CSSRule[];
+  const diffs = diffArray(oldSheetRules, Array.prototype.slice.call(newSheet.cssRules) as CSSRule[], compareCSSRule);
+
+  const mutations = [];
+
+  eachArrayValueMutation(diffs, {
+    insert({ value, index }) {
+      mutations.push(styleSheetInsertRule(oldSheet, value, index));
+    },
+    delete({ value, index }) {
+      mutations.push(styleSheetInsertRule(oldSheet, value, index));
+    },
+    update({ newValue, patchedOldIndex, index, originalOldIndex }) {
+      if (patchedOldIndex !== index) { 
+        mutations.push(styleSheetMoveRule(oldSheet, newValue, index, patchedOldIndex));
+      }
+      mutations.push(...diffCSSRule(oldSheetRules[originalOldIndex], newValue));
+    }
+  });
+
+  return mutations;
+}
+
+export const patchCSSStyleSheet = (oldSheet: CSSStyleSheet, mutations: Mutation<any>[]) => {
+  console.log(mutations);
+}

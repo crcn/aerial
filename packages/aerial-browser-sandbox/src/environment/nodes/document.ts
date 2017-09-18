@@ -10,8 +10,8 @@ import { 
   eachArrayValueMutation, 
   createSetValueMutation,
   createInsertChildMutation,
-  createMoveChildChildMutation,
-  createRemoveChildChildMutation,
+  createMoveChildMutation,
+  createRemoveChildMutation,
 } from "aerial-common2";
 import { SEnvWindowInterface } from "../window";
 import { getSEnvNodeClass, SEnvNodeInterface, patchValueNode } from "./node";
@@ -782,8 +782,8 @@ export const REMOVE_STYLE_SHEET = "REMOVE_STYLE_SHEET";
 export const MOVE_STYLE_SHEET = "MOVE_STYLE_SHEET";
 
 // export const createInsertStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index?: number) => createInsertChildMutation(INSERT_STYLE_SHEET, target, sheet, index);
-// export const createRemoveStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index?: number) => createRemoveChildChildMutation(REMOVE_STYLE_SHEET, target, sheet, index);
-// export const createMoveStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index: number, oldIndex) => createMoveChildChildMutation(MOVE_STYLE_SHEET, target, sheet, index, oldIndex);
+// export const createRemoveStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index?: number) => createRemoveChildMutation(REMOVE_STYLE_SHEET, target, sheet, index);
+// export const createMoveStyleSheetMutation = (target: SEnvDocumentInterface, sheet: CSSStyleSheet, index: number, oldIndex) => createMoveChildMutation(MOVE_STYLE_SHEET, target, sheet, index, oldIndex);
 
 const createReadyStateChangeMutation = (target: SEnvDocumentInterface, readyState: string): SetValueMutation<SEnvDocumentInterface> => createSetValueMutation(READY_STATE_CHANGE, target, readyState)
 

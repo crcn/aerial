@@ -1,10 +1,14 @@
-import { weakMemo } from "aerial-common2";
+import { weakMemo, diffArray, eachArrayValueMutation, createPropertyMutation, generateDefaultId } from "aerial-common2";
 import { kebabCase, camelCase } from "lodash";
 
-export const isValidCSSDeclarationProperty = (property: string) => !/^([\$_]|\d+$)/.test(property.charAt(0)) && property !== "uid";
+export const isValidCSSDeclarationProperty = (property: string) => !/^([\$_]|\d+$)/.test(property.charAt(0)) && property !== "uid" && property !== "$id";
+
+export interface SEnvCSSStyleDeclaration extends CSSStyleDeclaration {
+  parentRule: CSSRule;
+}
 
 export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
-  return class SEnvCSSStyleDeclaration implements CSSStyleDeclaration {
+  return class SEnvCSSStyleDeclaration implements SEnvCSSStyleDeclaration {
 
     alignContent: string | null;
     alignItems: string | null;
@@ -220,7 +224,7 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
     pageBreakAfter: string | null;
     pageBreakBefore: string | null;
     pageBreakInside: string | null;
-    readonly parentRule: CSSRule;
+    parentRule: CSSRule;
     perspective: string | null;
     perspectiveOrigin: string | null;
     pointerEvents: string | null;
@@ -353,6 +357,11 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
     userSelect: string | null;
     [index: number]: string;
     $length;
+    $id: string;
+
+    constructor() {
+      this.$id = generateDefaultId();
+    }
 
     get length() {
       return this.$length || 0;
@@ -379,6 +388,35 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
         this.setProperty(key, value);
       });
     }
+
+
+  static fromString(source: string) {
+    const decl = new SEnvCSSStyleDeclaration();
+    const items = source.split(";");
+    for (let i = 0, n = items.length; i < n; i++) {
+      const expr = items[i];
+      const [name, value] = expr.split(":");
+      if (!name || !value) continue;
+      decl[camelCase(name.trim())] = value.trim();
+    }
+    decl.$updatePropertyIndices();
+    return decl;
+  }
+
+  static fromObject(declaration: any) {
+    const decl = new SEnvCSSStyleDeclaration();
+    if (declaration.length) {
+      for (let i = 0, n = declaration.length; i < n; i++) {
+        const key = declaration[i];
+        decl[key + ""] = declaration[key];
+      }
+      decl.$updatePropertyIndices();
+    } else {
+      Object.assign(decl, declaration);
+      decl.$updatePropertyIndices();
+    }
+    return decl;
+  }
     
     getPropertyPriority(propertyName: string): string {
       return null;
@@ -477,3 +515,32 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
     }
   }
 });
+
+export const CSS_STYLE_DECLARATION_SET_PROPERTY = "CSS_STYLE_DECLARATION_SET_PROPERTY"; 
+
+export const cssStyleDeclarationSetProperty = (target: CSSStyleDeclaration, key: string, value: string) => createPropertyMutation(CSS_STYLE_DECLARATION_SET_PROPERTY, target, key, value);
+
+export const diffCSStyleDeclaration = (oldStyle: CSSStyleDeclaration, newStyle: CSSStyleDeclaration) => {
+  const oldKeys = Object.keys(oldStyle).filter(isValidCSSDeclarationProperty);
+  const newKeys = Object.keys(oldStyle).filter(isValidCSSDeclarationProperty);
+
+  const diffs = diffArray(oldKeys, newKeys, (a, b) => a === b ? 0 : -1);
+  
+  const mutations = [];
+
+  eachArrayValueMutation(diffs, {
+    insert({ value: key }) {
+      mutations.push(cssStyleDeclarationSetProperty(oldStyle, key, newStyle[key]));
+    },
+    delete({ value: key }) {
+      mutations.push(cssStyleDeclarationSetProperty(oldStyle, key, undefined));
+    },
+    update({ newValue: key }) {
+      if (oldStyle[key] !== newStyle[key]) {
+        mutations.push(cssStyleDeclarationSetProperty(oldStyle, key, newStyle[key]));
+      }
+    }
+  });
+
+  return mutations;
+}

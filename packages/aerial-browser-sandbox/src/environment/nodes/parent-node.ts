@@ -4,8 +4,8 @@ import {
   diffArray, 
   eachArrayValueMutation, 
   createInsertChildMutation,
-  createRemoveChildChildMutation,
-  createMoveChildChildMutation,
+  createRemoveChildMutation,
+  createMoveChildMutation,
   MoveChildMutation,
   InsertChildMutation,
   RemoveChildMutation,
@@ -188,11 +188,11 @@ export const createParentNodeInsertChildMutation = (parent: BasicParentNode, chi
 };
 
 export const createParentNodeRemoveChildMutation = (parent: BasicParentNode, child: BasicNode, index?: number) => {
-  return createRemoveChildChildMutation(SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT, parent, child, index != null ? index : Array.from(parent.childNodes).indexOf(child));
+  return createRemoveChildMutation(SEnvParentNodeMutationTypes.REMOVE_CHILD_NODE_EDIT, parent, child, index != null ? index : Array.from(parent.childNodes).indexOf(child));
 };
 
 export const createParentNodeMoveChildMutation = (oldNode: BasicParentNode, child: BasicNode, index: number, patchedOldIndex?: number) => {
-  return createMoveChildChildMutation(SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT, oldNode, child, patchedOldIndex || Array.from(oldNode.childNodes).indexOf(child), index);
+  return createMoveChildMutation(SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT, oldNode, child, patchedOldIndex || Array.from(oldNode.childNodes).indexOf(child), index);
 };
 
 export const diffParentNode = (oldNode: ParentNode & Node, newNode: ParentNode & Node, diffChildNode: (oldChild: BasicNode, newChild: BasicNode) => Mutation<any>[]) => {

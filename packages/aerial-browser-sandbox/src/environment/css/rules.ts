@@ -1,27 +1,15 @@
-import { weakMemo } from "aerial-common2";
+import { 
+  weakMemo, 
+  Mutation,
+  createSetValueMutation,
+  createPropertyMutation,
+} from "aerial-common2";
+import { diffCSStyleDeclaration, SEnvCSSStyleDeclaration } from "./declaration";
 import { SEnvCSSObjectInterface } from "./base";
 import { getSEnvCSSCollectionClasses } from "./collections";
+import { CSSRuleType } from "../constants";
 
-// https://developer.mozilla.org/en-US/docs/Web/API/CSSRule
-export enum CSSRuleType {
-  STYLE_RULE, // 1
-  CHARSET_RULE,
-  IMPORT_RULE,
-  MEDIA_RULE,
-  FONT_FACE_RULE,
-  PAGE_RULE,
-  KEYFRAMES_RULE,
-  KEYFRAME_RULE,
-  __FUTURE_NS,  // 9
-  NAMESPACE_RULE,
-  COUNTER_STYLE_RULE,
-  SUPPORTS_RULE,
-  DOCUMENT_RULE,
-  FONT_FEATURE_VALUES_RULE,
-  VIEWPORT_RULE,
-  REGION_STYLE_RULE,
-  UNKNOWN_RULE
-};
+
 
 export const getSEnvCSSRuleClasses = weakMemo((context: any) => {
   const { SEnvCSSRuleList } =  getSEnvCSSCollectionClasses(context);
@@ -71,10 +59,11 @@ export const getSEnvCSSRuleClasses = weakMemo((context: any) => {
     selectorText: string;
     readonly style: CSSStyleDeclaration;
     readonly type = CSSRuleType.STYLE_RULE;
-    constructor(selectorText: string, style: CSSStyleDeclaration) {
+    constructor(selectorText: string, style: SEnvCSSStyleDeclaration) {
       super();
       this.selectorText = selectorText;
       this.style = style;
+      style.parentRule = this;
     }
     protected cssTextDidChange() {
       // NOTHING FOR NOW
@@ -106,9 +95,34 @@ export const getSEnvCSSRuleClasses = weakMemo((context: any) => {
 
   class SEnvCSSFontFace extends SEnvCSSRule implements CSSFontFaceRule {
     readonly type = CSSRuleType.FONT_FACE_RULE;
-    readonly style: CSSStyleDeclaration;
+    constructor(readonly style: CSSStyleDeclaration) {
+      super();
+    }
     protected cssTextDidChange() {
 
+    }
+  }
+
+  class SEnvCSSKeyframesRule extends SEnvCSSRule implements CSSKeyframesRule {
+    readonly type = CSSRuleType.FONT_FACE_RULE;
+    readonly cssRules: CSSRuleList;
+    constructor(readonly name: string, rules: CSSRule[] = []) {
+      super();
+      this.cssRules = new SEnvCSSRuleList(...rules);
+    }
+
+    protected cssTextDidChange() {
+
+    }
+
+    appendRule(rule: string) {
+
+    }
+    deleteRule(rule: string) {
+
+    }
+    findRule(rule: string) {
+      return null;
     }
   }
 
@@ -123,7 +137,70 @@ export const getSEnvCSSRuleClasses = weakMemo((context: any) => {
   return {
     SEnvCSSStyleRule,
     SEnvCSSMediaRule,
+    SEnvCSSKeyframesRule,
     SEnvCSSFontFace,
     SEnvUnknownGroupingRule
   };
 });
+
+export const CSS_STYLE_RULE_SET_SELECTOR_TEXT = "STYLE_RULE_SET_SELECTOR_TEXT"; 
+
+const styleRuleSetSelectorText = (rule: CSSStyleRule, selectorText: string) => createSetValueMutation(CSS_STYLE_RULE_SET_SELECTOR_TEXT, rule, selectorText);
+
+const diffStyleRule = (oldRule: CSSStyleRule, newRule: CSSStyleRule) => {
+  const mutations = [];
+
+  if (oldRule.selectorText !== newRule.selectorText) {
+    throw new Error(`Not implemented yet`);
+    // mutations.push(styleRuleSetSelectorText
+  }
+
+  mutations.push(...diffCSStyleDeclaration(oldRule.style, newRule.style));
+
+  return mutations;
+};
+
+
+export const diffCSSRule = (oldRule: CSSRule, newRule: CSSRule) => {
+  if (oldRule.type === CSSRuleType.STYLE_RULE) {
+    return diffStyleRule(oldRule as CSSStyleRule, newRule as CSSStyleRule);
+  }
+  return [];
+};
+
+export const patchCSSRule = (oldRule: CSSRule, mutations: Mutation<any>[]) => {
+  console.log("PATCH");
+};
+
+export const compareCSSRule = (a: CSSRule, b: CSSRule) => {
+  if (a.type !== b.type) {
+    return -1;
+  }
+
+  if (a.cssText === b.cssText) {
+    return 0;
+  }
+
+  if (a.type === CSSRuleType.STYLE_RULE) {
+    const a2 = a as CSSStyleRule;
+    const b2 = b as CSSStyleRule;
+
+    if (a2.selectorText === b2.selectorText) {
+      return 0;
+    }
+
+    return 1;
+  } else if (a.type === CSSRuleType.MEDIA_RULE) {
+    
+  } else if (a.type === CSSRuleType.FONT_FACE_RULE) {
+
+  } else if (a.type === CSSRuleType.KEYFRAMES_RULE) {
+    
+  } else if (a.type === CSSRuleType.KEYFRAME_RULE) {
+
+  } else if (a.type === CSSRuleType.UNKNOWN_RULE) {
+
+  }
+
+  return 1;
+}
