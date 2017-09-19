@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { SEnvWindowInterface, diffCSSStyleSheet, patchCSSStyleSheet } from "../../environment";
+import { SEnvWindowInterface, diffCSSStyleSheet, patchCSSStyleSheet, flattenSyntheticCSSStyleSheetSources, SEnvCSSStyleSheetInterface } from "../../environment";
 import { wrapHTML, openTestWindow, waitForDocumentComplete, stripWhitespace } from "./utils";
 
 describe(__filename + "#", () => {
@@ -114,7 +114,13 @@ describe(__filename + "#", () => {
           }
 
           const mutations = diffCSSStyleSheet(main.document.stylesheets[0] as CSSStyleSheet, current.document.stylesheets[0] as CSSStyleSheet);
-          patchCSSStyleSheet(main.document.stylesheets[0] as CSSStyleSheet, mutations);
+          const allObjects = flattenSyntheticCSSStyleSheetSources((main.document.stylesheets[0] as SEnvCSSStyleSheetInterface).struct);
+
+          for (const mutation of mutations) {
+            const target = allObjects[mutation.target.$id];
+            patchCSSStyleSheet(target, mutation);
+          }
+          
           expect(stripWhitespace((main.document.styleSheets[0] as CSSStyleSheet).cssText)).to.eql(stripWhitespace(variant));
         }
       });

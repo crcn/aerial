@@ -29,6 +29,13 @@ import {
   CSSRuleType,
 } from "../environment/constants";
 
+import {
+  SEnvCSSStyleSheetInterface,
+  SEnvCSSObjectInterface,
+  SEnvCSSRuleInterface,
+  SEnvCSSStyleDeclaration,
+} from "../environment/css";
+
 export const SYNTHETIC_BROWSER_STORE = "SYNTHETIC_BROWSER_STORE";
 export const SYNTHETIC_BROWSER = "SYNTHETIC_BROWSER";
 export const SYNTHETIC_DOCUMENT = "SYNTHETIC_DOCUMENT";
@@ -36,24 +43,31 @@ export const SYNTHETIC_TEXT_NODE = "SYNTHETIC_TEXT_NODE";
 export const SYNTHETIC_WINDOW = "SYNTHETIC_WINDOW";
 export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
 export const SYNTHETIC_COMMENT = "SYNTHETIC_COMMENT";
+export const SYNTHETIC_CSS_STYLE_SHEET = "SYNTHETIC_CSS_STYLE_SHEET";
+export const SYNTHETIC_CSS_STYLE_RULE = "SYNTHETIC_CSS_STYLE_RULE";
+export const SYNTHETIC_CSS_STYLE_DECLARATION = "SYNTHETIC_CSS_STYLE_DECLARATION";
 
 /**
  * CSSOM
  */
 
 export type SyntheticCSSStyleSheet = {
-  cssRules: SyntheticCSSRule;
+  source: SEnvCSSStyleSheetInterface;
+  cssRules: SyntheticCSSRule[];
 } & Struct;
 
 export type SyntheticCSSRule = {
-  type: CSSRuleType
+  source: SEnvCSSRuleInterface;
+  type: CSSRuleType;
 } & Struct;
 
 export type SyntheticCSSStyleRule = {
-  style: SyntheticCSSStyleDeclaration
-} & Struct;
+  source: SEnvCSSObjectInterface;
+  style: SyntheticCSSStyleDeclaration;
+} & SyntheticCSSRule;
 
 export type SyntheticCSSStyleDeclaration = {
+  source: SEnvCSSStyleDeclaration;
   alignContent: string | null;
   alignItems: string | null;
   alignmentBaseline: string | null;
@@ -401,9 +415,6 @@ export type SyntheticCSSStyleDeclaration = {
   userSelect: string | null;
 } & Struct;
 
-
-
-
 /**
  * Basic nodes contain information that all DOM-like structures share
  */
@@ -560,6 +571,14 @@ export const getSyntheticBrowserStoreItemByReference = weakMemo((root: Synthetic
     return getSyntheticWindow(root as any, id);
   }
 });
+
+export const createSyntheticCSSStyleSheet = createStructFactory<SyntheticCSSStyleSheet>(SYNTHETIC_CSS_STYLE_SHEET);
+
+export const createSyntheticCSSStyleRule = createStructFactory<SyntheticCSSStyleRule>(SYNTHETIC_CSS_STYLE_RULE, {
+  type: CSSRuleType.STYLE_RULE
+});
+
+export const createSyntheticCSSStyleDeclaration = createStructFactory<SyntheticCSSStyleDeclaration>(SYNTHETIC_CSS_STYLE_DECLARATION);
 
 export const createSyntheticDocument = createStructFactory<SyntheticDocument>(SYNTHETIC_DOCUMENT, {
   nodeName: "#document",

@@ -1,10 +1,13 @@
-import { weakMemo, diffArray, eachArrayValueMutation, createPropertyMutation, generateDefaultId } from "aerial-common2";
+import { weakMemo, diffArray, eachArrayValueMutation, createPropertyMutation, generateDefaultId, Struct, SetPropertyMutation } from "aerial-common2";
 import { kebabCase, camelCase } from "lodash";
+import { SEnvCSSObjectInterface } from "./base";
+import { createSyntheticCSSStyleDeclaration } from "../../state";
 
-export const isValidCSSDeclarationProperty = (property: string) => !/^([\$_]|\d+$)/.test(property.charAt(0)) && property !== "uid" && property !== "$id";
+export const isValidCSSDeclarationProperty = (property: string) => !/^([\$_]|\d+$)/.test(property.charAt(0)) && property !== "uid" && property !== "$id" && property !== "struct" && property !== "parentRule";
 
 export interface SEnvCSSStyleDeclaration extends CSSStyleDeclaration {
   parentRule: CSSRule;
+  readonly struct: Struct;
 }
 
 export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
@@ -358,9 +361,11 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
     [index: number]: string;
     $length;
     $id: string;
+    struct: Struct;
 
     constructor() {
       this.$id = generateDefaultId();
+      this.resetStruct();
     }
 
     get length() {
@@ -383,40 +388,49 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
     }
 
     set cssText(value: string) {
+      const obj = {};
       value.split(";").forEach((decl) => {
         const [key, value] = decl.split(":");
-        this.setProperty(key, value);
+        obj[key] = value;
       });
+
+      Object.assign(this, obj);
+      this.$updatePropertyIndices();
+      this.resetStruct();
     }
 
-
-  static fromString(source: string) {
-    const decl = new SEnvCSSStyleDeclaration();
-    const items = source.split(";");
-    for (let i = 0, n = items.length; i < n; i++) {
-      const expr = items[i];
-      const [name, value] = expr.split(":");
-      if (!name || !value) continue;
-      decl[camelCase(name.trim())] = value.trim();
-    }
-    decl.$updatePropertyIndices();
-    return decl;
-  }
-
-  static fromObject(declaration: any) {
-    const decl = new SEnvCSSStyleDeclaration();
-    if (declaration.length) {
-      for (let i = 0, n = declaration.length; i < n; i++) {
-        const key = declaration[i];
-        decl[key + ""] = declaration[key];
+    static fromString(source: string) {
+      const decl = new SEnvCSSStyleDeclaration();
+      const items = source.split(";");
+      for (let i = 0, n = items.length; i < n; i++) {
+        const expr = items[i];
+        const [name, value] = expr.split(":");
+        if (!name || !value) continue;
+        decl[camelCase(name.trim())] = value.trim();
       }
       decl.$updatePropertyIndices();
-    } else {
-      Object.assign(decl, declaration);
-      decl.$updatePropertyIndices();
+      return decl;
     }
-    return decl;
-  }
+
+    static fromObject(declaration: any) {
+      const decl = new SEnvCSSStyleDeclaration();
+      if (declaration.length) {
+        for (let i = 0, n = declaration.length; i < n; i++) {
+          const key = declaration[i];
+          decl[key] = declaration[key];
+        }
+        decl.$updatePropertyIndices();
+      } else {
+        Object.assign(decl, declaration);
+        decl.$updatePropertyIndices();
+      }
+      return decl;
+    }
+
+    protected resetStruct(notifyOwnerNode?: boolean) {
+      this.struct = createSyntheticCSSStyleDeclaration({ $id: this.$id, source: this });
+      Object.assign(this.struct, this);
+    }
     
     getPropertyPriority(propertyName: string): string {
       return null;
@@ -467,22 +481,8 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
       }
 
       this.$updatePropertyIndices();
-
-      if (notifyOwnerNode !== true) return;
-
-      // I"m not a fan of sending notifications from another object like this -- I"d typically make this
-      // object an observable, and notify changes from here. However, since this particular class is used so often, sending
-      // notifications from here would be put a notable bottleneck on the app. So, instead we"re notifying the owner of this node (typically the
-      // root document). Less ideal, but achieves the same result of notifying the system of any changes to the synthetic document.
-
-      // TODO
-      // const ownerNode = this.$parentRule && this.$parentRule.ownerNode;
-
-      // if (ownerNode) {
-      //   ownerNode.notify(new PropertyMutation(SyntheticCSSElementStyleRuleMutationTypes.SET_DECLARATION, this.$parentRule, name, newValue, undefined, oldName).toEvent(true));
-      // }
+      this.resetStruct(notifyOwnerNode);
     }
-
 
     public $updatePropertyIndices() {
 
@@ -517,6 +517,12 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
 });
 
 export const CSS_STYLE_DECLARATION_SET_PROPERTY = "CSS_STYLE_DECLARATION_SET_PROPERTY"; 
+
+export const cssStyleDeclarationMutators = {
+  [CSS_STYLE_DECLARATION_SET_PROPERTY](target: CSSStyleDeclaration, mutation: SetPropertyMutation<any>) {
+    target.setProperty(mutation.name, mutation.newValue);
+  }
+}
 
 export const cssStyleDeclarationSetProperty = (target: CSSStyleDeclaration, key: string, value: string) => createPropertyMutation(CSS_STYLE_DECLARATION_SET_PROPERTY, target, key, value);
 

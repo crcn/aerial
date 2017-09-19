@@ -26,6 +26,7 @@ LITMUS:
 
 - [ ] rebuild mesh.js.org (as async await iterator library)
 - [ ] rebuild paperclip.js.org 
+- [ ] test against 4k styles
 
 COOL TO HAVE:
 

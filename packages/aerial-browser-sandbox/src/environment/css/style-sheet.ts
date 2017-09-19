@@ -1,5 +1,7 @@
 import { parseCSS, evaluateCSS } from "./utils";
-import { compareCSSRule, diffCSSRule, patchCSSRule } from "./rules";
+import { SyntheticCSSStyleSheet, createSyntheticCSSStyleSheet, SYNTHETIC_CSS_STYLE_SHEET } from "../../state";
+import { CSSRuleType } from "../constants";
+import { compareCSSRule, diffCSSRule, flattenCSSRuleSources, cssRuleMutators } from "./rules";
 import { 
   weakMemo, 
   Mutation, 
@@ -12,13 +14,18 @@ import {
   createInsertChildMutation,
 } from "aerial-common2";
 import {  getSEnvCSSCollectionClasses } from "./collections";
-import { SEnvCSSObjectInterface } from "./base";
+import { SEnvCSSObjectInterface, getSEnvCSSBaseObjectClass } from "./base";
+
+export interface SEnvCSSStyleSheetInterface extends CSSStyleSheet, SEnvCSSObjectInterface {
+  struct: SyntheticCSSStyleSheet;
+  childDidChange();
+}
 
 export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
   const { SEnvCSSRuleList } =  getSEnvCSSCollectionClasses(context);
-  return class SEnvCSSSytyleSheet implements CSSStyleSheet,  SEnvCSSObjectInterface {
+  const SEnvCSSBaseObject = getSEnvCSSBaseObjectClass(context);
+  return class SEnvCSSSytyleSheet extends SEnvCSSBaseObject implements SEnvCSSStyleSheetInterface {
     disabled: boolean;
-    $source: any;
     private _rules: CSSRuleList;
     readonly href: string;
     readonly media: MediaList;
@@ -26,7 +33,6 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
     readonly parentStyleSheet: StyleSheet;
     readonly title: string;
     readonly type: string;
-    private _cssText: string;
     readonly id: string;
     readonly imports: StyleSheetList;
     readonly isAlternate: boolean;
@@ -35,13 +41,15 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
     readonly owningElement: Element;
     readonly pages: StyleSheetPageList;
     readonly readOnly: boolean;
+    struct: SyntheticCSSStyleSheet;
 
     constructor(rules: CSSRule[] = []) {
+      super();
       this._reset(rules);
     }
 
     get cssText() {
-      return this._cssText;
+      return Array.prototype.map.call(this.cssRules, rule => rule.cssText).join("\n");
     }
 
     get rules(): CSSRuleList {
@@ -52,8 +60,19 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
       return this._rules;
     }
 
+    $createStruct(): SyntheticCSSStyleSheet {
+      return createSyntheticCSSStyleSheet({ 
+        $id: this.$id,
+        source: this,
+        cssRules: Array.prototype.map.call(this.cssRules, ((rule: SEnvCSSObjectInterface) => rule.struct))
+      });
+    }
+
+    childDidChange() {
+      this._struct = undefined;
+    }
+
     set cssText(value: string) {
-      this._cssText = value;
       const styleSheet = evaluateCSS(value, this.href, context);
       this._reset(styleSheet.cssRules);
     }
@@ -90,6 +109,11 @@ export const STYLE_SHEET_INSERT_RULE = "STYLE_SHEET_INSERT_RULE";
 export const STYLE_SHEET_DELETE_RULE = "STYLE_SHEET_DELETE_RULE";
 export const STYLE_SHEET_MOVE_RULE   = "STYLE_SHEET_MOVE_RULE";
 
+const cssStyleSheetMutators = {
+  ...cssRuleMutators,
+  // [STYLE_SHEET_INSERT_RULE]: ()
+}
+
 export const styleSheetInsertRule = (styleSheet: CSSStyleSheet, rule: CSSRule, newIndex: number) => createInsertChildMutation(STYLE_SHEET_MOVE_RULE, styleSheet, rule, newIndex);
 
 export const styleSheetDeleteRule = (styleSheet: CSSStyleSheet, rule: CSSRule, newIndex: number, index?: number) => createRemoveChildMutation(STYLE_SHEET_MOVE_RULE, styleSheet, rule, index);
@@ -120,6 +144,18 @@ export const diffCSSStyleSheet = (oldSheet: CSSStyleSheet, newSheet: CSSStyleShe
   return mutations;
 }
 
-export const patchCSSStyleSheet = (oldSheet: CSSStyleSheet, mutations: Mutation<any>[]) => {
-  console.log(mutations);
+export const flattenSyntheticCSSStyleSheetSources = weakMemo((sheet: SyntheticCSSStyleSheet): { [identifier: string]: SEnvCSSObjectInterface } => {
+  const flattened = { [sheet.$id]: sheet.source };
+  for (let i = 0, n = sheet.cssRules.length; i < n; i++) {
+    Object.assign(flattened, flattenCSSRuleSources(sheet.cssRules[i]));
+  }
+  return flattened;
+});
+
+export const patchCSSStyleSheet = (target: SEnvCSSObjectInterface, mutation: Mutation<any>) => {
+  const mutate = cssStyleSheetMutators[mutation.$type] as any as (target: SEnvCSSObjectInterface, mutation: Mutation<any>) => any;
+  if (!mutate) {
+    throw new Error(`Cannot apply mutation ${mutation.$type} on CSS object`);
+  }
+  return mutate(target, mutation);
 }
