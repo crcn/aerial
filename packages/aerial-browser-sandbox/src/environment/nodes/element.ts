@@ -3,7 +3,7 @@ import { difference } from "lodash";
 import { diffTextNode } from "./text";
 import { SEnvNodeTypes } from "../constants";
 import { weakMemo, diffArray, eachArrayValueMutation, Mutation, createPropertyMutation, SetPropertyMutation } from "aerial-common2";
-import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface, patchParentNode } from "./parent-node";
+import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface, parentNodeMutators } from "./parent-node";
 import { getSEnvEventClasses } from "../events";
 import { evaluateHTMLDocumentFragment, constructNode } from "./utils";
 import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
@@ -342,6 +342,7 @@ export const getSEnvElementClass = weakMemo((context: any) => {
       const e = new SEnvMutationEvent();
       e.initMutationEvent(createPropertyMutation(SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT, this, name, newValue, oldValue));
       this.dispatchEvent(e);
+      this.didChange();
     }
 
 
@@ -406,8 +407,9 @@ export const diffBaseElement = (oldElement: Element, newElement: Element, diffCh
   return mutations;
 };
 
-export const patchBaseElement = (oldElement: Element, mutation: Mutation<any>) => {
-  if (mutation.$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
+export const baseElementMutators = {
+  ...parentNodeMutators,
+  [SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT](oldElement: Element, mutation: Mutation<any>) {
     
     const { name, oldName, newValue } = <SetPropertyMutation<any>>mutation;
 
@@ -439,7 +441,43 @@ export const patchBaseElement = (oldElement: Element, mutation: Mutation<any>) =
 
       oldElement.removeAttribute(oldName);
     }
-  } else {
-    patchParentNode(oldElement, mutation);
   }
-};
+}
+
+// export const patchBaseElement = (oldElement: Element, mutation: Mutation<any>) => {
+//   if (mutation.$type === SyntheticDOMElementMutationTypes.SET_ELEMENT_ATTRIBUTE_EDIT) {
+    
+//     const { name, oldName, newValue } = <SetPropertyMutation<any>>mutation;
+
+//     // need to set the current value (property), and the default value (attribute)
+//     // TODO - this may need to be separated later on.
+//     if (oldElement.constructor.prototype.hasOwnProperty(name)) {
+
+//       oldElement[name] = newValue == null ? "" : newValue;
+//     }
+
+//     if (newValue == null) {
+//       oldElement.removeAttribute(name);
+//     } else {
+
+//       // An error will be thrown by the DOM if the name is invalid. Need to ignore
+//       // native exceptions so that other parts of the app do not break.
+//       try {
+
+//         oldElement.setAttribute(name, newValue);
+//       } catch(e) {
+//         console.warn(e);
+//       }
+//     }
+
+//     if (oldName) {
+//       if (oldElement.hasOwnProperty(oldName)) {
+//         oldElement[oldName] = undefined;
+//       }
+
+//       oldElement.removeAttribute(oldName);
+//     }
+//   } else {
+//     patchParentNode(oldElement, mutation);
+//   }
+// };

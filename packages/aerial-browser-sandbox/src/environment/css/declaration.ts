@@ -380,7 +380,7 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
         const key = this[i];
         const value = this[key];
         if (value) {
-          buffer.push("\t", kebabCase(key), ": ", value, ";\n");
+          buffer.push(kebabCase(key), ": ", value, ";");
         }
       }
 
@@ -428,7 +428,7 @@ export const getSEnvCSSStyleDeclarationClass = weakMemo((context) => {
     }
 
     protected resetStruct(notifyOwnerNode?: boolean) {
-      this.struct = createSyntheticCSSStyleDeclaration({ $id: this.$id, source: this });
+      this.struct = createSyntheticCSSStyleDeclaration({ $id: this.$id, instance: this });
       Object.assign(this.struct, this);
     }
     

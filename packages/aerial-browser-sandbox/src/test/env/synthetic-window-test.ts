@@ -38,6 +38,9 @@ describe(__filename + "#", () => {
             const diffs = diffWindow(mainWindow, newWindow);
             patchWindow(mainWindow, diffs);
             expect(mainWindow.document.body.innerHTML).to.eql(newWindow.document.body.innerHTML);
+            if (mainWindow.document.stylesheets[0]) {
+              expect(mainWindow.document.stylesheets[0].cssText).to.eql((newWindow.document.stylesheets[0] as CSSStyleSheet).cssText);
+            }
           } else {
             mainWindow = newWindow;
           }

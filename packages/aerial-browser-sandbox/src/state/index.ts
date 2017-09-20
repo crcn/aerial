@@ -33,8 +33,10 @@ import {
   SEnvCSSStyleSheetInterface,
   SEnvCSSObjectInterface,
   SEnvCSSRuleInterface,
+  SEnvWindowInterface,
+  SEnvNodeInterface,
   SEnvCSSStyleDeclaration,
-} from "../environment/css";
+} from "../environment";
 
 export const SYNTHETIC_BROWSER_STORE = "SYNTHETIC_BROWSER_STORE";
 export const SYNTHETIC_BROWSER = "SYNTHETIC_BROWSER";
@@ -45,6 +47,11 @@ export const SYNTHETIC_ELEMENT = "SYNTHETIC_ELEMENT";
 export const SYNTHETIC_COMMENT = "SYNTHETIC_COMMENT";
 export const SYNTHETIC_CSS_STYLE_SHEET = "SYNTHETIC_CSS_STYLE_SHEET";
 export const SYNTHETIC_CSS_STYLE_RULE = "SYNTHETIC_CSS_STYLE_RULE";
+export const SYNTHETIC_CSS_MEDIA_RULE = "SYNTHETIC_CSS_MEDIA_RULE";
+export const SYNTHETIC_CSS_UNKNOWN_RULE = "SYNTHETIC_CSS_UNKNOWN_RULE";
+export const SYNTHETIC_CSS_KEYFRAME_RULE = "SYNTHETIC_CSS_KEYFRAME_RULE";
+export const SYNTHETIC_CSS_FONT_FACE_RULE = "SYNTHETIC_CSS_FONT_FACE_RULE";
+export const SYNTHETIC_CSS_KEYFRAMES_RULE = "SYNTHETIC_CSS_KEYFRAMES_RULE";
 export const SYNTHETIC_CSS_STYLE_DECLARATION = "SYNTHETIC_CSS_STYLE_DECLARATION";
 
 /**
@@ -52,22 +59,52 @@ export const SYNTHETIC_CSS_STYLE_DECLARATION = "SYNTHETIC_CSS_STYLE_DECLARATION"
  */
 
 export type SyntheticCSSStyleSheet = {
-  source: SEnvCSSStyleSheetInterface;
+  instance: SEnvCSSStyleSheetInterface;
   cssRules: SyntheticCSSRule[];
 } & Struct;
 
 export type SyntheticCSSRule = {
-  source: SEnvCSSRuleInterface;
+  instance: SEnvCSSRuleInterface;
   type: CSSRuleType;
 } & Struct;
 
 export type SyntheticCSSStyleRule = {
-  source: SEnvCSSObjectInterface;
+  instance: SEnvCSSObjectInterface;
   style: SyntheticCSSStyleDeclaration;
 } & SyntheticCSSRule;
 
+export type SyntheticCSSGroupingRule = {
+  instance: SEnvCSSObjectInterface;
+  style: SyntheticCSSStyleDeclaration;
+  rules: SyntheticCSSRule[];
+} & SyntheticCSSRule;
+
+export type SyntheticCSSMediaRule = {
+  instance: SEnvCSSObjectInterface;
+  conditionText: string;
+} & SyntheticCSSGroupingRule;
+
+export type SyntheticCSSFontFaceRule = {
+  instance: SEnvCSSObjectInterface;
+  style: SyntheticCSSStyleDeclaration;
+} & SyntheticCSSRule;
+
+export type SyntheticCSSKeyframeRule = {
+  instance: SEnvCSSObjectInterface;
+  keyText: string;
+  style: SyntheticCSSStyleDeclaration;
+} & SyntheticCSSRule;
+
+export type SyntheticCSSKeyframesRule = {
+  instance: SEnvCSSObjectInterface;
+} & SyntheticCSSGroupingRule;
+
+export type SyntheticCSSUnknownGroupingRule = {
+  params: string;
+} & SyntheticCSSGroupingRule;
+
 export type SyntheticCSSStyleDeclaration = {
-  source: SEnvCSSStyleDeclaration;
+  instance: SEnvCSSStyleDeclaration;
   alignContent: string | null;
   alignItems: string | null;
   alignmentBaseline: string | null;
@@ -461,6 +498,8 @@ export type SyntheticBaseNode = {
 } & BasicNode & Struct;
 
 export type SyntheticNode = {
+  instance: SEnvNodeInterface;
+  childNodes?: ArrayLike<SyntheticNode>;
 } & SyntheticBaseNode;
 
 export type SyntheticParentNode = {
@@ -576,6 +615,26 @@ export const createSyntheticCSSStyleSheet = createStructFactory<SyntheticCSSStyl
 
 export const createSyntheticCSSStyleRule = createStructFactory<SyntheticCSSStyleRule>(SYNTHETIC_CSS_STYLE_RULE, {
   type: CSSRuleType.STYLE_RULE
+});
+
+export const createSyntheticCSSMediaRule = createStructFactory<SyntheticCSSMediaRule>(SYNTHETIC_CSS_MEDIA_RULE, {
+  type: CSSRuleType.MEDIA_RULE
+});
+
+export const createSyntheticCSSFontFaceRule = createStructFactory<SyntheticCSSFontFaceRule>(SYNTHETIC_CSS_FONT_FACE_RULE, {
+  type: CSSRuleType.FONT_FACE_RULE
+});
+
+export const createSyntheticCSSKeyframeRule = createStructFactory<SyntheticCSSStyleRule>(SYNTHETIC_CSS_KEYFRAME_RULE, {
+  type: CSSRuleType.KEYFRAME_RULE
+});
+
+export const createSyntheticCSSKeyframesRule = createStructFactory<SyntheticCSSKeyframesRule>(SYNTHETIC_CSS_KEYFRAMES_RULE, {
+  type: CSSRuleType.KEYFRAMES_RULE
+});
+
+export const createSyntheticCSSUnknownGroupingRule = createStructFactory<SyntheticCSSUnknownGroupingRule>(SYNTHETIC_CSS_UNKNOWN_RULE, {
+  type: CSSRuleType.UNKNOWN_RULE
 });
 
 export const createSyntheticCSSStyleDeclaration = createStructFactory<SyntheticCSSStyleDeclaration>(SYNTHETIC_CSS_STYLE_DECLARATION);

@@ -6,10 +6,11 @@ import { getUri } from "../utils";
 import { SEnvWindowInterface } from "../window";
 import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
 import { SEnvNodeListInterface, getSEnvHTMLCollectionClasses } from "./collections";
-import { getSEnvCSSStyleSheetClass, getSEnvCSSStyleDeclarationClass } from "../css";
+import { getSEnvCSSStyleSheetClass, getSEnvCSSStyleDeclarationClass, diffCSSStyleSheet, patchCSSStyleSheet, flattenSyntheticCSSStyleSheetSources, SEnvCSSStyleSheetInterface, cssStyleSheetMutators } from "../css";
 import { SEnvDocumentInterface } from "./document";
+import { SyntheticNode } from "../../state";
 import { weakMemo, SetValueMutation, createSetValueMutation, Mutation } from "aerial-common2";
-import { getSEnvElementClass, SEnvElementInterface, diffBaseElement, patchBaseElement, diffBaseNode } from "./element";
+import { getSEnvElementClass, SEnvElementInterface, diffBaseElement, diffBaseNode, baseElementMutators } from "./element";
 
 export interface SEnvHTMLElementInterface extends HTMLElement, SEnvElementInterface {
   $$preconstruct();
@@ -269,7 +270,6 @@ export const getSEnvHTMLStyleElementClass = weakMemo((context: any) => {
 
 export const diffHTMLStyleElement = (oldElement: HTMLStyledElement, newElement: HTMLStyledElement) => diffHTMLStyledElement(oldElement, newElement);
 
-export const patchHTMLStyleElement = (oldElement: HTMLStyledElement, mutation: Mutation<any>) => patchHTMLStyledElement(oldElement, mutation);
 
 export const getSEnvHTMLLinkElementClass = weakMemo((context: any) => {
   const SEnvHTMLElement = getSEnvHTMLElementClass(context);
@@ -387,28 +387,28 @@ export const SET_STYLED_ELEMENT_SHEET = "SET_STYLED_ELEMENT_SHEET";
 export const setStyledElementSheetMutation = (target: HTMLStyledElement, sheet: CSSStyleSheet) => createSetValueMutation(SET_STYLED_ELEMENT_SHEET, target, sheet);
 
 export const diffHTMLStyledElement = (oldElement: HTMLStyledElement, newElement: HTMLStyledElement) => {
-
-  const mutations = [];
-
-  // TODO - patch here instead
-  if ((oldElement.sheet as CSSStyleSheet).cssText !== (newElement.sheet as CSSStyleSheet).cssText) {
-    mutations.push(setStyledElementSheetMutation(oldElement, (newElement.sheet as CSSStyleSheet)));
-  }
-
   return [
-    ...mutations,
-    ...diffBaseElement(oldElement, newElement)
-  ]
+    ...diffBaseElement(oldElement, newElement),
+    ...diffCSSStyleSheet(oldElement.sheet as CSSStyleSheet, newElement.sheet as CSSStyleSheet)
+  ];
 }
 
-export const patchHTMLStyledElement = (oldElement: HTMLStyledElement, mutation: Mutation<any>) => {
-  switch(mutation.$type) {
-    case SET_STYLED_ELEMENT_SHEET: {
+export const flattenNodeSources = weakMemo((node: SyntheticNode) => {
+  const flattened = { [node.$id]: node.instance };
 
+  // TODO - use callback here
+  if ((node.nodeName === "STYLE" || node.nodeName === "LINK") && (node.instance as any as HTMLStyleElement).sheet) {
+    Object.assign(flattened, flattenSyntheticCSSStyleSheetSources(((node.instance as any as HTMLStyleElement).sheet as SEnvCSSStyleSheetInterface).struct));
+  }
+
+  if (node.childNodes) {
+    for (let i = 0, n = node.childNodes.length; i < n; i++) {
+      Object.assign(flattened, flattenNodeSources(node.childNodes[i]));
     }
   }
-}
 
+  return flattened;
+});
 
 export const diffHTMLLinkElement = (oldElement: HTMLLinkElement, newElement: HTMLLinkElement) => {
   if (oldElement.rel === "stylesheet") {
@@ -417,8 +417,6 @@ export const diffHTMLLinkElement = (oldElement: HTMLLinkElement, newElement: HTM
     return diffBaseElement(oldElement, newElement);
   }
 }
-
-export const patchHTMLLinkElement = (oldElement: HTMLLinkElement, mutation: Mutation<any>) => patchHTMLStyledElement(oldElement, mutation);
 
 const _scriptCache = {};
 
@@ -1594,18 +1592,13 @@ export const diffHTMLNode = (oldElement: Node, newElement: Node) => {
   if (oldElement.nodeName === "LINK") {
     return diffHTMLLinkElement(oldElement as HTMLLinkElement, newElement as HTMLLinkElement);
   } else if (oldElement.nodeName === "STYLE") {
-    return diffHTMLLinkElement(oldElement as HTMLLinkElement, newElement as HTMLLinkElement);
+    return diffHTMLStyleElement(oldElement as HTMLLinkElement, newElement as HTMLLinkElement);
   }
 
   return diffBaseNode(oldElement, newElement, diffHTMLNode);
 }
 
-export const patchHTMLNode = (oldElement: HTMLElement, mutation: Mutation<any>) => {
-  if (oldElement.nodeName === "LINK") {
-    return patchHTMLLinkElement(oldElement as HTMLLinkElement, mutation);
-  } else if (oldElement.nodeName === "STYLE") {
-    return patchHTMLStyleElement(oldElement as HTMLStyleElement, mutation);
-  }
-
-  return patchBaseElement(oldElement, mutation);
-}
+export const baseHTMLElementMutators = {
+  ...baseElementMutators,
+  ...cssStyleSheetMutators
+};

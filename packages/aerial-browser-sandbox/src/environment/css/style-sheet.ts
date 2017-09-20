@@ -1,7 +1,7 @@
 import { parseCSS, evaluateCSS } from "./utils";
 import { SyntheticCSSStyleSheet, createSyntheticCSSStyleSheet, SYNTHETIC_CSS_STYLE_SHEET } from "../../state";
 import { CSSRuleType } from "../constants";
-import { compareCSSRule, diffCSSRule, flattenCSSRuleSources, cssRuleMutators } from "./rules";
+import { compareCSSRule, diffCSSRule, flattenCSSRuleSources, cssRuleMutators, diffCSSParentObject, cssParentMutators, cssInsertRule, cssDeleteRule } from "./rules";
 import { 
   weakMemo, 
   Mutation, 
@@ -49,7 +49,7 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
     }
 
     get cssText() {
-      return Array.prototype.map.call(this.cssRules, rule => rule.cssText).join("\n");
+      return Array.prototype.map.call(this.cssRules, rule => rule.cssText).join(" \n");
     }
 
     get rules(): CSSRuleList {
@@ -63,7 +63,7 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
     $createStruct(): SyntheticCSSStyleSheet {
       return createSyntheticCSSStyleSheet({ 
         $id: this.$id,
-        source: this,
+        instance: this,
         cssRules: Array.prototype.map.call(this.cssRules, ((rule: SEnvCSSObjectInterface) => rule.struct))
       });
     }
@@ -91,16 +91,19 @@ export const getSEnvCSSStyleSheetClass = weakMemo((context: any) => {
       throw new Error(`not currently supported`);
     }
     deleteRule(index?: number): void {
-      throw new Error(`not currently supported`);
+      return cssDeleteRule(this, index);
     }
-    insertRule(rule: string, index?: number): number {
-      throw new Error(`not currently supported`);
+    insertRule(rule: string|CSSRule, index?: number): number {
+      return cssInsertRule(this, rule, index, context);
     }
     removeImport(lIndex: number): void {
       throw new Error(`not currently supported`);
     }
     removeRule(lIndex: number): void {
-      throw new Error(`not currently supported`);
+      return cssDeleteRule(this, lIndex);
+    }
+    didChange() {
+
     }
   }
 });
@@ -109,8 +112,8 @@ export const STYLE_SHEET_INSERT_RULE = "STYLE_SHEET_INSERT_RULE";
 export const STYLE_SHEET_DELETE_RULE = "STYLE_SHEET_DELETE_RULE";
 export const STYLE_SHEET_MOVE_RULE   = "STYLE_SHEET_MOVE_RULE";
 
-const cssStyleSheetMutators = {
-  ...cssRuleMutators,
+export const cssStyleSheetMutators = {
+  ...cssParentMutators,
   // [STYLE_SHEET_INSERT_RULE]: ()
 }
 
@@ -121,31 +124,11 @@ export const styleSheetDeleteRule = (styleSheet: CSSStyleSheet, rule: CSSRule, n
 export const styleSheetMoveRule = (styleSheet: CSSStyleSheet, rule: CSSRule, newIndex: number, oldIndex: number) => createMoveChildMutation(STYLE_SHEET_MOVE_RULE, styleSheet, rule, newIndex, oldIndex);
 
 export const diffCSSStyleSheet = (oldSheet: CSSStyleSheet, newSheet: CSSStyleSheet) => {
-  const oldSheetRules = Array.prototype.slice.call(oldSheet.cssRules) as CSSRule[];
-  const diffs = diffArray(oldSheetRules, Array.prototype.slice.call(newSheet.cssRules) as CSSRule[], compareCSSRule);
-
-  const mutations = [];
-
-  eachArrayValueMutation(diffs, {
-    insert({ value, index }) {
-      mutations.push(styleSheetInsertRule(oldSheet, value, index));
-    },
-    delete({ value, index }) {
-      mutations.push(styleSheetInsertRule(oldSheet, value, index));
-    },
-    update({ newValue, patchedOldIndex, index, originalOldIndex }) {
-      if (patchedOldIndex !== index) { 
-        mutations.push(styleSheetMoveRule(oldSheet, newValue, index, patchedOldIndex));
-      }
-      mutations.push(...diffCSSRule(oldSheetRules[originalOldIndex], newValue));
-    }
-  });
-
-  return mutations;
+  return diffCSSParentObject(oldSheet, newSheet);
 }
 
 export const flattenSyntheticCSSStyleSheetSources = weakMemo((sheet: SyntheticCSSStyleSheet): { [identifier: string]: SEnvCSSObjectInterface } => {
-  const flattened = { [sheet.$id]: sheet.source };
+  const flattened = { [sheet.$id]: sheet.instance };
   for (let i = 0, n = sheet.cssRules.length; i < n; i++) {
     Object.assign(flattened, flattenCSSRuleSources(sheet.cssRules[i]));
   }
@@ -154,6 +137,7 @@ export const flattenSyntheticCSSStyleSheetSources = weakMemo((sheet: SyntheticCS
 
 export const patchCSSStyleSheet = (target: SEnvCSSObjectInterface, mutation: Mutation<any>) => {
   const mutate = cssStyleSheetMutators[mutation.$type] as any as (target: SEnvCSSObjectInterface, mutation: Mutation<any>) => any;
+
   if (!mutate) {
     throw new Error(`Cannot apply mutation ${mutation.$type} on CSS object`);
   }

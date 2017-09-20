@@ -1,6 +1,6 @@
 import { cancel, fork, take, put, call, spawn, actionChannel, select } from "redux-saga/effects";
 import { eventChannel, delay } from "redux-saga";
-import { difference, debounce } from "lodash";
+import { difference, debounce, values } from "lodash";
 import { createQueue } from "mesh";
 
 import { 
@@ -130,6 +130,7 @@ import {
   SEnvDocumentInterface,
   waitForDocumentComplete,
   SEnvHTMLElementInterface,
+  flattenWindowObjectSources,
   SyntheticWindowRendererEvent,
   createUpdateValueNodeMutation,
   SEnvWindowOpenedEventInterface,
@@ -344,9 +345,12 @@ function* handleSyntheticWindowInstance(window: SEnvWindowInterface, browserId: 
 }
 
 const getAllWindowObjects = (window: SEnvWindowInterface) => {
-  const allNodes = {};
-  window.childObjects.forEach((value, key) => allNodes[key] = value.struct);
-  return allNodes;
+  const allChildStructs = {};
+  const childObjects = flattenWindowObjectSources(window.struct);
+  for (const key in childObjects) {
+    allChildStructs[key] = childObjects[key].struct;
+  }
+  return allChildStructs;
 }
 
 function* handleSyntheticWindowEvents(window: SEnvWindowInterface, browserId: string) {
@@ -430,8 +434,8 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
 
   yield fork(function* handleRemoveNode() {
     while(true) {
-      const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
-      const target = window.childObjects.get(itemId) as Node;
+      const {itemType, itemId}: Removed = (yield take((action: Removed) => action.type === REMOVED && isSyntheticNodeType(action.itemType) && !!flattenWindowObjectSources(window.struct)[action.itemId]));
+      const target = flattenWindowObjectSources(window.struct)[itemId] as Node;
       const parent = target.parentNode;
       const removeMutation = createParentNodeRemoveChildMutation(parent, target);
 
@@ -443,7 +447,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
 
   yield fork(function* handleMoveNode() {
     while(true) {
-      const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
+      const {itemType, itemId, point}: Moved = (yield take((action: Moved) => action.type === MOVED && isSyntheticNodeType(action.itemType) && !!flattenWindowObjectSources(window.struct)[action.itemId]));
 
       // compute based on the data currently in the store
       const syntheticWindow = getSyntheticWindow(yield select(), window.$id);
@@ -462,7 +466,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
         top: -syntheticWindow.bounds.top
       }));
 
-      const envElement = window.childObjects.get(syntheticNode.$id);
+      const envElement = flattenWindowObjectSources(window.struct)[syntheticNode.$id] as any as HTMLElement;
 
       // TODO - get best CSS style
       if (computedStyle.position === "static") {
@@ -480,7 +484,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
   yield fork(function*() {
     while(true) {
       const { syntheticNodeId, textContent } = (yield takeWindowAction(SYNTHETIC_NODE_TEXT_CONTENT_CHANGED)) as SyntheticNodeTextContentChanged;
-      const syntheticNode = window.childObjects.get(syntheticNodeId);
+      const syntheticNode = flattenWindowObjectSources(window.struct)[syntheticNodeId] as SEnvNodeInterface;
       syntheticNode.textContent = textContent;
     }
   }); 
@@ -490,7 +494,7 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
   yield fork(function* handleNodeStoppedEditing() {
     while(true) {
       const { nodeId } = (yield takeWindowAction(NODE_VALUE_STOPPED_EDITING)) as SyntheticNodeValueStoppedEditing;
-      const node = window.childObjects.get(nodeId) as HTMLElement;
+      const node = flattenWindowObjectSources(window.struct)[nodeId] as any as HTMLElement;
       const mutation = createSetElementTextContentMutation(node, node.textContent);
 
       yield request(deferApplyFileMutationsRequest(mutation));
@@ -499,10 +503,10 @@ function* handleSyntheticWindowMutations(window: SEnvWindowInterface) {
 
   yield fork(function* handleMoveNodeStopped() {
     while(true) {
-      const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType) && window.childObjects.get(action.itemId)));
+      const {itemType, itemId}: Moved = (yield take((action: Moved) => action.type === STOPPED_MOVING && isSyntheticNodeType(action.itemType) && !!flattenWindowObjectSources(window.struct)[action.itemId]));
 
       yield spawn(function*() {
-        const target = window.childObjects.get(itemId) as HTMLElement;
+        const target = flattenWindowObjectSources(window.struct)[itemId] as any as HTMLElement;
 
         target.style.transition = "";
         // TODO - prompt where to persist style

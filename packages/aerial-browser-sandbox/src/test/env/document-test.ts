@@ -4,7 +4,6 @@ import { timeout } from "../utils";
 import { openTestWindow, waitForDocumentComplete, wrapHTML } from "./utils";
 import { 
   diffDocument,
-  patchDocument,
   getSEnvWindowClass, 
   openSyntheticEnvironmentWindow, 
 } from "../../environment";

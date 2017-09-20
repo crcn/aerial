@@ -1,6 +1,6 @@
 import { SyntheticWindow, createSyntheticWindow } from "../state";
 import { getSEnvLocationClass } from "./location";
-import { Dispatcher, weakMemo, Mutation, generateDefaultId, mergeBounds, Rectangle } from "aerial-common2";
+import { Dispatcher, weakMemo, Mutation, Mutator, generateDefaultId, mergeBounds, Rectangle } from "aerial-common2";
 import { clamp } from "lodash";
 import { getSEnvEventTargetClass, getSEnvEventClasses, SEnvMutationEventInterface } from "./events";
 import { SyntheticWindowRendererInterface, createNoopRenderer, SyntheticDOMRendererFactory, SyntheticWindowRendererEvent } from "./renderers";
@@ -12,15 +12,12 @@ import {
   getSEnvElementClass, 
   getSEnvHTMLElementClass, 
   SEnvDocumentInterface, 
-  patchDocument, 
-  patchParentNode, 
-  patchValueNode, 
+  flattenDocumentSources,
   diffDocument, 
   diffComment, 
   filterNodes,
   diffHTMLNode,
-  patchHTMLNode,
-  patchBaseElement
+  documentMutators,
 } from "./nodes";
 import { getSEnvCustomElementRegistry } from "./custom-element-registry";
 import nwmatcher = require("nwmatcher");
@@ -31,6 +28,7 @@ type OpenTarget = "_self" | "_blank";
 export interface SEnvWindowInterface extends Window {
   uid: string;
   $id: string;
+  didChange();
   $load();
   fetch: Fetch;
   struct: SyntheticWindow;
@@ -41,7 +39,6 @@ export interface SEnvWindowInterface extends Window {
   // particularly to point generated source map URIs to 
   // proxies to handle any file mutations
   getSourceUri(uri: string);
-  readonly childObjects: Map<string, any>;
   renderer:  SyntheticWindowRendererInterface;
   $selector: any;
   clone(): SEnvWindowInterface;
@@ -386,6 +383,10 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
         return false;
       });
     }
+    
+    didChange() {
+      this._struct = undefined;
+    }
 
     get renderer() {
       return this._renderer;
@@ -490,7 +491,7 @@ export const getSEnvWindowClass = weakMemo((context: SEnvWindowContext) => {
       const window = new SEnvWindow(this.location.toString());
       window.$id = this.$id;
       if (deep !== false) {
-        window.document.$$setID(this.document.$id);
+        window.document.$id = this.document.$id;
         patchWindow(window, diffWindow(window, this));
       }
       return window;
@@ -687,30 +688,27 @@ export const diffWindow = (oldWindow: SEnvWindowInterface, newWindow: SEnvWindow
   return diffDocument(oldWindow.document, newWindow.document);
 };
 
-export const patchWindow = (oldWindow: SEnvWindowInterface, mutations: Mutation<any>[]) => {
-  const { childObjects } = oldWindow;
-  for (const mutation of mutations) {
-    const target = childObjects.get(mutation.target.$id);
-    if (target.nodeType != null) {
-      patchNode(target, mutation);
-    }
-  }
-}
+export const flattenWindowObjectSources = weakMemo((window: SyntheticWindow) => {
+  return flattenDocumentSources(window.document);
+});
 
-export const patchNode = (node: Node, mutation: Mutation<any>) => {
-  switch(node.nodeType) {
-    case SEnvNodeTypes.TEXT:
-    case SEnvNodeTypes.COMMENT: {
-      patchValueNode(node as any, mutation);
-      break;
+export const windowMutators = {
+  ...documentMutators
+};
+
+export const patchWindow = (oldWindow: SEnvWindowInterface, mutations: Mutation<any>[]) => {
+  const childObjects = flattenWindowObjectSources(oldWindow.struct);
+  for (const mutation of mutations) {
+    const target = childObjects[mutation.target.$id];
+    if (!target) {
+      throw new Error(`Unable to find target for mutation ${mutation.$type}`);
     }
-    case SEnvNodeTypes.ELEMENT: {
-      patchHTMLNode(node as any, mutation);
-      break;      
+    const mutate = windowMutators[mutation.$type] as Mutator<any, any>;
+
+    if (!mutate) {
+      throw new Error(`Unable to find window mutator for ${mutation.$type}`);
     }
-    case SEnvNodeTypes.DOCUMENT: {
-      patchDocument(node as SEnvDocumentInterface, mutation);
-      break;
-    }
+
+    mutate(target, mutation);
   }
 }

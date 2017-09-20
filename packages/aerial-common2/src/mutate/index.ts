@@ -7,9 +7,12 @@ export const REMOVE_CHILD_MUTATION = "REMOVE_CHILD_MUTATION";
 export const SET_PROPERTY_MUTATION = "SET_PROPERTY_MUTATION";
 export const REMOVE_MUTATION       = "REMOVE_MUTATION";
 
+
 export type Mutation<T> = {
   target?: T
 } & Struct;
+
+export type Mutator<TTarget, TMutation extends Mutation<TTarget>> = (TTarget, TMutation) => any;
 
 export type SetValueMutation<T> = {
   newValue: any

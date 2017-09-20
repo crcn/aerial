@@ -14,15 +14,15 @@ import { 
   createRemoveChildMutation,
 } from "aerial-common2";
 import { SEnvWindowInterface } from "../window";
-import { getSEnvNodeClass, SEnvNodeInterface, patchValueNode } from "./node";
-import { getSEnvParentNodeClass, diffParentNode, patchParentNode, SEnvParentNodeInterface, SEnvParentNodeMutationTypes } from "./parent-node";
+import { getSEnvNodeClass, SEnvNodeInterface } from "./node";
+import { getSEnvParentNodeClass, diffParentNode, SEnvParentNodeInterface, SEnvParentNodeMutationTypes, parentNodeMutators } from "./parent-node";
 import { diffBaseNode } from "./element";
 import { getL3EventClasses } from "../level3";
 import { getSEnvEventClasses, SEnvMutationEventInterface } from "../events";
 import { getSEnvHTMLCollectionClasses, SEnvNodeListInterface } from "./collections";
 import { getSEnvTextClass, SEnvTextInterface } from "./text";
 import { getSEnvCommentClass, SEnvCommentInterface } from "./comment";
-import { SEnvHTMLElementInterface, getSEnvHTMLElementClass, diffHTMLNode, patchHTMLNode } from "./html-elements";
+import { SEnvHTMLElementInterface, getSEnvHTMLElementClass, diffHTMLNode, baseHTMLElementMutators, flattenNodeSources } from "./html-elements";
 import { SEnvNodeTypes } from "../constants";
 import { parseHTMLDocument, constructNodeTree, whenLoaded, mapExpressionToNode } from "./utils";
 import { getSEnvDocumentFragment } from "./fragment";
@@ -129,7 +129,6 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     constructor(readonly defaultView: SEnvWindowInterface) {
       super();
       this.addEventListener("readystatechange", e => this.onreadystatechange && this.onreadystatechange(e));
-      defaultView.childObjects.set(this.$id, this);
     }
 
     get stylesheets(): StyleSheetList {
@@ -662,6 +661,12 @@ export const getSEnvDocumentClass = weakMemo((context: any) => {
     exitFullscreen(): void {
 
     }
+
+    didChange() {
+      super.didChange();
+      (this.defaultView as SEnvWindowInterface).didChange();
+    }
+
     exitPointerLock(): void {
 
     }
@@ -829,12 +834,24 @@ export const diffDocument = (oldDocument: SEnvDocumentInterface, newDocument: SE
   ];
 };
 
-export const patchDocument = (oldDocument: SEnvDocumentInterface, mutation: Mutation<any>) => {
-  patchParentNode(oldDocument, mutation);
-  if (mutation.$type === READY_STATE_CHANGE) {
-    oldDocument.$$setReadyState((mutation as SetValueMutation<SEnvDocumentInterface>).newValue);
+export const documentMutators = {
+  ...parentNodeMutators,
+  ...baseHTMLElementMutators,
+  [READY_STATE_CHANGE](target: SEnvDocumentInterface, mutation: SetValueMutation<SEnvDocumentInterface>) {
+    target.$$setReadyState((mutation as SetValueMutation<SEnvDocumentInterface>).newValue);
   }
 };
+
+export const flattenDocumentSources = weakMemo((document: SyntheticDocument) => {
+  return flattenNodeSources(document);
+});
+
+// export const patchDocument = (oldDocument: SEnvDocumentInterface, mutation: Mutation<any>) => {
+//   patchParentNode(oldDocument, mutation);
+//   if (mutation.$type === READY_STATE_CHANGE) {
+//     oldDocument.$$setReadyState((mutation as SetValueMutation<SEnvDocumentInterface>).newValue);
+//   }
+// };
 
 
 export const waitForDocumentComplete = (window: Window) => new Promise((resolve) => {

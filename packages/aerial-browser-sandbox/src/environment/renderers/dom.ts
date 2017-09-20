@@ -1,11 +1,11 @@
-import { debounce, throttle } from "lodash";
+import { debounce, throttle, values } from "lodash";
 import { SEnvNodeTypes } from "../constants";
 import { SEnvNodeInterface } from "../nodes";
-import { SEnvWindowInterface, patchWindow, patchNode } from "../window";
+import { SEnvWindowInterface, patchWindow, windowMutators, flattenWindowObjectSources } from "../window";
 import { SEnvParentNodeMutationTypes, createParentNodeInsertChildMutation, SEnvParentNodeInterface, SEnvCommentInterface, SEnvElementInterface, SEnvTextInterface, createParentNodeRemoveChildMutation } from "../nodes";
 import { SEnvMutationEventInterface } from "../events";
 import { BaseSyntheticWindowRenderer } from "./base";
-import { InsertChildMutation, RemoveChildMutation, MoveChildMutation, Mutation } from "aerial-common2";
+import { InsertChildMutation, RemoveChildMutation, MoveChildMutation, Mutation, Mutator } from "aerial-common2";
 import { SET_SYNTHETIC_SOURCE_CHANGE } from "../nodes";
 import { getNodeByPath, getNodePath } from "../../utils";
 
@@ -116,7 +116,8 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
   }
 
   private _applyMutation(mutation: Mutation<any>) {
-    const targetNode = getNodeByPath(getNodePath(this._sourceWindow.childObjects.get(mutation.target.$id), this._sourceWindow.document), this.mount.lastElementChild);
+
+    const targetNode = getNodeByPath(getNodePath(flattenWindowObjectSources(this._sourceWindow.struct)[mutation.target.$id], this._sourceWindow.document), this.mount.lastElementChild);
 
     if (mutation.$type === SEnvParentNodeMutationTypes.MOVE_CHILD_NODE_EDIT) {
     } else if (mutation.$type === SEnvParentNodeMutationTypes.INSERT_CHILD_NODE_EDIT) {
@@ -127,7 +128,8 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
       mutation = createParentNodeRemoveChildMutation(targetNode, null, removeChildMutation.index);
     }
 
-    patchNode(targetNode, mutation);
+    // Fix me -- don't use any key
+    (windowMutators[mutation.$type] as Mutator<any, any>)(targetNode, mutation);
   }
 
   protected _onWindowResize(event: Event) {
@@ -158,8 +160,8 @@ export class SyntheticDOMRenderer extends BaseSyntheticWindowRenderer {
     const allComputedStyles = {};
     const childObjectsByUID = {}; 
     
-    for (const child of Array.from(this.sourceWindow.childObjects.values())) {
-      childObjectsByUID[child.uid] = child;
+    for (const child of Array.from(values(flattenWindowObjectSources(this.sourceWindow.struct)))) {
+      childObjectsByUID[(child as any).uid] = child;
     }
     Array.prototype.forEach.call(this.mount.lastElementChild.querySelectorAll("*"), (element) => {
       const sourceUID = element.dataset.sourceUID;

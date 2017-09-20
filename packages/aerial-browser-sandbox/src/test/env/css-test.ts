@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { SEnvWindowInterface, diffCSSStyleSheet, patchCSSStyleSheet, flattenSyntheticCSSStyleSheetSources, SEnvCSSStyleSheetInterface } from "../../environment";
-import { wrapHTML, openTestWindow, waitForDocumentComplete, stripWhitespace } from "./utils";
+import { wrapHTML, openTestWindow, waitForDocumentComplete, stripCSSWhitespace } from "./utils";
 
 describe(__filename + "#", () => {
   describe("basic", () => {
@@ -85,7 +85,24 @@ describe(__filename + "#", () => {
       const rule = (style.sheet as CSSStyleSheet).cssRules.item(0) as CSSKeyframesRule;
       expect(rule.cssRules.length).to.eql(1);
     }); 
+
+    it("can parse a media rule", async () => {
+      const window = await openTestWindow(wrapHTML(`
+      <style>
+        @media screen {
+          .container {
+            color: red;
+          }
+        }
+      </style>`));
+      await waitForDocumentComplete(window);
+      const style = window.document.querySelector("style") as HTMLStyleElement;
+      const rule = (style.sheet as CSSStyleSheet).cssRules.item(0) as CSSMediaRule;
+      expect(rule.conditionText).to.eql(`screen`);
+      expect(rule.cssRules.length).to.eql(1);
+    }); 
   });
+
   describe("diff/patch#", () => {
     [
       [
@@ -95,7 +112,35 @@ describe(__filename + "#", () => {
       [
         `a { color: red; }`,
         `b { color: red; }`
-      ]
+      ],
+      [
+        `a { color: red; }`,
+        `b { color: red; } c { color: red; }`
+      ],
+      [
+        `a { color: red; } c { color: red; }`,
+        `c { color: red; } a { color: red; }`
+      ],
+      [
+        `a { color: red; } c { color: red; }`,
+        `c { color: red; }`
+      ],
+      [
+        `a { } b { } c { } d { }`,
+        `d { } c { } b { } a { }`,
+      ],
+      [
+        `@media screen { a { color: red; } }`,
+        `@media screen2 { a { color: red; } }`
+      ],
+      [
+        `@media screen { a { color: red; } }`,
+        `@media screen { b { color: red; } }`
+      ],
+      [
+        `@media screen { a { color: red; } }`,
+        `@media screen { a { color: blue; } }`
+      ],
     ].forEach((variants) => {
       it(`can diff & patch ${variants.join(" -> ")}`, async () => {
         let main: SEnvWindowInterface;
@@ -121,7 +166,7 @@ describe(__filename + "#", () => {
             patchCSSStyleSheet(target, mutation);
           }
           
-          expect(stripWhitespace((main.document.styleSheets[0] as CSSStyleSheet).cssText)).to.eql(stripWhitespace(variant));
+          expect(stripCSSWhitespace((main.document.styleSheets[0] as CSSStyleSheet).cssText)).to.eql(stripCSSWhitespace(variant));
         }
       });
     });

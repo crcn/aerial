@@ -30,6 +30,7 @@ export interface SEnvNodeInterface extends Node {
   struct: SyntheticNode;
   source: ExpressionLocation;
   contentLoaded: Promise<any>;
+  didChange();
   interactiveLoaded: Promise<any>;
   connectedToDocument: boolean;
   $setOwnerDocument(document: SEnvDocumentInterface);
@@ -39,7 +40,6 @@ export interface SEnvNodeInterface extends Node {
   $$addedToDocument(deep?: boolean);
   $$removedFromDocument();
   $$preconstruct();
-  $$setID(value: string);
 };
 
 export const getSEnvNodeClass = weakMemo((context: any) => {
@@ -118,14 +118,6 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     }
 
-    $$setID(value: string) {
-      // quick fix. Don't this
-      const co = this._getDefaultView().childObjects;
-      co.delete(this.$id);
-      this.$id = value;
-      co.set(this.$id, this);
-    }
-
     $$preconstruct() {
       super.$$preconstruct();
       this.uid = this.$id = generateDefaultId();
@@ -144,6 +136,12 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       return this.parentNode.childNodes[Array.prototype.indexOf.call(this.parentNode.childNodes, this) - 1];
     }
 
+    didChange() {
+      if (this.parentNode && this._struct) {
+        (this.parentNode as SEnvNodeInterface).didChange();
+      }
+      this._struct = undefined;
+    }
 
     get parentNode() {
       return this.$$parentNode;
@@ -183,6 +181,7 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
         nodeType: this.nodeType,
         nodeName: this.nodeName,
         source: this.source,
+        instance: this,
         $type: this.structType,
         $id: this.$id
       };
@@ -273,7 +272,6 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
     }
 
     protected _onMutation(event: SEnvMutationEventInterface) {
-      this._struct = null;
     }
 
     replaceChild<T extends Node>(newChild: Node, oldChild: T): T {
@@ -289,8 +287,6 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
       this.connectedToDocument = true;
       this.connectedCallback();
 
-      // TODO - don't mutate state here (CC)
-      this._getDefaultView().childObjects.set(this.$id, this);
       if (deep !== false) {
         for (const child of this.childNodes) {
           child.$$addedToDocument();
@@ -317,7 +313,6 @@ export const getSEnvNodeClass = weakMemo((context: any) => {
 
     $$removedFromDocument() {
       this.connectedToDocument = false;
-      this._getDefaultView().childObjects.delete(this.$id);
     }
 
     dispatchEvent(event: Event): boolean {
@@ -362,6 +357,7 @@ export const getSEnvValueNode = weakMemo((context) => {
     set nodeValue(value: string) {
       this._nodeValue = value;
       this.dispatchMutationEvent(createPropertyMutation(UPDATE_VALUE_NODE, this, "nodeValue", value, undefined));
+      this.didChange();
     }
   }
 });
@@ -378,9 +374,9 @@ export const diffNodeBase = (oldNode: Partial<SEnvNodeInterface>, newNode: Parti
   return mutations;
 };
 
-export const patchBaseNode = (oldNode: Partial<SEnvNodeInterface>, mutation: Mutation<any>) => {
-  if (mutation.$type === SET_SYNTHETIC_SOURCE_CHANGE && oldNode.setSource) {
-    oldNode.setSource(JSON.parse(JSON.stringify((mutation as SetPropertyMutation<any>).newValue)) as ExpressionLocation);
+export const nodeMutators = {
+  [SET_SYNTHETIC_SOURCE_CHANGE](oldNode: SEnvNodeInterface, {newValue}: SetPropertyMutation<any>) {
+    oldNode.setSource(JSON.parse(JSON.stringify(newValue)) as ExpressionLocation);
   }
 };
 
@@ -398,10 +394,13 @@ export const diffValueNode = (oldNode: BasicValueNode, newNode: BasicValueNode) 
   return [...mutations, ...diffNodeBase(oldNode, newNode)];
 };
 
-export const patchValueNode = (oldNode: BasicValueNode, mutation: Mutation<any>) => {
-  if (mutation.$type === UPDATE_VALUE_NODE) {
-    oldNode.nodeValue = (mutation as SetValueMutation<any>).newValue;
-  } else {
-    patchBaseNode(oldNode, mutation);
+export const valueNodeMutators = {
+  [UPDATE_VALUE_NODE](oldNode: BasicValueNode, { newValue }: SetValueMutation<any>) {
+    oldNode.nodeValue = newValue;
   }
+};
+
+export const baseNodeMutators = {
+  ...nodeMutators,
+  ...valueNodeMutators
 };

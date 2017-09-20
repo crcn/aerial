@@ -13,8 +13,9 @@ html, body {
   }
 }
 
-@media screen {
+@media screen and (max-width: 1000px) and (min-width: 700px) {
   .items {
     color: red;
   }
 }
+

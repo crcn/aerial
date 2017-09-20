@@ -94,7 +94,7 @@ export const evaluateCSS = (source: string, sourceURI: string, context: any, map
     if (atRule.name === "keyframes") {
       return link(atRule, new SEnvCSSKeyframesRule(atRule.params, acceptAll(atRule.nodes)));
     } else if (atRule.name === "media") {
-      return link(atRule, new SEnvCSSMediaRule(acceptAll(atRule.nodes)));
+      return link(atRule, new SEnvCSSMediaRule(atRule.params, acceptAll(atRule.nodes)));
     } else if (atRule.name === "font-face") {
       return link(atRule, new SEnvCSSFontFace(getStyleDeclaration(atRule.nodes as postcss.Declaration[])));
     }
