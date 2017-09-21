@@ -1,1 +1,1 @@
-#### Aerial has been moved back to the main [Tandem](http://github.com/crcn/tandem) repository.
+#### Aerial has been moved back to the [Tandem](http://github.com/crcn/tandem) repository.
